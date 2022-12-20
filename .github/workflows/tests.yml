@@ -104,7 +104,7 @@ jobs:
       - name: mypy_checks
         run: |
           poetry install
-          poetry run mypy ./qter
+          poetry run mypy ./qtier
 
   publish:
     runs-on: ubuntu-latest
