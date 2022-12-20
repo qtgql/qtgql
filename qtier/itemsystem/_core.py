@@ -11,15 +11,15 @@ from typing import (
     get_args,
 )
 
-from PySide6.QtCore import QModelIndex
 import attr as attr
 import attrs
 from attrs import NOTHING, asdict, define
 from qtpy import QtCore as qtc
+from qtpy.QtCore import QModelIndex
 from typing_extensions import dataclass_transform
 
-from qter import slot
-from qter.exceptions import QtHackException
+from qtier import slot
+from qtier.exceptions import QtHackException
 
 UNSET = TypeVar("UNSET")
 IS_GQL = "is_gql"
@@ -228,16 +228,26 @@ class GenericModel(Generic[T], qtc.QAbstractListModel):
             try:
                 return getattr(self._data[index.row()], self.roles.by_num[role].name, None)
             except KeyError as exc:
+                if role in (
+                    -1,
+                    qtc.Qt.ItemDataRole.DisplayRole,
+                    qtc.Qt.ItemDataRole.ToolTipRole,
+                    qtc.Qt.ItemDataRole.StatusTipRole,
+                    qtc.Qt.ItemDataRole.WhatsThisRole,
+                    qtc.Qt.ItemDataRole.SizeHintRole,
+                    qtc.Qt.ItemDataRole.FontRole,
+                    qtc.Qt.ItemDataRole.BackgroundRole,
+                    qtc.Qt.ItemDataRole.ForegroundRole,
+                    qtc.Qt.ItemDataRole.DecorationRole,
+                    qtc.Qt.ItemDataRole.TextAlignmentRole,
+                    qtc.Qt.ItemDataRole.CheckStateRole,
+                ):
+                    return None
                 # resolvers should be pre-evaluated when the model updated
                 raise RoleDoesNotExist(
                     f"role {role} of type {self.type_} at index: [{index}] "
                     f"is not a valid role!\n"
                     f"options are: {self.roles.qt_roles}"
-                ) from exc
-            except IndexError as exc:  # pragma: no cover
-                raise IndexError(
-                    f"index [{index.row()}] of type {self.type_} could not be resolved"
-                    f"max index is {self.rowCount()}"
                 ) from exc
 
         return None

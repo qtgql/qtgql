@@ -11,8 +11,8 @@ from qtpy import QtCore as qtc
 from qtpy import QtNetwork as qtn
 from qtpy import QtWebSockets as qtws
 
-from qter import slot
-from qter.gql.gqlcore import UNSET, EncodeAble, GqlEncoder, QueryPayload, T
+from qtier import slot
+from qtier.gql.gqlcore import UNSET, EncodeAble, GqlEncoder, QueryPayload, T
 
 logger = logging.getLogger(__name__)
 

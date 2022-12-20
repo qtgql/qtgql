@@ -6,7 +6,7 @@ from attrs import asdict
 import pytest
 from qtpy import QtCore as qtc
 
-from qter.itemsystem import GenericModel, RoleDoesNotExist, define_roles, role
+from qtier.itemsystem import GenericModel, RoleDoesNotExist, define_roles, role
 
 NORMAL_GQL = "normal_gql"
 NORMAL_GQL_CAMELIZED = "normalGql"
@@ -88,12 +88,16 @@ class Test_roleDefined:
 
 class TestGenericModel:
     @pytest.fixture
-    def full_model(self) -> GenericModel[FullClass]:
-        return FullClass.Model([init_dict_fullClass() for _ in range(10)])
+    def full_model(self, qtbot, qtmodeltester) -> GenericModel[FullClass]:
+        model = FullClass.Model([init_dict_fullClass() for _ in range(10)])
+        yield model
+        qtmodeltester.check(model, force_py=True)
 
     @pytest.fixture
-    def model_with_child(self) -> GenericModel[WithChild]:
-        return WithChild.Model([init_dict_withChild() for _ in range(3)])
+    def model_with_child(self, qtbot, qtmodeltester) -> GenericModel[WithChild]:
+        model = WithChild.Model([init_dict_withChild() for _ in range(3)])
+        yield model
+        qtmodeltester.check(model)
 
     def test_get_role_names(self):
         @define_roles
@@ -118,7 +122,10 @@ class TestGenericModel:
 
     def test_get_data_wrong_role_raises_exception(self, full_model):
         with pytest.raises(RoleDoesNotExist):
-            full_model.data(full_model.index(0), 0)
+            full_model.data(full_model.index(0), 999)
+
+    def test_get_data_wrong_index_returns_None(self, full_model):
+        assert full_model.data(full_model.index(999, 999), 256) is None
 
     def test_child_creates_model(self, full_model):
         model = WithChild.Model([init_dict_withChild() for _ in range(3)])

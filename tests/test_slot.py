@@ -5,7 +5,7 @@ from attr import define
 import pytest
 from qtpy.QtCore import QMetaMethod, QObject, Slot
 
-from qter import slot
+from qtier import slot
 
 
 class QObjectHelper(QObject):

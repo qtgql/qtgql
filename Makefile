@@ -1,4 +1,4 @@
 .PHONY : test
 
 test:
-	poetry run pytest --cov=qter --cov-report=xml
+	poetry run pytest --cov=qtier --cov-report=xml

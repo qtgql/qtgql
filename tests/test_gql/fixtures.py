@@ -6,7 +6,7 @@ import time
 
 import pytest
 
-from qter.gql.client import GqlClientMessage, GqlWsTransportClient, HandlerProto
+from qtier.gql.client import GqlClientMessage, GqlWsTransportClient, HandlerProto
 
 
 @dataclass

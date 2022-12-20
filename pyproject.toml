@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "qter"
+name = "qtier"
 version = "0.1.0"
-packages = [{ include = "qter" }]
+packages = [{ include = "qtier" }]
 description = "Cuter approuch to Qt-for-python, with focus on type hints."
 authors = ["Nir <88795475+nrbnlulu@users.noreply.github.com>"]
 license = "MIT"
@@ -29,7 +29,7 @@ build-backend = "poetry.core.masonry.api"
 
 
 [tool.mypy]
-plugins = ['qter/ext/mypy_plugin.py']
+plugins = ['qtier/ext/mypy_plugin.py']
 ignore_missing_imports = "True"
 
 
@@ -64,7 +64,7 @@ markers = [
     "no_captcha: This test requires that `LOGIN_REQUIRE_CAPTCHA=False` on the server",
 ]
 [tool.coverage.run]
-omit = ['test_*', 'tests/*', 'qter/ext/*']
+omit = ['test_*', 'tests/*', 'qtier/ext/*']
 relative_files = true
 
 [tool.coverage.report]
