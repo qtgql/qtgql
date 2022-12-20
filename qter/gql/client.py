@@ -55,7 +55,7 @@ class SubscribeResponseMessage(BaseGqlWsTransportMessage):
     id: str
 
 
-class HandlerProto(typing.Protocol):
+class HandlerProto(typing.Protocol):  # pragma: no cover
     message: GqlClientMessage
 
     @abstractmethod

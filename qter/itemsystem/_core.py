@@ -234,7 +234,7 @@ class GenericModel(Generic[T], qtc.QAbstractListModel):
                     f"is not a valid role!\n"
                     f"options are: {self.roles.qt_roles}"
                 ) from exc
-            except IndexError as exc:
+            except IndexError as exc:  # pragma: no cover
                 raise IndexError(
                     f"index [{index.row()}] of type {self.type_} could not be resolved"
                     f"max index is {self.rowCount()}"
