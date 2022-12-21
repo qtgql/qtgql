@@ -121,8 +121,8 @@ def test_header_authentications_headers(qtbot, mini_server):
     authorized_client.query(subscriber)
 
     def cond():
-        assert subscriber.data
+        assert subscriber.completed
 
-    qtbot.wait_until(cond)
+    qtbot.wait_until(cond, timeout=2000)
     assert subscriber.data == {"isAuthenticated": token}
     assert not authorized_client.handlers
