@@ -103,7 +103,6 @@ jobs:
 
       - name: mypy_checks
         run: |
-          poetry install
           poetry run mypy ./qtier
 
   publish:

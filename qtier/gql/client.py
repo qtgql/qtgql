@@ -238,7 +238,7 @@ class GqlWsTransportClient(qtws.QWebSocket):
 
     def _on_gql_complete(self, message: SubscribeResponseMessage) -> None:
         handler = self.handlers.pop(message.id)
-        handler.on_completed()
+        handler.on_completed(message)
 
     def _on_gql_next(self, message: SubscribeResponseMessage) -> None:
         if message.payload:

@@ -1,10 +1,33 @@
 import asyncio
-from typing import AsyncGenerator
+import random
+from typing import AsyncGenerator, Optional
 
 from aiohttp import web
+from faker import Faker
 import strawberry
 from strawberry.aiohttp.views import GraphQLView
 from strawberry.types import Info
+
+fake = Faker()
+
+
+@strawberry.type
+class Worm:
+    name: str = strawberry.field(default_factory=fake.name)
+    family: str = strawberry.field(
+        default_factory=lambda: random.choice(
+            ["Platyhelminthes", "Annelida", "Nemertea", "Nematoda", "Acanthocephala"]
+        )
+    )
+    size: int = strawberry.field(default_factory=lambda: random.randint(10, 100))
+
+
+@strawberry.type
+class Apple:
+    size: int = strawberry.field(default_factory=lambda: random.randint(10, 100))
+    owner: str = strawberry.field(default_factory=fake.name)
+    worms: Optional[list[Worm]] = strawberry.field()
+    color: str = strawberry.field(default_factory=fake.color)
 
 
 @strawberry.type
@@ -16,6 +39,10 @@ class Query:
     @strawberry.field
     def is_authenticated(self, info: Info) -> str:
         return info.context["request"].headers["Authorization"]
+
+    @strawberry.field
+    def apples(self) -> list[Apple]:
+        return [Apple(worms=[Worm() for _ in range(5)] if fake.pybool() else []) for _ in range(30)]
 
 
 @strawberry.type

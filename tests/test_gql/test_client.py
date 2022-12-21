@@ -1,5 +1,5 @@
-from PySide6.QtNetwork import QAbstractSocket
 import pytest
+from qtpy.QtNetwork import QAbstractSocket
 
 from qtier.gql.client import PROTOCOL, GqlWsTransportClient, SubscribeResponseMessage
 from qtier.gql.gqlcore import QueryPayload

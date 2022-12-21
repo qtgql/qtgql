@@ -165,7 +165,7 @@ class TestGenericModel:
         original_data.pop(1)
         assert original_data == full_model._data
 
-    @patch("PySide6.QtCore.QAbstractListModel.endRemoveRows")
+    @patch("qtpy.QtCore.QAbstractListModel.endRemoveRows")
     def test_clear(self, mock, qtbot, full_model):
         assert full_model.rowCount() > 0
         with qtbot.wait_signal(full_model.rowsAboutToBeRemoved):
