@@ -46,8 +46,8 @@ class EntryPoint(QObject):
         def on_error(self, message: dict) -> None:
             print(message)
 
-        def on_completed(self, message: dict) -> None:
-            print(message)
+        def on_completed(self) -> None:
+            ...
 
     def __init__(self, parent=None):
         super().__init__(parent)

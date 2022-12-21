@@ -83,5 +83,5 @@ class PseudoHandler(HandlerProto):
     def on_error(self, message) -> None:
         self.error = message
 
-    def on_completed(self, message: dict) -> None:
+    def on_completed(self) -> None:
         self.completed = True
