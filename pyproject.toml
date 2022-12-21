@@ -1,0 +1,73 @@
+[tool.poetry]
+name = "qtier"
+version = "0.1.0"
+packages = [{ include = "qtier" }]
+description = "Cuter approuch to Qt-for-python, with focus on type hints."
+authors = ["Nir <88795475+nrbnlulu@users.noreply.github.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.12"
+PySide6 = "^6.4.1"
+QtPy = "^2.3.0"
+attrs = "^22.1.0"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest-qt = "^4.2.0"
+pytest-cov = "^4.0.0"
+pre-commit = "^2.20.0"
+strawberry-graphql = ">=0.142.2"
+aiohttp = {extras = ["speedups"], version = "^3.8.3"}
+mypy = "^0.991"
+faker = "^15.3.4"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
+
+[tool.mypy]
+plugins = ['qtier/ext/mypy_plugin.py']
+ignore_missing_imports = "True"
+
+
+[tool.black]
+line-length = 100
+target-version = ['py310']
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | __pycached__
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+force_sort_within_sections = true
+
+
+[tool.pytest.ini_options]
+addopts = "--cov-config=pyproject.toml "
+markers = [
+    "no_captcha: This test requires that `LOGIN_REQUIRE_CAPTCHA=False` on the server",
+]
+[tool.coverage.run]
+omit = ['test_*', 'tests/*', 'qtier/ext/*']
+relative_files = true
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 96
