@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Material
 import com.props 1.0
-import "Icon.js" as MdiFont
 
 Pane {
     id: root
@@ -48,7 +47,7 @@ Pane {
             }
             TLabel {
                 id: appleIcon
-                text: MdiFont.Icon.apple
+                text: EntryPoint.icons.apple
                 color: appleDelegate.model.color
                 font.pointSize: appleDelegate.model.size
                 anchors {
@@ -90,7 +89,7 @@ Pane {
                         }
                     }
                     TLabel {
-                        text: MdiFont.Icon.ladybug
+                        text: EntryPoint.icons.ladybug
                         color: "pink"
                         anchors.right: parent.right
                     }

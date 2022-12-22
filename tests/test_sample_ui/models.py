@@ -1,4 +1,4 @@
-from qtier.itemsystem import define_roles, role
+from qtgql.itemsystem import define_roles, role
 
 
 @define_roles

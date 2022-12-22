@@ -1,4 +1,4 @@
 .PHONY : test
 
 test:
-	pytest --cov=qtier --cov-report=xml
+	pytest --cov=qtgql --cov-report=xml

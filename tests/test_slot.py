@@ -4,7 +4,7 @@ from attr import define
 import pytest
 from qtpy.QtCore import QMetaMethod, QObject, Signal, Slot
 
-from qtier import slot
+from qtgql import slot
 
 
 class QObjectHelper(QObject):

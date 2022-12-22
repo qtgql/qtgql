@@ -1,8 +1,8 @@
 import pytest
 from qtpy.QtNetwork import QAbstractSocket
 
-from qtier.gql.client import PROTOCOL, GqlWsTransportClient, SubscribeResponseMessage
-from qtier.gql.gqlcore import QueryPayload
+from qtgql.gqlcore.client import PROTOCOL, GqlWsTransportClient, SubscribeResponseMessage
+from qtgql.gqlcore.gqlcore import QueryPayload
 from tests.test_gql.fixtures import get_subscription_str
 
 pytest_plugins = ("tests.test_gql.fixtures",)

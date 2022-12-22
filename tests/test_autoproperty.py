@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING, Any, Optional
 
 from qtpy import QtCore as qtc
 
-from qtier.autoproperty import define_properties
+from qtgql.autoproperty import define_properties
 
 if TYPE_CHECKING:
 

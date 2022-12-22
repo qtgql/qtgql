@@ -1,17 +1,18 @@
 [tool.poetry]
-name = "qtier"
+name = "qtgql"
 version = "0.1.0"
-packages = [{ include = "qtier" }]
-description = "Cuter approuch to Qt-for-python, with focus on type hints."
+packages = [{ include = "qtgql" }]
+description = "Qt framework for building graphql driven QML applications"
 authors = ["Nir <88795475+nrbnlulu@users.noreply.github.com>"]
 license = "MIT"
 readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.12"
-PySide6 = "^6.4.1"
-QtPy = "^2.3.0"
-attrs = "^22.1.0"
+PySide6 = ">=6.4.1"
+QtPy = ">=2.3.0"
+nothing = "^0.0.3"
+pytest = "^7.2.0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -30,7 +31,7 @@ build-backend = "poetry.core.masonry.api"
 
 
 [tool.mypy]
-plugins = ['qtier/ext/mypy_plugin.py']
+plugins = ['qtgql/ext/mypy_plugin.py']
 ignore_missing_imports = "True"
 
 
@@ -65,7 +66,7 @@ markers = [
     "no_captcha: This test requires that `LOGIN_REQUIRE_CAPTCHA=False` on the server",
 ]
 [tool.coverage.run]
-omit = ['test_*', 'tests/*', 'qtier/ext/*']
+omit = ['test_*', 'tests/*', 'qtgql/ext/*']
 relative_files = true
 
 [tool.coverage.report]

@@ -7,10 +7,11 @@ from qtpy import QtCore, QtGui, QtQml, QtQuick
 from qtpy.QtCore import QObject, Signal
 from qtpy.QtQml import QQmlApplicationEngine
 
-from qtier import slot
-from qtier.gql.client import GqlClientMessage, GqlWsTransportClient, HandlerProto
-from qtier.itemsystem import GenericModel
+from qtgql import slot
+from qtgql.gqlcore.client import GqlClientMessage, GqlWsTransportClient, HandlerProto
+from qtgql.itemsystem import GenericModel
 from tests.test_sample_ui.models import Apple
+from tests.test_sample_ui.qml.icons import ICONS
 
 DEV = not os.environ.get("IS_GITHUB_ACTION", False)
 
@@ -76,6 +77,10 @@ class EntryPoint(QObject):
     @QtCore.Property(QtCore.QObject, constant=True)
     def appleModel(self) -> GenericModel[Apple]:
         return self.apple_model
+
+    @QtCore.Property('QVariant', constant=True)
+    def icons(self) -> dict:
+        return ICONS
 
     if DEV:  # pragma: no cover
 
