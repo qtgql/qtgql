@@ -1,16 +1,25 @@
-from typing import Protocol, Union, TypeVar, Generic, Callable, Optional, Any, Type, TYPE_CHECKING, ClassVar
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Generic,
+    Optional,
+    Protocol,
+    Type,
+    TypeVar,
+    Union,
+)
 from uuid import UUID
 
-import attrs
 from PySide6.QtCore import QModelIndex
-from attr import define
+import attrs
 from qtpy import QtCore as qtc
 
 from qtgql import slot
 from qtgql.exceptions import QtGqlException
 
 if TYPE_CHECKING:
-    from qtgql.itemsystem.role import RoleMapper, BaseRoleDefined
+    from qtgql.itemsystem.role import BaseRoleDefined, RoleMapper
     from qtgql.itemsystem.schema import Schema
 
 
@@ -18,14 +27,14 @@ class RoleDoesNotExist(QtGqlException):
     ...
 
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 class NodeProto(Protocol):
     uuid: Union[UUID, str]
 
 
-NodeT = TypeVar('NodeT', bound=NodeProto)
+NodeT = TypeVar("NodeT", bound=NodeProto)
 
 
 @attrs.define
@@ -46,11 +55,13 @@ class GenericModel(Generic[T], qtc.QAbstractListModel):
     layoutChanged: qtc.Signal
     dataChanged: Callable[[QModelIndex, QModelIndex, Optional[list[int]]], None]
 
-    def __init__(self, *, schema: 'Schema', data: Optional[Union[list[dict], dict]] = None, parent=None):
+    def __init__(
+        self, *, schema: "Schema", data: Optional[Union[list[dict], dict]] = None, parent=None
+    ):
         super().__init__(parent)
         self.schema = schema
         self.rowsAb = None
-        self.parent_model: Optional['GenericModel'] = parent
+        self.parent_model: Optional["GenericModel"] = parent
         self.type_ = self.__roledefined_type__
         self.roles: RoleMapper = self.type_.__roles__
         self._data: list[T] = []
@@ -91,18 +102,18 @@ class GenericModel(Generic[T], qtc.QAbstractListModel):
                 return getattr(self._data[index.row()], self.roles.by_num[role].name, None)
             except KeyError as exc:
                 if role in (
-                        -1,
-                        qtc.Qt.ItemDataRole.DisplayRole,
-                        qtc.Qt.ItemDataRole.ToolTipRole,
-                        qtc.Qt.ItemDataRole.StatusTipRole,
-                        qtc.Qt.ItemDataRole.WhatsThisRole,
-                        qtc.Qt.ItemDataRole.SizeHintRole,
-                        qtc.Qt.ItemDataRole.FontRole,
-                        qtc.Qt.ItemDataRole.BackgroundRole,
-                        qtc.Qt.ItemDataRole.ForegroundRole,
-                        qtc.Qt.ItemDataRole.DecorationRole,
-                        qtc.Qt.ItemDataRole.TextAlignmentRole,
-                        qtc.Qt.ItemDataRole.CheckStateRole,
+                    -1,
+                    qtc.Qt.ItemDataRole.DisplayRole,
+                    qtc.Qt.ItemDataRole.ToolTipRole,
+                    qtc.Qt.ItemDataRole.StatusTipRole,
+                    qtc.Qt.ItemDataRole.WhatsThisRole,
+                    qtc.Qt.ItemDataRole.SizeHintRole,
+                    qtc.Qt.ItemDataRole.FontRole,
+                    qtc.Qt.ItemDataRole.BackgroundRole,
+                    qtc.Qt.ItemDataRole.ForegroundRole,
+                    qtc.Qt.ItemDataRole.DecorationRole,
+                    qtc.Qt.ItemDataRole.TextAlignmentRole,
+                    qtc.Qt.ItemDataRole.CheckStateRole,
                 ):
                     return None
                 # resolvers should be pre-evaluated when the model updated
@@ -137,7 +148,7 @@ class GenericModel(Generic[T], qtc.QAbstractListModel):
         self._data.append(node)
         self.endInsertRows()
 
-    def update_child(self, node: 'NodeProto'):
+    def update_child(self, node: "NodeProto"):
         if self.update_node(node):
             return
 
@@ -166,7 +177,7 @@ class GenericModel(Generic[T], qtc.QAbstractListModel):
     # CLASS METHODS
     @classmethod
     def from_role_defined(
-            cls, type_: 'Type[BaseRoleDefined]', parent: Optional[Type["GenericModel"]] = None
+        cls, type_: "Type[BaseRoleDefined]", parent: Optional[Type["GenericModel"]] = None
     ) -> Type["GenericModel"]:
         bases = (cls,)
         if parent:

@@ -1,4 +1,4 @@
-from qtgql.itemsystem import GenericModel, role, BaseRoleDefined
+from qtgql.itemsystem import BaseRoleDefined, GenericModel, role
 from tests.test_itemsystem.fixtures import FullClass, WithChild, init_dict_fullClass
 
 
@@ -20,7 +20,7 @@ def test_role_fields_in_qt_roles():
 def test_roledefined_with_children_collects_them():
     roles = WithChild.__roles__
     assert roles.children
-    assert roles.children['child'].type.of_type[0].type is FullClass
+    assert roles.children["child"].type.of_type[0].type is FullClass
 
 
 def test_get_subclassed_model():

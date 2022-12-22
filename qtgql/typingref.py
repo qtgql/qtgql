@@ -1,4 +1,4 @@
-from typing import Union, get_args, get_origin, Optional, Type, Any, NamedTuple, Generic, TypeVar
+from typing import Any, NamedTuple, Optional, Type, Union, get_args, get_origin
 
 
 def is_optional(field) -> bool:
@@ -29,15 +29,13 @@ UNSET: Any = UnsetType()
 
 class TypeHinter(NamedTuple):
     type: Any  # noqa: A003
-    of_type: Optional[tuple['TypeHinter']]
+    of_type: Optional[tuple["TypeHinter"]]
+
     @classmethod
-    def from_annotations(cls, tp: Any) -> 'TypeHinter':
+    def from_annotations(cls, tp: Any) -> "TypeHinter":
         if args := get_args(tp):
             new_args = []
             for arg in args:
                 new_args.append(TypeHinter.from_annotations(arg))
             return TypeHinter(type=get_origin(tp), of_type=tuple(new_args))
         return TypeHinter(type=tp, of_type=None)
-
-
-

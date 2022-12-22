@@ -1,4 +1,4 @@
-from qtgql.itemsystem import BaseRoleDefined, role, GenericModel
+from qtgql.itemsystem import BaseRoleDefined, role
 from qtgql.itemsystem.schema import Schema
 
 pytest_plugins = ("tests.test_itemsystem.fixtures",)
@@ -9,7 +9,7 @@ def test_simple_schema():
         a: str = role()
 
     schema = Schema(query=Query)
-    assert schema.types['Query'] is Query
+    assert schema.types["Query"] is Query
 
 
 def test_nested_types():
@@ -31,8 +31,8 @@ def test_nested_types():
 
 def test_deferred_types():
     class Query(BaseRoleDefined):
-        a: list['A'] = role()
-        b: list['B'] = role()
+        a: list["A"] = role()
+        b: list["B"] = role()
 
     class A(BaseRoleDefined):
         a: int = role()

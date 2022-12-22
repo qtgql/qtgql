@@ -1,4 +1,4 @@
-from typing import Union, Optional, get_origin, get_args
+from typing import Optional, Union, get_args, get_origin
 
 import pytest
 
@@ -6,7 +6,6 @@ from qtgql.typingref import TypeHinter
 
 
 class TestRoleType:
-
     @pytest.mark.parametrize("tp", [int, float, str, bool, object])
     def test_simple_type(self, tp):
         th = TypeHinter.from_annotations(tp)

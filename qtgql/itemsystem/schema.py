@@ -1,22 +1,22 @@
 from typing import Optional, Type, TypeVar, Union
 from uuid import UUID
 
-from qtgql.itemsystem import GenericModel
-from qtgql.itemsystem.model import NodeProto, NodeHelper
-from qtgql.itemsystem.role import BaseRoleDefined, TypesStorage
+from qtgql.itemsystem.model import NodeHelper, NodeProto
+from qtgql.itemsystem.role import BaseRoleDefined
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 class Schema:
-    __slots__ = ('query', 'mutation', 'subscription', '_types', '_deferred_types', 'nodes', 'types')
+    __slots__ = ("query", "mutation", "subscription", "_types", "_deferred_types", "nodes", "types")
 
-    def __init__(self,
-                 *,
-                 query: Type[BaseRoleDefined],
-                 mutation: Optional[Type[BaseRoleDefined]] = None,
-                 subscriptions: Optional[Type[BaseRoleDefined]] = None
-                 ):
+    def __init__(
+        self,
+        *,
+        query: Type[BaseRoleDefined],
+        mutation: Optional[Type[BaseRoleDefined]] = None,
+        subscriptions: Optional[Type[BaseRoleDefined]] = None,
+    ):
         self.query = query
         self.mutation = mutation
         self.subscription = subscriptions

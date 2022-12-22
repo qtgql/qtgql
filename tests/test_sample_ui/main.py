@@ -78,7 +78,7 @@ class EntryPoint(QObject):
     def appleModel(self) -> GenericModel[Apple]:
         return self.apple_model
 
-    @QtCore.Property('QVariant', constant=True)
+    @QtCore.Property("QVariant", constant=True)
     def icons(self) -> dict:
         return ICONS
 

@@ -1,21 +1,15 @@
-import dataclasses
 from collections import defaultdict
-from typing import (
-    ClassVar,
-    Optional,
-    Type,
-    TypeVar, NamedTuple,
-)
-from typing_extensions import Self
+import dataclasses
+from typing import ClassVar, NamedTuple, Type, TypeVar
 
 import attr as attr
-import attrs
-from attrs import NOTHING, asdict, define
+from attrs import define
 from qtpy import QtCore as qtc
-from typing_extensions import dataclass_transform
+from typing_extensions import Self, dataclass_transform
+
+from qtgql.typingref import UNSET, TypeHinter
 
 from .model import GenericModel
-from qtgql.typingref import UNSET, TypeHinter
 
 IS_GQL = "is_gql"
 IS_ROLE = "is_role"
@@ -28,6 +22,7 @@ class Role:
     """
     provides metadata about a field in a define_roles decorated class
     """
+
     type: TypeHinter  # noqa: A003
     num: int
     name: str
@@ -52,7 +47,8 @@ class RoleMapper:
     A container that maps the roles of a defined class
     each map has a certain usage in the future.
     """
-    __slots__ = ('qt_roles', 'by_name', 'by_num', 'qt_roles', 'children', 'deferred')
+
+    __slots__ = ("qt_roles", "by_name", "by_num", "qt_roles", "children", "deferred")
 
     def __init__(self):
         # this is the real name of the field
@@ -70,8 +66,8 @@ class RoleMapper:
 
 
 def role(
-        default=None,
-        factory=UNSET,
+    default=None,
+    factory=UNSET,
 ):
     """
     role is optional by default.
@@ -82,7 +78,7 @@ def role(
     return dataclasses.field(
         default=dataclasses.MISSING if default is UNSET else default,
         default_factory=factory if factory else dataclasses.MISSING,
-        metadata={IS_ROLE: True}
+        metadata={IS_ROLE: True},
     )
 
 
@@ -101,9 +97,11 @@ class RoleDefinedMeta(type):
         # and avoid recursion
         if bases and not dataclasses.is_dataclass(cls):
             cls = dataclasses.dataclass(cls, kw_only=True, slots=True)
-            cls: 'BaseRoleDefined'
+            cls: "BaseRoleDefined"
             roles = RoleMapper()
-            for role_num, field in enumerate(dataclasses.fields(cls), int(qtc.Qt.ItemDataRole.UserRole)):
+            for role_num, field in enumerate(
+                dataclasses.fields(cls), int(qtc.Qt.ItemDataRole.UserRole)
+            ):
                 # assign role and check if not exists
                 python_name = field.name
                 if field_is(IS_ROLE, field):
@@ -117,7 +115,9 @@ class RoleDefinedMeta(type):
                         child_type = role_.type.of_type[0].type
                         # find forward references
                         if isinstance(child_type, str):
-                            cls.__deferred_types__[child_type].append(DeferredRole(role=role_, parent=cls))
+                            cls.__deferred_types__[child_type].append(
+                                DeferredRole(role=role_, parent=cls)
+                            )
                         else:
                             assert issubclass(child_type, BaseRoleDefined)
                             roles.children[role_.name] = child_type
@@ -128,8 +128,7 @@ class RoleDefinedMeta(type):
 
 
 class TypesStorage(dict):
-
-    def add(self, type_: Type['BaseRoleDefined']):
+    def add(self, type_: Type["BaseRoleDefined"]):
         super().__setitem__(type_.__name__, type_)
 
     def __setitem__(self, key, value):
@@ -138,7 +137,7 @@ class TypesStorage(dict):
 
 class DeferredRole(NamedTuple):
     role: Role
-    parent: 'BaseRoleDefined'
+    parent: "BaseRoleDefined"
 
 
 @dataclass_transform(
