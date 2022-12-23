@@ -1,47 +1,60 @@
-from qtgql.itemsystem import BaseRoleDefined, role
+from __future__ import annotations
+
+from qtgql.itemsystem import role
 from qtgql.itemsystem.schema import Schema
 
 pytest_plugins = ("tests.test_itemsystem.fixtures",)
 
 
-def test_simple_schema():
-    class Query(BaseRoleDefined):
+def test_simple_schema(types_storage):
+    @types_storage.register
+    class Query:
         a: str = role()
 
-    schema = Schema(query=Query)
+    schema = Schema(query=Query, types_storage=types_storage)
     assert schema.types["Query"] is Query
 
 
-def test_nested_types():
-    class A(BaseRoleDefined):
+def test_nested_types(types_storage):
+    @types_storage.register
+    class A:
         a: int = role()
 
-    class B(BaseRoleDefined):
+    @types_storage.register
+    class B:
         b: str = role()
 
-    class Query(BaseRoleDefined):
+    @types_storage.register
+    class Query:
         a: list[A] = role()
         b: list[B] = role()
 
-    schema = Schema(query=Query)
+    schema = Schema(query=Query, types_storage=types_storage)
     assert schema.types[Query.__name__] is Query
+    assert Query.__roles__.children["a"] is A
+    assert Query.__roles__.children["b"] is B
     assert schema.types[B.__name__] is B
     assert schema.types[A.__name__] is A
 
 
-def test_deferred_types():
-    class Query(BaseRoleDefined):
-        a: list["A"] = role()
-        b: list["B"] = role()
+def test_deferred_types(types_storage):
+    @types_storage.register
+    class Query:
+        a: list[A] = role()
+        b: list[B] = role()
 
-    class A(BaseRoleDefined):
+    @types_storage.register
+    class A:
         a: int = role()
 
-    class B(BaseRoleDefined):
+    @types_storage.register
+    class B:
         b: str = role()
 
-    schema = Schema(query=Query)
+    schema = Schema(query=Query, types_storage=types_storage)
     assert schema.types[Query.__name__] is Query
+    assert Query.__roles__.children["a"] is A
+    assert Query.__roles__.children["b"] is B
     assert schema.types[B.__name__] is B
     assert schema.types[A.__name__] is A
 

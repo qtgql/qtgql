@@ -1,9 +1,12 @@
+from __future__ import annotations
+
 from uuid import uuid4
 
-from attrs import asdict
 import pytest
 
-from qtgql.itemsystem import BaseRoleDefined, GenericModel, role
+from qtgql.itemsystem import BaseRoleDefined, role
+from qtgql.itemsystem.model import GenericModel
+from qtgql.itemsystem.role import TypesStorage
 from qtgql.itemsystem.schema import Schema
 
 NORMAL_GQL = "normal_gql"
@@ -17,7 +20,7 @@ NOT_A_CHILD = "not_a_child"
 class FullClass(BaseRoleDefined):
     normalGql: int = role()
     uuid: str = role(factory=lambda: uuid4().hex)
-    parent_ref: "WithChild" = role()
+    parent_ref: WithChild = role()
 
 
 def init_dict_fullClass():
@@ -28,7 +31,7 @@ class WithChild(BaseRoleDefined):
     uuid: str = role(factory=lambda: uuid4().hex)
     child: list[FullClass] = role()
     not_a_child: int = role()
-    parent_ref: "NestedX3" = role()
+    parent_ref: NestedX3 = role()
 
 
 def init_dict_withChild():
@@ -41,12 +44,17 @@ class NestedX3(BaseRoleDefined):
 
 
 def init_dict_nestedX3() -> dict:
-    return asdict(NestedX3(childX=[WithChild(**init_dict_withChild()) for _ in range(5)]))
+    return NestedX3(childX=[WithChild(**init_dict_withChild()) for _ in range(5)]).as_dict()
 
 
 @pytest.fixture(scope="session")
 def schema():
     return Schema(query=NestedX3)
+
+
+@pytest.fixture
+def types_storage() -> TypesStorage:
+    return TypesStorage()
 
 
 @pytest.fixture

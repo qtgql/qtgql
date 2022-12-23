@@ -5,50 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="288baa58-55a0-493e-a12a-9b49a4f1837e" name="Changes" comment="chore: migrate to graphql oriented library, deferred types work.">
-      <change afterPath="$PROJECT_DIR$/qtgql/exceptions.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/qtgql/itemsystem/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/qtgql/itemsystem/model.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/qtgql/itemsystem/role.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/qtgql/itemsystem/schema.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/qtgql/typingref.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tests/test_itemsystem/fixtures.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tests/test_itemsystem/test_define_roles.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tests/test_itemsystem/test_generic_model/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tests/test_itemsystem/test_generic_model/test_core.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tests/test_itemsystem/test_generic_model/test_updates.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tests/test_itemsystem/test_schema/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tests/test_itemsystem/test_schema/test_schema.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tests/test_sample_ui/qml/icons.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tests/test_typingref.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/workflows/tests.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/tests.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/Makefile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/poetry.lock" beforeDir="false" afterPath="$PROJECT_DIR$/poetry.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyproject.toml" beforeDir="false" afterPath="$PROJECT_DIR$/pyproject.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qtier/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/qtgql/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qtier/autoproperty.py" beforeDir="false" afterPath="$PROJECT_DIR$/qtgql/autoproperty.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qtier/exceptions.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qtier/ext/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/qtgql/ext/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qtier/ext/mypy_plugin.py" beforeDir="false" afterPath="$PROJECT_DIR$/qtgql/ext/mypy_plugin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qtier/gql/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/qtgql/gqlcore/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qtier/gql/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/qtgql/gqlcore/client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qtier/gql/gqlcore.py" beforeDir="false" afterPath="$PROJECT_DIR$/qtgql/gqlcore/gqlcore.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qtier/itemsystem/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qtier/itemsystem/_core.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qtier/py.typed" beforeDir="false" afterPath="$PROJECT_DIR$/qtgql/py.typed" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qtier/slot.py" beforeDir="false" afterPath="$PROJECT_DIR$/qtgql/slot.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qtier/typingref.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_autoproperty.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_autoproperty.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_gql/fixtures.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_gql/fixtures.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_gql/test_client.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_gql/test_client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_gql/test_handlers.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_gql/test_handlers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_itemsystem/test_core.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_sample_ui/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_sample_ui/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_sample_ui/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_sample_ui/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_sample_ui/qml/Icon.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_sample_ui/qml/RootRect.qml" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_sample_ui/qml/RootRect.qml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_sample_ui/qml/TLabel.qml" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_sample_ui/qml/TLabel.qml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_slot.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_slot.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/poetry.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/poetry.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/qter.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/qter.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qtgql/itemsystem/role.py" beforeDir="false" afterPath="$PROJECT_DIR$/qtgql/itemsystem/role.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qtgql/itemsystem/schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/qtgql/itemsystem/schema.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_itemsystem/fixtures.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_itemsystem/fixtures.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_itemsystem/test_schema/test_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_itemsystem/test_schema/test_schema.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -78,21 +46,21 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "/home/nir/Desktop/tzv5hob/qter/qtgql/itemsystem/role.py",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "editor.preferences.import",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/nir/Desktop/tzv5hob/qter/qtgql/itemsystem/role.py&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.import&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/tests/test_sample_ui/qml" />
@@ -105,7 +73,7 @@
       <recent name="$PROJECT_DIR$/qter" />
     </key>
   </component>
-  <component name="RunManager" selected="Python tests.pytest for tests.test_itemsystem">
+  <component name="RunManager" selected="Python tests.pytest for tests.test_itemsystem.test_schema.test_schema.test_simple_schema">
     <configuration name="Python tests for test_schema.test_deferred_types" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
       <module name="qter" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -169,7 +137,7 @@
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
-    <configuration name="pytest for tests.test_itemsystem.test_schema" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+    <configuration name="pytest for tests.test_itemsystem.test_schema.test_schema.test_simple_schema" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
       <module name="qter" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -183,17 +151,17 @@
       <option name="_new_keywords" value="&quot;&quot;" />
       <option name="_new_parameters" value="&quot;&quot;" />
       <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;tests.test_itemsystem.test_schema&quot;" />
+      <option name="_new_target" value="&quot;tests.test_itemsystem.test_schema.test_schema.test_simple_schema&quot;" />
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python tests.pytest for tests.test_itemsystem" />
-        <item itemvalue="Python tests.pytest for tests.test_itemsystem.test_schema" />
+        <item itemvalue="Python tests.pytest for tests.test_itemsystem.test_schema.test_schema.test_simple_schema" />
+        <item itemvalue="Python tests.Python tests for test_schema.test_simple_schema" />
         <item itemvalue="Python tests.Python tests for test_schema.test_deferred_types" />
         <item itemvalue="Python tests.Python tests for test_schema.test_nested_types" />
-        <item itemvalue="Python tests.Python tests for test_schema.test_simple_schema" />
+        <item itemvalue="Python tests.pytest for tests.test_itemsystem" />
       </list>
     </recent_temporary>
   </component>
@@ -211,7 +179,7 @@
       <workItem from="1671627682752" duration="373000" />
       <workItem from="1671628122300" duration="645000" />
       <workItem from="1671685687456" duration="9000" />
-      <workItem from="1671687149652" duration="40123000" />
+      <workItem from="1671687149652" duration="45769000" />
     </task>
     <task id="LOCAL-00001" summary="first commit!">
       <created>1671541830132</created>
@@ -321,9 +289,24 @@
           <option name="timeStamp" value="44" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/qtgql/itemsystem/role.py</url>
-          <line>120</line>
-          <option name="timeStamp" value="51" />
+          <url>file://$PROJECT_DIR$/tests/test_itemsystem/test_schema/test_schema.py</url>
+          <line>23</line>
+          <option name="timeStamp" value="58" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/qtgql/itemsystem/schema.py</url>
+          <line>35</line>
+          <option name="timeStamp" value="60" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/tests/test_itemsystem/test_schema/test_schema.py</url>
+          <line>46</line>
+          <option name="timeStamp" value="61" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/qtgql/itemsystem/schema.py</url>
+          <line>40</line>
+          <option name="timeStamp" value="63" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -334,12 +317,13 @@
     </watches-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/qter$.coverage" NAME=" Coverage Results" MODIFIED="1671738387025" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_itemsystem/test_schema" />
     <SUITE FILE_PATH="coverage/qter$pytest_for_tests_test_itemsystem_test_schema.coverage" NAME="pytest for tests.test_itemsystem.test_schema Coverage Results" MODIFIED="1671738415142" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_itemsystem/test_schema" />
     <SUITE FILE_PATH="coverage/qter$pytest_for_tests_test_itemsystem.coverage" NAME="pytest for tests.test_itemsystem Coverage Results" MODIFIED="1671738419112" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_itemsystem/test_schema" />
+    <SUITE FILE_PATH="coverage/qter$.coverage" NAME=" Coverage Results" MODIFIED="1671778253887" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_itemsystem/test_schema" />
     <SUITE FILE_PATH="coverage/qter$pytest_for_tests_test_itemsystem_test_generic_model.coverage" NAME="pytest for tests.test_itemsystem.test_generic_model Coverage Results" MODIFIED="1671731949732" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_itemsystem/test_generic_model" />
     <SUITE FILE_PATH="coverage/qter$pytest_for_tests_test_gql_test_handlers_test_subscriber_called_with_on_gql_next.coverage" NAME="pytest for tests.test_gql.test_handlers.test_subscriber_called_with_on_gql_next Coverage Results" MODIFIED="1671546140462" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_gql" />
     <SUITE FILE_PATH="coverage/qter$pytest_for_tests_test_itemsystem_test_core_TestGenericModel_test_initialize_create_data.coverage" NAME="pytest for tests.test_itemsystem.test_core.TestGenericModel.test_initialize_create_data Coverage Results" MODIFIED="1671550177288" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_itemsystem" />
+    <SUITE FILE_PATH="coverage/qter$pytest_for_tests_test_itemsystem_test_schema_test_schema_test_simple_schema.coverage" NAME="pytest for tests.test_itemsystem.test_schema.test_schema.test_simple_schema Coverage Results" MODIFIED="1671778290507" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_itemsystem/test_schema" />
     <SUITE FILE_PATH="coverage/qter$pytest_for_tests_test_gql.coverage" NAME="pytest for tests.test_gql Coverage Results" MODIFIED="1671546188608" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_gql" />
     <SUITE FILE_PATH="coverage/qter$pytest_for_tests_test_itemsystem_test_generic_model_test_core_test_child_creates_model.coverage" NAME="pytest for tests.test_itemsystem.test_generic_model.test_core.test_child_creates_model Coverage Results" MODIFIED="1671720267060" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_itemsystem/test_generic_model" />
     <SUITE FILE_PATH="coverage/qter$pytest_for_tests.coverage" NAME="pytest for tests Coverage Results" MODIFIED="1671546202241" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_gql" />
