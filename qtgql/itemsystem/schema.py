@@ -1,18 +1,11 @@
-import dataclasses
 from typing import Optional, Type, TypeVar, Union, get_type_hints
 from uuid import UUID
 
+import attrs
 from qtpy.QtCore import Qt
 
-from qtgql.itemsystem.model import GenericModel, NodeHelper, NodeProto
-from qtgql.itemsystem.role import (
-    IS_ROLE,
-    BaseRoleDefined,
-    Role,
-    RoleMapper,
-    TypesStorage,
-    field_is,
-)
+from qtgql.itemsystem.model import GenericModel, NodeHelper, NodeProto, Role, RoleMapper
+from qtgql.itemsystem.type_ import IS_ROLE, BaseType, field_is
 
 T = TypeVar("T")
 
@@ -23,17 +16,20 @@ class Schema:
     def __init__(
         self,
         *,
-        query: Type[BaseRoleDefined],
-        types_storage: TypesStorage,
-        mutation: Optional[Type[BaseRoleDefined]] = None,
-        subscriptions: Optional[Type[BaseRoleDefined]] = None,
+        query: Type[BaseType],
+        mutation: Optional[Type[BaseType]] = None,
+        subscriptions: Optional[Type[BaseType]] = None,
     ):
         self.query = query
         self.mutation = mutation
         self.subscription = subscriptions
         self.nodes: dict[Union[UUID, str], NodeHelper] = {}
+        if mutation:
+            assert mutation.__types_store__ is query.__types_store__
+        if subscriptions:
+            assert subscriptions.__types_store__ is query.__types_store__
 
-        self.types = types_storage
+        self.types = query.__types_store__
         self._evaluate_types()
 
     def _evaluate_types(self) -> None:
@@ -41,8 +37,8 @@ class Schema:
         types.update(self.types)
         for t in self.types.values():
             roles = RoleMapper()
-            tp_hints = get_type_hints(t, globalns=self.types.copy())
-            for role_num, field in enumerate(dataclasses.fields(t), int(Qt.ItemDataRole.UserRole)):
+            tp_hints = get_type_hints(t, globalns=types)
+            for role_num, field in enumerate(attrs.fields(t), int(Qt.ItemDataRole.UserRole)):
                 # assign role and check if not exists
                 if field_is(IS_ROLE, field):
                     role_ = Role.create(
@@ -53,12 +49,12 @@ class Schema:
                     roles.by_name[role_.name] = role_
                     roles.qt_roles[role_.num] = role_.qt_name
                     # lists must be child models
-                    if role_.type.type is list:
+                    if role_.type.type is GenericModel:
                         child_type = role_.type.of_type[0].type
                         roles.children[role_.name] = child_type
 
-            t.__roles__ = roles
             t.Model = GenericModel.from_role_defined(t)
+            t.Model.__roles__ = roles
 
     def get_node(self, node: NodeProto) -> Optional[NodeHelper[T]]:
         return self.nodes.get(node.uuid, None)

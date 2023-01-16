@@ -4,10 +4,10 @@ from uuid import uuid4
 
 import pytest
 
-from qtgql.itemsystem import BaseRoleDefined, role
+from qtgql.itemsystem import BaseType, role
 from qtgql.itemsystem.model import GenericModel
-from qtgql.itemsystem.role import TypesStorage
 from qtgql.itemsystem.schema import Schema
+from qtgql.itemsystem.type_ import TypesStore, get_base_type
 
 NORMAL_GQL = "normal_gql"
 NORMAL_GQL_CAMELIZED = "normalGql"
@@ -16,20 +16,22 @@ NOT_GQL = "not_gql"
 CHILD = "child"
 NOT_A_CHILD = "not_a_child"
 
+store = TypesStore()
 
-class FullClass(BaseRoleDefined):
+
+class FullClass(BaseType):
     normalGql: int = role()
     uuid: str = role(factory=lambda: uuid4().hex)
-    parent_ref: WithChild = role()
+    parentRef: WithChild = role()
 
 
 def init_dict_fullClass():
     return {NORMAL_GQL_CAMELIZED: 2}
 
 
-class WithChild(BaseRoleDefined):
+class WithChild(BaseType):
     uuid: str = role(factory=lambda: uuid4().hex)
-    child: list[FullClass] = role()
+    child: GenericModel[FullClass] = role()
     not_a_child: int = role()
     parent_ref: NestedX3 = role()
 
@@ -38,9 +40,12 @@ def init_dict_withChild():
     return {CHILD: [init_dict_fullClass() for _ in range(3)], NOT_A_CHILD: "not child"}
 
 
-class NestedX3(BaseRoleDefined):
-    childX: GenericModel[WithChild] = role()
+class NestedX3(BaseType):
+    childX: list[WithChild] = role()
     uuid: str = role(factory=lambda: uuid4().hex)
+
+
+_schema = Schema(query=NestedX3)
 
 
 def init_dict_nestedX3() -> dict:
@@ -49,30 +54,35 @@ def init_dict_nestedX3() -> dict:
 
 @pytest.fixture(scope="session")
 def schema():
-    return Schema(query=NestedX3)
+    return _schema
 
 
 @pytest.fixture
-def types_storage() -> TypesStorage:
-    return TypesStorage()
+def base_type() -> type[BaseType]:
+    """
+
+    :return: BaseType, this is required to avoid TypeStore conflicts.
+    """
+
+    return get_base_type()
 
 
 @pytest.fixture
-def full_model(qtbot, schema, qtmodeltester) -> GenericModel[FullClass]:
-    model = FullClass.Model(schema=schema, data=[init_dict_fullClass() for _ in range(10)])
+def full_model(qtbot, qtmodeltester) -> GenericModel[FullClass]:
+    model = FullClass.Model(schema=_schema, data=[init_dict_fullClass() for _ in range(10)])
     yield model
     qtmodeltester.check(model, force_py=True)
 
 
 @pytest.fixture
-def model_with_child(qtbot, schema, qtmodeltester) -> GenericModel[WithChild]:
-    model = WithChild.Model(schema=schema, data=[init_dict_withChild() for _ in range(3)])
+def model_with_child(qtbot, qtmodeltester) -> GenericModel[WithChild]:
+    model = WithChild.Model(schema=_schema, data=[init_dict_withChild() for _ in range(3)])
     yield model
     qtmodeltester.check(model)
 
 
 @pytest.fixture
-def nested_model(qtbot, schema, qtmodeltester) -> GenericModel[NestedX3]:
-    model = NestedX3.Model(schema=schema, data=[init_dict_nestedX3() for _ in range(3)])
+def nested_model(qtbot, qtmodeltester) -> GenericModel[NestedX3]:
+    model = NestedX3.Model(schema=_schema, data=[init_dict_nestedX3() for _ in range(3)])
     yield model
     qtbot.check(model)

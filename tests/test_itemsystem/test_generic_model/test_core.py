@@ -1,9 +1,13 @@
+from __future__ import annotations
+
 from unittest.mock import patch
 
 import pytest
 from qtpy import QtCore as qtc
 
-from qtgql.itemsystem import BaseRoleDefined, GenericModel, RoleDoesNotExist, role
+from qtgql.itemsystem import RoleDoesNotExist, role
+from qtgql.itemsystem.model import GenericModel, RoleMapper
+from qtgql.itemsystem.schema import Schema
 from tests.test_itemsystem.fixtures import (
     CHILD,
     FullClass,
@@ -15,11 +19,35 @@ from tests.test_itemsystem.fixtures import (
 pytest_plugins = ("tests.test_itemsystem.fixtures",)
 
 
-def test_get_role_names():
-    class Simple(BaseRoleDefined):
+def test_has_dunder_roles(full_model):
+    assert isinstance(full_model.__roles__, RoleMapper)
+
+
+def test_first_role_is_256(full_model):
+    assert list(full_model.__roles__.qt_roles.keys())[0] == 256
+
+
+def test_annotated_with_GenericModel_in_childre_dict(model_with_child):
+    roles = model_with_child.__roles__
+    assert roles.children
+    assert roles.children["child"] is FullClass
+
+
+def test_role_fields_in_qt_roles(full_model):
+    roles = full_model.__roles__
+    qt_roles = roles.qt_roles
+    for num, role_ in roles.by_num.items():
+        assert role_.qt_name is qt_roles[num]
+
+
+def test_get_role_names(base_type):
+    class Simple(base_type):
         a: int = role()
 
-    assert Simple.Model(schema=None, data=[{"a": 2}]).roleNames() is Simple.__roles__.qt_roles
+    schema = Schema(query=Simple)
+    assert (
+        Simple.Model(schema=schema, data=[{"a": 2}]).roleNames() is Simple.Model.__roles__.qt_roles
+    )
 
 
 def test_initialize_create_data(full_model):
@@ -37,7 +65,7 @@ def test_get_data_wrong_index_returns_None(full_model):
 
 def test_child_creates_model(schema, full_model):
     model = WithChild.Model(schema=schema, data=[init_dict_withChild() for _ in range(3)])
-    res = model.data(full_model.index(0), WithChild.__roles__.by_name[CHILD].num)
+    res = model.data(full_model.index(0), model.__roles__.by_name[CHILD].num)
     assert isinstance(res, GenericModel)
 
 
@@ -51,7 +79,7 @@ def test_child_has_parent_model(schema, full_model):
 
 def test_child_model_has_parent_model(schema, full_model):
     model = WithChild.Model(schema=schema, data=[init_dict_withChild() for _ in range(3)])
-    res: GenericModel = model.data(full_model.index(0), model.roles.by_name[CHILD].num)
+    res: GenericModel = model.data(full_model.index(0), model.__roles__.by_name[CHILD].num)
     assert res.parent_model is model
 
 

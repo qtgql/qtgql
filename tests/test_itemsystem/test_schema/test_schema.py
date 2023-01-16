@@ -1,66 +1,59 @@
 from __future__ import annotations
 
 from qtgql.itemsystem import role
+from qtgql.itemsystem.model import GenericModel
 from qtgql.itemsystem.schema import Schema
 
 pytest_plugins = ("tests.test_itemsystem.fixtures",)
 
 
-def test_simple_schema(types_storage):
-    @types_storage.register
-    class Query:
+def test_simple_schema(base_type):
+    class Query(base_type):
         a: str = role()
 
-    schema = Schema(query=Query, types_storage=types_storage)
+    schema = Schema(query=Query)
     assert schema.types["Query"] is Query
 
 
-def test_nested_types(types_storage):
-    @types_storage.register
-    class A:
+def test_nested_types(base_type):
+    class A(base_type):
         a: int = role()
 
-    @types_storage.register
-    class B:
+    class B(base_type):
         b: str = role()
 
-    @types_storage.register
-    class Query:
-        a: list[A] = role()
-        b: list[B] = role()
+    class Query(base_type):
+        a: GenericModel[A] = role()
+        b: GenericModel[B] = role()
 
-    schema = Schema(query=Query, types_storage=types_storage)
+    schema = Schema(query=Query)
     assert schema.types[Query.__name__] is Query
-    assert Query.__roles__.children["a"] is A
-    assert Query.__roles__.children["b"] is B
+    assert Query.Model.__roles__.children["a"] is A
+    assert Query.Model.__roles__.children["b"] is B
     assert schema.types[B.__name__] is B
     assert schema.types[A.__name__] is A
 
 
-def test_deferred_types(types_storage):
-    @types_storage.register
-    class Query:
-        a: list[A] = role()
-        b: list[B] = role()
+def test_deferred_types(base_type):
+    class Query(base_type):
+        a: GenericModel[A] = role()
+        b: GenericModel[B] = role()
 
-    @types_storage.register
-    class A:
+    class A(base_type):
         a: int = role()
 
-    @types_storage.register
-    class B:
+    class B(base_type):
         b: str = role()
 
-    schema = Schema(query=Query, types_storage=types_storage)
+    schema = Schema(query=Query)
     assert schema.types[Query.__name__] is Query
-    assert Query.__roles__.children["a"] is A
-    assert Query.__roles__.children["b"] is B
+    assert Query.Model.__roles__.children["a"] is A
+    assert Query.Model.__roles__.children["b"] is B
     assert schema.types[B.__name__] is B
     assert schema.types[A.__name__] is A
 
 
 def test_get_node(model_with_child):
-    raise NotImplementedError
-    # node: FullClass = model_with_child._data[0].child._data[0]
-    # result = model_with_child.get_node(node)
-    # assert result.node == node
+    node = model_with_child._data[0].child._data[0]
+    result = model_with_child.schema.get_node(node)
+    assert result.node == node

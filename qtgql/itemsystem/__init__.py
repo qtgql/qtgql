@@ -1,4 +1,4 @@
 from .model import RoleDoesNotExist
-from .role import BaseRoleDefined, role
+from .type_ import BaseType, role
 
-__all__ = ["BaseRoleDefined", "role", "RoleDoesNotExist"]
+__all__ = ["BaseType", "role", "RoleDoesNotExist"]
