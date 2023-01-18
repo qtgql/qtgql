@@ -1,7 +1,6 @@
 from typing import Optional, Union, get_args, get_origin
 
 import pytest
-
 from qtgql.typingref import TypeHinter
 
 

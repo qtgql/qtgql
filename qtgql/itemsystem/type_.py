@@ -20,9 +20,10 @@ def role(
     default=None,
     factory=UNSET,
 ):
-    """
-    role is optional by default.
-    this will be changed in the future when we will implement schema generation.
+    """role is optional by default.
+
+    this will be changed in the future when we will implement schema
+    generation.
     """
     if factory is not UNSET:
         default = UNSET
@@ -33,10 +34,6 @@ def role(
     )
 
     # dataclasses.field(
-    #     default=dataclasses.MISSING if default is UNSET else default,
-    #     default_factory=factory if factory else dataclasses.MISSING,
-    #     metadata={IS_ROLE: True},
-    # )
 
 
 def field_is(key: str, field):

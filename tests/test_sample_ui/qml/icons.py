@@ -5753,7 +5753,6 @@ ICONS = {
     "walletPlusOutline": "\U000f0F8F",
     "walletTravel": "\U000f0587",
     "wallpaper": "\U000f0E09",
-    "wan": "\U000f0588",
     "wardrobe": "\U000f0F90",
     "wardrobeOutline": "\U000f0F91",
     "warehouse": "\U000f0F81",

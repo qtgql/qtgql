@@ -1,11 +1,10 @@
-from dataclasses import dataclass
-from pathlib import Path
 import socket
 import subprocess
 import time
+from dataclasses import dataclass
+from pathlib import Path
 
 import pytest
-
 from qtgql.gqlcore.client import GqlClientMessage, GqlWsTransportClient, HandlerProto
 
 

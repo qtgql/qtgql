@@ -1,7 +1,7 @@
 import json
 import re
-from typing import Generic, Optional, TypeVar, Union
 import uuid
+from typing import Generic, Optional, TypeVar, Union
 
 from attr import asdict, define
 
