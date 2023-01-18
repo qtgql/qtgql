@@ -33,16 +33,17 @@ def role(
         metadata={IS_ROLE: True},
     )
 
-    # dataclasses.field(
-
 
 def field_is(key: str, field):
     metadata = getattr(field, "metadata", {})
     return metadata.get(key, False)
 
 
-class TypesStore(dict):
-    def add(self, type_: type[BaseType]):
+T_V = TypeVar("T_V")
+
+
+class TypesStore(dict[str, type[T_V]]):
+    def add(self, type_: type[T_V]):
         super().__setitem__(type_.__name__, type_)
 
     def __setitem__(self, key, value):
@@ -71,8 +72,8 @@ class BaseTypeMeta(type):
 
 
 class BaseType(metaclass=BaseTypeMeta):
-    __types_store__: TypesStore[str, type[BaseType]] = TypesStore()
-    Model: ClassVar[type[GenericModel[Self]]]
+    __types_store__: TypesStore[BaseType] = TypesStore()
+    Model: ClassVar[type[GenericModel[Self]]]  # type: ignore
 
     def asdict(self) -> dict:
         return attrs.asdict(self)  # type: ignore

@@ -34,8 +34,8 @@ class TypeHinter(NamedTuple):
     @classmethod
     def from_annotations(cls, tp: Any) -> "TypeHinter":
         if args := get_args(tp):
-            new_args = []
+            new_args: list[TypeHinter] = []
             for arg in args:
                 new_args.append(TypeHinter.from_annotations(arg))
-            return TypeHinter(type=get_origin(tp), of_type=tuple(new_args))
+            return TypeHinter(type=get_origin(tp), of_type=tuple(new_args))  # type: ignore
         return TypeHinter(type=tp, of_type=None)

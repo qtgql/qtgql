@@ -84,7 +84,7 @@ class GqlWsTransportClient(qtws.QWebSocket):
     textMessageReceived: qtc.Signal
     connected: qtc.Signal
     disconnected: qtc.Signal
-    error: qtc.Signal
+    error: qtc.Signal  # type: ignore
 
     def __init__(
         self,

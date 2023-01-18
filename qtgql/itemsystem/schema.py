@@ -38,7 +38,7 @@ class Schema:
         for t in self.types.values():
             roles = RoleMapper()
             tp_hints = get_type_hints(t, globalns=types)
-            for role_num, field in enumerate(attrs.fields(t), int(Qt.ItemDataRole.UserRole)):
+            for role_num, field in enumerate(attrs.fields(t), int(Qt.ItemDataRole.UserRole)):  # type: ignore
                 # assign role and check if not exists
                 if field_is(IS_ROLE, field):
                     role_ = Role.create(
@@ -56,7 +56,7 @@ class Schema:
             t.Model = GenericModel.from_role_defined(t)
             t.Model.__roles__ = roles
 
-    def get_node(self, node: NodeProto) -> Optional[NodeHelper[T]]:
+    def get_node(self, node: NodeProto) -> Optional[NodeHelper[NodeProto]]:
         return self.nodes.get(node.uuid, None)
 
     def update_node(self, node: NodeProto) -> bool:

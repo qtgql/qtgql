@@ -6,16 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="288baa58-55a0-493e-a12a-9b49a4f1837e" name="Changes" comment="added doc ui animation.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.pre-commit-config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/.pre-commit-config.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qtgql/gqlcore/gqlcore.py" beforeDir="false" afterPath="$PROJECT_DIR$/qtgql/gqlcore/gqlcore.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qtgql/autoproperty.py" beforeDir="false" afterPath="$PROJECT_DIR$/qtgql/autoproperty.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qtgql/itemsystem/type_.py" beforeDir="false" afterPath="$PROJECT_DIR$/qtgql/itemsystem/type_.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_gql/fixtures.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_gql/fixtures.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_gql/mini_gql_server.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_gql/mini_gql_server.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_gql/test_handlers.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_gql/test_handlers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_itemsystem/test_base_type.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_itemsystem/test_base_type.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_sample_ui/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_sample_ui/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_sample_ui/qml/icons.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_sample_ui/qml/icons.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_typingref.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_typingref.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qtgql/typingref.py" beforeDir="false" afterPath="$PROJECT_DIR$/qtgql/typingref.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -194,7 +187,7 @@
       <workItem from="1673948397473" duration="1004000" />
       <workItem from="1674019502407" duration="18400000" />
       <workItem from="1674049769215" duration="1227000" />
-      <workItem from="1674059058064" duration="1555000" />
+      <workItem from="1674059058064" duration="2986000" />
     </task>
     <task id="LOCAL-00001" summary="first commit!">
       <created>1671541830132</created>
@@ -266,7 +259,14 @@
       <option name="project" value="LOCAL" />
       <updated>1674060092048</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="added doc ui animation.">
+      <created>1674060979391</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1674060979391</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

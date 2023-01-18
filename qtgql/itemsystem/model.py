@@ -38,7 +38,7 @@ NodeT = TypeVar("NodeT", bound=NodeProto)
 class NodeHelper(Generic[NodeT]):
     # NOTE: This is useless if every child would have the model object as a role.
     node: NodeT
-    model: GenericModel[NodeT]
+    model: GenericModel[NodeT]  # type: ignore
 
 
 class GenericModel(Generic[_TBaseType], qtc.QAbstractListModel):
@@ -191,7 +191,7 @@ class Role:
     qt_name: qtc.QByteArray
 
     @classmethod
-    def create(cls, name: str, role_num: int, type_: type):
+    def create(cls, name: str, role_num: int, type_: Any):
         return cls(
             type=TypeHinter.from_annotations(type_),
             num=role_num,  # not needed currently but saving here for any case
