@@ -8,11 +8,9 @@ license = "MIT"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.10,<3.12"
+python = ">=3.9,<3.12"
 PySide6 = ">=6.4.1"
-QtPy = ">=2.3.0"
 nothing = "^0.0.3"
-pytest = "^7.2.0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -23,6 +21,11 @@ strawberry-graphql = ">=0.142.2"
 aiohttp = {extras = ["speedups"], version = "^3.8.3"}
 mypy = "^0.991"
 faker = "^15.3.4"
+mkdocs-material = "^9.0.5"
+mike = "^1.1.2"
+markdown-include = "^0.8.0"
+mkdocstrings = "^0.19.1"
+pygments = "^2.14.0"
 
 [build-system]
 requires = ["poetry-core"]
@@ -54,10 +57,16 @@ exclude = '''
 )/
 '''
 
-[tool.isort]
-profile = "black"
-multi_line_output = 3
-force_sort_within_sections = true
+[tool.ruff]
+line-length = 100
+select = ["E", "F", "ERA", "I"]
+ignore = [
+    "TID252",
+    "E501",  # line too long, handled by black
+]
+fix = true
+
+src = ["qtgql", "tests"]
 
 
 [tool.pytest.ini_options]

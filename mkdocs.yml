@@ -1,0 +1,82 @@
+# yaml-language-server: $schema=https://squidfunk.github.io/mkdocs-material/schema.json
+
+site_name: qtgql
+
+repo_url: https://github.com/pdm-project/pdm
+edit_uri: edit/main/docs/docs
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: deep purple
+      accent: teal
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+    - scheme: slate
+      primary: deep purple
+      accent: teal
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+  font:
+    text: Open Sans
+    code: Fira Code
+  logo: assets/logo.svg
+  favicon: assets/logo.svg
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+
+plugins:
+  - search
+  - mike
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: google
+
+
+nav:
+  - Install:
+      - Home: ./
+
+markdown_extensions:
+  - pymdownx.highlight:
+      linenums: true
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.details
+  - admonition
+  - tables
+  - toc:
+      permalink: "#"
+  - markdown_include.include:
+      base_path: docs
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+copyright: Copyright &copy; Nir Benlulu 2023 <a href="https://github/nrbnlulu.com>Nir</a>
+
+extra:
+  version:
+    provider: mike
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/nrbnlulu/qtgql
+
+extra_css:
+  - css/termynal.css
+  - css/custom.css
+
+extra_javascript:
+  - js/termynal.js
+  - js/custom.js
+
+watch:
+  - ../

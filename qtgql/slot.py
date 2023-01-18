@@ -1,7 +1,7 @@
 import itertools
 from typing import Any, Optional, get_args
 
-from qtpy import QtCore as qtc
+from PySide6 import QtCore as qtc
 
 from qtgql.typingref import is_optional
 

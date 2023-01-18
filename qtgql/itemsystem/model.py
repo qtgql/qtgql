@@ -1,21 +1,12 @@
 from __future__ import annotations
 
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Callable,
-    Generic,
-    Optional,
-    Protocol,
-    Type,
-    TypeVar,
-)
+from typing import TYPE_CHECKING, Any, Callable, Generic, Protocol, TypeVar
 from uuid import UUID
 
-from PySide6.QtCore import QModelIndex
-from attr import define
 import attrs
-from qtpy import QtCore as qtc
+from attr import define
+from PySide6 import QtCore as qtc
+from PySide6.QtCore import QModelIndex
 
 from qtgql import slot
 from qtgql.exceptions import QtGqlException
@@ -51,10 +42,8 @@ class NodeHelper(Generic[NodeT]):
 
 
 class GenericModel(Generic[_TBaseType], qtc.QAbstractListModel):
-    """
-    this class shouldn't be initiated directly
-     it should be subclassed for every RoleDefined class.
-    """
+    """this class shouldn't be initiated directly it should be subclassed for
+    every RoleDefined class."""
 
     __roledefined_type__: type[_TBaseType]
     __roles__: RoleMapper
@@ -66,7 +55,7 @@ class GenericModel(Generic[_TBaseType], qtc.QAbstractListModel):
         super().__init__(parent)
         self.schema = schema
         self.rowsAb = None
-        self.parent_model: Optional[GenericModel] = parent
+        self.parent_model: GenericModel | None = parent
         self.type_ = self.__roledefined_type__
         self._data: list[_TBaseType] = []
         self._child_models: list[GenericModel[Any]] = []
@@ -74,9 +63,8 @@ class GenericModel(Generic[_TBaseType], qtc.QAbstractListModel):
             self.initialize_data(data)
 
     def initialize_data(self, data: list[dict] | dict) -> None:
-        """
-        the first model will accept a dict, children will get list of dicts.
-        """
+        """the first model will accept a dict, children will get list of
+        dicts."""
         self.layoutAboutToBeChanged.emit()
         qtc.QEventLoop().processEvents()
         # search for children and initialize them as models
@@ -183,7 +171,7 @@ class GenericModel(Generic[_TBaseType], qtc.QAbstractListModel):
     # CLASS METHODS
     @classmethod
     def from_role_defined(
-        cls, type_: Type[BaseType], parent: type[GenericModel] | None = None
+        cls, type_: type[BaseType], parent: type[GenericModel] | None = None
     ) -> type[GenericModel]:
         bases = (cls,)
         if parent:
@@ -199,9 +187,7 @@ class GenericModel(Generic[_TBaseType], qtc.QAbstractListModel):
 
 @define
 class Role:
-    """
-    provides metadata about a field in a define_roles decorated class
-    """
+    """Provides metadata about a field in a define_roles decorated class."""
 
     type: TypeHinter
     num: int
@@ -219,10 +205,8 @@ class Role:
 
 
 class RoleMapper:
-    """
-    A container that maps the roles of a defined class
-    each map has a certain usage in the future.
-    """
+    """A container that maps the roles of a defined class each map has a
+    certain usage in the future."""
 
     __slots__ = ("qt_roles", "by_name", "by_num", "qt_roles", "children", "deferred")
 

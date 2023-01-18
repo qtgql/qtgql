@@ -3,11 +3,11 @@ from __future__ import annotations
 from unittest.mock import patch
 
 import pytest
-from qtpy import QtCore as qtc
-
+from PySide6 import QtCore as qtc
 from qtgql.itemsystem import RoleDoesNotExist, role
 from qtgql.itemsystem.model import GenericModel, RoleMapper
 from qtgql.itemsystem.schema import Schema
+
 from tests.test_itemsystem.fixtures import (
     CHILD,
     FullClass,
@@ -115,7 +115,7 @@ def test_pop(qtbot, full_model):
     assert original_data == full_model._data
 
 
-@patch("qtpy.QtCore.QAbstractListModel.endRemoveRows")
+@patch("PySide6.QtCore.QAbstractListModel.endRemoveRows")
 def test_clear(mock, qtbot, full_model):
     assert full_model.rowCount() > 0
     with qtbot.wait_signal(full_model.rowsAboutToBeRemoved):

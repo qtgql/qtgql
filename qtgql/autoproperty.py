@@ -3,7 +3,7 @@ from typing import Any, Type, TypeVar, Union, cast, get_args
 
 import attr
 from attr import Attribute, define
-from qtpy import QtCore as qtc
+from PySide6 import QtCore as qtc
 from typing_extensions import dataclass_transform
 
 __all__ = ["define_properties"]

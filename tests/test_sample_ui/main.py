@@ -1,15 +1,15 @@
 import glob
 import os
-from pathlib import Path
 import sys
+from pathlib import Path
 
-from qtpy import QtCore, QtGui, QtQml, QtQuick
-from qtpy.QtCore import QObject, Signal
-from qtpy.QtQml import QQmlApplicationEngine
-
+from PySide6 import QtCore, QtGui, QtQml, QtQuick
+from PySide6.QtCore import QObject, Signal
+from PySide6.QtQml import QQmlApplicationEngine
 from qtgql import slot
 from qtgql.gqlcore.client import GqlClientMessage, GqlWsTransportClient, HandlerProto
 from qtgql.itemsystem import GenericModel
+
 from tests.test_sample_ui.models import Apple
 from tests.test_sample_ui.qml.icons import ICONS
 

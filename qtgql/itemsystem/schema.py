@@ -2,7 +2,7 @@ from typing import Optional, Type, TypeVar, Union, get_type_hints
 from uuid import UUID
 
 import attrs
-from qtpy.QtCore import Qt
+from PySide6.QtCore import Qt
 
 from qtgql.itemsystem.model import GenericModel, NodeHelper, NodeProto, Role, RoleMapper
 from qtgql.itemsystem.type_ import IS_ROLE, BaseType, field_is

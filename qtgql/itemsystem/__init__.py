@@ -1,4 +1,4 @@
-from .model import RoleDoesNotExist
-from .type_ import BaseType, role
+from .model import RoleDoesNotExist, GenericModel,
+from .type_ import BaseType, role,
 
-__all__ = ["BaseType", "role", "RoleDoesNotExist"]
+__all__ = ["BaseType", "role", "RoleDoesNotExist", 'GenericModel']
