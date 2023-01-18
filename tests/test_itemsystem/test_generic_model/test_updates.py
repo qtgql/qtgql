@@ -16,28 +16,3 @@ def test_update_node(model_with_child):
     model_with_child.schema.update_node(new_node)
     after_update = model_with_child._data[0].child._data[0]
     assert after_update == new_node
-
-
-def test_update_child_updates_node_if_exist(model_with_child):
-    before = model_with_child._data[0].child._data[0]
-    TEST_NODE_UPDATE = "TEST_NODE_UPDATE"
-    assert before.normalGql != TEST_NODE_UPDATE
-    new_node = attrs.evolve(before, **{NORMAL_GQL_CAMELIZED: TEST_NODE_UPDATE})
-    new_node.normalGql = TEST_NODE_UPDATE
-    assert before != new_node
-    assert before.uuid == new_node.uuid
-    model_with_child.reverse_update(new_node)
-    after_update = model_with_child._data[0].child._data[0]
-    assert after_update == new_node
-
-
-def test_reverse_update_appends_child_to_model_if_not_exists(model_with_child):
-    parent = model_with_child._data[0]
-    TEST_NODE_UPDATE = 999
-    new_node = FullClass()
-    new_node.normalGql = TEST_NODE_UPDATE
-    new_node.parentRef = parent
-    assert not model_with_child.schema.get_node(new_node)
-    model_with_child.reverse_update(new_node, target_node=FullClass)
-    injected = model_with_child.schema.get_node(new_node)
-    assert injected is new_node

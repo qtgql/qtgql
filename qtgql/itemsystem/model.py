@@ -63,8 +63,11 @@ class GenericModel(Generic[_TBaseType], qtc.QAbstractListModel):
             self.initialize_data(data)
 
     def initialize_data(self, data: list[dict] | dict) -> None:
-        """the first model will accept a dict, children will get list of
-        dicts."""
+        """
+
+        :param data: data to generate the model
+
+        """
         self.layoutAboutToBeChanged.emit()
         qtc.QEventLoop().processEvents()
         # search for children and initialize them as models
@@ -139,13 +142,6 @@ class GenericModel(Generic[_TBaseType], qtc.QAbstractListModel):
         self.beginInsertRows(self.index(count), count, count)
         self._data.append(node)
         self.endInsertRows()
-
-    def reverse_update(self, node: NodeProto) -> None:
-        if self.schema.update_node(node):
-            return
-        target = self.schema.types[node.__name__]
-        for name, children in self.__roles__.children.items():
-            ...
 
     @slot
     def pop(self, index: int | None = None) -> None:

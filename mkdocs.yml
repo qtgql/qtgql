@@ -35,15 +35,20 @@ plugins:
   - mkdocstrings:
       handlers:
         python:
+          paths: [qtgql]
           options:
-            docstring_style: google
+            annotations_path: source
+            docstring_style: sphinx
 
 
 nav:
-  - Install:
-      - Home: ./
-
+  - Home:
+      - Overview: ./index.md
+  - API:
+    - GenericModel: ./api/genericmodel.md
 markdown_extensions:
+  - attr_list
+  - md_in_html
   - pymdownx.highlight:
       linenums: true
   - pymdownx.tabbed:
@@ -55,11 +60,7 @@ markdown_extensions:
       permalink: "#"
   - markdown_include.include:
       base_path: docs
-  - pymdownx.superfences:
-      custom_fences:
-        - name: mermaid
-          class: mermaid
-          format: !!python/name:pymdownx.superfences.fence_code_format
+
 
 copyright: Copyright &copy; Nir Benlulu 2023 <a href="https://github/nrbnlulu.com>Nir</a>
 

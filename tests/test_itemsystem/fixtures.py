@@ -3,7 +3,6 @@ from __future__ import annotations
 from uuid import uuid4
 
 import pytest
-
 from qtgql.itemsystem import BaseType, role
 from qtgql.itemsystem.model import GenericModel
 from qtgql.itemsystem.schema import Schema

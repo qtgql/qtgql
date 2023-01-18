@@ -1,10 +1,9 @@
+# QtGQL
+![Logo](./assets/logo.svg){ align=center width=350}
+*GrahpQL client from Qt and QML.*
 
-## Install FastAPI
 
-The first step is to install FastAPI.
-
-For the tutorial, you might want to install it with all the optional dependencies and features:
-
+## Installation
 <div class="termy">
 
 ```
