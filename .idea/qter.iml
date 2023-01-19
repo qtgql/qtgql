@@ -5,4 +5,21 @@
     <orderEntry type="jdk" jdkName="Poetry (qter)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
+  <component name="TemplatesService">
+    <option name="templateFileTypes">
+      <list>
+        <option value="HTML" />
+        <option value="PythonStub" />
+        <option value="PLAIN_TEXT" />
+        <option value="XHTML" />
+        <option value="XML" />
+      </list>
+    </option>
+    <option name="TEMPLATE_CONFIGURATION" value="Jinja2" />
+    <option name="TEMPLATE_FOLDERS">
+      <list>
+        <option value="$MODULE_DIR$/qtgql/compiler/py/templates" />
+      </list>
+    </option>
+  </component>
 </module>
