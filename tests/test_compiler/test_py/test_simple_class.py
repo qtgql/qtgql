@@ -3,7 +3,8 @@ from types import ModuleType
 from typing import Any, Callable
 
 import pytest
-from qtgql.compiler.py.compiler import GqlType, PropertyImpl, SchemaTemplate
+from qtgql.compiler.objecttype import GqlType, PropertyImpl
+from qtgql.compiler.py.compiler import SchemaTemplate
 
 
 @pytest.fixture

@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import pytest
-from qtgql.gqlcore.client import GqlClientMessage, GqlWsTransportClient, HandlerProto
+from qtgql.gqltransport.client import GqlClientMessage, GqlWsTransportClient, HandlerProto
 
 
 @dataclass
@@ -40,7 +40,7 @@ def mini_server() -> MiniServer:
             "-H",
             "localhost",
             f"-P {port}",
-            "mini_gql_server:init_func",
+            "tests.mini_gql_server:init_func",
         ],
         cwd=Path(__file__).parent,
         stdout=subprocess.PIPE,

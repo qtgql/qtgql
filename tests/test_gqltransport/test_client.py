@@ -1,11 +1,9 @@
 import pytest
 from PySide6.QtNetwork import QAbstractSocket
-from qtgql.gqlcore.client import PROTOCOL, GqlWsTransportClient, SubscribeResponseMessage
-from qtgql.gqlcore.gqlcore import QueryPayload
+from qtgql.gqltransport.client import PROTOCOL, GqlWsTransportClient, SubscribeResponseMessage
+from qtgql.gqltransport.core import QueryPayload
 
-from tests.test_gql.fixtures import get_subscription_str
-
-pytest_plugins = ("tests.test_gql.fixtures",)
+from tests.test_gqltransport.conftest import get_subscription_str
 
 
 def test_get_operation_name():

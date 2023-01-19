@@ -46,7 +46,7 @@ from qtpy.QtCore import QObject, Signal
 from qtpy import QtCore, QtGui, QtQml, QtQuick
 
 from qtgql import slot
-from qtgql.gqlcore.client import HandlerProto, GqlClientMessage, GqlWsTransportClient
+from qtgql.gqltransport.client import HandlerProto, GqlClientMessage, GqlWsTransportClient
 from qtgql.itemsystem import GenericModel
 from tests.test_sample_ui.models import Apple
 
