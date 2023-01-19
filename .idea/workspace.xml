@@ -4,22 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="288baa58-55a0-493e-a12a-9b49a4f1837e" name="Changes" comment="tests: fix mypy">
-      <change afterPath="$PROJECT_DIR$/.idea/webResources.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/qtgql/compiler/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/qtgql/compiler/py/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/qtgql/compiler/py/compiler.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/qtgql/compiler/py/templates/property.jinja" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/qtgql/compiler/py/templates/schema.jinja.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tests/test_compiler/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tests/test_compiler/test_py/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tests/test_compiler/test_py/test-generate_types_from_schema.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tests/test_compiler/test_py/test_simple_class.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/qter.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/qter.iml" afterDir="false" />
+    <list default="true" id="288baa58-55a0-493e-a12a-9b49a4f1837e" name="Changes" comment="simple compilation work">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/poetry.lock" beforeDir="false" afterPath="$PROJECT_DIR$/poetry.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pyproject.toml" beforeDir="false" afterPath="$PROJECT_DIR$/pyproject.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qtgql/gqlcore/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/qtgql/gqlcore/client.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_compiler/test_py/test_simple_class.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_compiler/test_py/test_simple_class.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -208,7 +196,7 @@
       <workItem from="1674019502407" duration="18400000" />
       <workItem from="1674049769215" duration="1227000" />
       <workItem from="1674059058064" duration="11428000" />
-      <workItem from="1674104577460" duration="9030000" />
+      <workItem from="1674104577460" duration="10256000" />
     </task>
     <task id="LOCAL-00001" summary="first commit!">
       <created>1671541830132</created>
@@ -301,7 +289,14 @@
       <option name="project" value="LOCAL" />
       <updated>1674064532657</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="simple compilation work">
+      <created>1674113998953</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1674113998953</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -343,7 +338,8 @@
     <MESSAGE value="pc" />
     <MESSAGE value="added doc ui animation." />
     <MESSAGE value="tests: fix mypy" />
-    <option name="LAST_COMMIT_MESSAGE" value="tests: fix mypy" />
+    <MESSAGE value="simple compilation work" />
+    <option name="LAST_COMMIT_MESSAGE" value="simple compilation work" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -385,23 +381,18 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/tests/test_compiler/test_py/test-generate_types_from_schema.py</url>
-          <line>149</line>
+          <line>150</line>
           <option name="timeStamp" value="91" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/tests/test_compiler/test_py/test_simple_class.py</url>
-          <line>41</line>
+          <line>37</line>
           <option name="timeStamp" value="95" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/qtgql/compiler/py/compiler.py</url>
-          <line>41</line>
+          <line>45</line>
           <option name="timeStamp" value="96" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/tests/test_compiler/test_py/test_simple_class.py</url>
-          <line>53</line>
-          <option name="timeStamp" value="97" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/docs/js/termynal.js</url>
@@ -420,7 +411,7 @@
     <SUITE FILE_PATH="coverage/qter$pytest_for_tests_test_compiler_test_py_test_class_compilation_test_type_name.coverage" NAME="pytest for tests.test_compiler.test_py.test_class_compilation.test_type_name Coverage Results" MODIFIED="1674106612409" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_compiler/test_py" />
     <SUITE FILE_PATH="coverage/qter$pytest_for_tests_test_itemsystem_test_schema.coverage" NAME="pytest for tests.test_itemsystem.test_schema Coverage Results" MODIFIED="1671738415142" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_itemsystem/test_schema" />
     <SUITE FILE_PATH="coverage/qter$pytest_for_tests_test_itemsystem.coverage" NAME="pytest for tests.test_itemsystem Coverage Results" MODIFIED="1671962897743" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_itemsystem" />
-    <SUITE FILE_PATH="coverage/qter$.coverage" NAME=" Coverage Results" MODIFIED="1674113555467" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_compiler/test_py" />
+    <SUITE FILE_PATH="coverage/qter$.coverage" NAME=" Coverage Results" MODIFIED="1674113969367" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_compiler/test_py" />
     <SUITE FILE_PATH="coverage/qter$compiler.coverage" NAME="compiler Coverage Results" MODIFIED="1674113006440" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/qtgql/compiler/py" />
     <SUITE FILE_PATH="coverage/qter$pytest_for_tests_test_itemsystem_test_generic_model.coverage" NAME="pytest for tests.test_itemsystem.test_generic_model Coverage Results" MODIFIED="1671731949732" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_itemsystem/test_generic_model" />
     <SUITE FILE_PATH="coverage/qter$pytest_for_tests_test_gql_test_handlers_test_subscriber_called_with_on_gql_next.coverage" NAME="pytest for tests.test_gql.test_handlers.test_subscriber_called_with_on_gql_next Coverage Results" MODIFIED="1671546140462" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_gql" />
@@ -428,7 +419,7 @@
     <SUITE FILE_PATH="coverage/qter$pytest_for_tests_test_itemsystem_test_schema_test_schema_test_simple_schema.coverage" NAME="pytest for tests.test_itemsystem.test_schema.test_schema.test_simple_schema Coverage Results" MODIFIED="1671778644984" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_itemsystem/test_schema" />
     <SUITE FILE_PATH="coverage/qter$test_generate_types_from_schema.coverage" NAME="test-generate_types_from_schema Coverage Results" MODIFIED="1674111058928" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_compiler/test_py" />
     <SUITE FILE_PATH="coverage/qter$pytest_for_tests_test_gql.coverage" NAME="pytest for tests.test_gql Coverage Results" MODIFIED="1671546188608" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_gql" />
-    <SUITE FILE_PATH="coverage/qter$pytest_for_tests_test_compiler_test_py_test_simple_class.coverage" NAME="pytest for tests.test_compiler.test_py.test_simple_class Coverage Results" MODIFIED="1674109643921" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_compiler/test_py" />
+    <SUITE FILE_PATH="coverage/qter$pytest_for_tests_test_compiler_test_py_test_simple_class.coverage" NAME="pytest for tests.test_compiler.test_py.test_simple_class Coverage Results" MODIFIED="1674113868721" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_compiler/test_py" />
     <SUITE FILE_PATH="coverage/qter$templates.coverage" NAME="templates Coverage Results" MODIFIED="1674066126422" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/qtgql/compiler/py" />
     <SUITE FILE_PATH="coverage/qter$pytest_for_tests_test_itemsystem_test_generic_model_test_core_test_child_creates_model.coverage" NAME="pytest for tests.test_itemsystem.test_generic_model.test_core.test_child_creates_model Coverage Results" MODIFIED="1671720267060" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_itemsystem/test_generic_model" />
     <SUITE FILE_PATH="coverage/qter$pytest_for_tests_test_itemsystem_test_define_roles_test_post_init.coverage" NAME="pytest for tests.test_itemsystem.test_define_roles.test_post_init Coverage Results" MODIFIED="1671949026153" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_itemsystem" />

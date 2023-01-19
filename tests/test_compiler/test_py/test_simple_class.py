@@ -1,3 +1,4 @@
+import uuid
 from types import ModuleType
 from typing import Any, Callable
 
@@ -21,7 +22,7 @@ def default_types() -> list[GqlType]:
 
 @pytest.fixture()
 def tmp_mod():
-    return ModuleType("testmodule")
+    return ModuleType(uuid.uuid4().hex)
 
 
 def test_simple_compile(default_types, tmp_mod):

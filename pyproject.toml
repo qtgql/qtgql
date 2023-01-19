@@ -80,7 +80,7 @@ markers = [
     "no_captcha: This test requires that `LOGIN_REQUIRE_CAPTCHA=False` on the server",
 ]
 [tool.coverage.run]
-omit = ['test_*', 'tests/*', 'qtgql/ext/*']
+omit = ['test_*', 'tests/*', 'qtgql/ext/*', '**/*.jinja.py']
 relative_files = true
 
 [tool.coverage.report]
