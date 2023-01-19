@@ -16,7 +16,7 @@ nothing = "^0.0.3"
 [tool.poetry.group.dev.dependencies]
 pytest-qt = "^4.2.0"
 pytest-cov = "^4.0.0"
-pre-commit = "^2.20.0"
+pre-commit = "^2.21.0"
 strawberry-graphql = ">=0.142.2"
 aiohttp = {extras = ["speedups"], version = "^3.8.3"}
 mypy = "^0.991"
