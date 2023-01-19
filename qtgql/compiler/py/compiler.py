@@ -10,7 +10,7 @@ T = TypeVar("T")
 class PropertyImpl(Generic[T]):
     name: str
     type: Type[T] = field(converter=lambda v: v.__name__)
-    default: T = None
+    default: Optional[T] = None
 
     @property
     def setter_name(self) -> str:

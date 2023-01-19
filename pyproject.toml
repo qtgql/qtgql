@@ -41,7 +41,7 @@ build-backend = "poetry.core.masonry.api"
 [tool.mypy]
 plugins = ['qtgql/ext/mypy_plugin.py']
 ignore_missing_imports = "True"
-
+exclude = "(?x)^(.*\\.jinja.py|)$"
 
 [tool.black]
 line-length = 100
