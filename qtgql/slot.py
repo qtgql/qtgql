@@ -1,9 +1,9 @@
 import itertools
 from typing import Any, Optional, get_args
 
-from qtpy import QtCore as qtc
+from PySide6 import QtCore as qtc
 
-from qtier.typingref import is_optional
+from qtgql.typingref import is_optional
 
 
 def get_optional_args(annotations: list[Any]) -> list[Any]:

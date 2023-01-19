@@ -1,8 +1,8 @@
 import platform
 
 import pytest
+from qtgql.gqlcore.client import PROTOCOL, GqlWsTransportClient, SubscribeResponseMessage
 
-from qtier.gql.client import PROTOCOL, GqlWsTransportClient, SubscribeResponseMessage
 import tests.test_gql.fixtures
 from tests.test_gql.fixtures import PseudoHandler
 

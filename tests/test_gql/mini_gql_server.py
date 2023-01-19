@@ -2,9 +2,9 @@ import asyncio
 import random
 from typing import AsyncGenerator, Optional
 
+import strawberry
 from aiohttp import web
 from faker import Faker
-import strawberry
 from strawberry.aiohttp.views import GraphQLView
 from strawberry.types import Info
 

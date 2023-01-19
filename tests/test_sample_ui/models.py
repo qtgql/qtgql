@@ -1,15 +1,13 @@
-from qtier.itemsystem import define_roles, role
+from qtgql.itemsystem import BaseType, role
 
 
-@define_roles
-class Worm:
+class Worm(BaseType):
     name: str = role()
     family: str = role()
     size: int = role()
 
 
-@define_roles
-class Apple:
+class Apple(BaseType):
     size: int = role()
     owner: str = role()
     color: str = role()

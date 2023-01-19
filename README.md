@@ -1,11 +1,17 @@
-# qtier
-## Cuter approach to Qt-for-python, with focus on type hints, JSON APIs and QML.
+# qtgql
+## Qt framework for building graphql driven QML applications
+![PyPI - Downloads](https://img.shields.io/pypi/dm/qtgql)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/qtgql?style=for-the-badge)
+![PyPI](https://img.shields.io/pypi/v/qtgql?style=for-the-badge)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/nrbnlulu/qtgql/tests.yml?label=tests&style=for-the-badge)
+
 
 ### Example Usage:
-The following example shows how qtier can be used to query a graphql service.
+The following example shows how qtgql can be used to query a graphql service.
 *models.py*
+
 ```python
-from qtier.itemsystem import role, define_roles
+from qtgql.itemsystem import role, define_roles
 
 
 @define_roles
@@ -23,11 +29,12 @@ class Apple:
     # nested models are also supported!
     worms: Worm = role(default=None)
 ```
-qtier will create for you `QAbstractListModel` to be used in QML you only need to
+qtgql will create for you `QAbstractListModel` to be used in QML you only need to
 define your models with `define_roles`.
-qtier initializes the data with a dict, in this case coming from graphql service.
+qtgql initializes the data with a dict, in this case coming from graphql service.
 
 *main.py*
+
 ```python
 import glob
 import os
@@ -38,9 +45,9 @@ from qtpy.QtQml import QQmlApplicationEngine
 from qtpy.QtCore import QObject, Signal
 from qtpy import QtCore, QtGui, QtQml, QtQuick
 
-from qtier import slot
-from qtier.gql.client import HandlerProto, GqlClientMessage, GqlWsTransportClient
-from qtier.itemsystem import GenericModel
+from qtgql import slot
+from qtgql.gqlcore.client import HandlerProto, GqlClientMessage, GqlWsTransportClient
+from qtgql.itemsystem import GenericModel
 from tests.test_sample_ui.models import Apple
 
 
@@ -62,9 +69,9 @@ class EntryPoint(QObject):
             }
             """
         )
+
         def __init__(self, app: 'EntryPoint'):
             self.app = app
-
 
         def on_data(self, message: dict) -> None:
             self.app.apple_model.initialize_data(message['apples'])
@@ -89,7 +96,6 @@ class EntryPoint(QObject):
         QtCore.QEventLoop().processEvents(QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 1000)
         self.qml_engine.load(str(main_qml.resolve()))
 
-
     @QtCore.Property(QtCore.QObject, constant=True)
     def appleModel(self) -> GenericModel[Apple]:
         return self.apple_model
@@ -106,4 +112,4 @@ if __name__ == "__main__":
     main()
 ```
 
-![Example](assets/qtier.gif)
+![Example](assets/qtgql.gif)

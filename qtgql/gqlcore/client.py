@@ -1,25 +1,27 @@
-from abc import abstractmethod
-from collections import deque
 import json
 import logging
 import typing
-from typing import Any, Optional
 import uuid
+from abc import abstractmethod
+from collections import deque
+from typing import Any, Optional
 
 from attrs import define, field
-from qtpy import QtCore as qtc
-from qtpy import QtNetwork as qtn
-from qtpy import QtWebSockets as qtws
+from PySide6 import QtCore as qtc
+from PySide6 import QtNetwork as qtn
+from PySide6 import QtWebSockets as qtws
 
-from qtier import slot
-from qtier.gql.gqlcore import UNSET, EncodeAble, GqlEncoder, QueryPayload, T
+from qtgql import slot
+from qtgql.gqlcore.gqlcore import EncodeAble, GqlEncoder, QueryPayload, T
+from qtgql.typingref import UNSET
 
 logger = logging.getLogger(__name__)
 
 
 class PROTOCOL:
-    """
-    The WebSocket sub-protocol for this specification is: graphql-transport-ws.
+    """The WebSocket sub-protocol for this specification is: graphql-transport-
+    ws.
+
     https://github.com/enisdenjo/graphql-ws/blob/master/PROTOCOL.md
     """
 
@@ -82,7 +84,7 @@ class GqlWsTransportClient(qtws.QWebSocket):
     textMessageReceived: qtc.Signal
     connected: qtc.Signal
     disconnected: qtc.Signal
-    error: qtc.Signal
+    error: qtc.Signal  # type: ignore
 
     def __init__(
         self,
@@ -130,9 +132,7 @@ class GqlWsTransportClient(qtws.QWebSocket):
         self._init_connection(req)
 
     def _init_connection(self, request: qtn.QNetworkRequest) -> None:
-        """
-        Instantiate the connection with server.
-        """
+        """Instantiate the connection with server."""
         self.open(request, self.ws_options)
 
     @staticmethod
@@ -140,9 +140,8 @@ class GqlWsTransportClient(qtws.QWebSocket):
         return json.dumps(data, cls=GqlEncoder)
 
     def gql_is_valid(self) -> bool:
-        """
-        return True if the CONNECTION_ACK has been received and ping is valid.
-        """
+        """return True if the CONNECTION_ACK has been received and ping is
+        valid."""
         return self.isValid() and self._connection_ack
 
     def subscribe(self, handler: HandlerProto) -> None:

@@ -1,31 +1,11 @@
 import json
 import re
-from typing import Any, Generic, Optional, Type, TypeVar, Union
 import uuid
+from typing import Generic, Optional, TypeVar, Union
 
 from attr import asdict, define
 
-
-class UnsetType:
-    __instance: Optional["UnsetType"] = None
-
-    def __new__(cls: Type["UnsetType"]) -> "UnsetType":
-        if cls.__instance is None:
-            cls.__instance = super().__new__(cls)
-            return cls.__instance
-        return cls.__instance
-
-    def __str__(self):
-        return ""
-
-    def __repr__(self) -> str:  # pragma: no cover
-        return "UNSET"
-
-    def __bool__(self):
-        return False
-
-
-UNSET: Any = UnsetType()
+from qtgql.typingref import UNSET
 
 
 @define

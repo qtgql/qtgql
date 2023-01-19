@@ -3,7 +3,7 @@ from typing import Any, Type, TypeVar, Union, cast, get_args
 
 import attr
 from attr import Attribute, define
-from qtpy import QtCore as qtc
+from PySide6 import QtCore as qtc
 from typing_extensions import dataclass_transform
 
 __all__ = ["define_properties"]
@@ -27,12 +27,12 @@ class BaseInner(qtc.QObject):
 class PropertyImpl(qtc.Property):
     def __init__(self, type_: type, name: str, notify: qtc.Signal):
         self.name = name
-        super().__init__(type_, fget=self.getter, fset=self.setter, notify=notify)
+        super().__init__(type_, fget=self.getter, fset=self.setter, notify=notify)  # type: ignore
 
-    def getter(self, instance: BaseInner):
+    def getter(self, instance: BaseInner):  # type: ignore
         return getattr(instance.attrs_instance, f"{self.name}")
 
-    def setter(self, instance: BaseInner, value):
+    def setter(self, instance: BaseInner, value):  # type: ignore
         signal = getattr(instance, signal_name(self.name))
         setattr(instance.attrs_instance, f"{self.name}", value)
         signal.emit()
