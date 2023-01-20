@@ -21,7 +21,7 @@ strawberry-graphql = ">=0.142.2"
 aiohttp = {extras = ["speedups"], version = "^3.8.3"}
 mypy = "^0.991"
 faker = "^15.3.4"
-mkdocs-material = "^9.0.5"
+mkdocs-material = "^9.0.6"
 mike = "^1.1.2"
 markdown-include = "^0.8.0"
 mkdocstrings = {extras = ["python"], version = "^0.19.1"}
