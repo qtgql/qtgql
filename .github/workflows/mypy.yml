@@ -1,5 +1,5 @@
 ---
-name: Run Tests
+name: Type checks
 
 on:
   push:
