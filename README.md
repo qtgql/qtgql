@@ -5,8 +5,9 @@
 ![PyPI](https://img.shields.io/pypi/v/qtgql?style=for-the-badge)
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/nrbnlulu/qtgql/tests.yml?label=tests&style=for-the-badge)
 
-
-
+### Disclaimer
+This project is currently under development and **it is not** production ready,
+You can play-around and tell us what is wrong / missing / awesome :smile:.
 ### Intro
 Qt-QML IMO is a big game changer
 - you get native performance

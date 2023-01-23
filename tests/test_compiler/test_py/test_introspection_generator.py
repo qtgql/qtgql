@@ -176,3 +176,17 @@ class TestObjectWithListOfObject(ObjectTestCaseMixin):
         klass = getattr(compiled.mod, compiled.tested_type.name)
         inst: BaseQGraphQLObject = klass.from_dict(None, self.initialize_dict)
         assert isinstance(inst.persons, BaseModel)
+
+
+class TestObjectWithInterface(ObjectTestCaseMixin):
+    schema = schemas.object_with_interface.schema
+    initialize_dict = schema.execute_sync(
+        query="""
+        query {
+            user{
+                name
+                age
+            }
+        }
+        """
+    ).data["user"]

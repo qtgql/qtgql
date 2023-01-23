@@ -5,21 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="288baa58-55a0-493e-a12a-9b49a4f1837e" name="Changes" comment="feat: init from dict, list of object type creates a model. the model is not tested yet.">
-      <change afterPath="$PROJECT_DIR$/tests/conftest.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tests/test_compiler/schemas/object_with_list_of_object.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tests/test_compiler/test_py/__temp.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/test_compiler/schemas/object_with_interface.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qtgql/compiler/introspection.py" beforeDir="false" afterPath="$PROJECT_DIR$/qtgql/compiler/introspection.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qtgql/compiler/objecttype.py" beforeDir="false" afterPath="$PROJECT_DIR$/qtgql/compiler/objecttype.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qtgql/compiler/py/bases.py" beforeDir="false" afterPath="$PROJECT_DIR$/qtgql/compiler/py/bases.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qtgql/compiler/py/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/qtgql/compiler/py/serializers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qtgql/compiler/py/templates/schema.jinja.py" beforeDir="false" afterPath="$PROJECT_DIR$/qtgql/compiler/py/templates/schema.jinja.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qtgql/itemsystem/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/qtgql/itemsystem/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/mini_gql_server.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/mini_gql_server.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/test_compiler/schemas/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_compiler/schemas/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_compiler/test_py/__temp.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_compiler/test_py/__temp.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/test_compiler/test_py/test_introspection_generator.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_compiler/test_py/test_introspection_generator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_sample_ui/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_sample_ui/models.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -82,7 +73,7 @@
       <recent name="$PROJECT_DIR$/docs" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.main">
+  <component name="RunManager" selected="Python tests.Python tests for test_introspection_generator.TestSimpleObjectWithInterface">
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="qter" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -97,50 +88,6 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tests/test_sample_ui/main.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="mini_gql_server" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="qter" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tests/mini_gql_server.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="object_with_list_of_object" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="qter" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests/test_compiler/schemas" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tests/test_compiler/schemas/object_with_list_of_object.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -164,7 +111,7 @@
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
-    <configuration name="Python tests for test_introspection_generator.TestObjectWithListOfObject.test_from_dict" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+    <configuration name="Python tests for test_introspection_generator.TestSimpleObjectWithInterface" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
       <module name="qter" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -175,17 +122,53 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;test_introspection_generator.TestObjectWithListOfObject.test_from_dict&quot;" />
+      <option name="_new_target" value="&quot;test_introspection_generator.TestSimpleObjectWithInterface&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest for tests.test_compiler.test_py.test_introspection_generator" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="qter" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="$PROJECT_DIR$/.venv/bin/python" />
+      <option name="SDK_NAME" value="Poetry (qter)" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests/test_compiler/test_py" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_parameters" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;tests.test_compiler.test_py.test_introspection_generator&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest for tests.test_compiler.test_py.test_introspection_generator.TestObjectWithListOfObject" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="qter" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="$PROJECT_DIR$/.venv/bin/python" />
+      <option name="SDK_NAME" value="Poetry (qter)" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests/test_compiler/test_py" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_parameters" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;tests.test_compiler.test_py.test_introspection_generator.TestObjectWithListOfObject&quot;" />
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.main" />
-        <item itemvalue="Python.mini_gql_server" />
-        <item itemvalue="Python tests.Python tests for test_introspection_generator.TestObjectWithListOfObject.test_from_dict" />
+        <item itemvalue="Python tests.Python tests for test_introspection_generator.TestSimpleObjectWithInterface" />
+        <item itemvalue="Python tests.pytest for tests.test_compiler.test_py.test_introspection_generator" />
+        <item itemvalue="Python tests.pytest for tests.test_compiler.test_py.test_introspection_generator.TestObjectWithListOfObject" />
         <item itemvalue="Python tests.Python tests for test_introspection_generator.TestObjectWithListOfObject" />
-        <item itemvalue="Python.object_with_list_of_object" />
+        <item itemvalue="Python.main" />
       </list>
     </recent_temporary>
   </component>
@@ -217,7 +200,7 @@
       <workItem from="1674325247191" duration="8325000" />
       <workItem from="1674363605508" duration="18000000" />
       <workItem from="1674383624576" duration="27748000" />
-      <workItem from="1674450509285" duration="12330000" />
+      <workItem from="1674450509285" duration="13960000" />
     </task>
     <task id="LOCAL-00001" summary="first commit!">
       <created>1671541830132</created>
@@ -345,7 +328,14 @@
       <option name="project" value="LOCAL" />
       <updated>1674452928351</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="feat: init from dict, list of object type creates a model. the model is not tested yet.">
+      <created>1674463284162</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1674463284162</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -468,6 +458,11 @@
           <line>177</line>
           <option name="timeStamp" value="179" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/tests/test_compiler/test_py/test_introspection_generator.py</url>
+          <line>38</line>
+          <option name="timeStamp" value="181" />
+        </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/docs/js/termynal.js</url>
           <line>73</line>
@@ -477,7 +472,8 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/qter$.coverage" NAME=" Coverage Results" MODIFIED="1674462494520" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_compiler/test_py" />
+    <SUITE FILE_PATH="coverage/qter$pytest_for_tests_test_compiler_test_py_test_introspection_generator_TestObjectWithListOfObject.coverage" NAME="pytest for tests.test_compiler.test_py.test_introspection_generator.TestObjectWithListOfObject Coverage Results" MODIFIED="1674463540765" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_compiler/test_py" />
+    <SUITE FILE_PATH="coverage/qter$.coverage" NAME=" Coverage Results" MODIFIED="1674464299694" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_compiler/test_py" />
     <SUITE FILE_PATH="coverage/qter$pytest_for_tests_test_itemsystem_test_core_TestGenericModel_test_initialize_create_data.coverage" NAME="pytest for tests.test_itemsystem.test_core.TestGenericModel.test_initialize_create_data Coverage Results" MODIFIED="1671550177288" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_itemsystem" />
     <SUITE FILE_PATH="coverage/qter$pytest_for_tests_test_itemsystem_test_schema_test_schema_test_simple_schema.coverage" NAME="pytest for tests.test_itemsystem.test_schema.test_schema.test_simple_schema Coverage Results" MODIFIED="1671778644984" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_itemsystem/test_schema" />
     <SUITE FILE_PATH="coverage/qter$test_generate_types_from_schema.coverage" NAME="test-generate_types_from_schema Coverage Results" MODIFIED="1674115758887" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_compiler/test_py" />
@@ -495,7 +491,7 @@
     <SUITE FILE_PATH="coverage/qter$pytest_for_tests_test_typingref.coverage" NAME="pytest for tests.test_typingref Coverage Results" MODIFIED="1674372222205" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
     <SUITE FILE_PATH="coverage/qter$pytest_for_tests_test_itemsystem_test_schema.coverage" NAME="pytest for tests.test_itemsystem.test_schema Coverage Results" MODIFIED="1671738415142" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_itemsystem/test_schema" />
     <SUITE FILE_PATH="coverage/qter$pytest_for_tests_test_itemsystem.coverage" NAME="pytest for tests.test_itemsystem Coverage Results" MODIFIED="1671962897743" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_itemsystem" />
-    <SUITE FILE_PATH="coverage/qter$pytest_for_tests_test_compiler_test_py_test_introspection_generator.coverage" NAME="pytest for tests.test_compiler.test_py.test_introspection_generator Coverage Results" MODIFIED="1674458474873" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_compiler/test_py" />
+    <SUITE FILE_PATH="coverage/qter$pytest_for_tests_test_compiler_test_py_test_introspection_generator.coverage" NAME="pytest for tests.test_compiler.test_py.test_introspection_generator Coverage Results" MODIFIED="1674463543972" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_compiler/test_py" />
     <SUITE FILE_PATH="coverage/qter$compiler.coverage" NAME="compiler Coverage Results" MODIFIED="1674113006440" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/qtgql/compiler/py" />
     <SUITE FILE_PATH="coverage/qter$pytest_for_tests_test_itemsystem_test_generic_model.coverage" NAME="pytest for tests.test_itemsystem.test_generic_model Coverage Results" MODIFIED="1671731949732" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_itemsystem/test_generic_model" />
     <SUITE FILE_PATH="coverage/qter$pytest_for_tests_test_gql_test_handlers_test_subscriber_called_with_on_gql_next.coverage" NAME="pytest for tests.test_gql.test_handlers.test_subscriber_called_with_on_gql_next Coverage Results" MODIFIED="1671546140462" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_gql" />

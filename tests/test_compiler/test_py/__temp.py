@@ -19,7 +19,7 @@ class Query(BaseQGraphQLObject):
     def from_dict(cls, parent, data: dict) -> Query:
         return cls(
             parent=parent,
-            user=User.from_dict(data["user"]),
+            user=User.from_dict(parent, data["user"]),
         )
 
     userChanged = Signal()
@@ -44,49 +44,15 @@ class User(BaseQGraphQLObject):
     def __init__(
         self,
         parent: QObject = None,
-        persons: list[Person] = None,
-    ):
-        super().__init__(parent)
-        self._persons = persons
-
-    @classmethod
-    def from_dict(cls, parent, data: dict) -> User:
-        return cls(
-            parent=parent,
-            persons=cls.deserialize_list_of(parent, data, PersonModel, "persons", Person),
-        )
-
-    personsChanged = Signal()
-
-    def persons_setter(self, v: list[Person]) -> None:
-        self._persons = v
-        self.personsChanged.emit()
-
-    @Property(type="QVariant", fset=persons_setter, notify=personsChanged)
-    def persons(self) -> list[Person]:
-        return self._persons
-
-
-class UserModel(BaseModel):
-    def __init__(self, data: list[User], parent: BaseQGraphQLObject | None = None):
-        super().__init__(data, parent)
-
-
-class Person(BaseQGraphQLObject):
-    """None."""
-
-    def __init__(
-        self,
-        parent: QObject = None,
         name: str = None,
-        age: int = None,
+        age: str = None,
     ):
         super().__init__(parent)
         self._name = name
         self._age = age
 
     @classmethod
-    def from_dict(cls, parent, data: dict) -> Person:
+    def from_dict(cls, parent, data: dict) -> User:
         return cls(
             parent=parent,
             name=data["name"],
@@ -105,15 +71,15 @@ class Person(BaseQGraphQLObject):
 
     ageChanged = Signal()
 
-    def age_setter(self, v: int) -> None:
+    def age_setter(self, v: str) -> None:
         self._age = v
         self.ageChanged.emit()
 
-    @Property(type=int, fset=age_setter, notify=ageChanged)
-    def age(self) -> int:
+    @Property(type=str, fset=age_setter, notify=ageChanged)
+    def age(self) -> str:
         return self._age
 
 
-class PersonModel(BaseModel):
-    def __init__(self, data: list[Person], parent: BaseQGraphQLObject | None = None):
+class UserModel(BaseModel):
+    def __init__(self, data: list[User], parent: BaseQGraphQLObject | None = None):
         super().__init__(data, parent)
