@@ -65,26 +65,21 @@ class _BaseQGraphQLObject(QObject):
 
 
 class BaseModel(QAbstractListModel):
-    PROPERTY_ROLE = Qt.ItemDataRole.UserRole + 1
+    OBJECT_ROLE = Qt.ItemDataRole.UserRole + 1
 
     def __init__(self, data: list[T_BaseQGraphQLObject], parent: QObject | None = None):
         super().__init__(parent)
         self._data = data
 
-    def flags(self, index):
-        if index.row() < len(self._data) and index.isValid():
-            return Qt.ItemFlag.ItemIsEditable
-        return Qt.ItemFlag.NoItemFlags
-
     def rowCount(self, *args, **kwargs) -> int:
         return len(self._data)
 
     def roleNames(self) -> dict:
-        return {self.PROPERTY_ROLE: QByteArray("object")}
+        return {self.OBJECT_ROLE: QByteArray("object")}
 
     def data(self, index, role=...) -> _BaseQGraphQLObject | None:
         if index.row() < len(self._data) and index.isValid():
-            if role == self.PROPERTY_ROLE:
+            if role == self.OBJECT_ROLE:
                 return self._data[index.row()]
             raise NotImplementedError(
                 f"role {role} is not a valid role for {self.__class__.__name__}"

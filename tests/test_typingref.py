@@ -1,7 +1,7 @@
 from typing import List, Optional, Union, get_args, get_origin
 
 import pytest
-from qtgql.typingref import TypeHinter
+from qtgql.typingref import UNSET, TypeHinter, UnsetType
 
 
 class TestFromAnnotation:
@@ -66,3 +66,14 @@ class TestToAnnotation:
         tp = Optional[SomeHiddenType]
         th = TypeHinter(type=Optional, of_type=(TypeHinter(type=SomeHiddenType.__name__),))
         assert th.as_annotation({SomeHiddenType.__name__: SomeHiddenType}) == tp
+
+
+class TestUnsetType:
+    def test_returns_null_str(self):
+        assert not str(UNSET)
+
+    def test_false_bool(self):
+        assert not bool(UNSET)
+
+    def test_singleton(self):
+        assert UNSET is UnsetType()
