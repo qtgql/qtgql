@@ -1,4 +1,5 @@
-from typing import Optional
+from functools import cached_property
+from typing import Optional, Union
 
 import graphql
 
@@ -19,6 +20,18 @@ class SchemaEvaluator:
             for scalar in BuiltinScalars.keys()
         }
         self._evaluate()
+
+    @cached_property
+    def unions(self) -> list[dict]:
+        return [
+            t for t in self.introspection["__schema"]["types"] if Kinds[t["kind"]] == Kinds.UNION
+        ]
+
+    def get_possible_types_for_union(self, name: str) -> list[str]:
+        for union in self.unions:
+            if union["name"] == name:
+                return union["possibleTypes"]
+        raise ValueError(f"Union for {name} was not found")
 
     def evaluate_field_type(self, t: dict) -> TypeHinter:
         kind = Kinds[t["kind"]]
@@ -43,10 +56,17 @@ class SchemaEvaluator:
             ret = TypeHinter(type=BuiltinScalars[name], of_type=None)
         elif kind == Kinds.OBJECT:
             ret = TypeHinter(type=anti_forward_ref(name), of_type=None)
-        elif kind == Kinds.ENUM:
-            raise NotImplementedError
+        elif kind == Kinds.UNION:
+            ret = TypeHinter(
+                type=Union,
+                of_type=tuple(
+                    TypeHinter(type=anti_forward_ref(possible["name"]))
+                    for possible in self.get_possible_types_for_union(name)
+                ),
+            )
         if ret:
             return optional_maybe(ret)
+
         raise NotImplementedError(f"kind {kind} not supported yet")
 
     def evaluate_field(self, field: dict) -> FieldProperty:

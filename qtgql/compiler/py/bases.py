@@ -6,12 +6,24 @@ from PySide6.QtCore import QObject, Qt
 
 from qtgql import slot
 
+__all__ = ["BaseModel", "get_base_graphql_object"]
 
-class BaseQGraphQLObject(QObject):
+
+def get_base_graphql_object(name: str | None = "BaseGraphQLObject") -> _BaseQGraphQLObject:
+    type_map = {}
+    return type(name, (_BaseQGraphQLObject,), {"type_map": type_map})  # type: ignore
+
+
+class _BaseQGraphQLObject(QObject):
+    type_map: dict[str, type[_BaseQGraphQLObject]]
+
+    def __init_subclass__(cls, **kwargs):
+        cls.type_map[cls.__name__] = cls
+
     def __init__(self, parent: QObject | None = None):
         super().__init__(parent)
 
-    def from_dict(self, parent: BaseQGraphQLObject, data: dict) -> BaseQGraphQLObject:
+    def from_dict(self, parent: _BaseQGraphQLObject, data: dict) -> _BaseQGraphQLObject:
         raise NotImplementedError
 
     @classmethod
@@ -21,7 +33,7 @@ class BaseQGraphQLObject(QObject):
         data: dict,
         child: type[T_BaseQGraphQLObject],
         field_name: str,
-    ) -> None | (T_BaseQGraphQLObject):
+    ) -> T_BaseQGraphQLObject | None:
         if found := data.get(field_name, None):
             return child.from_dict(parent, found)
         return None
@@ -39,11 +51,23 @@ class BaseQGraphQLObject(QObject):
             return model(parent=parent, data=[of_type.from_dict(parent, data) for data in found])
         return None
 
+    @classmethod
+    def deserialize_union(
+        cls,
+        parent: T_BaseQGraphQLObject,
+        data: dict,
+        field_name: str,
+    ) -> T_BaseModel | None:
+        if found := data.get(field_name, None):
+            child = cls.type_map[found["__typename"]]
+            return child.from_dict(parent, found)
+        return None
+
 
 class BaseModel(QObject):
     PROPERTY_ROLE = Qt.ItemDataRole.UserRole + 1
 
-    def __init__(self, data: list[BaseQGraphQLObject], parent: QObject | None = None):
+    def __init__(self, data: list[_BaseQGraphQLObject], parent: QObject | None = None):
         super().__init__(parent)
         self._data = data
 
@@ -55,7 +79,7 @@ class BaseModel(QObject):
     def roleNames(self) -> dict:
         return {b"object": self.PROPERTY_ROLE}
 
-    def data(self, index, role=...) -> BaseQGraphQLObject | None:
+    def data(self, index, role=...) -> _BaseQGraphQLObject | None:
         if index.row() < len(self._data) and index.isValid():
             if role == self.PROPERTY_ROLE:
                 return self._data[index.row()]
@@ -63,7 +87,7 @@ class BaseModel(QObject):
                 f"role {role} is not a valid role for {self.__class__.__name__}"
             )
 
-    def append(self, node: BaseQGraphQLObject) -> None:
+    def append(self, node: _BaseQGraphQLObject) -> None:
         count = self.rowCount()
         self.beginInsertRows(self.index(count), count, count)
         self._data.append(node)
@@ -79,4 +103,4 @@ class BaseModel(QObject):
 
 
 T_BaseModel = TypeVar("T_BaseModel", bound=BaseModel)
-T_BaseQGraphQLObject = TypeVar("T_BaseQGraphQLObject", bound=BaseQGraphQLObject)
+T_BaseQGraphQLObject = TypeVar("T_BaseQGraphQLObject", bound=_BaseQGraphQLObject)

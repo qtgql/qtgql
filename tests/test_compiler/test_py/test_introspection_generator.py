@@ -5,7 +5,7 @@ from typing import NamedTuple
 import pytest
 from qtgql.compiler.introspection import SchemaEvaluator, introspection_query
 from qtgql.compiler.objecttype import GqlType
-from qtgql.compiler.py.bases import BaseModel, BaseQGraphQLObject
+from qtgql.compiler.py.bases import BaseModel, _BaseQGraphQLObject
 from strawberry import Schema
 
 from tests.mini_gql_server import schema
@@ -174,7 +174,7 @@ class TestObjectWithListOfObject(ObjectTestCaseMixin):
     def test_from_dict(self, qtbot):
         compiled = self.compiled()
         klass = getattr(compiled.mod, compiled.tested_type.name)
-        inst: BaseQGraphQLObject = klass.from_dict(None, self.initialize_dict)
+        inst: _BaseQGraphQLObject = klass.from_dict(None, self.initialize_dict)
         assert isinstance(inst.persons, BaseModel)
 
 
@@ -190,3 +190,54 @@ class TestObjectWithInterface(ObjectTestCaseMixin):
         }
         """
     ).data["user"]
+
+
+class TestObjectWithUnion(ObjectTestCaseMixin):
+    schema = schemas.object_with_union.schema
+    initialize_dict = schema.execute_sync(
+        query="""
+            {
+              user {
+                whoAmI {
+                  ... on Frog {
+                    __typename
+                    name
+                    color
+                  }
+                  ... on Person {
+                    __typename
+                    name
+                    age
+                  }
+                }
+              }
+            }
+        """
+    ).data["user"]
+
+
+class TestObjectWithListOfTypeWithUnion(ObjectTestCaseMixin):
+    schema = schemas.object_with_list_of_type_with_union.schema
+    initialize_dict = schema.execute_sync(
+        query="""
+            {
+              userManager {
+                users {
+                  whoAmI {
+                    ... on Frog {
+                      __typename
+                      name
+                      color
+                    }
+                    ... on Person {
+                      __typename
+                      name
+                      age
+                    }
+                  }
+                }
+              }
+            }
+
+        """
+    ).data["userManager"]

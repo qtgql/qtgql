@@ -1,10 +1,10 @@
 import enum
 from functools import cached_property
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from attrs import define
 
-from qtgql.compiler.py.bases import BaseQGraphQLObject
+from qtgql.compiler.py.bases import _BaseQGraphQLObject
 from qtgql.compiler.utils import AntiForwardRef
 from qtgql.typingref import TypeHinter
 
@@ -44,7 +44,7 @@ class FieldProperty:
             # handle inner type
             assert issubclass(inner, AntiForwardRef)
             if inner.name in self.type_map.keys():
-                return f"cls.{BaseQGraphQLObject.deserialize_optional_child.__name__}(parent, data, {inner.name}, '{self.name}')"
+                return f"cls.{_BaseQGraphQLObject.deserialize_optional_child.__name__}(parent, data, {inner.name}, '{self.name}')"
 
         if t in BuiltinScalars.values():
             return default
@@ -53,8 +53,11 @@ class FieldProperty:
             # handle inner type
             assert issubclass(inner, AntiForwardRef)
             gql_type = self.type_map[inner.name]
-            return f"cls.{BaseQGraphQLObject.deserialize_list_of.__name__}(parent, data, {gql_type.model_name}, '{self.name}', {gql_type.name})"
-
+            return f"cls.{_BaseQGraphQLObject.deserialize_list_of.__name__}(parent, data, {gql_type.model_name}, '{self.name}', {gql_type.name})"
+        if t is Union:
+            return (
+                f"cls.{_BaseQGraphQLObject.deserialize_union.__name__}(parent, data, '{self.name}')"
+            )
         # handle inner type
         assert issubclass(t, AntiForwardRef)
         if t.name in self.type_map.keys():

@@ -1,12 +1,12 @@
 from __future__ import annotations
 from PySide6.QtCore import Property, Signal, QObject
-from typing import Optional
-from qtgql.compiler.py.bases import BaseQGraphQLObject, BaseModel
+from typing import Optional, Union
+from qtgql.compiler.py.bases import get_base_graphql_object, BaseModel
 
-
+BaseObject = get_base_graphql_object()
 
 {% for type in types %}
-class {{ type.name }}(BaseQGraphQLObject):
+class {{ type.name }}(BaseObject):
     """{{  type.docstring  }}"""
     def __init__(self, parent: QObject = None, {% for f in type.fields %} {{f.name}}: {{f.annotation}} = None, {% endfor %}):
         super().__init__(parent){% for f in type.fields %}
@@ -31,7 +31,7 @@ class {{ type.name }}(BaseQGraphQLObject):
         return self.{{  f.private_name  }}
     {% endfor %}
 class {{ type.model_name }}(BaseModel):
-    def __init__(self, data: list[{{  type.name  }}], parent: Optional[BaseQGraphQLObject] = None):
+    def __init__(self, data: list[{{  type.name  }}], parent: Optional[BaseObject] = None):
         super().__init__(data, parent)
 
 
