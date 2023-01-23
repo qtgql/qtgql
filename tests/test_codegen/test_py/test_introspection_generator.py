@@ -9,9 +9,9 @@ from qtgql.codegen.py.bases import BaseModel, _BaseQGraphQLObject
 from strawberry import Schema
 
 from tests.mini_gql_server import schema
-from tests.test_compiler import schemas
-from tests.test_compiler.conftest import get_introspection_for
-from tests.test_compiler.test_py.conftest import generate_type_kwargs
+from tests.test_codegen import schemas
+from tests.test_codegen.conftest import get_introspection_for
+from tests.test_codegen.test_py.conftest import generate_type_kwargs
 
 
 @pytest.fixture

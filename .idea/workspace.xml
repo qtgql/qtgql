@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="288baa58-55a0-493e-a12a-9b49a4f1837e" name="Changes" comment="remove redundant pytest plugins.">
-      <change afterPath="$PROJECT_DIR$/.github/workflows/mypy.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/workflows/tests.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/tests.yml" afterDir="false" />
+    <list default="true" id="288baa58-55a0-493e-a12a-9b49a4f1837e" name="Changes" comment="update workflows files.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -205,7 +203,7 @@
       <workItem from="1674325247191" duration="8325000" />
       <workItem from="1674363605508" duration="18000000" />
       <workItem from="1674383624576" duration="27748000" />
-      <workItem from="1674450509285" duration="27894000" />
+      <workItem from="1674450509285" duration="29847000" />
     </task>
     <task id="LOCAL-00001" summary="first commit!">
       <created>1671541830132</created>
@@ -382,7 +380,21 @@
       <option name="project" value="LOCAL" />
       <updated>1674484046296</updated>
     </task>
-    <option name="localTasksCounter" value="26" />
+    <task id="LOCAL-00026" summary="update workflows files.">
+      <created>1674484208621</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1674484208621</updated>
+    </task>
+    <task id="LOCAL-00027" summary="update workflows files.">
+      <created>1674484256749</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1674484256749</updated>
+    </task>
+    <option name="localTasksCounter" value="28" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -435,7 +447,8 @@
     <MESSAGE value="rename `compiler` module to `codegen`" />
     <MESSAGE value="migrate the sample UI to codegen." />
     <MESSAGE value="remove redundant pytest plugins." />
-    <option name="LAST_COMMIT_MESSAGE" value="remove redundant pytest plugins." />
+    <MESSAGE value="update workflows files." />
+    <option name="LAST_COMMIT_MESSAGE" value="update workflows files." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
