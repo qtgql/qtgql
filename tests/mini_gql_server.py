@@ -4,11 +4,10 @@ from typing import AsyncGenerator, Optional
 
 import strawberry
 from aiohttp import web
-from faker import Faker
 from strawberry.aiohttp.views import GraphQLView
 from strawberry.types import Info
 
-fake = Faker()
+from tests.conftest import fake
 
 
 @strawberry.type

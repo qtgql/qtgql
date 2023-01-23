@@ -1,9 +1,10 @@
 import enum
 from functools import cached_property
-from typing import Optional
+from typing import List, Optional
 
 from attrs import define
 
+from qtgql.compiler.py.bases import BaseQGraphQLObject
 from qtgql.compiler.utils import AntiForwardRef
 from qtgql.typingref import TypeHinter
 
@@ -43,14 +44,21 @@ class FieldProperty:
             # handle inner type
             assert issubclass(inner, AntiForwardRef)
             if inner.name in self.type_map.keys():
-                return f"deserialize_optional_child(data, {inner.name}, '{self.name}')"
+                return f"cls.{BaseQGraphQLObject.deserialize_optional_child.__name__}(parent, data, {inner.name}, '{self.name}')"
 
         if t in BuiltinScalars.values():
             return default
+        if t in (list, List):
+            inner = self.type.of_type[0].type
+            # handle inner type
+            assert issubclass(inner, AntiForwardRef)
+            gql_type = self.type_map[inner.name]
+            return f"cls.{BaseQGraphQLObject.deserialize_list_of.__name__}(parent, data, {gql_type.model_name}, '{self.name}', {gql_type.name})"
+
         # handle inner type
         assert issubclass(t, AntiForwardRef)
         if t.name in self.type_map.keys():
-            return f"{t.name}.from_dict({default})"
+            return f"{t.name}.from_dict(parent, {default})"
         raise NotImplementedError
 
     @cached_property
@@ -88,12 +96,16 @@ class FieldProperty:
         return "_" + self.name
 
 
-@define
+@define(slots=False)
 class GqlType:
     kind: Kinds
     name: str
     fields: list["FieldProperty"]
     docstring: Optional[str] = ""
+
+    @cached_property
+    def model_name(self) -> str:
+        return self.name + "Model"
 
 
 BuiltinScalars: dict[str, type] = {

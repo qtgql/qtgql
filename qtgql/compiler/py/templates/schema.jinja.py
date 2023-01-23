@@ -1,20 +1,21 @@
 from __future__ import annotations
 from PySide6.QtCore import Property, Signal, QObject
 from typing import Optional
+from qtgql.compiler.py.bases import BaseQGraphQLObject, BaseModel
 
-from qtgql.compiler.py.serializers import deserialize_optional_child
 
 
 {% for type in types %}
-class {{ type.name }}(QObject):
+class {{ type.name }}(BaseQGraphQLObject):
     """{{  type.docstring  }}"""
     def __init__(self, parent: QObject = None, {% for f in type.fields %} {{f.name}}: {{f.annotation}} = None, {% endfor %}):
         super().__init__(parent){% for f in type.fields %}
         self.{{  f.private_name  }} = {{f.name}}{% endfor %}
 
     @classmethod
-    def from_dict(cls, data: dict) -> {{type.name}}:
-        return cls({% for f in type.fields %}
+    def from_dict(cls, parent,  data: dict) -> {{type.name}}:
+        return cls(
+        parent=parent,{% for f in type.fields %}
         {{f.name}} = {{f.deserializer}},{% endfor %}
         )
 
@@ -29,5 +30,9 @@ class {{ type.name }}(QObject):
     def {{ f.name }}(self) -> {{ f.annotation }}:
         return self.{{  f.private_name  }}
     {% endfor %}
+class {{ type.model_name }}(BaseModel):
+    def __init__(self, data: list[{{  type.name  }}], parent: Optional[BaseQGraphQLObject] = None):
+        super().__init__(data, parent)
+
 
 {% endfor %}

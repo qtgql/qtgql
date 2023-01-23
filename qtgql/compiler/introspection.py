@@ -88,4 +88,6 @@ class SchemaEvaluator:
         """
         :return: The generated schema module as a string.
         """
-        return self.compiler(list(self._generated_types.values()))
+        return self.compiler(
+            [t for name, t in self._generated_types.items() if name not in BuiltinScalars.keys()]
+        )

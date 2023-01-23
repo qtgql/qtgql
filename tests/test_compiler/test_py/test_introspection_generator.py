@@ -5,6 +5,7 @@ from typing import NamedTuple
 import pytest
 from qtgql.compiler.introspection import SchemaEvaluator, introspection_query
 from qtgql.compiler.objecttype import GqlType
+from qtgql.compiler.py.bases import BaseModel, BaseQGraphQLObject
 from strawberry import Schema
 
 from tests.mini_gql_server import schema
@@ -26,10 +27,18 @@ class ObjectTesterHelper(NamedTuple):
 class ObjectTestCaseMixin:
     schema: Schema
     initialize_dict: dict
+    type_name = "User"
 
     @classmethod
     def compiled(cls) -> ObjectTesterHelper:
-        raise NotImplementedError
+        tmp_mod = cls.get_tmp_mod()
+        type_name = cls.type_name
+        introspection = get_introspection_for(cls.schema)
+        res = SchemaEvaluator(introspection)
+        generated = res.generate()
+        compiled = compile(generated, "schema", "exec")
+        exec(compiled, tmp_mod.__dict__)
+        return ObjectTesterHelper(mod=tmp_mod, tested_type=res._generated_types[type_name])
 
     @classmethod
     def get_tmp_mod(cls):
@@ -70,7 +79,7 @@ class ObjectTestCaseMixin:
     def test_from_dict(self, qtbot):
         compiled = self.compiled()
         klass = getattr(compiled.mod, compiled.tested_type.name)
-        klass.from_dict(self.initialize_dict)
+        klass.from_dict(None, self.initialize_dict)
 
 
 class TestSimpleObjectWithScalar(ObjectTestCaseMixin):
@@ -86,16 +95,6 @@ class TestSimpleObjectWithScalar(ObjectTestCaseMixin):
         """
     ).data["user"]
 
-    @classmethod
-    def compiled(cls):
-        tmp_mod = cls.get_tmp_mod()
-        type_name = "User"
-        introspection = get_introspection_for(cls.schema)
-        res = SchemaEvaluator(introspection)
-        compiled = compile(res.generate(), "schema", "exec")
-        exec(compiled, tmp_mod.__dict__)
-        return ObjectTesterHelper(mod=tmp_mod, tested_type=res._generated_types[type_name])
-
 
 class TestObjectWithOptionalScalar(ObjectTestCaseMixin):
     schema = schemas.object_with_optional_scalar.schema
@@ -109,16 +108,6 @@ class TestObjectWithOptionalScalar(ObjectTestCaseMixin):
         }
         """
     ).data["user"]
-
-    @classmethod
-    def compiled(cls):
-        tmp_mod = cls.get_tmp_mod()
-        type_name = "User"
-        introspection = get_introspection_for(cls.schema)
-        res = SchemaEvaluator(introspection)
-        compiled = compile(res.generate(), "schema", "exec")
-        exec(compiled, tmp_mod.__dict__)
-        return ObjectTesterHelper(mod=tmp_mod, tested_type=res._generated_types[type_name])
 
 
 class TestObjectWithObject(ObjectTestCaseMixin):
@@ -136,20 +125,10 @@ class TestObjectWithObject(ObjectTestCaseMixin):
         """
     ).data["user"]
 
-    @classmethod
-    def compiled(cls):
-        tmp_mod = cls.get_tmp_mod()
-        type_name = "User"
-        introspection = get_introspection_for(cls.schema)
-        res = SchemaEvaluator(introspection)
-        compiled = compile(res.generate(), "schema", "exec")
-        exec(compiled, tmp_mod.__dict__)
-        return ObjectTesterHelper(mod=tmp_mod, tested_type=res._generated_types[type_name])
-
     def test_from_dict(self, qtbot):
         compiled = self.compiled()
         klass = getattr(compiled.mod, compiled.tested_type.name)
-        inst = klass.from_dict(self.initialize_dict)
+        inst = klass.from_dict(None, self.initialize_dict)
         assert inst.person.name == "Patrick"
         assert inst.person.age == 100
 
@@ -169,18 +148,31 @@ class TestObjectWithOptionalObjectField(ObjectTestCaseMixin):
         """
     ).data["user"]
 
-    @classmethod
-    def compiled(cls) -> ObjectTesterHelper:
-        tmp_mod = cls.get_tmp_mod()
-        type_name = "User"
-        introspection = get_introspection_for(cls.schema)
-        res = SchemaEvaluator(introspection)
-        compiled = compile(res.generate(), "schema", "exec")
-        exec(compiled, tmp_mod.__dict__)
-        return ObjectTesterHelper(mod=tmp_mod, tested_type=res._generated_types[type_name])
+    def test_from_dict(self, qtbot):
+        compiled = self.compiled()
+        klass = getattr(compiled.mod, compiled.tested_type.name)
+        inst = klass.from_dict(None, self.initialize_dict)
+        assert inst.person is None
+
+
+# TODO: TestObjectWithListOfScalar
+class TestObjectWithListOfObject(ObjectTestCaseMixin):
+    schema = schemas.object_with_list_of_object.schema
+    initialize_dict = schema.execute_sync(
+        query="""
+        query {
+            user{
+                persons{
+                    name
+                    age
+                }
+            }
+        }
+        """
+    ).data["user"]
 
     def test_from_dict(self, qtbot):
         compiled = self.compiled()
         klass = getattr(compiled.mod, compiled.tested_type.name)
-        inst = klass.from_dict(self.initialize_dict)
-        assert inst.person is None
+        inst: BaseQGraphQLObject = klass.from_dict(None, self.initialize_dict)
+        assert isinstance(inst.persons, BaseModel)
