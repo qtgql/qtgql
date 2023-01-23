@@ -34,22 +34,18 @@ class FieldProperty:
     @cached_property
     def deserializer(self) -> str:
         """If the field is optional this would be."""
-
-        default = f"data['{self.name}']"
+        # every thing is possibly optional since you can query for only so or so fields.
+        default = f"data.get('{self.name}', None)"
         t = self.type.type
+        type_hinter = self.type
         if t is Optional:
-            inner = self.type.of_type[0].type
-            if inner in BuiltinScalars.values():
-                return f"data.get('{self.name}', None)"
-            # handle inner type
-            assert issubclass(inner, AntiForwardRef)
-            if inner.name in self.type_map.keys():
-                return f"cls.{_BaseQGraphQLObject.deserialize_optional_child.__name__}(parent, data, {inner.name}, '{self.name}')"
+            t = self.type.of_type[0].type
+            type_hinter = self.type.of_type[0]
 
         if t in BuiltinScalars.values():
             return default
         if t in (list, List):
-            inner = self.type.of_type[0].type
+            inner = type_hinter.of_type[0].type
             # handle inner type
             assert issubclass(inner, AntiForwardRef)
             gql_type = self.type_map[inner.name]
@@ -61,7 +57,7 @@ class FieldProperty:
         # handle inner type
         assert issubclass(t, AntiForwardRef)
         if t.name in self.type_map.keys():
-            return f"{t.name}.from_dict(parent, {default})"
+            return f"cls.{_BaseQGraphQLObject.deserialize_optional_child.__name__}(parent, data, {t.name}, '{self.name}')"
         raise NotImplementedError
 
     @cached_property
@@ -84,7 +80,7 @@ class FieldProperty:
             or self.type.of_type in BuiltinScalars.values()
         ):
             return self.annotation
-        return '"QVariant"'
+        return "QObject"
 
     @cached_property
     def setter_name(self) -> str:

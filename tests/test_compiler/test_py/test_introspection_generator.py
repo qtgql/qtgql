@@ -178,6 +178,9 @@ class TestObjectWithListOfObject(ObjectTestCaseMixin):
         assert isinstance(inst.persons, BaseModel)
 
 
+# TODO: test for optional list.
+
+
 class TestObjectWithInterface(ObjectTestCaseMixin):
     schema = schemas.object_with_interface.schema
     initialize_dict = schema.execute_sync(

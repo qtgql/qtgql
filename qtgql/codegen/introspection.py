@@ -2,6 +2,7 @@ from functools import cached_property
 from typing import Optional, Union
 
 import graphql
+from strawberry import Schema
 
 from qtgql.codegen.objecttype import BuiltinScalars, FieldProperty, GqlType, Kinds
 from qtgql.codegen.py.compiler import py_template
@@ -111,3 +112,9 @@ class SchemaEvaluator:
         return self.compiler(
             [t for name, t in self._generated_types.items() if name not in BuiltinScalars.keys()]
         )
+
+    @classmethod
+    def from_schema(cls, schema: Schema) -> str:
+        introspection = schema.execute_sync(graphql.get_introspection_query()).data
+        evaluator = SchemaEvaluator(introspection)
+        return evaluator.generate()

@@ -8,6 +8,8 @@ BaseObject = get_base_graphql_object()
 {% for type in types %}
 class {{ type.name }}(BaseObject):
     """{{  type.docstring  }}"""
+    __slots__ = ({% for f in type.fields %}'{{  f.private_name  }}', {% endfor %})
+
     def __init__(self, parent: QObject = None, {% for f in type.fields %} {{f.name}}: {{f.annotation}} = None, {% endfor %}):
         super().__init__(parent){% for f in type.fields %}
         self.{{  f.private_name  }} = {{f.name}}{% endfor %}

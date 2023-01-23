@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from typing import TypeVar
 
-from PySide6.QtCore import QObject, Qt
+from PySide6.QtCore import QAbstractListModel, QByteArray, QObject, Qt
 
 from qtgql import slot
 
 __all__ = ["BaseModel", "get_base_graphql_object"]
 
 
-def get_base_graphql_object(name: str | None = "BaseGraphQLObject") -> _BaseQGraphQLObject:
+def get_base_graphql_object(name: str | None = "BaseGraphQLObject") -> type[_BaseQGraphQLObject]:
     type_map = {}
     return type(name, (_BaseQGraphQLObject,), {"type_map": type_map})  # type: ignore
 
@@ -29,7 +29,7 @@ class _BaseQGraphQLObject(QObject):
     @classmethod
     def deserialize_optional_child(
         cls,
-        parent: T_BaseQGraphQLObject,
+        parent: T_BaseQGraphQLObject | None,
         data: dict,
         child: type[T_BaseQGraphQLObject],
         field_name: str,
@@ -41,7 +41,7 @@ class _BaseQGraphQLObject(QObject):
     @classmethod
     def deserialize_list_of(
         cls,
-        parent: T_BaseQGraphQLObject,
+        parent: T_BaseQGraphQLObject | None,
         data: dict,
         model: type[T_BaseModel],
         field_name: str,
@@ -54,7 +54,7 @@ class _BaseQGraphQLObject(QObject):
     @classmethod
     def deserialize_union(
         cls,
-        parent: T_BaseQGraphQLObject,
+        parent: T_BaseQGraphQLObject | None,
         data: dict,
         field_name: str,
     ) -> T_BaseModel | None:
@@ -64,10 +64,10 @@ class _BaseQGraphQLObject(QObject):
         return None
 
 
-class BaseModel(QObject):
+class BaseModel(QAbstractListModel):
     PROPERTY_ROLE = Qt.ItemDataRole.UserRole + 1
 
-    def __init__(self, data: list[_BaseQGraphQLObject], parent: QObject | None = None):
+    def __init__(self, data: list[T_BaseQGraphQLObject], parent: QObject | None = None):
         super().__init__(parent)
         self._data = data
 
@@ -76,8 +76,11 @@ class BaseModel(QObject):
             return Qt.ItemFlag.ItemIsEditable
         return Qt.ItemFlag.NoItemFlags
 
+    def rowCount(self, *args, **kwargs) -> int:
+        return len(self._data)
+
     def roleNames(self) -> dict:
-        return {b"object": self.PROPERTY_ROLE}
+        return {self.PROPERTY_ROLE: QByteArray("object")}
 
     def data(self, index, role=...) -> _BaseQGraphQLObject | None:
         if index.row() < len(self._data) and index.isValid():
