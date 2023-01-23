@@ -8,15 +8,13 @@ from qtgql.itemsystem import RoleDoesNotExist, role
 from qtgql.itemsystem.model import GenericModel, RoleMapper
 from qtgql.itemsystem.schema import Schema
 
-from tests.test_itemsystem.fixtures import (
+from tests.test_itemsystem.conftest import (
     CHILD,
     FullClass,
     WithChild,
     init_dict_fullClass,
     init_dict_withChild,
 )
-
-pytest_plugins = ("tests.test_itemsystem.fixtures",)
 
 
 def test_has_dunder_roles(full_model):

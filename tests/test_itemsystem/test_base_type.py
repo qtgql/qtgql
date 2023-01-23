@@ -1,9 +1,7 @@
 from qtgql.itemsystem import role
 from qtgql.itemsystem.model import GenericModel
 
-from tests.test_itemsystem.fixtures import FullClass, init_dict_fullClass
-
-pytest_plugins = ("tests.test_itemsystem.fixtures",)
+from tests.test_itemsystem.conftest import FullClass, init_dict_fullClass
 
 
 def test_has_inner_class_GenericModel(full_model):

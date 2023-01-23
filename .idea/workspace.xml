@@ -4,23 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="288baa58-55a0-493e-a12a-9b49a4f1837e" name="Changes" comment="rename `compiler` module to `codegen`">
+    <list default="true" id="288baa58-55a0-493e-a12a-9b49a4f1837e" name="Changes" comment="migrate the sample UI to codegen.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qtgql/codegen/introspection.py" beforeDir="false" afterPath="$PROJECT_DIR$/qtgql/codegen/introspection.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qtgql/codegen/objecttype.py" beforeDir="false" afterPath="$PROJECT_DIR$/qtgql/codegen/objecttype.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qtgql/codegen/py/bases.py" beforeDir="false" afterPath="$PROJECT_DIR$/qtgql/codegen/py/bases.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qtgql/codegen/py/compiler.py" beforeDir="false" afterPath="$PROJECT_DIR$/qtgql/codegen/py/compiler.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qtgql/codegen/py/templates/schema.jinja.py" beforeDir="false" afterPath="$PROJECT_DIR$/qtgql/codegen/py/templates/schema.jinja.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_compiler/test_py/test_introspection_generator.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_compiler/test_py/test_introspection_generator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_sample_ui_itemsystem/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_sample_ui/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_sample_ui_itemsystem/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_sample_ui/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_sample_ui_itemsystem/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_sample_ui/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_sample_ui_itemsystem/qml/RootRect.qml" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_sample_ui/qml/RootRect.qml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_sample_ui_itemsystem/qml/TLabel.qml" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_sample_ui/qml/TLabel.qml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_sample_ui_itemsystem/qml/icons.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_sample_ui/qml/icons.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_sample_ui_itemsystem/qml/main.qml" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_sample_ui/qml/main.qml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_sample_ui_itemsystem/qml/materialdesignicons-webfont.ttf" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_sample_ui/qml/materialdesignicons-webfont.ttf" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -218,7 +203,7 @@
       <workItem from="1674325247191" duration="8325000" />
       <workItem from="1674363605508" duration="18000000" />
       <workItem from="1674383624576" duration="27748000" />
-      <workItem from="1674450509285" duration="26960000" />
+      <workItem from="1674450509285" duration="27509000" />
     </task>
     <task id="LOCAL-00001" summary="first commit!">
       <created>1671541830132</created>
@@ -374,7 +359,21 @@
       <option name="project" value="LOCAL" />
       <updated>1674471057750</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="migrate the sample UI to codegen.">
+      <created>1674483367417</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1674483367417</updated>
+    </task>
+    <task id="LOCAL-00024" summary="migrate the sample UI to codegen.">
+      <created>1674483416311</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1674483416312</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -425,7 +424,8 @@
     <MESSAGE value="test: add interface testcase." />
     <MESSAGE value="test: add union and list of type with union tests." />
     <MESSAGE value="rename `compiler` module to `codegen`" />
-    <option name="LAST_COMMIT_MESSAGE" value="rename `compiler` module to `codegen`" />
+    <MESSAGE value="migrate the sample UI to codegen." />
+    <option name="LAST_COMMIT_MESSAGE" value="migrate the sample UI to codegen." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -497,7 +497,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/tests/test_sample_ui/__temp.py</url>
-          <line>124</line>
+          <line>146</line>
           <option name="timeStamp" value="209" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
@@ -527,7 +527,7 @@
     <SUITE FILE_PATH="coverage/qter$main.coverage" NAME="main Coverage Results" MODIFIED="1674474295117" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_sample_ui_itemsystem" />
     <SUITE FILE_PATH="coverage/qter$pytest_for_tests_test_compiler_test_py_test_class_compilation_test_type_name.coverage" NAME="pytest for tests.test_compiler.test_py.test_class_compilation.test_type_name Coverage Results" MODIFIED="1674106612409" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_compiler/test_py" />
     <SUITE FILE_PATH="coverage/qter$pytest_for_tests_test_typingref.coverage" NAME="pytest for tests.test_typingref Coverage Results" MODIFIED="1674372222205" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
-    <SUITE FILE_PATH="coverage/qter$main__1_.coverage" NAME="main (1) Coverage Results" MODIFIED="1674483191099" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_sample_ui" />
+    <SUITE FILE_PATH="coverage/qter$main__1_.coverage" NAME="main (1) Coverage Results" MODIFIED="1674483283676" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_sample_ui" />
     <SUITE FILE_PATH="coverage/qter$pytest_for_tests_test_itemsystem_test_schema.coverage" NAME="pytest for tests.test_itemsystem.test_schema Coverage Results" MODIFIED="1671738415142" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_itemsystem/test_schema" />
     <SUITE FILE_PATH="coverage/qter$pytest_for_tests_test_itemsystem.coverage" NAME="pytest for tests.test_itemsystem Coverage Results" MODIFIED="1671962897743" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_itemsystem" />
     <SUITE FILE_PATH="coverage/qter$pytest_for_tests_test_compiler_test_py_test_introspection_generator.coverage" NAME="pytest for tests.test_compiler.test_py.test_introspection_generator Coverage Results" MODIFIED="1674463543972" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/test_compiler/test_py" />
