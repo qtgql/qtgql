@@ -2,26 +2,32 @@ from __future__ import annotations
 from PySide6.QtCore import Property, Signal, QObject
 from typing import Optional
 
+from qtgql.compiler.py.serializers import deserialize_optional_child
+
+
 {% for type in types %}
 class {{ type.name }}(QObject):
     """{{  type.docstring  }}"""
-    def __init__(self, parent: QObject = None, {% for p in type.properties %} {{p.name}}: Optional[{{p.type}}] = {{p.default}} {% endfor %}):
-        super().__init__(parent)
-        {% for p in type.properties %}
-        self.{{  p.private_name  }} = {{p.name}}
-        {% endfor %}
+    def __init__(self, parent: QObject = None, {% for f in type.fields %} {{f.name}}: {{f.annotation}} = None, {% endfor %}):
+        super().__init__(parent){% for f in type.fields %}
+        self.{{  f.private_name  }} = {{f.name}}{% endfor %}
 
+    @classmethod
+    def from_dict(cls, data: dict) -> {{type.name}}:
+        return cls({% for f in type.fields %}
+        {{f.name}} = {{f.deserializer}},{% endfor %}
+        )
 
-    {% for p in type.properties %}
-    {{ p.signal_name }} = Signal()
+    {% for f in type.fields %}
+    {{ f.signal_name }} = Signal()
 
-    def {{ p.setter_name }}(self, v: {{  p.type  }}) -> None:
-        self.{{  p.private_name  }} = v
-        self.{{  p.name  }}Changed.emit()
+    def {{ f.setter_name }}(self, v: {{  f.annotation  }}) -> None:
+        self.{{  f.private_name  }} = v
+        self.{{  f.name  }}Changed.emit()
 
-    @Property(type={{ p.type }}, fset={{ p.setter_name }}, notify={{p.signal_name}})
-    def {{ p.name }}(self) -> {{ p.type }}:
-        return self.{{  p.private_name  }}
+    @Property(type={{ f.property_type }}, fset={{ f.setter_name }}, notify={{f.signal_name}})
+    def {{ f.name }}(self) -> {{ f.annotation }}:
+        return self.{{  f.private_name  }}
     {% endfor %}
 
 {% endfor %}

@@ -1,11 +1,91 @@
-from typing import List
+from typing import Optional
 
 import graphql
 
-from qtgql.compiler.objecttype import GqlType
+from qtgql.compiler.objecttype import BuiltinScalars, FieldProperty, GqlType, Kinds
+from qtgql.compiler.py.compiler import py_template
+from qtgql.compiler.utils import anti_forward_ref
+from qtgql.typingref import TypeHinter
 
-query = graphql.get_introspection_query(descriptions=True)
+introspection_query = graphql.get_introspection_query(descriptions=True)
 
 
-def introspect(url: str) -> List[GqlType]:
-    raise NotImplementedError
+class SchemaEvaluator:
+    def __init__(self, introspection: dict, compiler=py_template):
+        self.compiler = compiler
+        self.introspection = introspection
+        self._generated_types: dict[str, GqlType] = {
+            scalar: GqlType(name=scalar, kind=Kinds.SCALAR, fields=[])
+            for scalar in BuiltinScalars.keys()
+        }
+        self._evaluate()
+
+    def evaluate_field_type(self, t: dict) -> TypeHinter:
+        kind = Kinds[t["kind"]]
+
+        is_optional = True
+        if kind == Kinds.NON_NULL:
+            # move to inner, this is not optional
+            t = t["ofType"]
+            is_optional = False
+
+        of_type = t["ofType"]
+        name = t["name"]
+        kind = Kinds[t["kind"]]
+        ret: Optional[TypeHinter] = None
+
+        def optional_maybe(inner: TypeHinter) -> TypeHinter:
+            return TypeHinter(type=Optional, of_type=(inner,)) if is_optional else inner
+
+        if kind == Kinds.LIST:
+            ret = TypeHinter(type=list, of_type=(self.evaluate_field_type(of_type),))
+        elif kind == Kinds.SCALAR:
+            ret = TypeHinter(type=BuiltinScalars[name], of_type=None)
+        elif kind == Kinds.OBJECT:
+            ret = TypeHinter(type=anti_forward_ref(name), of_type=None)
+        elif kind == Kinds.ENUM:
+            raise NotImplementedError
+        if ret:
+            return optional_maybe(ret)
+        raise NotImplementedError(f"kind {kind} not supported yet")
+
+    def evaluate_field(self, field: dict) -> FieldProperty:
+        """we don't really know what is the field type just it's name."""
+        return FieldProperty(
+            type=self.evaluate_field_type(field["type"]),
+            name=field["name"],
+            type_map=self._generated_types,
+            description=field["description"],
+        )
+
+    def evaluate_object_type(self, type_: dict) -> Optional[GqlType]:
+        # scalars are swallowed here.
+        t_name: str = type_["name"]
+        if t_name.startswith("__"):
+            return
+        if evaluated := self._generated_types.get(t_name, None):
+            return evaluated
+
+        concrete = GqlType(
+            kind=Kinds.OBJECT,
+            name=t_name,
+            docstring=type_["description"],
+            fields=[self.evaluate_field(f) for f in type_["fields"]],
+        )
+        self._generated_types[t_name] = concrete
+        return concrete
+
+    def _evaluate(self) -> None:
+        types = self.introspection["__schema"]["types"]
+        for tp in types:
+            kind = tp["kind"]
+            if kind == Kinds.SCALAR.name:
+                continue
+            if kind == Kinds.OBJECT.name:
+                self.evaluate_object_type(tp)
+
+    def generate(self) -> str:
+        """
+        :return: The generated schema module as a string.
+        """
+        return self.compiler(list(self._generated_types.values()))

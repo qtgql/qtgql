@@ -1,8 +1,186 @@
+import uuid
+from types import ModuleType
+from typing import NamedTuple
+
 import pytest
+from qtgql.compiler.introspection import SchemaEvaluator, introspection_query
+from qtgql.compiler.objecttype import GqlType
+from strawberry import Schema
 
 from tests.mini_gql_server import schema
+from tests.test_compiler import schemas
+from tests.test_compiler.conftest import get_introspection_for
+from tests.test_compiler.test_py.conftest import generate_type_kwargs
 
 
 @pytest.fixture
-def introspection_query() -> dict:
-    return schema
+def introspected():
+    return schema.execute_sync(introspection_query)
+
+
+class ObjectTesterHelper(NamedTuple):
+    mod: ModuleType
+    tested_type: GqlType
+
+
+class ObjectTestCaseMixin:
+    schema: Schema
+    initialize_dict: dict
+
+    @classmethod
+    def compiled(cls) -> ObjectTesterHelper:
+        raise NotImplementedError
+
+    @classmethod
+    def get_tmp_mod(cls):
+        return ModuleType(uuid.uuid4().hex)
+
+    def test_has_correct_annotations(self):
+        compiled = self.compiled()
+        klass = getattr(compiled.mod, compiled.tested_type.name)
+        for field in compiled.tested_type.fields:
+            annotation = field.annotation
+            assert klass.__init__.__annotations__[field.name] == annotation
+            assert getattr(klass, field.setter_name).__annotations__["v"] == annotation
+            assert getattr(klass, field.name).fget.__annotations__["return"] == annotation
+
+    def test_init(self):
+        compiled = self.compiled()
+        klass = getattr(compiled.mod, compiled.tested_type.name)
+        klass()
+
+    def test_property_getter(self):
+        compiled = self.compiled()
+
+        klass = getattr(compiled.mod, compiled.tested_type.name)
+        inst = klass(**generate_type_kwargs(compiled.tested_type, 1))
+        for field in compiled.tested_type.fields:
+            assert getattr(inst, field.name) == 1
+
+    def test_property_setter_emits(self, qtbot):
+        compiled = self.compiled()
+        klass = getattr(compiled.mod, compiled.tested_type.name)
+        inst = klass(**generate_type_kwargs(compiled.tested_type, 1))
+        for field in compiled.tested_type.fields:
+            signal = getattr(inst, field.signal_name)
+            with qtbot.wait_signal(signal):
+                getattr(inst, field.setter_name)(2)
+            assert getattr(inst, field.name) == 2
+
+    def test_from_dict(self, qtbot):
+        compiled = self.compiled()
+        klass = getattr(compiled.mod, compiled.tested_type.name)
+        klass.from_dict(self.initialize_dict)
+
+
+class TestSimpleObjectWithScalar(ObjectTestCaseMixin):
+    schema = schemas.object_with_scalar.schema
+    initialize_dict = schema.execute_sync(
+        query="""
+        query {
+            user{
+                name
+                age
+            }
+        }
+        """
+    ).data["user"]
+
+    @classmethod
+    def compiled(cls):
+        tmp_mod = cls.get_tmp_mod()
+        type_name = "User"
+        introspection = get_introspection_for(cls.schema)
+        res = SchemaEvaluator(introspection)
+        compiled = compile(res.generate(), "schema", "exec")
+        exec(compiled, tmp_mod.__dict__)
+        return ObjectTesterHelper(mod=tmp_mod, tested_type=res._generated_types[type_name])
+
+
+class TestObjectWithOptionalScalar(ObjectTestCaseMixin):
+    schema = schemas.object_with_optional_scalar.schema
+    initialize_dict = schema.execute_sync(
+        query="""
+        query {
+            user{
+                name
+                age
+            }
+        }
+        """
+    ).data["user"]
+
+    @classmethod
+    def compiled(cls):
+        tmp_mod = cls.get_tmp_mod()
+        type_name = "User"
+        introspection = get_introspection_for(cls.schema)
+        res = SchemaEvaluator(introspection)
+        compiled = compile(res.generate(), "schema", "exec")
+        exec(compiled, tmp_mod.__dict__)
+        return ObjectTesterHelper(mod=tmp_mod, tested_type=res._generated_types[type_name])
+
+
+class TestObjectWithObject(ObjectTestCaseMixin):
+    schema = schemas.object_with_object.schema
+    initialize_dict = schema.execute_sync(
+        query="""
+        query {
+            user{
+                person{
+                    name
+                    age
+                }
+            }
+        }
+        """
+    ).data["user"]
+
+    @classmethod
+    def compiled(cls):
+        tmp_mod = cls.get_tmp_mod()
+        type_name = "User"
+        introspection = get_introspection_for(cls.schema)
+        res = SchemaEvaluator(introspection)
+        compiled = compile(res.generate(), "schema", "exec")
+        exec(compiled, tmp_mod.__dict__)
+        return ObjectTesterHelper(mod=tmp_mod, tested_type=res._generated_types[type_name])
+
+    def test_from_dict(self, qtbot):
+        compiled = self.compiled()
+        klass = getattr(compiled.mod, compiled.tested_type.name)
+        inst = klass.from_dict(self.initialize_dict)
+        assert inst.person.name == "Patrick"
+        assert inst.person.age == 100
+
+
+class TestObjectWithOptionalObjectField(ObjectTestCaseMixin):
+    schema = schemas.object_with_optional_object.schema
+    initialize_dict = schema.execute_sync(
+        query="""
+        query {
+            user{
+                person{
+                    name
+                    age
+                }
+            }
+        }
+        """
+    ).data["user"]
+
+    @classmethod
+    def compiled(cls) -> ObjectTesterHelper:
+        tmp_mod = cls.get_tmp_mod()
+        type_name = "User"
+        introspection = get_introspection_for(cls.schema)
+        res = SchemaEvaluator(introspection)
+        compiled = compile(res.generate(), "schema", "exec")
+        exec(compiled, tmp_mod.__dict__)
+        return ObjectTesterHelper(mod=tmp_mod, tested_type=res._generated_types[type_name])
+
+    def test_from_dict(self, qtbot):
+        compiled = self.compiled()
+        klass = getattr(compiled.mod, compiled.tested_type.name)
+        inst = klass.from_dict(self.initialize_dict)
+        assert inst.person is None

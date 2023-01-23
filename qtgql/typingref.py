@@ -1,4 +1,6 @@
-from typing import Any, NamedTuple, Optional, Type, Union, get_args, get_origin
+from typing import Any, Optional, Type, Union, get_args, get_origin
+
+from attrs import define
 
 
 def is_optional(field) -> bool:
@@ -27,9 +29,10 @@ class UnsetType:
 UNSET: Any = UnsetType()
 
 
-class TypeHinter(NamedTuple):
+@define
+class TypeHinter:
     type: Any  # noqa: A003
-    of_type: Optional[tuple["TypeHinter"]]
+    of_type: Optional[tuple["TypeHinter", ...]] = None
 
     @classmethod
     def from_annotations(cls, tp: Any) -> "TypeHinter":
@@ -39,3 +42,19 @@ class TypeHinter(NamedTuple):
                 new_args.append(TypeHinter.from_annotations(arg))
             return TypeHinter(type=get_origin(tp), of_type=tuple(new_args))  # type: ignore
         return TypeHinter(type=tp, of_type=None)
+
+    def as_annotation(self, object_map: Optional[dict[str, Any]] = None) -> Any:
+        if self.type is str:
+            return self.type
+        # eval forward refs
+        if isinstance(self.type, str):
+            assert object_map, "can't evaluate forward refs without object_map."
+            self.type = object_map[self.type]
+
+        if builder := getattr(
+            self.type, "__class_getitem__", getattr(self.type, "__getitem__", None)
+        ):
+            if self.type is Union:
+                return builder(tuple(arg.as_annotation(object_map) for arg in self.of_type))
+            return builder(self.of_type[0].as_annotation(object_map))
+        return self.type

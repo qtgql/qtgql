@@ -40,6 +40,11 @@ Pane {
             width: ListView.view.width
             height: 100 + wormsList.implicitHeight
             hoverEnabled: true
+            Text {
+                text: model.p_class.prop
+                color: "red"
+                anchors.right: parent.right
+            }
             Label {
                 id: header
                 text: appleDelegate.model.owner + "'s apple:"

@@ -10,7 +10,7 @@ from qtgql import slot
 from qtgql.gqltransport.client import GqlClientMessage, GqlWsTransportClient, HandlerProto
 from qtgql.itemsystem import GenericModel
 
-from tests.test_sample_ui.models import Apple
+from tests.test_sample_ui.models import Apple, schema
 from tests.test_sample_ui.qml.icons import ICONS
 
 DEV = not os.environ.get("IS_GITHUB_ACTION", False)
@@ -60,7 +60,7 @@ class EntryPoint(QObject):
         self.gql_client = GqlWsTransportClient(url="ws://localhost:8080/graphql")
         self.apple_query_handler = self.AppleHandler(self)
         self.gql_client.query(self.apple_query_handler)
-        self.apple_model: GenericModel[Apple] = Apple.Model()
+        self.apple_model: GenericModel[Apple] = Apple.Model(schema=schema)
         QtQml.qmlRegisterSingletonInstance(EntryPoint, "com.props", 1, 0, "EntryPoint", self)  # type: ignore
         # for some reason the app won't initialize without this event processing here.
         QtCore.QEventLoop().processEvents(QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 1000)
