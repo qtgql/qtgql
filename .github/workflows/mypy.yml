@@ -17,7 +17,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, ubuntu-latest]
+        os: [ubuntu-latest]
         python-version: ["3.10"]
 
 
@@ -65,49 +65,6 @@ jobs:
       - name: Install library
         run: poetry install --no-interaction
 
-      - name: pre-commit hooks
-        run: poetry run pre-commit run -a
-
-      - name: Install Qt Dependencies
-        shell: bash
+      - name: mypy checks
         run: |
-          if [ "$RUNNER_OS" == "macOS" ]; then
-            brew install ffmpeg
-          elif [ "$RUNNER_OS" == "Windows" ]; then
-            choco install ffmpeg
-          elif [ "$RUNNER_OS" == "Linux" ]; then
-          sudo apt update -y
-          sudo apt install libxcb-icccm4 libxcb-image0 libxcb-keysyms1 \
-                           libxkbcommon-x11-0 xvfb libxcb-randr0 \
-                           libxcb-render-util0 libxcb-xinerama0 libegl1 \
-                           libxcb-shape0
-          sudo apt-get install -y libgles2-mesa-dev
-          fi
-
-      - name: Run tests
-        shell: bash
-        run: |
-          if [ "$RUNNER_OS" == "Windows" ]; then
-            poetry run make test
-          elif [ "$RUNNER_OS" == "Linux" ]; then
-            poetry run xvfb-run make test
-          fi
-
-
-      - name: Codecov
-        uses: codecov/codecov-action@v3.1.1
-
-
-  publish:
-    runs-on: ubuntu-latest
-    needs: [tests]
-    if: ${{ needs.lint.result == 'success' &&
-      needs.tests.result == 'success' &&
-      github.event.action == 'published' }}
-
-    steps:
-      - uses: actions/checkout@v2
-      - name: Build and publish to pypi
-        uses: JRubics/poetry-publish@v1.15
-        with:
-          pypi_token: ${{ secrets.PYPI_API_TOKEN }}
+          poetry run mypy ./qtgql
