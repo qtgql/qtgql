@@ -3,9 +3,9 @@ from typing import Optional, Union
 
 import graphql
 
-from qtgql.compiler.objecttype import BuiltinScalars, FieldProperty, GqlType, Kinds
-from qtgql.compiler.py.compiler import py_template
-from qtgql.compiler.utils import anti_forward_ref
+from qtgql.codegen.objecttype import BuiltinScalars, FieldProperty, GqlType, Kinds
+from qtgql.codegen.py.compiler import py_template
+from qtgql.codegen.utils import anti_forward_ref
 from qtgql.typingref import TypeHinter
 
 introspection_query = graphql.get_introspection_query(descriptions=True)

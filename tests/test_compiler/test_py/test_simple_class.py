@@ -1,6 +1,6 @@
 import pytest
-from qtgql.compiler.objecttype import FieldProperty, GqlType, Kinds
-from qtgql.compiler.py.compiler import SchemaTemplate
+from qtgql.codegen.objecttype import FieldProperty, GqlType, Kinds
+from qtgql.codegen.py.compiler import SchemaTemplate
 from qtgql.typingref import TypeHinter
 
 from tests.test_compiler.test_py.conftest import generate_type_kwargs, property_tester

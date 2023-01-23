@@ -1,7 +1,7 @@
 from __future__ import annotations
 from PySide6.QtCore import Property, Signal, QObject
 from typing import Optional, Union
-from qtgql.compiler.py.bases import get_base_graphql_object, BaseModel
+from qtgql.codegen.py.bases import get_base_graphql_object, BaseModel
 
 BaseObject = get_base_graphql_object()
 

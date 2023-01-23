@@ -3,7 +3,7 @@ from types import ModuleType
 from typing import Any, Callable
 
 import pytest
-from qtgql.compiler.objecttype import FieldProperty, GqlType
+from qtgql.codegen.objecttype import FieldProperty, GqlType
 
 
 @pytest.fixture()

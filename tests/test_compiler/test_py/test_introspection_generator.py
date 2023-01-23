@@ -3,9 +3,9 @@ from types import ModuleType
 from typing import NamedTuple
 
 import pytest
-from qtgql.compiler.introspection import SchemaEvaluator, introspection_query
-from qtgql.compiler.objecttype import GqlType
-from qtgql.compiler.py.bases import BaseModel, _BaseQGraphQLObject
+from qtgql.codegen.introspection import SchemaEvaluator, introspection_query
+from qtgql.codegen.objecttype import GqlType
+from qtgql.codegen.py.bases import BaseModel, _BaseQGraphQLObject
 from strawberry import Schema
 
 from tests.mini_gql_server import schema

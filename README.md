@@ -130,7 +130,7 @@ from qtpy import QtCore, QtGui, QtQml, QtQuick
 from qtgql import slot
 from qtgql.gqltransport.client import HandlerProto, GqlClientMessage, GqlWsTransportClient
 from qtgql.itemsystem import GenericModel
-from tests.test_sample_ui.models import Apple
+from tests.test_sample_ui_itemsystem.models import Apple
 
 
 class EntryPoint(QObject):

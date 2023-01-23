@@ -10,8 +10,8 @@ from qtgql import slot
 from qtgql.gqltransport.client import GqlClientMessage, GqlWsTransportClient, HandlerProto
 from qtgql.itemsystem import GenericModel
 
-from tests.test_sample_ui.models import Apple, schema
-from tests.test_sample_ui.qml.icons import ICONS
+from tests.test_sample_ui_itemsystem.models import Apple, schema
+from tests.test_sample_ui_itemsystem.qml.icons import ICONS
 
 DEV = not os.environ.get("IS_GITHUB_ACTION", False)
 

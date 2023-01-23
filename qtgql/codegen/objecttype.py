@@ -4,8 +4,8 @@ from typing import List, Optional, Union
 
 from attrs import define
 
-from qtgql.compiler.py.bases import _BaseQGraphQLObject
-from qtgql.compiler.utils import AntiForwardRef
+from qtgql.codegen.py.bases import _BaseQGraphQLObject
+from qtgql.codegen.utils import AntiForwardRef
 from qtgql.typingref import TypeHinter
 
 
@@ -75,7 +75,7 @@ class FieldProperty:
             return ret.__name__
         # handle Optional, Union, List etc...
         # removing redundant prefixes.
-        return str(ret).replace("typing.", "").replace("qtgql.compiler.utils.", "")
+        return str(ret).replace("typing.", "").replace("qtgql.codegen.utils.", "")
 
     @cached_property
     def property_type(self) -> str:
