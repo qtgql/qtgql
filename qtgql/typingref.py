@@ -32,7 +32,7 @@ UNSET: Any = UnsetType()
 @define
 class TypeHinter:
     type: Any  # noqa: A003
-    of_type: Optional[tuple["TypeHinter", ...]] = None
+    of_type: tuple["TypeHinter", ...] = ()
 
     @classmethod
     def from_annotations(cls, tp: Any) -> "TypeHinter":
@@ -41,7 +41,7 @@ class TypeHinter:
             for arg in args:
                 new_args.append(TypeHinter.from_annotations(arg))
             return TypeHinter(type=get_origin(tp), of_type=tuple(new_args))  # type: ignore
-        return TypeHinter(type=tp, of_type=None)
+        return TypeHinter(type=tp)
 
     def as_annotation(self, object_map: Optional[dict[str, Any]] = None) -> Any:
         if self.type is str:

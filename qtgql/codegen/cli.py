@@ -10,24 +10,25 @@ from qtgql.codegen.py.config import QtGqlConfig
 
 console = rich.console.Console()
 
-__all__ = []
-
 
 def _get_pyproject(p: Path) -> Optional[Path]:
     pproject = p / "pyproject.toml"
     if pproject.exists():
         return pproject
+    return None
 
 
-def _find_pyproject(p: Path) -> Path:
+def _find_pyproject(p: Path) -> Optional[Path]:
     if pp := _get_pyproject(p):
         return pp
     for parent in p.parents:
         return _find_pyproject(parent)
+    return None
 
 
 def _get_app_import_path(root: Path = Path.cwd()) -> str:
     pyproject = _find_pyproject(root)
+    assert pyproject
     pp = toml.load(pyproject)
     try:
         return pp["tool"][TOOL_NAME][QTGQL_CONFIG_KEY]

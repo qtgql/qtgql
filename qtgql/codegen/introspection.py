@@ -28,7 +28,7 @@ class SchemaEvaluator:
             t for t in self.introspection["__schema"]["types"] if Kinds[t["kind"]] == Kinds.UNION
         ]
 
-    def get_possible_types_for_union(self, name: str) -> list[str]:
+    def get_possible_types_for_union(self, name: str) -> list[dict]:
         for union in self.unions:
             if union["name"] == name:
                 return union["possibleTypes"]
@@ -54,9 +54,9 @@ class SchemaEvaluator:
         if kind == Kinds.LIST:
             ret = TypeHinter(type=list, of_type=(self.evaluate_field_type(of_type),))
         elif kind == Kinds.SCALAR:
-            ret = TypeHinter(type=BuiltinScalars[name], of_type=None)
+            ret = TypeHinter(type=BuiltinScalars[name])
         elif kind == Kinds.OBJECT:
-            ret = TypeHinter(type=anti_forward_ref(name), of_type=None)
+            ret = TypeHinter(type=anti_forward_ref(name))
         elif kind == Kinds.UNION:
             ret = TypeHinter(
                 type=Union,
@@ -83,7 +83,7 @@ class SchemaEvaluator:
         # scalars are swallowed here.
         t_name: str = type_["name"]
         if t_name.startswith("__"):
-            return
+            return None
         if evaluated := self._generated_types.get(t_name, None):
             return evaluated
 

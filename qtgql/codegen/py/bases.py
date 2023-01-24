@@ -10,7 +10,7 @@ __all__ = ["BaseModel", "get_base_graphql_object"]
 
 
 def get_base_graphql_object(name: str | None = "BaseGraphQLObject") -> type[_BaseQGraphQLObject]:
-    type_map = {}
+    type_map: dict[str, type[_BaseQGraphQLObject]] = {}
     return type(name, (_BaseQGraphQLObject,), {"type_map": type_map})  # type: ignore
 
 
@@ -23,7 +23,8 @@ class _BaseQGraphQLObject(QObject):
     def __init__(self, parent: QObject | None = None):
         super().__init__(parent)
 
-    def from_dict(self, parent: _BaseQGraphQLObject, data: dict) -> _BaseQGraphQLObject:
+    @classmethod
+    def from_dict(cls, parent: T_BaseQGraphQLObject, data: dict) -> T_BaseQGraphQLObject:
         raise NotImplementedError
 
     @classmethod
@@ -35,7 +36,7 @@ class _BaseQGraphQLObject(QObject):
         field_name: str,
     ) -> T_BaseQGraphQLObject | None:
         if found := data.get(field_name, None):
-            return child.from_dict(parent, found)
+            return child.from_dict(parent, found)  # type: ignore
         return None
 
     @classmethod
@@ -48,7 +49,7 @@ class _BaseQGraphQLObject(QObject):
         of_type: type[T_BaseQGraphQLObject],
     ) -> T_BaseModel | None:
         if found := data.get(field_name, None):
-            return model(parent=parent, data=[of_type.from_dict(parent, data) for data in found])
+            return model(parent=parent, data=[of_type.from_dict(parent, data) for data in found])  # type: ignore
         return None
 
     @classmethod
@@ -60,7 +61,7 @@ class _BaseQGraphQLObject(QObject):
     ) -> T_BaseModel | None:
         if found := data.get(field_name, None):
             child = cls.type_map[found["__typename"]]
-            return child.from_dict(parent, found)
+            return child.from_dict(parent, found)  # type: ignore
         return None
 
 
@@ -75,17 +76,18 @@ class BaseModel(QAbstractListModel):
         return len(self._data)
 
     def roleNames(self) -> dict:
-        return {self.OBJECT_ROLE: QByteArray("object")}
+        return {self.OBJECT_ROLE: QByteArray("object")}  # type: ignore
 
-    def data(self, index, role=...) -> _BaseQGraphQLObject | None:
+    def data(self, index, role=...) -> T_BaseQGraphQLObject | None:
         if index.row() < len(self._data) and index.isValid():
             if role == self.OBJECT_ROLE:
                 return self._data[index.row()]
             raise NotImplementedError(
                 f"role {role} is not a valid role for {self.__class__.__name__}"
             )
+        return None
 
-    def append(self, node: _BaseQGraphQLObject) -> None:
+    def append(self, node: T_BaseQGraphQLObject) -> None:
         count = self.rowCount()
         self.beginInsertRows(self.index(count), count, count)
         self._data.append(node)

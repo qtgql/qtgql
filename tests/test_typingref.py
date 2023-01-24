@@ -42,7 +42,7 @@ class TestToAnnotation:
         "container, inner", [(list, float), (Optional, str), (List, int), (tuple, bool)]
     )
     def test_containers(self, container, inner):
-        th = TypeHinter(type=container, of_type=(TypeHinter(type=inner, of_type=None),))
+        th = TypeHinter(type=container, of_type=(TypeHinter(type=inner),))
         assert th.as_annotation() == container[inner]
 
     def test_unions(self):
