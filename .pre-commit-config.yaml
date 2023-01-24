@@ -53,7 +53,7 @@ repos:
     hooks:
       - id: docformatter
 
-  - repo: https://github.com/nrbnlulu/qt-pre-commit-hooks
-    rev: v0.1.1
+  - repo: https://github.com/nrbnlulu/qt-hooks
+    rev: v0.1.2
     hooks:
       -  id: qml-format
