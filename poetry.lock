@@ -158,7 +158,7 @@ files = [
 name = "attrs"
 version = "22.2.0"
 description = "Classes Without Boilerplate"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 files = [
@@ -2016,4 +2016,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.12"
-content-hash = "ac387b448a2fa5aa43897dfc4417c35b7563a044f3ffed0d801b5ce55f7e7c70"
+content-hash = "c09264e95efd52670111b646ec821bb444682ef24efb15043667cde4427a236f"

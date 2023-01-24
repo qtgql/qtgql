@@ -11,6 +11,7 @@ readme = "README.md"
 python = ">=3.9,<3.12"
 PySide6 = ">=6.4.1"
 nothing = "^0.0.3"
+attrs = "^22.2.0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -75,7 +76,7 @@ src = ["qtgql", "tests"]
 
 
 [tool.pytest.ini_options]
-addopts = "--cov-config=pyproject.toml "
+addopts = "--cov-config=pyproject.toml --ignore=codegen/py/templates --doctest-modules"
 markers = [
     "no_captcha: This test requires that `LOGIN_REQUIRE_CAPTCHA=False` on the server",
 ]
