@@ -29,9 +29,11 @@ mkdocstrings = {extras = ["python"], version = "^0.19.1"}
 pygments = "^2.14.0"
 
 
-[tool.poetry.group.templates.dependencies]
+[tool.poetry.group.codegen.dependencies]
 graphql-core = "^3.2.3"
 jinja2 = "^3.1.2"
+typer = {extras = ["all"], version = "^0.7.0"}
+
 
 [build-system]
 requires = ["poetry-core"]
@@ -76,7 +78,7 @@ src = ["qtgql", "tests"]
 
 
 [tool.pytest.ini_options]
-addopts = "--cov-config=pyproject.toml --ignore=codegen/py/templates --doctest-modules"
+addopts = "--cov-config=pyproject.toml --ignore=qtgql/codegen/py/templates/  --doctest-modules"
 markers = [
     "no_captcha: This test requires that `LOGIN_REQUIRE_CAPTCHA=False` on the server",
 ]
@@ -87,3 +89,10 @@ relative_files = true
 [tool.coverage.report]
 show_missing = true
 fail_under = 95
+
+[tool.qtgql]
+config = "tests.test_sample_ui.main:qtgqlconfig"
+
+
+[tool.poetry.scripts]
+qtgql = "qtgql.codegen.cli:entrypoint"

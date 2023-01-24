@@ -1,8 +1,8 @@
 from functools import cached_property
+from pathlib import Path
 from typing import Optional, Union
 
 import graphql
-from strawberry import Schema
 
 from qtgql.codegen.objecttype import BuiltinScalars, FieldProperty, GqlType, Kinds
 from qtgql.codegen.py.compiler import py_template
@@ -114,7 +114,13 @@ class SchemaEvaluator:
         )
 
     @classmethod
-    def from_schema(cls, schema: Schema) -> str:
-        introspection = schema.execute_sync(graphql.get_introspection_query()).data
+    def from_dict(cls, introspection: dict) -> "SchemaEvaluator":
         evaluator = SchemaEvaluator(introspection)
-        return evaluator.generate()
+        return evaluator
+
+    def dump(self, file: Path):
+        """
+        :param file: Path to the file the codegen would dump to.
+        """
+        with open(file, "w") as fh:
+            fh.write(self.generate())

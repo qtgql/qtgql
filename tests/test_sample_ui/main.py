@@ -8,6 +8,7 @@ from PySide6 import QtCore, QtGui, QtQml, QtQuick
 from PySide6.QtCore import QObject, Signal
 from PySide6.QtQml import QQmlApplicationEngine
 from qtgql import slot
+from qtgql.codegen.py.config import QtGqlConfig
 from qtgql.gqltransport.client import GqlClientMessage, GqlWsTransportClient, HandlerProto
 
 from tests.test_sample_ui.__temp import Query
@@ -108,6 +109,11 @@ class EntryPoint(QObject):
         # all child QML instances are destroyed in the correct order.
         del self.qml_engine
         super().deleteLater()
+
+
+qtgqlconfig = QtGqlConfig(
+    url="http://localhost:8080/graphql", output=Path(__file__).parent / "__temp.py"
+)
 
 
 def main():  # pragma: no cover

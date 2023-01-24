@@ -9,12 +9,6 @@ BaseObject = get_base_graphql_object()
 class Query(BaseObject):
     """None."""
 
-    __slots__ = (
-        "_hello",
-        "_isAuthenticated",
-        "_apples",
-    )
-
     def __init__(
         self,
         parent: QObject = None,
@@ -74,13 +68,6 @@ class QueryModel(BaseModel):
 
 class Apple(BaseObject):
     """None."""
-
-    __slots__ = (
-        "_size",
-        "_owner",
-        "_worms",
-        "_color",
-    )
 
     def __init__(
         self,
@@ -155,12 +142,6 @@ class AppleModel(BaseModel):
 class Worm(BaseObject):
     """None."""
 
-    __slots__ = (
-        "_name",
-        "_family",
-        "_size",
-    )
-
     def __init__(
         self,
         parent: QObject = None,
@@ -221,8 +202,6 @@ class WormModel(BaseModel):
 class Mutation(BaseObject):
     """None."""
 
-    __slots__ = ("_pseudoMutation",)
-
     def __init__(
         self,
         parent: QObject = None,
@@ -256,8 +235,6 @@ class MutationModel(BaseModel):
 
 class Subscription(BaseObject):
     """None."""
-
-    __slots__ = ("_count",)
 
     def __init__(
         self,

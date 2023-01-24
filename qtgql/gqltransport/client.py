@@ -17,6 +17,8 @@ from qtgql.typingref import UNSET
 
 logger = logging.getLogger(__name__)
 
+__all__ = ["HandlerProto", "GqlWsTransportClient"]
+
 
 class PROTOCOL:
     """The WebSocket sub-protocol for this specification is: graphql-transport-
