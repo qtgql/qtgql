@@ -34,6 +34,7 @@ aiohttp = {extras = ["speedups"], version = "^3.8.3"}
 mypy = "^0.991"
 faker = "^15.3.4"
 types-toml = "^0.10.8.1"
+# doc deps
 mkdocs-material = "^9.0.5"
 mike = "^1.1.2"
 markdown-include = "^0.8.0"
