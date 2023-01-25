@@ -46,6 +46,7 @@ plugins:
 nav:
   - Home:
       - Overview: ./index.md
+      - Utils: ./utilities.md
   - Codegen:
       - Tutorial: ./codegen/tutorial.md
   - ItemSystem:
