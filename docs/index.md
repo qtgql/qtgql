@@ -17,5 +17,3 @@ $ pip install qtgql[codegen]
 ```
 
 </div>
-
-
