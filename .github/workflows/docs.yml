@@ -4,12 +4,12 @@ on:
     branches: [master, main]
   pull_request:
     branches: [master, main]
-    paths:
-      - "qtgql/**"
-      - "docs/**"
-      - "pyproject.toml"
-      - "poetry.lock"
-      - ".github/workflows/docs.yml"
+#    paths:
+#      - "qtgql/**"
+#      - "docs/**"
+#      - "pyproject.toml"
+#      - "poetry.lock"
+#      - ".github/workflows/docs.yml"
 
 permissions:
   contents: write
