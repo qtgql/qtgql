@@ -54,6 +54,6 @@ repos:
       - id: docformatter
 
   - repo: https://github.com/nrbnlulu/qt-hooks
-    rev: v0.1.2
+    rev: v0.1.3
     hooks:
       -  id: qml-format
