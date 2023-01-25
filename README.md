@@ -1,7 +1,6 @@
 # qtgql
 ## Qt framework for building graphql driven QML applications
 ![qt-graphql.png](assets%2Fqt-graphql.png)
-![PyPI - Downloads](https://img.shields.io/pypi/dm/qtgql?style=for-the-badge)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/qtgql?style=for-the-badge)
 ![PyPI](https://img.shields.io/pypi/v/qtgql?style=for-the-badge)
 ![GitHub Workflow Status (with branch)](https://img.shields.io/github/actions/workflow/status/nrbnlulu/qtgql/tests.yml?branch=main&style=for-the-badge)
