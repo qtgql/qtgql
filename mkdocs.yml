@@ -45,6 +45,8 @@ plugins:
 nav:
   - Home:
       - Overview: ./index.md
+  - Codegen:
+      - Tutorial: ./codegen/tutorial.md
   - API:
       - GenericModel: ./api/genericmodel.md
 markdown_extensions:

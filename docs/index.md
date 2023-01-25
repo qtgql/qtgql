@@ -8,9 +8,14 @@
 <div class="termy">
 
 ```console
+
+// This would install our codegen dependencies as well.
+
 $ pip install qtgql[codegen]
 
 ---> 100%
 ```
 
 </div>
+
+

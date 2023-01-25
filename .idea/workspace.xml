@@ -4,7 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="288baa58-55a0-493e-a12a-9b49a4f1837e" name="Changes" comment="update workflows.">
+    <list default="true" id="288baa58-55a0-493e-a12a-9b49a4f1837e" name="Changes" comment="termy works.">
+      <change afterPath="$PROJECT_DIR$/docs/codegen/tutorial.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/index.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/index.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mkdocs.yml" beforeDir="false" afterPath="$PROJECT_DIR$/mkdocs.yml" afterDir="false" />
@@ -22,9 +23,6 @@
         <option value="Python Script" />
       </list>
     </option>
-  </component>
-  <component name="FormatOnSaveOptions">
-    <option name="myRunOnSave" value="true" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
@@ -203,7 +201,7 @@
       <workItem from="1674623961013" duration="1500000" />
       <workItem from="1674626181765" duration="13000" />
       <workItem from="1674626209529" duration="4791000" />
-      <workItem from="1674634233728" duration="320000" />
+      <workItem from="1674634233728" duration="1561000" />
     </task>
     <task id="LOCAL-00001" summary="first commit!">
       <created>1671541830132</created>
@@ -527,7 +525,14 @@
       <option name="project" value="LOCAL" />
       <updated>1674630609761</updated>
     </task>
-    <option name="localTasksCounter" value="47" />
+    <task id="LOCAL-00047" summary="termy works.">
+      <created>1674634560480</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1674634560480</updated>
+    </task>
+    <option name="localTasksCounter" value="48" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -557,7 +562,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added doc ui animation." />
     <MESSAGE value="tests: fix mypy" />
     <MESSAGE value="simple compilation work" />
     <MESSAGE value="coverage ignores." />
@@ -582,7 +586,8 @@
     <MESSAGE value="add pre-commit.yml workflow" />
     <MESSAGE value="add docs workflow" />
     <MESSAGE value="update workflows." />
-    <option name="LAST_COMMIT_MESSAGE" value="update workflows." />
+    <MESSAGE value="termy works." />
+    <option name="LAST_COMMIT_MESSAGE" value="termy works." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
