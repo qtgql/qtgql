@@ -2,6 +2,8 @@
 __pycache__/
 *.py[cod]
 *$py.class
+# Pycharm
+.idea/workspace.xml
 
 # C extensions
 *.so

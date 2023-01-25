@@ -35,7 +35,7 @@ plugins:
   - mkdocstrings:
       handlers:
         python:
-          paths: [qtgql]
+          paths: [ qtgql ]
           options:
             annotations_path: source
             docstring_style: sphinx
@@ -45,7 +45,7 @@ nav:
   - Home:
       - Overview: ./index.md
   - API:
-    - GenericModel: ./api/genericmodel.md
+      - GenericModel: ./api/genericmodel.md
 markdown_extensions:
   - attr_list
   - md_in_html
@@ -72,12 +72,12 @@ extra:
       link: https://github.com/nrbnlulu/qtgql
 
 extra_css:
-  - css/termynal.css
-  - css/custom.css
+  - ./docs/css/termynal.css
+  - ./docs/css/custom.css
 
 extra_javascript:
-  - js/termynal.js
-  - js/custom.js
+  - ./docs/js/termynal.js
+  - ./docs/js/custom.js
 
 watch:
   - ./
