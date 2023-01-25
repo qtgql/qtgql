@@ -33,7 +33,7 @@ def mini_server() -> MiniServer:
             "-H",
             "localhost",
             f"-P {port}",
-            "tests.mini_gql_server:init_func",
+            "mini_gql_server:init_func",
         ],
         cwd=Path(__file__).parent,
         stdout=subprocess.PIPE,
