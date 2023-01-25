@@ -54,5 +54,5 @@ jobs:
           key: ${{ github.ref }}
           path: .cache
 
-      - run: poetry install --only docs
+      - run: poetry install --all-extras
       - run: poetry run mkdocs gh-deploy --force
