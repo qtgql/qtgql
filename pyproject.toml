@@ -4,13 +4,18 @@ version = "v0.101.0"
 packages = [{ include = "qtgql" }]
 description = "Qt framework for building graphql driven QML applications"
 authors = ["Nir <88795475+nrbnlulu@users.noreply.github.com>"]
+maintainers = ["Nir.J Benlulu <nrbnlulu@gmail.com>"]
 license = "MIT"
 readme = "README.md"
 
+[tool.poetry.urls]
+"Homepage" = "https://github.com/nrbnlulu/strawberry-django-auth"
+"Documentation" = "https://nrbnlulu.github.io/strawberry-django-auth/"
+
+
 [tool.poetry.dependencies]
 python = ">=3.9,<3.12"
-PySide6 = ">=6.4.1"
-nothing = "^0.0.3"
+PySide6 = "^6.4.2"
 attrs = "^22.2.0"
 
 
