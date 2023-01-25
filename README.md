@@ -1,9 +1,12 @@
 # qtgql
 ## Qt framework for building graphql driven QML applications
-![PyPI - Downloads](https://img.shields.io/pypi/dm/qtgql)
+![qt-graphql.png](assets%2Fqt-graphql.png)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/qtgql?style=for-the-badge)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/qtgql?style=for-the-badge)
 ![PyPI](https://img.shields.io/pypi/v/qtgql?style=for-the-badge)
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/nrbnlulu/qtgql/tests.yml?label=tests&style=for-the-badge)
+![GitHub Workflow Status (with branch)](https://img.shields.io/github/actions/workflow/status/nrbnlulu/qtgql/tests.yml?branch=main&style=for-the-badge)
+[![forthebadge](https://forthebadge.com/images/badges/gluten-free.svg)](https://forthebadge.com)
+[![forthebadge](https://forthebadge.com/images/badges/contains-cat-gifs.svg)](https://forthebadge.com)
 
 ### Disclaimer
 This project is currently under development and **it is not** production ready,

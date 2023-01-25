@@ -4,9 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="288baa58-55a0-493e-a12a-9b49a4f1837e" name="Changes" comment="add codegen docs.">
-      <change beforePath="$PROJECT_DIR$/.github/workflows/check-docs.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/docs.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/workflows/deply-docs.yml" beforeDir="false" />
+    <list default="true" id="288baa58-55a0-493e-a12a-9b49a4f1837e" name="Changes" comment="deploy docs.yml">
+      <change afterPath="$PROJECT_DIR$/assets/qt-graphql.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -65,11 +66,11 @@
       <recent name="$PROJECT_DIR$/tests/test_sample_ui/qml" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/assets" />
       <recent name="$PROJECT_DIR$/tests/test_codegen" />
       <recent name="$PROJECT_DIR$/tests" />
       <recent name="$PROJECT_DIR$/qtgql/compiler/py" />
       <recent name="$PROJECT_DIR$/qtgql" />
-      <recent name="$PROJECT_DIR$/qtgql/compiler" />
     </key>
   </component>
   <component name="RunManager" selected="Python tests.Python tests in test_codegen">
@@ -199,14 +200,7 @@
       <workItem from="1674623961013" duration="1500000" />
       <workItem from="1674626181765" duration="13000" />
       <workItem from="1674626209529" duration="4791000" />
-      <workItem from="1674634233728" duration="1876000" />
-    </task>
-    <task id="LOCAL-00001" summary="first commit!">
-      <created>1671541830132</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1671541830132</updated>
+      <workItem from="1674634233728" duration="2881000" />
     </task>
     <task id="LOCAL-00002" summary="feat: added gql client.">
       <created>1671546261645</created>
@@ -537,7 +531,21 @@
       <option name="project" value="LOCAL" />
       <updated>1674635832190</updated>
     </task>
-    <option name="localTasksCounter" value="49" />
+    <task id="LOCAL-00049" summary="migrate docs.yml">
+      <created>1674636149402</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1674636149402</updated>
+    </task>
+    <task id="LOCAL-00050" summary="deploy docs.yml">
+      <created>1674636432170</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1674636432170</updated>
+    </task>
+    <option name="localTasksCounter" value="51" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -567,8 +575,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="simple compilation work" />
-    <MESSAGE value="coverage ignores." />
     <MESSAGE value="mypy fixes" />
     <MESSAGE value="refactor tests and file names." />
     <MESSAGE value="simple init from dict works." />
@@ -592,7 +598,9 @@
     <MESSAGE value="update workflows." />
     <MESSAGE value="termy works." />
     <MESSAGE value="add codegen docs." />
-    <option name="LAST_COMMIT_MESSAGE" value="add codegen docs." />
+    <MESSAGE value="migrate docs.yml" />
+    <MESSAGE value="deploy docs.yml" />
+    <option name="LAST_COMMIT_MESSAGE" value="deploy docs.yml" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
