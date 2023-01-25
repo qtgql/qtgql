@@ -1,21 +1,17 @@
-name: 📖 check docs
+name: 📖 docs
+
 on:
   push:
-    branches: [master, main]
+    branches: [main]
   pull_request:
-    branches: [master, main]
-    paths:
-      - "qtgql/**"
-      - "docs/**"
-      - "pyproject.toml"
-      - "poetry.lock"
-      - ".github/workflows/docs.yml"
+    branches: [main]
+
 
 permissions:
   contents: write
 
 jobs:
-  docs build and deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
