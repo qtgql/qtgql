@@ -7,7 +7,7 @@
 
 <div class="termy">
 
-```
+```console
 $ pip install qtgql[codegen]
 
 ---> 100%
