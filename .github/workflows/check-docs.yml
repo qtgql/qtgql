@@ -1,4 +1,4 @@
-name: check docs
+name: 📖 check docs
 on:
   pull_request:
     branches: [master, main]
