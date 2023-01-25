@@ -5,13 +5,10 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
-    paths:
-      - "qtgql/**"
-      - "docs/**"
-      - ".github/workflows/docs.yml"
 
-#permissions:
-#  contents: write
+
+permissions:
+  contents: write
 
 jobs:
   docs build and deploy:
