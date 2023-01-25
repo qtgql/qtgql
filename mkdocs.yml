@@ -45,15 +45,18 @@ plugins:
 nav:
   - Home:
       - Overview: ./index.md
+  - Codegen:
+      - Tutorial: ./codegen/tutorial.md
   - API:
       - GenericModel: ./api/genericmodel.md
 markdown_extensions:
   - attr_list
   - md_in_html
   - pymdownx.highlight:
-      linenums: true
-  - pymdownx.tabbed:
-      alternate_style: true
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
   - pymdownx.details
   - admonition
   - tables

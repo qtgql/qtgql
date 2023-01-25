@@ -1,5 +1,7 @@
 name: 📖 check docs
 on:
+  push:
+    branches: [master, main]
   pull_request:
     branches: [master, main]
     paths:
@@ -26,3 +28,7 @@ jobs:
 
     - name: build docs
       run: poetry run mkdocs build
+
+    - name: deploy
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+      run: poetry run mkdocs gh-deploy --force

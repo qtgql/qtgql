@@ -4,11 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="288baa58-55a0-493e-a12a-9b49a4f1837e" name="Changes" comment="update workflows.">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/index.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/index.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mkdocs.yml" beforeDir="false" afterPath="$PROJECT_DIR$/mkdocs.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyproject.toml" beforeDir="false" afterPath="$PROJECT_DIR$/pyproject.toml" afterDir="false" />
+    <list default="true" id="288baa58-55a0-493e-a12a-9b49a4f1837e" name="Changes" comment="add codegen docs.">
+      <change beforePath="$PROJECT_DIR$/.github/workflows/check-docs.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/docs.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.github/workflows/deply-docs.yml" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,9 +21,6 @@
         <option value="Python Script" />
       </list>
     </option>
-  </component>
-  <component name="FormatOnSaveOptions">
-    <option name="myRunOnSave" value="true" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
@@ -45,22 +40,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "/home/nir/Desktop/tzv5hob/qter/tests/conftest.py",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "actions.on.save",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/nir/Desktop/tzv5hob/qter/tests/conftest.py&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;actions.on.save&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/tests" />
@@ -204,6 +199,7 @@
       <workItem from="1674623961013" duration="1500000" />
       <workItem from="1674626181765" duration="13000" />
       <workItem from="1674626209529" duration="4791000" />
+      <workItem from="1674634233728" duration="1876000" />
     </task>
     <task id="LOCAL-00001" summary="first commit!">
       <created>1671541830132</created>
@@ -527,7 +523,21 @@
       <option name="project" value="LOCAL" />
       <updated>1674630609761</updated>
     </task>
-    <option name="localTasksCounter" value="47" />
+    <task id="LOCAL-00047" summary="termy works.">
+      <created>1674634560480</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1674634560480</updated>
+    </task>
+    <task id="LOCAL-00048" summary="add codegen docs.">
+      <created>1674635832190</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1674635832190</updated>
+    </task>
+    <option name="localTasksCounter" value="49" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -557,8 +567,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added doc ui animation." />
-    <MESSAGE value="tests: fix mypy" />
     <MESSAGE value="simple compilation work" />
     <MESSAGE value="coverage ignores." />
     <MESSAGE value="mypy fixes" />
@@ -582,7 +590,9 @@
     <MESSAGE value="add pre-commit.yml workflow" />
     <MESSAGE value="add docs workflow" />
     <MESSAGE value="update workflows." />
-    <option name="LAST_COMMIT_MESSAGE" value="update workflows." />
+    <MESSAGE value="termy works." />
+    <MESSAGE value="add codegen docs." />
+    <option name="LAST_COMMIT_MESSAGE" value="add codegen docs." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
