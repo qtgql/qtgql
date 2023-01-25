@@ -4,17 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="288baa58-55a0-493e-a12a-9b49a4f1837e" name="Changes" comment="add pre-commit.yml workflow">
-      <change afterPath="$PROJECT_DIR$/.github/workflows/check-docs.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.github/workflows/deply-docs.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/workflows/tests.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/tests.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/qter.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/qter.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/index.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/index.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/poetry.lock" beforeDir="false" afterPath="$PROJECT_DIR$/poetry.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyproject.toml" beforeDir="false" afterPath="$PROJECT_DIR$/pyproject.toml" afterDir="false" />
-    </list>
+    <list default="true" id="288baa58-55a0-493e-a12a-9b49a4f1837e" name="Changes" comment="add docs workflow" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -202,7 +192,7 @@
       <workItem from="1674577061243" duration="6259000" />
       <workItem from="1674623961013" duration="1500000" />
       <workItem from="1674626181765" duration="13000" />
-      <workItem from="1674626209529" duration="982000" />
+      <workItem from="1674626209529" duration="1382000" />
     </task>
     <task id="LOCAL-00001" summary="first commit!">
       <created>1671541830132</created>
@@ -463,7 +453,14 @@
       <option name="project" value="LOCAL" />
       <updated>1674625470904</updated>
     </task>
-    <option name="localTasksCounter" value="38" />
+    <task id="LOCAL-00038" summary="add docs workflow">
+      <created>1674627591061</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1674627591061</updated>
+    </task>
+    <option name="localTasksCounter" value="39" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -493,7 +490,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: deferred types work with decorators." />
     <MESSAGE value="pc" />
     <MESSAGE value="added doc ui animation." />
     <MESSAGE value="tests: fix mypy" />
@@ -518,7 +514,8 @@
     <MESSAGE value="mypy fixes." />
     <MESSAGE value="bump qt-hooks" />
     <MESSAGE value="add pre-commit.yml workflow" />
-    <option name="LAST_COMMIT_MESSAGE" value="add pre-commit.yml workflow" />
+    <MESSAGE value="add docs workflow" />
+    <option name="LAST_COMMIT_MESSAGE" value="add docs workflow" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

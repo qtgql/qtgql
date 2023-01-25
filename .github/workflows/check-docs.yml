@@ -4,7 +4,7 @@ on:
     branches: [master, main]
 
 jobs:
-  deploy:
+  check-docs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
