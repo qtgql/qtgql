@@ -1,9 +1,10 @@
 # yaml-language-server: $schema=https://squidfunk.github.io/mkdocs-material/schema.json
-
-site_name: qtgql
-
+site_name: Qt-GraphQL
+site_description: Graphql client framework for Qt
+site_url: https://nrbnlulu.github.io/qtgql/
+site_author: Nir Benlulu
+repo_name: nrbnlulu/qtgqql
 repo_url: https://github.com/nrbnlulu/qtgql
-edit_uri: edit/main/docs/docs
 
 
 theme:
@@ -45,10 +46,11 @@ plugins:
 nav:
   - Home:
       - Overview: ./index.md
+      - Utils: ./utilities.md
   - Codegen:
       - Tutorial: ./codegen/tutorial.md
-  - API:
-      - GenericModel: ./api/genericmodel.md
+  - ItemSystem:
+      Intro: ./itemsystem/intro.md
 markdown_extensions:
   - attr_list
   - md_in_html

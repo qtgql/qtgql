@@ -3,10 +3,7 @@ from __future__ import annotations
 from uuid import uuid4
 
 import pytest
-from qtgql.itemsystem import BaseType, role
-from qtgql.itemsystem.model import GenericModel
-from qtgql.itemsystem.schema import Schema
-from qtgql.itemsystem.type_ import TypesStore, get_base_type
+from qtgql.itemsystem.core import GenericModel, _BaseType, get_base_type, role
 
 NORMAL_GQL = "normal_gql"
 NORMAL_GQL_CAMELIZED = "normalGql"
@@ -15,7 +12,7 @@ NOT_GQL = "not_gql"
 CHILD = "child"
 NOT_A_CHILD = "not_a_child"
 
-store = TypesStore()
+BaseType = get_base_type()
 
 
 class FullClass(BaseType):
@@ -44,20 +41,12 @@ class NestedX3(BaseType):
     uuid: str = role(factory=lambda: uuid4().hex)
 
 
-_schema = Schema(query=NestedX3)
-
-
 def init_dict_nestedX3() -> dict:
     return NestedX3(childX=[WithChild(**init_dict_withChild()) for _ in range(5)]).as_dict()
 
 
-@pytest.fixture(scope="session")
-def schema():
-    return _schema
-
-
 @pytest.fixture
-def base_type() -> type[BaseType]:
+def base_type() -> type[_BaseType]:
     """
 
     :return: BaseType, this is required to avoid TypeStore conflicts.
@@ -68,20 +57,20 @@ def base_type() -> type[BaseType]:
 
 @pytest.fixture
 def full_model(qtbot, qtmodeltester) -> GenericModel[FullClass]:
-    model = FullClass.Model(schema=_schema, data=[init_dict_fullClass() for _ in range(10)])
+    model = FullClass.Model(data=[init_dict_fullClass() for _ in range(10)])
     yield model
     qtmodeltester.check(model, force_py=True)
 
 
 @pytest.fixture
 def model_with_child(qtbot, qtmodeltester) -> GenericModel[WithChild]:
-    model = WithChild.Model(schema=_schema, data=[init_dict_withChild() for _ in range(3)])
+    model = WithChild.Model(data=[init_dict_withChild() for _ in range(3)])
     yield model
     qtmodeltester.check(model)
 
 
 @pytest.fixture
 def nested_model(qtbot, qtmodeltester) -> GenericModel[NestedX3]:
-    model = NestedX3.Model(schema=_schema, data=[init_dict_nestedX3() for _ in range(3)])
+    model = NestedX3.Model(data=[init_dict_nestedX3() for _ in range(3)])
     yield model
     qtbot.check(model)

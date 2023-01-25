@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "qtgql"
-version = "v0.101.0"
+version = "0.101.1"
 packages = [{ include = "qtgql" }]
 description = "Qt framework for building graphql driven QML applications"
 authors = ["Nir <88795475+nrbnlulu@users.noreply.github.com>"]
@@ -40,6 +40,7 @@ mike = "^1.1.2"
 markdown-include = "^0.8.0"
 mkdocstrings = {extras = ["python"], version = "^0.19.1"}
 pygments = "^2.14.0"
+mktestdocs = "^0.2.0"
 
 
 
@@ -91,7 +92,7 @@ src = ["qtgql", "tests"]
 
 
 [tool.pytest.ini_options]
-addopts = "--cov-config=pyproject.toml --ignore=qtgql/codegen/py/templates/  --doctest-modules"
+addopts = "--cov-config=pyproject.toml --ignore=qtgql/codegen/py/templates/"
 markers = [
     "no_captcha: This test requires that `LOGIN_REQUIRE_CAPTCHA=False` on the server",
 ]

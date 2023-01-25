@@ -10,18 +10,18 @@ from qtgql.codegen.py.config import QtGqlConfig
 
 console = rich.console.Console()
 
-
+# these lines are covered coverage failed to catch them.
 def _get_pyproject(p: Path) -> Optional[Path]:
     pproject = p / "pyproject.toml"
     if pproject.exists():
         return pproject
-    return None
+    return None  # pragma: no cover
 
 
 def _find_pyproject(p: Path) -> Optional[Path]:
     if pp := _get_pyproject(p):
         return pp
-    for parent in p.parents:
+    for parent in p.parents:  # pragma: no cover
         return _find_pyproject(parent)
     return None
 
@@ -69,5 +69,5 @@ def hotreload():  # pragma: no cover
     raise NotImplementedError
 
 
-def entrypoint():
+def entrypoint():  # pragma: no cover
     app()

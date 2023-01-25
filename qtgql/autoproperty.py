@@ -84,21 +84,6 @@ def define_properties(cls: Union[Type[T], Type[MakeProperties]]) -> Type[BasePro
     :return: `@attrs.define` decorated class with properties field injected.
      this field is a `QObject` that will emit signals when you set attribute on that class
      and is use-able via QML and other parts of QT.
-
-     Example:
-     >>> from qtgql.autoproperty import define_properties
-
-     >>> @define_properties
-     ... class Apple:
-     ...    color: str
-     ...    size: int
-     >>> apple = Apple(color="red", size=92)
-     >>> apple_as_qt: Apple = apple.properties
-     >>> apple_as_qt.color == apple.color
-     True
-     >>> apple.color = "green"
-     >>> apple_as_qt.color == "green"
-     True
     """
     ns = cls.__dict__.copy()
     bases = cls.__bases__ if cls.__bases__ != (object,) else (MakeProperties,)

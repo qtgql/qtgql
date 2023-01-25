@@ -35,6 +35,20 @@ class TypeHinter:
     of_type: tuple["TypeHinter", ...] = ()
 
     @classmethod
+    def from_string(cls, tp: str, ns: dict) -> "TypeHinter":
+        from typing import List, Union, Dict, Optional, Any, Type, get_type_hints  # noqa
+
+        ns = ns.copy()
+        ns.update(locals())
+
+        def tmp(t: tp):  # type: ignore
+            ...
+
+        annotation = get_type_hints(tmp, localns=ns, globalns=globals())["t"]
+
+        return cls.from_annotations(annotation)
+
+    @classmethod
     def from_annotations(cls, tp: Any) -> "TypeHinter":
         if args := get_args(tp):
             new_args: list[TypeHinter] = []

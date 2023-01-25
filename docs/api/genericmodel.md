@@ -1,2 +1,0 @@
-# Reference
-::: itemsystem.model.GenericModel
