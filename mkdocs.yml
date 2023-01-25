@@ -2,8 +2,9 @@
 
 site_name: qtgql
 
-repo_url: https://github.com/pdm-project/pdm
+repo_url: https://github.com/nrbnlulu/qtgql
 edit_uri: edit/main/docs/docs
+
 
 theme:
   name: material
@@ -46,11 +47,13 @@ nav:
       - Overview: ./index.md
   - API:
       - GenericModel: ./api/genericmodel.md
+
 markdown_extensions:
   - attr_list
   - md_in_html
   - pymdownx.highlight:
-      linenums: true
+
+    linenums: true
   - pymdownx.tabbed:
       alternate_style: true
   - pymdownx.details
@@ -59,7 +62,7 @@ markdown_extensions:
   - toc:
       permalink: "#"
   - markdown_include.include:
-      base_path: docs
+      base_path: ./docs
 
 
 copyright: Copyright &copy; Nir Benlulu 2023 <a href="https://github/nrbnlulu.com>Nir</a>
@@ -72,12 +75,10 @@ extra:
       link: https://github.com/nrbnlulu/qtgql
 
 extra_css:
-  - ./docs/css/termynal.css
-  - ./docs/css/custom.css
-
+  - css/termynal.css
+  - css/custom.css
 extra_javascript:
-  - ./docs/js/termynal.js
-  - ./docs/js/custom.js
-
+  - js/termynal.js
+  - js/custom.js
 watch:
-  - ./
+  - .
