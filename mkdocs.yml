@@ -47,13 +47,11 @@ nav:
       - Overview: ./index.md
   - API:
       - GenericModel: ./api/genericmodel.md
-
 markdown_extensions:
   - attr_list
   - md_in_html
   - pymdownx.highlight:
-
-    linenums: true
+      linenums: true
   - pymdownx.tabbed:
       alternate_style: true
   - pymdownx.details
