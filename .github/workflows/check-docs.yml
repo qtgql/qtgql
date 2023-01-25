@@ -1,28 +1,12 @@
----
-name: Type checks
-
+name: check docs
 on:
-  push:
-    branches: [master, main]
   pull_request:
     branches: [master, main]
-  release:
-    types: [released]
-env:
-  IS_GITHUB_ACTION: 1
 
 jobs:
-  tests:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest]
-        python-version: ["3.10"]
-
-
+  deploy:
+    runs-on: ubuntu-latest
     steps:
-
       - name: Checkout
         uses: actions/checkout@v3
 
@@ -62,7 +46,10 @@ jobs:
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: poetry install --with codegen
 
+      - uses: actions/cache@v2
+        with:
+          key: ${{ github.ref }}
+          path: .cache
 
-      - name: mypy checks
-        run: |
-          poetry run mypy ./qtgql
+      - run: poetry install --only docs
+      - run: poetry run mkdocs build

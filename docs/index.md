@@ -8,7 +8,7 @@
 
 ```
 $
-$ pip install qtgql
+$ pip install qtgql[codegen]
 
 ---> 100%
 ```
