@@ -92,7 +92,7 @@ src = ["qtgql", "tests"]
 
 
 [tool.pytest.ini_options]
-addopts = "--cov-config=pyproject.toml --ignore=qtgql/codegen/py/templates/  --doctest-modules"
+addopts = "--cov-config=pyproject.toml --ignore=qtgql/codegen/py/templates/"
 markers = [
     "no_captcha: This test requires that `LOGIN_REQUIRE_CAPTCHA=False` on the server",
 ]
