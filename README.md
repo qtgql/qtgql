@@ -84,11 +84,7 @@ Ideally every graphql type would be a `QObject` with `Property` for each field.
 
 
 
-
-
-
-
-### Example Usage:
+### Example Usage (no codegen):
 The following example shows how qtgql can be used to query a graphql service.
 *models.py*
 

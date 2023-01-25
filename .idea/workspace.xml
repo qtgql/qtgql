@@ -4,9 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="288baa58-55a0-493e-a12a-9b49a4f1837e" name="Changes" comment="bump qt-hooks">
-      <change afterPath="$PROJECT_DIR$/.github/workflows/pre-commit.yml" afterDir="false" />
+    <list default="true" id="288baa58-55a0-493e-a12a-9b49a4f1837e" name="Changes" comment="add pre-commit.yml workflow">
+      <change afterPath="$PROJECT_DIR$/RELEASE.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/qtier.gif" beforeDir="false" afterPath="$PROJECT_DIR$/assets/qtgql.gif" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -193,7 +195,7 @@
       <workItem from="1674450509285" duration="34273000" />
       <workItem from="1674536485745" duration="25336000" />
       <workItem from="1674577061243" duration="6259000" />
-      <workItem from="1674623961013" duration="746000" />
+      <workItem from="1674623961013" duration="1082000" />
     </task>
     <task id="LOCAL-00001" summary="first commit!">
       <created>1671541830132</created>
@@ -440,7 +442,14 @@
       <option name="project" value="LOCAL" />
       <updated>1674624037917</updated>
     </task>
-    <option name="localTasksCounter" value="36" />
+    <task id="LOCAL-00036" summary="add pre-commit.yml workflow">
+      <created>1674624811718</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1674624811718</updated>
+    </task>
+    <option name="localTasksCounter" value="37" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -470,7 +479,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="chore: migrate to graphql oriented library, deferred types work." />
     <MESSAGE value="feat: deferred types work with decorators." />
     <MESSAGE value="pc" />
     <MESSAGE value="added doc ui animation." />
@@ -495,7 +503,8 @@
     <MESSAGE value="update precommit hooks" />
     <MESSAGE value="mypy fixes." />
     <MESSAGE value="bump qt-hooks" />
-    <option name="LAST_COMMIT_MESSAGE" value="bump qt-hooks" />
+    <MESSAGE value="add pre-commit.yml workflow" />
+    <option name="LAST_COMMIT_MESSAGE" value="add pre-commit.yml workflow" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
