@@ -4,11 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="288baa58-55a0-493e-a12a-9b49a4f1837e" name="Changes" comment="termy works.">
-      <change afterPath="$PROJECT_DIR$/docs/codegen/tutorial.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/index.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/index.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mkdocs.yml" beforeDir="false" afterPath="$PROJECT_DIR$/mkdocs.yml" afterDir="false" />
+    <list default="true" id="288baa58-55a0-493e-a12a-9b49a4f1837e" name="Changes" comment="add codegen docs.">
+      <change beforePath="$PROJECT_DIR$/.github/workflows/check-docs.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/docs.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.github/workflows/deply-docs.yml" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -201,7 +199,7 @@
       <workItem from="1674623961013" duration="1500000" />
       <workItem from="1674626181765" duration="13000" />
       <workItem from="1674626209529" duration="4791000" />
-      <workItem from="1674634233728" duration="1561000" />
+      <workItem from="1674634233728" duration="1876000" />
     </task>
     <task id="LOCAL-00001" summary="first commit!">
       <created>1671541830132</created>
@@ -532,7 +530,14 @@
       <option name="project" value="LOCAL" />
       <updated>1674634560480</updated>
     </task>
-    <option name="localTasksCounter" value="48" />
+    <task id="LOCAL-00048" summary="add codegen docs.">
+      <created>1674635832190</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1674635832190</updated>
+    </task>
+    <option name="localTasksCounter" value="49" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -562,7 +567,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="tests: fix mypy" />
     <MESSAGE value="simple compilation work" />
     <MESSAGE value="coverage ignores." />
     <MESSAGE value="mypy fixes" />
@@ -587,7 +591,8 @@
     <MESSAGE value="add docs workflow" />
     <MESSAGE value="update workflows." />
     <MESSAGE value="termy works." />
-    <option name="LAST_COMMIT_MESSAGE" value="termy works." />
+    <MESSAGE value="add codegen docs." />
+    <option name="LAST_COMMIT_MESSAGE" value="add codegen docs." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
