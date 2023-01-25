@@ -34,7 +34,7 @@ class TestFromAnnotation:
 
 class TestToAnnotation:
     @pytest.mark.parametrize("tp", [int, float, str, bool, object])
-    def test_simple_type(self, tp):
+    def test_builtins(self, tp):
         th = TypeHinter(type=tp, of_type=tuple())
         assert th.as_annotation() == tp
 
@@ -66,6 +66,28 @@ class TestToAnnotation:
         tp = Optional[SomeHiddenType]
         th = TypeHinter(type=Optional, of_type=(TypeHinter(type=SomeHiddenType.__name__),))
         assert th.as_annotation({SomeHiddenType.__name__: SomeHiddenType}) == tp
+
+
+class TestFromString:
+    @pytest.mark.parametrize("tp", [int, float, str, bool, object])
+    def test_builtins(self, tp):
+        assert TypeHinter.from_string(tp.__name__, ns={}).type == tp
+
+    @pytest.mark.parametrize(
+        "container, inner", [(list, float), (Optional, str), (List, int), (tuple, bool)]
+    )
+    def test_containers(self, container, inner):
+        def as_str():
+            return container.__name__ + "[" + inner.__name__ + "]"
+
+        th = TypeHinter.from_string(as_str(), ns={})
+        assert th == TypeHinter.from_annotations(container[inner])
+
+    def test_user_type(self):
+        class MyType:
+            ...
+
+        assert TypeHinter.from_string("MyType", ns=locals()).type is MyType
 
 
 class TestUnsetType:

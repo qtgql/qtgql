@@ -1,8 +1,6 @@
 from PySide6.QtCore import Property, QObject, QTimer, Signal
 from qtgql import slot
-from qtgql.itemsystem import GenericModel, role
-from qtgql.itemsystem.schema import Schema
-from qtgql.itemsystem.type_ import get_base_type
+from qtgql.itemsystem import GenericModel, get_base_type, role
 
 from tests.conftest import fake
 
@@ -46,6 +44,3 @@ class PropertyClass(QObject):
     @Property(type=str, notify=pChanged, fset=set_prop)
     def prop(self) -> str:
         return self._private_prop
-
-
-schema = Schema(query=Apple)

@@ -4,9 +4,8 @@ from unittest.mock import patch
 
 import pytest
 from PySide6 import QtCore as qtc
-from qtgql.itemsystem import RoleDoesNotExist, role
-from qtgql.itemsystem.model import GenericModel, RoleMapper
-from qtgql.itemsystem.schema import Schema
+from qtgql.itemsystem import GenericModel, RoleDoesNotExist, role
+from qtgql.itemsystem.core import RoleMapper
 
 from tests.test_itemsystem.conftest import (
     CHILD,
@@ -42,10 +41,7 @@ def test_get_role_names(base_type):
     class Simple(base_type):
         a: int = role()
 
-    schema = Schema(query=Simple)
-    assert (
-        Simple.Model(schema=schema, data=[{"a": 2}]).roleNames() is Simple.Model.__roles__.qt_roles
-    )
+    assert Simple.Model(data=[{"a": 2}]).roleNames() is Simple.Model.__roles__.qt_roles
 
 
 def test_initialize_create_data(full_model):
@@ -61,22 +57,22 @@ def test_get_data_wrong_index_returns_None(full_model):
     assert full_model.data(full_model.index(999, 999), 256) is None
 
 
-def test_child_creates_model(schema, full_model):
-    model = WithChild.Model(schema=schema, data=[init_dict_withChild() for _ in range(3)])
+def test_child_creates_model(full_model):
+    model = WithChild.Model(data=[init_dict_withChild() for _ in range(3)])
     res = model.data(full_model.index(0), model.__roles__.by_name[CHILD].num)
     assert isinstance(res, GenericModel)
 
 
-def test_child_has_parent_model(schema, full_model):
+def test_child_has_parent_model(full_model):
     parent_model: GenericModel[WithChild] = WithChild.Model(
-        schema=schema, data=[init_dict_withChild() for _ in range(3)]
+        data=[init_dict_withChild() for _ in range(3)]
     )
     child_model: GenericModel[FullClass] = parent_model._data[0].child
     assert child_model.parent_model is parent_model
 
 
-def test_child_model_has_parent_model(schema, full_model):
-    model = WithChild.Model(schema=schema, data=[init_dict_withChild() for _ in range(3)])
+def test_child_model_has_parent_model(full_model):
+    model = WithChild.Model(data=[init_dict_withChild() for _ in range(3)])
     res: GenericModel = model.data(full_model.index(0), model.__roles__.by_name[CHILD].num)
     assert res.parent_model is model
 

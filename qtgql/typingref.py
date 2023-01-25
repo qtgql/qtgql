@@ -29,10 +29,40 @@ class UnsetType:
 UNSET: Any = UnsetType()
 
 
+class LazyType:
+    __slots__ = ("map", "name", "cached")
+
+    def __init__(self, map: dict[str, Any], name: str):
+        self.name = (name,)
+        self.map = map
+        self.cached: TypeHinter
+
+    def resolve(self) -> "TypeHinter":
+        try:
+            return self.cached
+        except AttributeError:
+            self.cached = self.map[self.name]
+            return self.cached
+
+
 @define
 class TypeHinter:
     type: Any  # noqa: A003
     of_type: tuple["TypeHinter", ...] = ()
+
+    @classmethod
+    def from_string(cls, tp: str, ns: dict) -> "TypeHinter":
+        from typing import List, Union, Dict, Optional, Any, Type, get_type_hints  # noqa
+
+        ns = ns.copy()
+        ns.update(locals())
+
+        def tmp(t: tp):
+            ...
+
+        annotation = get_type_hints(tmp, localns=ns, globalns=globals())["t"]
+
+        return cls.from_annotations(annotation)
 
     @classmethod
     def from_annotations(cls, tp: Any) -> "TypeHinter":
