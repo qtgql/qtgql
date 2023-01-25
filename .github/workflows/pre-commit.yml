@@ -1,5 +1,5 @@
 ---
-name: Run Tests
+name: 🔐 pre-commit hooks
 
 on:
   push:
