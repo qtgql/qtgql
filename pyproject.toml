@@ -40,6 +40,7 @@ mike = "^1.1.2"
 markdown-include = "^0.8.0"
 mkdocstrings = {extras = ["python"], version = "^0.19.1"}
 pygments = "^2.14.0"
+mktestdocs = "^0.2.0"
 
 
 

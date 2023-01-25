@@ -18,6 +18,10 @@ IS_ROLE = "is_role"
 OLD_NAME = "old_name"
 
 
+def asdict(t: _BaseType) -> dict:
+    return attrs.asdict(t)  # type: ignore
+
+
 def role(
     default=None,
     factory=UNSET,
@@ -93,7 +97,6 @@ count = 1
 
 def get_base_type() -> type[_BaseType]:
     """
-
     :return: BaseType to use for generating `GenericModel`'s
     """
     global count

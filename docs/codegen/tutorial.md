@@ -12,7 +12,7 @@ from qtgql.codegen.py.config import QtGqlConfig
 from pathlib import Path
 
 myconfig = QtGqlConfig(url="http://localhost:8000/graphql",
-                       output=Path(__file__).parent / '__generated.py'
+                       output=Path.cwd().parent / '__generated.py'
                        )
 ```
 Now in your `pyproject.toml` add the full import path
