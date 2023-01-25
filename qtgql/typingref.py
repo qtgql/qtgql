@@ -33,7 +33,7 @@ class LazyType:
     __slots__ = ("map", "name", "cached")
 
     def __init__(self, map: dict[str, Any], name: str):
-        self.name = (name,)
+        self.name = name
         self.map = map
         self.cached: TypeHinter
 
@@ -57,7 +57,7 @@ class TypeHinter:
         ns = ns.copy()
         ns.update(locals())
 
-        def tmp(t: tp):
+        def tmp(t: tp):  # type: ignore
             ...
 
         annotation = get_type_hints(tmp, localns=ns, globalns=globals())["t"]

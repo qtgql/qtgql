@@ -102,7 +102,8 @@ def get_base_type() -> type[_BaseType]:
     cls: type[_BaseType] = types.new_class(
         name=f"BaseType{count}", kwds={"metaclass": BaseTypeMeta}
     )
-    cls.__types_map__ = {GenericModel.__name__: GenericModel}
+    # we need to inject this here in order for `get_type_hints()` to work.
+    cls.__types_map__ = {GenericModel.__name__: GenericModel}  # type: ignore
     count += 1
     return cls
 
