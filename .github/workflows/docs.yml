@@ -1,15 +1,14 @@
-name: 📖 check docs
+name: 📖 build docs
+
 on:
   push:
-    branches: [master, main]
+    branches: [main]
   pull_request:
-    branches: [master, main]
-#    paths:
-#      - "qtgql/**"
-#      - "docs/**"
-#      - "pyproject.toml"
-#      - "poetry.lock"
-#      - ".github/workflows/docs.yml"
+    branches: [main]
+    paths:
+      - "qtgql/**"
+      - "docs/**"
+      - ".github/workflows/docs.yml"
 
 permissions:
   contents: write
