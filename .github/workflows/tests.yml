@@ -1,13 +1,16 @@
----
-name: Run Tests
+name: 🔂 Unit tests
 
 on:
   push:
     branches: [master, main]
   pull_request:
     branches: [master, main]
-  release:
-    types: [released]
+    paths:
+      - "qtgql/**"
+      - "tests/**"
+      - "pyproject.toml"
+      - "poetry.lock"
+      - ".github/workflows/test.yml"
 env:
   IS_GITHUB_ACTION: 1
 
@@ -58,7 +61,7 @@ jobs:
       #----------------------------------------------
       - name: Install dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-        run: poetry install --without docs
+        run: poetry install --all-extras
 
       - name: Install Qt Dependencies
         shell: bash

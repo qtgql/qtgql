@@ -47,7 +47,7 @@ jobs:
       #----------------------------------------------
       - name: Install dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-        run: poetry install --with codegen
+        run: poetry install --all-extras
 
       - uses: actions/cache@v2
         with:

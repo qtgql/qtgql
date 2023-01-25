@@ -1,18 +1,19 @@
----
-name: Type checks
+name: 🦺 MyPy
 
 on:
   push:
-    branches: [master, main]
+    branches: [main]
   pull_request:
-    branches: [master, main]
-  release:
-    types: [released]
+    branches: [main]
+    paths:
+      - "qtgql/**"
+      - "tests/**"
+      - ".github/workflows/mypy.yml"
 env:
   IS_GITHUB_ACTION: 1
 
 jobs:
-  tests:
+  mypy:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -60,7 +61,7 @@ jobs:
       #----------------------------------------------
       - name: Install dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-        run: poetry install --with codegen
+        run: poetry install --all-extras
 
 
       - name: mypy checks
