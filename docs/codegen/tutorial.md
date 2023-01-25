@@ -6,7 +6,7 @@ TBD
 
 ## Setup
 Somewhere on your application (probably in main.py)
-add our codegen configurations. 
+add our codegen configurations.
 ```python
 from qtgql.codegen.py.config import QtGqlConfig
 from pathlib import Path
@@ -22,7 +22,7 @@ for `myconfig`:
 [ tool.qtgql ]
 config = "myapp.main:myconfig"
 ```
-Now `qtgql` knows how to query your server for 
+Now `qtgql` knows how to query your server for
 introspection data, you just need to call
 
 <div class="termy">
@@ -43,5 +43,3 @@ And your typed are generated...
 ## Usage
 
 TBD...
-
-
