@@ -9,7 +9,7 @@
 
 ```console
 
-// This would install our codegen dependencies as well.
+// This would install our codegen dependencies as well...
 
 $ pip install qtgql[codegen]
 
