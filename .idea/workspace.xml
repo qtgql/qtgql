@@ -5,9 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="288baa58-55a0-493e-a12a-9b49a4f1837e" name="Changes" comment="deploy docs.yml">
-      <change afterPath="$PROJECT_DIR$/assets/qt-graphql.svg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/index.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/installation.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mkdocs.yml" beforeDir="false" afterPath="$PROJECT_DIR$/mkdocs.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -200,28 +201,7 @@
       <workItem from="1674623961013" duration="1500000" />
       <workItem from="1674626181765" duration="13000" />
       <workItem from="1674626209529" duration="4791000" />
-      <workItem from="1674634233728" duration="2881000" />
-    </task>
-    <task id="LOCAL-00002" summary="feat: added gql client.">
-      <created>1671546261645</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1671546261645</updated>
-    </task>
-    <task id="LOCAL-00003" summary="test: coverage ignores.">
-      <created>1671547009783</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1671547009783</updated>
-    </task>
-    <task id="LOCAL-00004" summary="rename package.">
-      <created>1671550790081</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1671550790081</updated>
+      <workItem from="1674634233728" duration="3304000" />
     </task>
     <task id="LOCAL-00005" summary="rename package.">
       <created>1671550818552</created>
@@ -545,7 +525,28 @@
       <option name="project" value="LOCAL" />
       <updated>1674636432170</updated>
     </task>
-    <option name="localTasksCounter" value="51" />
+    <task id="LOCAL-00051" summary="deploy docs.yml">
+      <created>1674637293823</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1674637293823</updated>
+    </task>
+    <task id="LOCAL-00052" summary="deploy docs.yml">
+      <created>1674637302931</created>
+      <option name="number" value="00052" />
+      <option name="presentableId" value="LOCAL-00052" />
+      <option name="project" value="LOCAL" />
+      <updated>1674637302931</updated>
+    </task>
+    <task id="LOCAL-00053" summary="deploy docs.yml">
+      <created>1674637313705</created>
+      <option name="number" value="00053" />
+      <option name="presentableId" value="LOCAL-00053" />
+      <option name="project" value="LOCAL" />
+      <updated>1674637313705</updated>
+    </task>
+    <option name="localTasksCounter" value="54" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
