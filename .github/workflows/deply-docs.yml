@@ -1,9 +1,14 @@
 name: 📖 deploy docs
 on:
   push:
-    branches:
-      - master
-      - main
+    branches: [master, main]
+    paths:
+      - "qtgql/**"
+      - "docs/**"
+      - "pyproject.toml"
+      - "poetry.lock"
+      - ".github/workflows/deploy-docs.yml"
+
 permissions:
   contents: write
 jobs:
