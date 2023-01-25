@@ -4,8 +4,6 @@ from qtgql.itemsystem import role
 from qtgql.itemsystem.model import GenericModel
 from qtgql.itemsystem.schema import Schema
 
-pytest_plugins = ("tests.test_itemsystem.fixtures",)
-
 
 def test_simple_schema(base_type):
     class Query(base_type):

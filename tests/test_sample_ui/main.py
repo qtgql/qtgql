@@ -2,15 +2,16 @@ import glob
 import os
 import sys
 from pathlib import Path
+from typing import Optional
 
 from PySide6 import QtCore, QtGui, QtQml, QtQuick
 from PySide6.QtCore import QObject, Signal
 from PySide6.QtQml import QQmlApplicationEngine
 from qtgql import slot
-from qtgql.gqlcore.client import GqlClientMessage, GqlWsTransportClient, HandlerProto
-from qtgql.itemsystem import GenericModel
+from qtgql.codegen.py.config import QtGqlConfig
+from qtgql.gqltransport.client import GqlClientMessage, GqlWsTransportClient, HandlerProto
 
-from tests.test_sample_ui.models import Apple
+from tests.test_sample_ui.__temp import Query
 from tests.test_sample_ui.qml.icons import ICONS
 
 DEV = not os.environ.get("IS_GITHUB_ACTION", False)
@@ -42,7 +43,7 @@ class EntryPoint(QObject):
             self.app = app
 
         def on_data(self, message: dict) -> None:
-            self.app.apple_model.initialize_data(message["apples"])
+            self.app.set_root_query(Query.from_dict(None, message))
 
         def on_error(self, message: dict) -> None:
             print(message)
@@ -60,7 +61,7 @@ class EntryPoint(QObject):
         self.gql_client = GqlWsTransportClient(url="ws://localhost:8080/graphql")
         self.apple_query_handler = self.AppleHandler(self)
         self.gql_client.query(self.apple_query_handler)
-        self.apple_model: GenericModel[Apple] = Apple.Model()
+        self._root_query: Optional[Query] = None
         QtQml.qmlRegisterSingletonInstance(EntryPoint, "com.props", 1, 0, "EntryPoint", self)  # type: ignore
         # for some reason the app won't initialize without this event processing here.
         QtCore.QEventLoop().processEvents(QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 1000)
@@ -74,9 +75,15 @@ class EntryPoint(QObject):
             self.file_watcher.addPaths(qml_files)
             self.file_watcher.fileChanged.connect(self.on_qml_file_changed)  # type: ignore
 
-    @QtCore.Property(QtCore.QObject, constant=True)
-    def appleModel(self) -> GenericModel[Apple]:
-        return self.apple_model
+    rootQueryChanged = Signal()
+
+    def set_root_query(self, v: Query):
+        self._root_query = v
+        self.rootQueryChanged.emit()
+
+    @QtCore.Property(QtCore.QObject, notify=rootQueryChanged)
+    def rootQuery(self) -> Optional[Query]:
+        return self._root_query
 
     @QtCore.Property("QVariant", constant=True)
     def icons(self) -> dict:
@@ -104,6 +111,11 @@ class EntryPoint(QObject):
         super().deleteLater()
 
 
+qtgqlconfig = QtGqlConfig(
+    url="http://localhost:8080/graphql", output=Path(__file__).parent / "__temp.py"
+)
+
+
 def main():  # pragma: no cover
     app = QtGui.QGuiApplication(sys.argv)
     ep = EntryPoint()  # noqa: F841, this collected by the gc otherwise.
@@ -112,4 +124,7 @@ def main():  # pragma: no cover
 
 
 if __name__ == "__main__":
+    #
+    # with open(Path(__file__).parent / '__temp.py', 'w') as fh:
+
     main()

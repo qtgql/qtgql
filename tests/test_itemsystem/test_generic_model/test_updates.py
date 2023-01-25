@@ -1,8 +1,6 @@
 import attrs
 
-from tests.test_itemsystem.fixtures import NORMAL_GQL_CAMELIZED, FullClass
-
-pytest_plugins = ("tests.test_itemsystem.fixtures",)
+from tests.test_itemsystem.conftest import NORMAL_GQL_CAMELIZED, FullClass
 
 
 def test_update_node(model_with_child):

@@ -1,17 +1,14 @@
 import platform
 
 import pytest
-from qtgql.gqlcore.client import PROTOCOL, GqlWsTransportClient, SubscribeResponseMessage
+from qtgql.gqltransport.client import PROTOCOL, GqlWsTransportClient, SubscribeResponseMessage
 
-import tests.test_gql.fixtures
-from tests.test_gql.fixtures import PseudoHandler
-
-pytest_plugins = ("tests.test_gql.fixtures",)
+from tests.test_gqltransport.conftest import PseudoHandler, get_subscription_str
 
 
 def test_generates_has_query_map_with_id_and_receivers(default_client):
-    subscriber_1 = PseudoHandler(tests.test_gql.fixtures.get_subscription_str())
-    subscriber_2 = PseudoHandler(tests.test_gql.fixtures.get_subscription_str())
+    subscriber_1 = PseudoHandler(get_subscription_str())
+    subscriber_2 = PseudoHandler(get_subscription_str())
     assert subscriber_1.message.id != subscriber_2.message.id
     default_client.subscribe(subscriber_1)
     default_client.subscribe(subscriber_2)
@@ -20,8 +17,8 @@ def test_generates_has_query_map_with_id_and_receivers(default_client):
 
 def test_subscriber_called_with_on_gql_next(qtbot, default_client):
     client = default_client
-    subscriber_1 = PseudoHandler(tests.test_gql.fixtures.get_subscription_str(target=5))
-    subscriber_2 = PseudoHandler(tests.test_gql.fixtures.get_subscription_str(target=2))
+    subscriber_1 = PseudoHandler(get_subscription_str(target=5))
+    subscriber_2 = PseudoHandler(get_subscription_str(target=2))
     assert subscriber_1.message.id != subscriber_2.message.id
     client.subscribe(subscriber_1)
     client.subscribe(subscriber_2)
@@ -64,7 +61,7 @@ def test_subscribe_complete_pops_subscriber_with_this_id(qtbot, mini_server, def
     "Windows" in platform.platform(), reason="for wome reason the server will die here on windows"
 )
 def test_gql_error_sends_error_to_subscriber(qtbot, default_client, default_handler):
-    error_subscriber = PseudoHandler(tests.test_gql.fixtures.get_subscription_str(raise_on_5=True))
+    error_subscriber = PseudoHandler(get_subscription_str(raise_on_5=True))
     default_client.subscribe(default_handler)
     default_client.subscribe(error_subscriber)
     qtbot.wait(500)

@@ -13,7 +13,7 @@ Pane {
         height: parent.height
         width: 400
         anchors.centerIn: parent
-        model: EntryPoint.appleModel
+        model: EntryPoint.rootQuery.apples
         removeDisplaced: Transition {
             NumberAnimation {
                 properties: "x, y"
@@ -37,19 +37,20 @@ Pane {
         delegate: ItemDelegate {
             id: appleDelegate
             required property var model
+            property var apple: model.object
             width: ListView.view.width
             height: 100 + wormsList.implicitHeight
             hoverEnabled: true
             Label {
                 id: header
-                text: appleDelegate.model.owner + "'s apple:"
+                text: appleDelegate.apple.owner + "'s apple:"
                 font.bold: true
             }
             TLabel {
                 id: appleIcon
                 text: EntryPoint.icons.apple
-                color: appleDelegate.model.color
-                font.pointSize: appleDelegate.model.size
+                color: appleDelegate.apple.color
+                font.pointSize: appleDelegate.apple.size
                 anchors {
                     right: parent.right
                     top: parent.top
@@ -57,7 +58,7 @@ Pane {
             }
             Button {
                 text: "click to remove"
-                onClicked: EntryPoint.appleModel.pop(model.index)
+                onClicked: EntryPoint.rootQuery.apples.pop(model.index)
                 anchors.bottom: parent.bottom
                 enabled: parent.hovered
             }
@@ -71,21 +72,22 @@ Pane {
                 header: Label {
                     text: wormsList.count ? 'Worms:' : 'No worms!'
                 }
-                model: appleDelegate.model.worms
+                model: appleDelegate.apple.worms
                 spacing: 10
                 delegate: ItemDelegate {
                     id: wormDelegate
                     width: parent.width
                     required property var model
+                    property var worm: model.object
                     Column {
                         Label {
-                            text: "family: " + wormDelegate.model.family
+                            text: "family: " + wormDelegate.worm.family
                         }
                         Label {
-                            text: "name: " + wormDelegate.model.name
+                            text: "name: " + wormDelegate.worm.name
                         }
                         Label {
-                            text: "size: " + wormDelegate.model.size
+                            text: "size: " + wormDelegate.worm.size
                         }
                     }
                     TLabel {

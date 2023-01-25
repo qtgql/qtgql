@@ -12,10 +12,12 @@ from PySide6 import QtNetwork as qtn
 from PySide6 import QtWebSockets as qtws
 
 from qtgql import slot
-from qtgql.gqlcore.gqlcore import EncodeAble, GqlEncoder, QueryPayload, T
+from qtgql.gqltransport.core import EncodeAble, GqlEncoder, QueryPayload, T
 from qtgql.typingref import UNSET
 
 logger = logging.getLogger(__name__)
+
+__all__ = ["HandlerProto", "GqlWsTransportClient"]
 
 
 class PROTOCOL:
