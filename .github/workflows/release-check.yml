@@ -6,8 +6,9 @@ on:
     branches:
     - main
     paths:
-    - "strawberry/**"
+    - "qtgql/**"
     - "pyproject.toml"
+    - ".github/workflows/release-check.yml"
 
 jobs:
   get-contributor-info:
