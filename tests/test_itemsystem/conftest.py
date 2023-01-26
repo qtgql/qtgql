@@ -3,7 +3,8 @@ from __future__ import annotations
 from uuid import uuid4
 
 import pytest
-from qtgql.itemsystem.core import GenericModel, _BaseType, get_base_type, role
+from qtgql.itemsystem import GenericModel, get_base_type, role
+from qtgql.itemsystem.core import _BaseType
 
 NORMAL_GQL = "normal_gql"
 NORMAL_GQL_CAMELIZED = "normalGql"
@@ -46,7 +47,7 @@ def init_dict_nestedX3() -> dict:
 
 
 @pytest.fixture
-def base_type() -> type[_BaseType]:
+def base_type(qtbot) -> type[_BaseType]:
     """
 
     :return: BaseType, this is required to avoid TypeStore conflicts.
