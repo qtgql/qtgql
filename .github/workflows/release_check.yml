@@ -1,4 +1,4 @@
-name: 🆙 Release.md Check
+name: 🆙 RELEASE.md check
 
 on:
   pull_request_target:
@@ -7,7 +7,7 @@ on:
     - main
     paths:
     - "qtgql/**"
-    - ".github/**"
+    - ".github/workflows/release_check.yml"
     - "pyproject.toml"
 
 jobs:
