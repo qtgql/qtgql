@@ -9,8 +9,8 @@ license = "MIT"
 readme = "README.md"
 
 [tool.poetry.urls]
-"Homepage" = "https://github.com/nrbnlulu/strawberry-django-auth"
-"Documentation" = "https://nrbnlulu.github.io/strawberry-django-auth/"
+"Homepage" = "https://github.com/nrbnlulu/qtgql"
+"Documentation" = "https://nrbnlulu.github.io/qtgql/"
 
 
 [tool.poetry.dependencies]
