@@ -90,6 +90,9 @@ jobs:
       - name: Get PR info
         id: get-info
         uses: strawberry-graphql/get-pr-info-action@v6
+        env:
+          ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
   update-release-on-github:
     name: Update release on github
