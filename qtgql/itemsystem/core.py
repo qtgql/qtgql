@@ -121,7 +121,7 @@ class Role:
         if isinstance(type, str):
             self.str_type = type
         else:
-            self._type = type
+            self._type = TypeHinter.from_annotations(type)
 
     @property
     def type(self) -> TypeHinter:
