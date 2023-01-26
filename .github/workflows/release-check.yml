@@ -7,6 +7,7 @@ on:
     - main
     paths:
     - "qtgql/**"
+    - "tests/**"
     - "pyproject.toml"
     - ".github/workflows/release-check.yml"
 
