@@ -20,7 +20,7 @@ Qt-QML IMO is a big game changer
 - Easy to customize
 - Easy to learn
 
-One of the big disadvantages in Qt-QML is that Qt-C++ API is very repititive and hard to maintain
+One of the big disadvantages in Qt-QML is that Qt-C++ API is very repetitive and hard to maintain
 for data-driven applications.
 
 although it is tempting to just use `relay` or other `JS` graphql lib
