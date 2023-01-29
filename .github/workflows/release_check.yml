@@ -28,10 +28,16 @@ jobs:
 
       - uses: mshick/add-pr-comment@v2
         if: ${{ steps.check_release.outputs.release!='' }}
-        name: add release comment
+        name: add failed release comment
         with:
           message: |
             ${{ steps.check_release.outputs.release }}
+      - uses: mshick/add-pr-comment@v2
+        if: ${{ steps.check_release.outputs.release=='' }}
+        name: add release comment
+        with:
+          message-path: ./RELEASE.md
+
       - name: fail if check failed
         if: ${{ steps.check_release.outputs.release!='' }}
         run: |
