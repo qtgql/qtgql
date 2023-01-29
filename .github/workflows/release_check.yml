@@ -30,4 +30,4 @@ jobs:
         name: add release comment
         with:
           message: |
-            {{ $GITHUB_OUTPUT }}
+            $GITHUB_OUTPUT
