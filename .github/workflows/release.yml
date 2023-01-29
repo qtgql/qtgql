@@ -1,20 +1,20 @@
 name: 🆙 Release
 
 on:
-  push:
-    branches:
-    - main
-    paths:
-    - "qtgql/**"
-    - ".github/workflows/release_check.yml"
-    - "pyproject.toml"
-
+  workflow_run:
+    workflows: [" 🔂 Unit tests"]
+    branches: [main]
+    types:
+      - completed
 jobs:
   deploy:
     name: Deploy
     environment: Deployment
     runs-on: ubuntu-latest
-    if: ${{ github.ref=='refs/heads/main' && github.event_name!='pull_request' }}
+    if: ${{
+            github.ref=='refs/heads/main' && github.event_name!='pull_request' &&
+            github.event.workflow_run.conclusion == 'success'
+        }}
 
     steps:
       - uses: actions/checkout@v2

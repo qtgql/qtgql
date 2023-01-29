@@ -108,5 +108,11 @@ fail_under = 95
 config = "tests.test_sample_ui.main:qtgqlconfig"
 
 
+[tool.autopub]
+git-username = "QtGqlBot"
+git-email = "bot@no.reply"
+project-name = "qtgql"
+append-github-contributor = true
+
 [tool.poetry.scripts]
 qtgql = "qtgql.codegen.cli:entrypoint"
