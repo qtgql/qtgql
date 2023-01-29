@@ -1,6 +1,13 @@
 name: 🆙 Release
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+    - main
+    paths:
+    - "qtgql/**"
+    - ".github/workflows/release_check.yml"
+    - "pyproject.toml"
 
 jobs:
   deploy:

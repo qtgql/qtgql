@@ -31,7 +31,7 @@ jobs:
         name: add release comment
         with:
           message: |
-            $GITHUB_OUTPUT
+            ${{ steps.check_release.outputs.release }}
       - name: fail if check failed
         if: ${{ steps.check_release.outputs.release!='' }}
         run: |
