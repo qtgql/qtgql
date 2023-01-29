@@ -1,20 +1,15 @@
 name: 🆙 Release
 
 on:
-  workflow_run:
-    workflows: [" 🔂 Unit tests"]
-    branches: [main]
-    types:
-      - completed
+  push:
+    branches:
+      - main
 jobs:
   deploy:
     name: Deploy
     environment: Deployment
     runs-on: ubuntu-latest
-    if: ${{
-            github.ref=='refs/heads/main' && github.event_name!='pull_request' &&
-            github.event.workflow_run.conclusion == 'success'
-        }}
+    if: ${{ github.ref=='refs/heads/main' && github.event_name!='pull_request' }}
 
     steps:
       - uses: actions/checkout@v2
