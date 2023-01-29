@@ -26,10 +26,10 @@ jobs:
           python -m pip install poetry githubrelease httpx==0.18.2 autopub
           echo "release=$(autopub check)" >> $GITHUB_OUTPUT
 
-      - name: Add reaction
-        uses: peter-evans/create-or-update-comment@v2
+      - uses: mshick/add-pr-comment@v2
+        name: add release comment
         with:
-          token: ${{ secrets.BOT_TOKEN }}
-          repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
-          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
-          reaction-type: hooray
+          message: |
+            **Hello**
+            🌏
+            !
