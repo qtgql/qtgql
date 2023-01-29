@@ -9,11 +9,6 @@ from qtgql import slot
 __all__ = ["BaseModel", "get_base_graphql_object"]
 
 
-def get_base_graphql_object(name: str | None = "BaseGraphQLObject") -> type[_BaseQGraphQLObject]:
-    type_map: dict[str, type[_BaseQGraphQLObject]] = {}
-    return type(name, (_BaseQGraphQLObject,), {"type_map": type_map})  # type: ignore
-
-
 class _BaseQGraphQLObject(QObject):
     type_map: dict[str, type[_BaseQGraphQLObject]]
 
@@ -101,6 +96,17 @@ class BaseModel(QAbstractListModel):
         self._data.pop(index)
         self.endRemoveRows()
 
+
+def get_base_graphql_object(name: str) -> type[_BaseQGraphQLObject]:
+    """
+    :param name: valid attribute name (used by codegen to import it).
+    :returns: A type to be extended by all generated types.
+    """
+    type_map: dict[str, type[_BaseQGraphQLObject]] = {}
+    return type(name, (_BaseQGraphQLObject,), {"type_map": type_map})  # type: ignore
+
+
+BaseGraphQLObject = get_base_graphql_object("BaseGraphQLObject")
 
 T_BaseModel = TypeVar("T_BaseModel", bound=BaseModel)
 T_BaseQGraphQLObject = TypeVar("T_BaseQGraphQLObject", bound=_BaseQGraphQLObject)

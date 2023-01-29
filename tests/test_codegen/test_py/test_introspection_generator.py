@@ -4,14 +4,15 @@ from typing import NamedTuple
 
 import pytest
 from qtgql.codegen.introspection import SchemaEvaluator, introspection_query
-from qtgql.codegen.objecttype import GqlType
 from qtgql.codegen.py.bases import BaseModel, _BaseQGraphQLObject
+from qtgql.codegen.py.config import QtGqlConfig
+from qtgql.codegen.py.objecttype import GqlType
+from qtgql.codegen.py.scalars import DateTimeScalar
 from strawberry import Schema
 
 from tests.mini_gql_server import schema
 from tests.test_codegen import schemas
 from tests.test_codegen.conftest import get_introspection_for
-from tests.test_codegen.test_py.conftest import generate_type_kwargs
 
 
 @pytest.fixture
@@ -34,7 +35,7 @@ class ObjectTestCaseMixin:
         tmp_mod = cls.get_tmp_mod()
         type_name = cls.type_name
         introspection = get_introspection_for(cls.schema)
-        res = SchemaEvaluator(introspection)
+        res = SchemaEvaluator(introspection, config=QtGqlConfig(url=None, output=None))
         generated = res.generate()
         compiled = compile(generated, "schema", "exec")
         exec(compiled, tmp_mod.__dict__)
@@ -51,7 +52,7 @@ class ObjectTestCaseMixin:
             annotation = field.annotation
             assert klass.__init__.__annotations__[field.name] == annotation
             assert getattr(klass, field.setter_name).__annotations__["v"] == annotation
-            assert getattr(klass, field.name).fget.__annotations__["return"] == annotation
+            assert getattr(klass, field.name).fget.__annotations__["return"] == field.property_type
 
     def test_init(self):
         compiled = self.compiled()
@@ -62,19 +63,34 @@ class ObjectTestCaseMixin:
         compiled = self.compiled()
 
         klass = getattr(compiled.mod, compiled.tested_type.name)
-        inst = klass(**generate_type_kwargs(compiled.tested_type, 1))
+        inst = klass.from_dict(None, self.initialize_dict)
         for field in compiled.tested_type.fields:
-            assert getattr(inst, field.name) == 1
+            v = getattr(inst, field.name)
+            if scalar := field.is_custom_scalar:
+                assert scalar.from_graphql(self.initialize_dict[field.name]).to_qt() == v
+            else:
+                assert v == self.initialize_dict[field.name]
 
     def test_property_setter_emits(self, qtbot):
         compiled = self.compiled()
         klass = getattr(compiled.mod, compiled.tested_type.name)
-        inst = klass(**generate_type_kwargs(compiled.tested_type, 1))
+        inst = klass.from_dict(None, self.initialize_dict)
         for field in compiled.tested_type.fields:
             signal = getattr(inst, field.signal_name)
+            v = self.initialize_dict[field.name]
             with qtbot.wait_signal(signal):
-                getattr(inst, field.setter_name)(2)
-            assert getattr(inst, field.name) == 2
+                if scalar := field.is_custom_scalar:
+                    setattr(inst, field.private_name, scalar.from_graphql(None))
+                else:
+                    setattr(inst, field.private_name, None)
+                assert not getattr(inst, field.name)
+                if scalar := field.is_custom_scalar:
+                    v = scalar.from_graphql(v)
+                getattr(inst, field.setter_name)(v)
+                if field.is_custom_scalar:
+                    assert getattr(inst, field.name) == v.to_qt()
+                else:
+                    assert getattr(inst, field.name) == v
 
     def test_from_dict(self, qtbot):
         compiled = self.compiled()
@@ -99,7 +115,7 @@ class TestSimpleObjectWithScalar(ObjectTestCaseMixin):
     ).data["user"]
 
 
-class TestObjectWithCustomScalar(ObjectTestCaseMixin):
+class TestObjectWithDateTimeScalar(ObjectTestCaseMixin):
     schema = schemas.object_with_datetime.schema
     initialize_dict = schema.execute_sync(
         query="""
@@ -112,6 +128,12 @@ class TestObjectWithCustomScalar(ObjectTestCaseMixin):
         }
         """
     ).data["user"]
+
+    def test_from_dict(self, qtbot):
+        compiled = self.compiled()
+        klass = getattr(compiled.mod, compiled.tested_type.name)
+        inst = klass.from_dict(None, self.initialize_dict)
+        assert inst.birth == DateTimeScalar.from_graphql(self.initialize_dict["birth"]).to_qt()
 
 
 class TestObjectWithOptionalScalar(ObjectTestCaseMixin):

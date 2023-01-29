@@ -3,7 +3,7 @@ from types import ModuleType
 from typing import Any, Callable
 
 import pytest
-from qtgql.codegen.objecttype import FieldProperty, GqlType
+from qtgql.codegen.py.objecttype import FieldProperty, GqlType
 
 
 @pytest.fixture()
@@ -18,7 +18,3 @@ def property_tester(
         cls = getattr(compiled_mod, t.name)
         for prop in t.fields:
             test(prop, cls)
-
-
-def generate_type_kwargs(t: GqlType, v) -> dict:
-    return {p.name: v for p in t.fields}

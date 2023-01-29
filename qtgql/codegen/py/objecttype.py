@@ -1,12 +1,16 @@
 import enum
 from functools import cached_property
-from typing import List, Optional, Union
+from typing import TYPE_CHECKING, Any, List, Optional, Union
 
 from attrs import define
 
 from qtgql.codegen.py.bases import _BaseQGraphQLObject
+from qtgql.codegen.py.scalars import BuiltinScalars, CustomScalarMap
 from qtgql.codegen.utils import AntiForwardRef
 from qtgql.typingref import TypeHinter
+
+if TYPE_CHECKING:
+    from qtgql.codegen.py.scalars import BaseCustomScalar
 
 
 class Kinds(enum.Enum):
@@ -24,11 +28,16 @@ class Kinds(enum.Enum):
         raise KeyError(item, "is a wrong kind")
 
 
+def stringify_annotation(annot: Any) -> str:
+    return str(annot).replace("typing.", "").replace("qtgql.codegen.utils.", "")
+
+
 @define(slots=False)
 class FieldProperty:
     name: str
     type: TypeHinter
     type_map: dict[str, "GqlType"]
+    scalars: CustomScalarMap
     description: Optional[str] = ""
 
     @cached_property
@@ -44,6 +53,9 @@ class FieldProperty:
 
         if t in BuiltinScalars.values():
             return default
+        if t in self.scalars.values():
+            t: BaseCustomScalar
+            return f"SCALARS.{t.__name__}.{BaseCustomScalar.from_graphql.__name__}({default})"
         if t in (list, List):
             inner = type_hinter.of_type[0].type
             # handle inner type
@@ -69,9 +81,14 @@ class FieldProperty:
         # int, str, float etc...
         if ret in BuiltinScalars.values():
             return ret.__name__
+
+        if ret in self.scalars.values():
+            ret: BaseCustomScalar
+            return f"SCALARS.{ret.__name__}"
+
         # handle Optional, Union, List etc...
         # removing redundant prefixes.
-        return str(ret).replace("typing.", "").replace("qtgql.codegen.utils.", "")
+        return stringify_annotation(ret)
 
     @cached_property
     def property_type(self) -> str:
@@ -80,6 +97,8 @@ class FieldProperty:
             or self.type.of_type in BuiltinScalars.values()
         ):
             return self.annotation
+        elif scalar := self.is_custom_scalar:
+            return stringify_annotation(scalar.to_qt.__annotations__["return"])
         return "QObject"
 
     @cached_property
@@ -94,6 +113,17 @@ class FieldProperty:
     def private_name(self) -> str:
         return "_" + self.name
 
+    @cached_property
+    def is_custom_scalar(self) -> Optional[BaseCustomScalar]:
+        if self.type.type in self.scalars.values():
+            return self.type.type
+
+    @property
+    def fget(self) -> str:
+        if self.is_custom_scalar:
+            return f"return self.{self.private_name}.{BaseCustomScalar.to_qt.__name__}()"
+        return f"return self.{self.private_name}"
+
 
 @define(slots=False)
 class GqlType:
@@ -105,12 +135,3 @@ class GqlType:
     @cached_property
     def model_name(self) -> str:
         return self.name + "Model"
-
-
-BuiltinScalars: dict[str, type] = {
-    "Int": int,
-    "Float": float,
-    "String": str,
-    "ID": str,
-    "Boolean": bool,
-}

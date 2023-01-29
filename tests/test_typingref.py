@@ -1,4 +1,4 @@
-from typing import List, Optional, Union, get_args, get_origin
+from typing import Generic, List, Optional, TypeVar, Union, get_args, get_origin
 
 import pytest
 from qtgql.typingref import UNSET, TypeHinter, UnsetType
@@ -89,6 +89,14 @@ class TestFromString:
 
         assert TypeHinter.from_string("MyType", ns=locals()).type is MyType
 
+    def test_generic_types(self):
+        T = TypeVar("T")
+
+        class A(Generic[T]):
+            ...
+
+        assert TypeHinter.from_string("A", ns=locals()).type is A
+
 
 class TestUnsetType:
     def test_returns_null_str(self):
@@ -99,3 +107,17 @@ class TestUnsetType:
 
     def test_singleton(self):
         assert UNSET is UnsetType()
+
+
+def test_is_union():
+    th = TypeHinter.from_annotations(Union[str, int])
+    assert th.is_union()
+    th = TypeHinter.from_annotations(int)
+    assert not th.is_union()
+
+
+def test_is_optional():
+    th = TypeHinter.from_annotations(Optional[str])
+    assert th.is_optional()
+    th = TypeHinter.from_annotations(int)
+    assert not th.is_optional()

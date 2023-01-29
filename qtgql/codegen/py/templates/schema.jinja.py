@@ -1,12 +1,20 @@
 from __future__ import annotations
 from PySide6.QtCore import Property, Signal, QObject
 from typing import Optional, Union
-from qtgql.codegen.py.bases import get_base_graphql_object, BaseModel
+from qtgql import qproperty
+from qtgql.codegen.py.bases import BaseModel
+from qtgql.codegen.py.config import QtGqlConfig
+{% for dep in context.dependencies %}
+{{dep}}
+{% endfor %}
 
-BaseObject = get_base_graphql_object()
+class SCALARS:
+    {% for scalar in context.custom_scalars %}
+    {{scalar}} = {{scalar}}
+    {% endfor %}
 
-{% for type in types %}
-class {{ type.name }}(BaseObject):
+{% for type in context.types %}
+class {{ type.name }}({{context.base_object_name}}):
     """{{  type.docstring  }}"""
 
     def __init__(self, parent: QObject = None, {% for f in type.fields %} {{f.name}}: {{f.annotation}} = None, {% endfor %}):
@@ -27,12 +35,12 @@ class {{ type.name }}(BaseObject):
         self.{{  f.private_name  }} = v
         self.{{  f.name  }}Changed.emit()
 
-    @Property(type={{ f.property_type }}, fset={{ f.setter_name }}, notify={{f.signal_name}})
-    def {{ f.name }}(self) -> {{ f.annotation }}:
-        return self.{{  f.private_name  }}
+    @qproperty(type={{ f.property_type }}, fset={{ f.setter_name }}, notify={{f.signal_name}})
+    def {{ f.name }}(self) -> {{ f.property_type }}:
+        {{f.fget}}
     {% endfor %}
 class {{ type.model_name }}(BaseModel):
-    def __init__(self, data: list[{{  type.name  }}], parent: Optional[BaseObject] = None):
+    def __init__(self, data: list[{{  type.name  }}], parent: Optional[{{context.base_object_name}}] = None):
         super().__init__(data, parent)
 
 
