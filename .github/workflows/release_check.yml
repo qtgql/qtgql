@@ -30,6 +30,4 @@ jobs:
         name: add release comment
         with:
           message: |
-            **Hello**
-            🌏
-            !
+            {{ $GITHUB_OUTPUT }}
