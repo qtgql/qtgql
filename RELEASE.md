@@ -1,3 +1,3 @@
-type: patch
+Release type: patch
 
-This release adds release support
+This release adds datetime scalar support.

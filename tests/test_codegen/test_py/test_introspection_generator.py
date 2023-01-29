@@ -86,11 +86,29 @@ class TestSimpleObjectWithScalar(ObjectTestCaseMixin):
     schema = schemas.object_with_scalar.schema
     initialize_dict = schema.execute_sync(
         query="""
-        query {
-            user{
-                name
-                age
-            }
+        {
+          user {
+            name
+            age
+            agePoint
+            male
+            id
+          }
+        }
+        """
+    ).data["user"]
+
+
+class TestObjectWithCustomScalar(ObjectTestCaseMixin):
+    schema = schemas.object_with_datetime.schema
+    initialize_dict = schema.execute_sync(
+        query="""
+        {
+          user {
+            name
+            age
+            birth
+          }
         }
         """
     ).data["user"]
