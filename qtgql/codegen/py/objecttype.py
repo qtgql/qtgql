@@ -1,16 +1,13 @@
 import enum
 from functools import cached_property
-from typing import TYPE_CHECKING, Any, List, Optional, Union
+from typing import Any, List, Optional, Union
 
 from attrs import define
 
 from qtgql.codegen.py.bases import _BaseQGraphQLObject
-from qtgql.codegen.py.scalars import BuiltinScalars, CustomScalarMap
+from qtgql.codegen.py.scalars import BaseCustomScalar, BuiltinScalars, CustomScalarMap
 from qtgql.codegen.utils import AntiForwardRef
 from qtgql.typingref import TypeHinter
-
-if TYPE_CHECKING:
-    from qtgql.codegen.py.scalars import BaseCustomScalar
 
 
 class Kinds(enum.Enum):

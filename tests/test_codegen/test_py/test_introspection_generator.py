@@ -1,8 +1,9 @@
 import uuid
 from types import ModuleType
-from typing import NamedTuple
+from typing import Optional
 
 import pytest
+from attr import define
 from qtgql.codegen.introspection import SchemaEvaluator, introspection_query
 from qtgql.codegen.py.bases import BaseModel, _BaseQGraphQLObject
 from qtgql.codegen.py.config import QtGqlConfig
@@ -20,31 +21,42 @@ def introspected():
     return schema.execute_sync(introspection_query)
 
 
-class ObjectTesterHelper(NamedTuple):
-    mod: ModuleType
-    tested_type: GqlType
-
-
-class ObjectTestCaseMixin:
+@define
+class QGQLObjectTestCase:
+    query: str
     schema: Schema
-    initialize_dict: dict
-    type_name = "User"
+    test_name: str
+    type_name: str = "User"
+    mod: Optional[ModuleType] = None
+    tested_type: Optional[GqlType] = None
 
-    @classmethod
-    def compiled(cls) -> ObjectTesterHelper:
-        tmp_mod = cls.get_tmp_mod()
-        type_name = cls.type_name
-        introspection = get_introspection_for(cls.schema)
+    @property
+    def module(self) -> ModuleType:
+        assert self.mod
+        return self.mod
+
+    @property
+    def gql_type(self) -> _BaseQGraphQLObject:
+        assert self.tested_type
+        return getattr(self.module, self.tested_type.name)
+
+    @property
+    def initialize_dict(self) -> dict:
+        return self.schema.execute_sync(self.query).data["user"]
+
+    def compile(self) -> None:
+        tmp_mod = ModuleType(uuid.uuid4().hex)
+        type_name = self.type_name
+        introspection = get_introspection_for(self.schema)
         res = SchemaEvaluator(introspection, config=QtGqlConfig(url=None, output=None))
         generated = res.generate()
         compiled = compile(generated, "schema", "exec")
         exec(compiled, tmp_mod.__dict__)
-        return ObjectTesterHelper(mod=tmp_mod, tested_type=res._generated_types[type_name])
+        self.mod = tmp_mod
+        self.tested_type = res._generated_types[type_name]
 
-    @classmethod
-    def get_tmp_mod(cls):
-        return ModuleType(uuid.uuid4().hex)
 
+class ObjectTestCaseMixin:
     def test_has_correct_annotations(self):
         compiled = self.compiled()
         klass = getattr(compiled.mod, compiled.tested_type.name)
@@ -98,10 +110,9 @@ class ObjectTestCaseMixin:
         klass.from_dict(None, self.initialize_dict)
 
 
-class TestSimpleObjectWithScalar(ObjectTestCaseMixin):
-    schema = schemas.object_with_scalar.schema
-    initialize_dict = schema.execute_sync(
-        query="""
+ScalarsTestCase = QGQLObjectTestCase(
+    schema=schemas.object_with_scalar.schema,
+    query="""
         {
           user {
             name
@@ -111,8 +122,161 @@ class TestSimpleObjectWithScalar(ObjectTestCaseMixin):
             id
           }
         }
-        """
-    ).data["user"]
+        """,
+    test_name="ScalarsTestCase",
+)
+
+DateTimeTestCase = QGQLObjectTestCase(
+    schema=schemas.object_with_datetime.schema,
+    query="""
+        {
+          user {
+            name
+            age
+            birth
+          }
+        }
+        """,
+    test_name="DateTimeTestCase",
+)
+
+OptionalScalarTestCase = QGQLObjectTestCase(
+    schema=schemas.object_with_optional_scalar.schema,
+    query="""
+    query {
+        user{
+            name
+            age
+        }
+    }
+    """,
+    test_name="OptionalScalarTestCase",
+)
+
+NestedObjectTestCase = QGQLObjectTestCase(
+    schema=schemas.object_with_object.schema,
+    query="""
+    query {
+        user{
+            person{
+                name
+                age
+            }
+        }
+    }
+    """,
+    test_name="NestedObjectTestCase",
+)
+
+OptionalNestedObjectTestCase = QGQLObjectTestCase(
+    schema=schemas.object_with_optional_object.schema,
+    query="""
+    query {
+        user{
+            person{
+                name
+                age
+            }
+        }
+    }
+    """,
+    test_name="OptionalNestedObjectTestCase",
+)
+
+ObjectWithListOfObjectTestCase = QGQLObjectTestCase(
+    schema=schemas.object_with_list_of_object.schema,
+    query="""
+    query {
+        user{
+            persons{
+                name
+                age
+            }
+        }
+    }
+    """,
+    test_name="ObjectWithListOfObjectTestCase",
+)
+
+InterfaceTestCase = QGQLObjectTestCase(
+    schema=schemas.object_with_interface.schema,
+    query="""
+    query {
+        user{
+            name
+            age
+        }
+    }
+    """,
+    test_name="InterfaceTestCase",
+)
+
+UnionTestCase = QGQLObjectTestCase(
+    schema=schemas.object_with_union.schema,
+    query="""
+        {
+          user {
+            whoAmI {
+              ... on Frog {
+                __typename
+                name
+                color
+              }
+              ... on Person {
+                __typename
+                name
+                age
+              }
+            }
+          }
+        }
+    """,
+    test_name="UnionTestCase",
+)
+
+ListOfUnionTestCase = QGQLObjectTestCase(
+    schema=schemas.object_with_list_of_type_with_union.schema,
+    query="""
+        {
+          userManager {
+            users {
+              whoAmI {
+                ... on Frog {
+                  __typename
+                  name
+                  color
+                }
+                ... on Person {
+                  __typename
+                  name
+                  age
+                }
+              }
+            }
+          }
+        }
+
+    """,
+    test_name="ListOfUnionTestCase",
+)
+
+all_test_cases = [
+    ScalarsTestCase,
+    DateTimeTestCase,
+    OptionalScalarTestCase,
+    NestedObjectTestCase,
+    OptionalNestedObjectTestCase,
+    ObjectWithListOfObjectTestCase,
+    InterfaceTestCase,
+    UnionTestCase,
+    ListOfUnionTestCase,
+]
+
+
+@pytest.mark.parametrize("testcase", all_test_cases, ids=lambda x: x.test_name)
+def test_init_no_arguments(testcase: QGQLObjectTestCase):
+    testcase.compile()
+    assert isinstance(testcase.gql_type(None), _BaseQGraphQLObject)
 
 
 class TestObjectWithDateTimeScalar(ObjectTestCaseMixin):
@@ -134,20 +298,6 @@ class TestObjectWithDateTimeScalar(ObjectTestCaseMixin):
         klass = getattr(compiled.mod, compiled.tested_type.name)
         inst = klass.from_dict(None, self.initialize_dict)
         assert inst.birth == DateTimeScalar.from_graphql(self.initialize_dict["birth"]).to_qt()
-
-
-class TestObjectWithOptionalScalar(ObjectTestCaseMixin):
-    schema = schemas.object_with_optional_scalar.schema
-    initialize_dict = schema.execute_sync(
-        query="""
-        query {
-            user{
-                name
-                age
-            }
-        }
-        """
-    ).data["user"]
 
 
 class TestObjectWithObject(ObjectTestCaseMixin):
@@ -233,54 +383,3 @@ class TestObjectWithInterface(ObjectTestCaseMixin):
         }
         """
     ).data["user"]
-
-
-class TestObjectWithUnion(ObjectTestCaseMixin):
-    schema = schemas.object_with_union.schema
-    initialize_dict = schema.execute_sync(
-        query="""
-            {
-              user {
-                whoAmI {
-                  ... on Frog {
-                    __typename
-                    name
-                    color
-                  }
-                  ... on Person {
-                    __typename
-                    name
-                    age
-                  }
-                }
-              }
-            }
-        """
-    ).data["user"]
-
-
-class TestObjectWithListOfTypeWithUnion(ObjectTestCaseMixin):
-    schema = schemas.object_with_list_of_type_with_union.schema
-    initialize_dict = schema.execute_sync(
-        query="""
-            {
-              userManager {
-                users {
-                  whoAmI {
-                    ... on Frog {
-                      __typename
-                      name
-                      color
-                    }
-                    ... on Person {
-                      __typename
-                      name
-                      age
-                    }
-                  }
-                }
-              }
-            }
-
-        """
-    ).data["userManager"]
