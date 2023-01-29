@@ -27,7 +27,12 @@ jobs:
           echo "release=$(autopub check)" >> $GITHUB_OUTPUT
 
       - uses: mshick/add-pr-comment@v2
+        if: ${{ steps.check_release.outputs.release!='' }}
         name: add release comment
         with:
           message: |
             $GITHUB_OUTPUT
+      - name: fail if check failed
+        if: ${{ steps.check_release.outputs.release!='' }}
+        run: |
+          exit 1
