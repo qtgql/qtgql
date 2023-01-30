@@ -106,6 +106,8 @@ class FieldProperty:
             ret = TypeHinter.from_string(self.fget_annotation, self.type_map)
             if ret.is_optional():
                 return ret.of_type[0].stringify()
+            if ret.type in self.type_map.values():
+                raise TypeError  # in py3.11 the get_type_hints won't raise so raise brutally
             return self.fget_annotation
         except (TypeError, NameError):
             if self.type.is_union():
