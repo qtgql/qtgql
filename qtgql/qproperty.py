@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Callable, Generic, TypeVar, get_type_hints, overload
+from typing import TYPE_CHECKING, Any, Callable, Generic, TypeVar, get_type_hints, overload, Optional
 
 from PySide6.QtCore import Property, Signal
 
@@ -13,23 +13,23 @@ if TYPE_CHECKING:  # pragma: no cover
 
     class qproperty_(property, Generic[R]):
         fget: Callable[[Any], R]
-        fset: Callable[[Any, R], None] | None
-        fdel: Callable[[Any], None] | None
+        fset: Optional[Callable[[Any, R], None]]
+        fdel: Optional[Callable[[Any], None]]
 
         def __new__(
             cls,
             fget: Callable[[Any], R],
-            fset: Callable[[Any, R], None] | None = ...,
-            fdel: Callable[[Any], None] | None = ...,
+            fset: Optional[Callable[[Any, R], None]] = ...,
+            fdel: Optional[Callable[[Any], None]] = ...,
         ) -> qproperty_[R]:
             ...
 
         @overload  # type: ignore
-        def __get__(self, obj: None, type_: type | None = ...) -> qproperty_[R]:
+        def __get__(self, obj: None, type_: Optional[type] = ...) -> qproperty_[R]:
             ...
 
         @overload
-        def __get__(self, obj: object, type_: type | None = ...) -> R:
+        def __get__(self, obj: object, type_: Optional[type] = ...) -> R:
             ...
 
         def __set__(self, obj: Any, value: R) -> None:
@@ -37,10 +37,10 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 def qproperty(
-    type: Any | None = None,
+    type: Any  = None,
     constant: bool = False,
-    fset: Callable | None = None,
-    notify: Signal | None = None,
+    fset: Optional[Callable] = None,
+    notify: Optional[Signal] = None,
 ) -> Callable[[Callable[[Any], R]], qproperty_[R]]:
     type_ = type
 

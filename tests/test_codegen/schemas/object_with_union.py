@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import random
+from typing import Union
 
 import strawberry
 
@@ -15,7 +16,7 @@ class Frog:
 
 @strawberry.type
 class User:
-    who_am_i: Frog | Person
+    who_am_i: Union[Frog, Person]
 
 
 @strawberry.type()

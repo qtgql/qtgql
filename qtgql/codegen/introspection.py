@@ -53,7 +53,7 @@ class SchemaEvaluator:
         of_type = t["ofType"]
         name = t["name"]
         kind = Kinds[t["kind"]]
-        ret: TypeHinter | None = None
+        ret: Optional[TypeHinter] = None
 
         def optional_maybe(inner: TypeHinter) -> TypeHinter:
             return TypeHinter(type=Optional, of_type=(inner,)) if is_optional else inner
@@ -90,7 +90,7 @@ class SchemaEvaluator:
             description=field["description"],
         )
 
-    def evaluate_object_type(self, type_: dict) -> GqlType | None:
+    def evaluate_object_type(self, type_: dict) -> Optional[GqlType]:
         # scalars are swallowed here.
         t_name: str = type_["name"]
         if t_name.startswith("__"):

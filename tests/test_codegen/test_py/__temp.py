@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Optional
+
 from PySide6.QtCore import QObject, Signal
 from qtgql import qproperty
 from qtgql.codegen.py.bases import BaseGraphQLObject, BaseModel
@@ -40,7 +42,7 @@ class Query(BaseGraphQLObject):
 
 
 class QueryModel(BaseModel):
-    def __init__(self, data: list[Query], parent: BaseGraphQLObject | None = None):
+    def __init__(self, data: list[Query], parent: Optional[BaseGraphQLObject] = None):
         super().__init__(data, parent)
 
 
@@ -95,10 +97,10 @@ class User(BaseGraphQLObject):
         self.birthChanged.emit()
 
     @qproperty(type=QObject, fset=birth_setter, notify=birthChanged)
-    def birth(self) -> str | None:
+    def birth(self) -> Optional[str]:
         return self._birth.to_qt()
 
 
 class UserModel(BaseModel):
-    def __init__(self, data: list[User], parent: BaseGraphQLObject | None = None):
+    def __init__(self, data: list[User], parent: Optional[BaseGraphQLObject] = None):
         super().__init__(data, parent)
