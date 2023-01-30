@@ -80,6 +80,13 @@ class QGQLObjectTestCase:
             if field_name == strawberry.utils.str_converters.to_camel_case(sf.name):
                 return sf
 
+    def __enter__(self):
+        self.compile()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        ...
+
 
 class ObjectTestCaseMixin:
     def test_property_setter_emits(self, qtbot):
@@ -355,6 +362,15 @@ class TestPropertyGetter:
     def test_datetime_scalar(self, qtbot):
         self.default_test(DateTimeTestCase, "birth")
 
+    def test_nested_object(self, qtbot):
+        self.default_test(NestedObjectTestCase, "person")
+
+    def test_list_of(self, qtbot):
+        self.default_test(ObjectWithListOfObjectTestCase, "persons")
+
+    def test_union(self, qtbot):
+        self.default_test(UnionTestCase, "whoAmI")
+
 
 class TestDeserializers:
     def test_from_dict_scalars(self, qtbot):
@@ -387,64 +403,22 @@ class TestDeserializers:
         assert inst.person.name == "Patrick"
         assert inst.person.age == 100
 
+    def test_nested_optional_object(self):
+        # TODO: remove this when implementing *placeholders*
+        with OptionalNestedObjectTestCase as testcase:
+            inst = testcase.gql_type.from_dict(None, testcase.initialize_dict)
+            assert inst.person is None
 
-class TestObjectWithOptionalObjectField(ObjectTestCaseMixin):
-    schema = schemas.object_with_optional_object.schema
-    initialize_dict = schema.execute_sync(
-        query="""
-        query {
-            user{
-                person{
-                    name
-                    age
-                }
-            }
-        }
-        """
-    ).data["user"]
+    def test_object_with_list_of_object(self):
+        with ObjectWithListOfObjectTestCase as testcase:
+            inst = testcase.gql_type.from_dict(None, testcase.initialize_dict)
+            assert isinstance(inst.persons, BaseModel)
+            assert inst.persons._data[0].name
 
-    def test_from_dict(self, qtbot):
-        compiled = self.compiled()
-        klass = getattr(compiled.mod, compiled.tested_type.name)
-        inst = klass.from_dict(None, self.initialize_dict)
-        assert inst.person is None
+    def test_object_with_interface(self):
+        with InterfaceTestCase as testcase:
+            inst = testcase.gql_type.from_dict(None, testcase.initialize_dict)
+            assert inst.name
 
 
 # TODO: TestObjectWithListOfScalar
-class TestObjectWithListOfObject(ObjectTestCaseMixin):
-    schema = schemas.object_with_list_of_object.schema
-    initialize_dict = schema.execute_sync(
-        query="""
-        query {
-            user{
-                persons{
-                    name
-                    age
-                }
-            }
-        }
-        """
-    ).data["user"]
-
-    def test_from_dict(self, qtbot):
-        compiled = self.compiled()
-        klass = getattr(compiled.mod, compiled.tested_type.name)
-        inst: _BaseQGraphQLObject = klass.from_dict(None, self.initialize_dict)
-        assert isinstance(inst.persons, BaseModel)
-
-
-# TODO: test for optional list.
-
-
-class TestObjectWithInterface(ObjectTestCaseMixin):
-    schema = schemas.object_with_interface.schema
-    initialize_dict = schema.execute_sync(
-        query="""
-        query {
-            user{
-                name
-                age
-            }
-        }
-        """
-    ).data["user"]

@@ -107,6 +107,8 @@ class FieldProperty:
             TypeHinter.from_string(self.fget_annotation, self.type_map)
             return self.fget_annotation
         except (TypeError, NameError):
+            if self.type.is_union():
+                return "QObject"  # graphql doesn't support scalars in Unions ATM.
             # might be a model, which has no type representation ATM.
             name = self.fget_annotation.strip("Model")
             assert self.type_map.get(name, None), f"{self.fget_annotation} Could not be resolved"
