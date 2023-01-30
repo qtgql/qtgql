@@ -87,9 +87,10 @@ ignore = [
     "E501",  # line too long, handled by black
 ]
 fix = true
-keep-runtime-typing = true
 src = ["qtgql", "tests"]
 
+[tool.ruff.pyupgrade]
+keep-runtime-typing = true
 
 [tool.pytest.ini_options]
 addopts = "--cov-config=pyproject.toml --ignore=qtgql/codegen/py/templates/"
