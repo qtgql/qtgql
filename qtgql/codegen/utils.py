@@ -1,12 +1,7 @@
 from typing import Type
 
 
-class AntiRefMeta(type):
-    def __str__(self):
-        return self.__name__
-
-
-class AntiForwardRef(metaclass=AntiRefMeta):
+class AntiForwardRef:
     """
     i.e:
     Union["someString"] would return a ForwardRef, this class is a simple hack

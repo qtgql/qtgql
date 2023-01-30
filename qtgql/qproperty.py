@@ -9,7 +9,7 @@ from qtgql.typingref import TypeHinter
 __all__ = ["qproperty"]
 
 R = TypeVar("R")
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
 
     class qproperty_(property, Generic[R]):
         fget: Callable[[Any], R]

@@ -81,7 +81,7 @@ class BaseTypeMeta(type):
 
 
 class _BaseType(metaclass=BaseTypeMeta):
-    if TYPE_CHECKING:
+    if TYPE_CHECKING:  # pragma: no cover
         __types_map__: dict[str, _BaseType]
         Model: ClassVar[type[GenericModel[Self]]]  # type: ignore
 
