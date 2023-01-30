@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import types
 from functools import cached_property
-from typing import TYPE_CHECKING, Any, Callable, ClassVar, Generic, TypeVar, Union, Optional, Type
+from typing import TYPE_CHECKING, Any, Callable, ClassVar, Generic, Optional, Type, TypeVar, Union
 
 import attrs
 from PySide6.QtCore import QAbstractListModel, QByteArray, QEventLoop, QModelIndex, Qt, Signal

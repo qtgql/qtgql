@@ -1,40 +1,41 @@
 from __future__ import annotations
-from PySide6.QtCore import Property, Signal, QObject
-from typing import Optional, Union
+
+from typing import Optional
+
+from PySide6.QtCore import QObject, Signal
 from qtgql import qproperty
-from qtgql.codegen.py.bases import BaseModel
-from qtgql.codegen.py.config import QtGqlConfig
-
+from qtgql.codegen.py.bases import BaseGraphQLObject, BaseModel
 from qtgql.codegen.py.scalars import DateTimeScalar
-
-from qtgql.codegen.py.bases import BaseGraphQLObject
 
 
 class SCALARS:
-    
     DateTimeScalar = DateTimeScalar
-    
 
 
 class Query(BaseGraphQLObject):
-    """None"""
+    """None."""
 
-    def __init__(self, parent: QObject = None,  hello: str = None,  isAuthenticated: str = None,  apples: list[Apple] = None, ):
+    def __init__(
+        self,
+        parent: QObject = None,
+        hello: str = None,
+        isAuthenticated: str = None,
+        apples: list[Apple] = None,
+    ):
         super().__init__(parent)
         self._hello = hello
         self._isAuthenticated = isAuthenticated
         self._apples = apples
 
     @classmethod
-    def from_dict(cls, parent,  data: dict) -> Query:
+    def from_dict(cls, parent, data: dict) -> Query:
         return cls(
-        parent=parent,
-        hello = data.get('hello', None),
-        isAuthenticated = data.get('isAuthenticated', None),
-        apples = cls.deserialize_list_of(parent, data, AppleModel, 'apples', Apple),
+            parent=parent,
+            hello=data.get("hello", None),
+            isAuthenticated=data.get("isAuthenticated", None),
+            apples=cls.deserialize_list_of(parent, data, AppleModel, "apples", Apple),
         )
 
-    
     helloChanged = Signal()
 
     def hello_setter(self, v: str) -> None:
@@ -44,7 +45,7 @@ class Query(BaseGraphQLObject):
     @qproperty(type=str, fset=hello_setter, notify=helloChanged)
     def hello(self) -> str:
         return self._hello
-    
+
     isAuthenticatedChanged = Signal()
 
     def isAuthenticated_setter(self, v: str) -> None:
@@ -54,7 +55,7 @@ class Query(BaseGraphQLObject):
     @qproperty(type=str, fset=isAuthenticated_setter, notify=isAuthenticatedChanged)
     def isAuthenticated(self) -> str:
         return self._isAuthenticated
-    
+
     applesChanged = Signal()
 
     def apples_setter(self, v: list[Apple]) -> None:
@@ -64,17 +65,24 @@ class Query(BaseGraphQLObject):
     @qproperty(type=QObject, fset=apples_setter, notify=applesChanged)
     def apples(self) -> AppleModel:
         return self._apples
-    
+
+
 class QueryModel(BaseModel):
     def __init__(self, data: list[Query], parent: Optional[BaseGraphQLObject] = None):
         super().__init__(data, parent)
 
 
-
 class Apple(BaseGraphQLObject):
-    """None"""
+    """None."""
 
-    def __init__(self, parent: QObject = None,  size: int = None,  owner: str = None,  worms: Optional[list[Worm]] = None,  color: str = None, ):
+    def __init__(
+        self,
+        parent: QObject = None,
+        size: int = None,
+        owner: str = None,
+        worms: Optional[list[Worm]] = None,
+        color: str = None,
+    ):
         super().__init__(parent)
         self._size = size
         self._owner = owner
@@ -82,16 +90,15 @@ class Apple(BaseGraphQLObject):
         self._color = color
 
     @classmethod
-    def from_dict(cls, parent,  data: dict) -> Apple:
+    def from_dict(cls, parent, data: dict) -> Apple:
         return cls(
-        parent=parent,
-        size = data.get('size', None),
-        owner = data.get('owner', None),
-        worms = cls.deserialize_list_of(parent, data, WormModel, 'worms', Worm),
-        color = data.get('color', None),
+            parent=parent,
+            size=data.get("size", None),
+            owner=data.get("owner", None),
+            worms=cls.deserialize_list_of(parent, data, WormModel, "worms", Worm),
+            color=data.get("color", None),
         )
 
-    
     sizeChanged = Signal()
 
     def size_setter(self, v: int) -> None:
@@ -101,7 +108,7 @@ class Apple(BaseGraphQLObject):
     @qproperty(type=int, fset=size_setter, notify=sizeChanged)
     def size(self) -> int:
         return self._size
-    
+
     ownerChanged = Signal()
 
     def owner_setter(self, v: str) -> None:
@@ -111,7 +118,7 @@ class Apple(BaseGraphQLObject):
     @qproperty(type=str, fset=owner_setter, notify=ownerChanged)
     def owner(self) -> str:
         return self._owner
-    
+
     wormsChanged = Signal()
 
     def worms_setter(self, v: Optional[list[Worm]]) -> None:
@@ -121,7 +128,7 @@ class Apple(BaseGraphQLObject):
     @qproperty(type=QObject, fset=worms_setter, notify=wormsChanged)
     def worms(self) -> WormModel:
         return self._worms
-    
+
     colorChanged = Signal()
 
     def color_setter(self, v: str) -> None:
@@ -131,32 +138,37 @@ class Apple(BaseGraphQLObject):
     @qproperty(type=str, fset=color_setter, notify=colorChanged)
     def color(self) -> str:
         return self._color
-    
+
+
 class AppleModel(BaseModel):
     def __init__(self, data: list[Apple], parent: Optional[BaseGraphQLObject] = None):
         super().__init__(data, parent)
 
 
-
 class Worm(BaseGraphQLObject):
-    """None"""
+    """None."""
 
-    def __init__(self, parent: QObject = None,  name: str = None,  family: str = None,  size: int = None, ):
+    def __init__(
+        self,
+        parent: QObject = None,
+        name: str = None,
+        family: str = None,
+        size: int = None,
+    ):
         super().__init__(parent)
         self._name = name
         self._family = family
         self._size = size
 
     @classmethod
-    def from_dict(cls, parent,  data: dict) -> Worm:
+    def from_dict(cls, parent, data: dict) -> Worm:
         return cls(
-        parent=parent,
-        name = data.get('name', None),
-        family = data.get('family', None),
-        size = data.get('size', None),
+            parent=parent,
+            name=data.get("name", None),
+            family=data.get("family", None),
+            size=data.get("size", None),
         )
 
-    
     nameChanged = Signal()
 
     def name_setter(self, v: str) -> None:
@@ -166,7 +178,7 @@ class Worm(BaseGraphQLObject):
     @qproperty(type=str, fset=name_setter, notify=nameChanged)
     def name(self) -> str:
         return self._name
-    
+
     familyChanged = Signal()
 
     def family_setter(self, v: str) -> None:
@@ -176,7 +188,7 @@ class Worm(BaseGraphQLObject):
     @qproperty(type=str, fset=family_setter, notify=familyChanged)
     def family(self) -> str:
         return self._family
-    
+
     sizeChanged = Signal()
 
     def size_setter(self, v: int) -> None:
@@ -186,28 +198,31 @@ class Worm(BaseGraphQLObject):
     @qproperty(type=int, fset=size_setter, notify=sizeChanged)
     def size(self) -> int:
         return self._size
-    
+
+
 class WormModel(BaseModel):
     def __init__(self, data: list[Worm], parent: Optional[BaseGraphQLObject] = None):
         super().__init__(data, parent)
 
 
-
 class Mutation(BaseGraphQLObject):
-    """None"""
+    """None."""
 
-    def __init__(self, parent: QObject = None,  pseudoMutation: bool = None, ):
+    def __init__(
+        self,
+        parent: QObject = None,
+        pseudoMutation: bool = None,
+    ):
         super().__init__(parent)
         self._pseudoMutation = pseudoMutation
 
     @classmethod
-    def from_dict(cls, parent,  data: dict) -> Mutation:
+    def from_dict(cls, parent, data: dict) -> Mutation:
         return cls(
-        parent=parent,
-        pseudoMutation = data.get('pseudoMutation', None),
+            parent=parent,
+            pseudoMutation=data.get("pseudoMutation", None),
         )
 
-    
     pseudoMutationChanged = Signal()
 
     def pseudoMutation_setter(self, v: bool) -> None:
@@ -217,28 +232,31 @@ class Mutation(BaseGraphQLObject):
     @qproperty(type=bool, fset=pseudoMutation_setter, notify=pseudoMutationChanged)
     def pseudoMutation(self) -> bool:
         return self._pseudoMutation
-    
+
+
 class MutationModel(BaseModel):
     def __init__(self, data: list[Mutation], parent: Optional[BaseGraphQLObject] = None):
         super().__init__(data, parent)
 
 
-
 class Subscription(BaseGraphQLObject):
-    """None"""
+    """None."""
 
-    def __init__(self, parent: QObject = None,  count: int = None, ):
+    def __init__(
+        self,
+        parent: QObject = None,
+        count: int = None,
+    ):
         super().__init__(parent)
         self._count = count
 
     @classmethod
-    def from_dict(cls, parent,  data: dict) -> Subscription:
+    def from_dict(cls, parent, data: dict) -> Subscription:
         return cls(
-        parent=parent,
-        count = data.get('count', None),
+            parent=parent,
+            count=data.get("count", None),
         )
 
-    
     countChanged = Signal()
 
     def count_setter(self, v: int) -> None:
@@ -248,9 +266,8 @@ class Subscription(BaseGraphQLObject):
     @qproperty(type=int, fset=count_setter, notify=countChanged)
     def count(self) -> int:
         return self._count
-    
+
+
 class SubscriptionModel(BaseModel):
     def __init__(self, data: list[Subscription], parent: Optional[BaseGraphQLObject] = None):
         super().__init__(data, parent)
-
-

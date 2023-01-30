@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TypeVar, Optional
+from typing import Optional, TypeVar
 
 from PySide6.QtCore import QAbstractListModel, QByteArray, QObject, Qt
 

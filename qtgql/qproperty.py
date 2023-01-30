@@ -1,6 +1,15 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Callable, Generic, TypeVar, get_type_hints, overload, Optional
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Generic,
+    Optional,
+    TypeVar,
+    get_type_hints,
+    overload,
+)
 
 from PySide6.QtCore import Property, Signal
 
@@ -37,7 +46,7 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 def qproperty(
-    type: Any  = None,
+    type: Any = None,
     constant: bool = False,
     fset: Optional[Callable] = None,
     notify: Optional[Signal] = None,
