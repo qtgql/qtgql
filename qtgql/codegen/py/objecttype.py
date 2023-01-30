@@ -106,10 +106,10 @@ class FieldProperty:
             # this should raise if it is an inner type.
             TypeHinter.from_string(self.fget_annotation, self.type_map)
             return self.fget_annotation
-        except TypeError:
-            assert self.type_map.get(
-                self.fget_annotation, None
-            ), f"{self.fget_annotation} Could not be resolved"
+        except (TypeError, NameError):
+            # might be a model, which has no type representation ATM.
+            name = self.fget_annotation.strip("Model")
+            assert self.type_map.get(name, None), f"{self.fget_annotation} Could not be resolved"
             # This is a QGraphQLObject, avoid undefined names.
             return "QObject"
 
