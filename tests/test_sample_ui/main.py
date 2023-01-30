@@ -11,7 +11,10 @@ from qtgql import slot
 from qtgql.codegen.py.config import QtGqlConfig
 from qtgql.gqltransport.client import GqlClientMessage, GqlWsTransportClient, HandlerProto
 
-from tests.test_sample_ui.__temp import Query
+try:
+    from tests.test_sample_ui.__temp import Query
+except ImportError:
+    Query = None
 from tests.test_sample_ui.qml.icons import ICONS
 
 DEV = not os.environ.get("IS_GITHUB_ACTION", False)

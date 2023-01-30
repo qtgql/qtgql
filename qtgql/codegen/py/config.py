@@ -24,14 +24,6 @@ class QtGqlConfig:
     base_object: _BaseQGraphQLObject = BaseGraphQLObject
     """base object to be extended by all generated types."""
 
-    @classmethod
-    def _self_import_name(cls) -> tuple[str, str]:
-        """Returns the app config based on pyproject.toml."""
-        from qtgql.codegen.cli import _get_app_import_path
-
-        mod, conf = _get_app_import_path().split(":")
-        return mod, conf
-
     def fetch(self) -> None:
         res = requests.post(self.url, json={"query": introspection_query})
         introspected = res.json()["data"]

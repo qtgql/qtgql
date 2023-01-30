@@ -13,7 +13,7 @@ class TestFromAnnotation:
     @pytest.mark.parametrize("tp", [list[float], Optional[str]])
     def test_containers(self, tp):
         th = TypeHinter.from_annotations(tp)
-        assert th.type is get_origin(tp)
+        assert th.type[get_args(tp)[0]] == tp
         assert th.of_type[0].type is get_args(tp)[0]
 
     def test_unions(self):

@@ -11,6 +11,10 @@ def tmp_mod():
     return ModuleType(uuid.uuid4().hex)
 
 
+def generate_type_kwargs(t: GqlType, v) -> dict:
+    return {p.name: v for p in t.fields}
+
+
 def property_tester(
     default_types: list[GqlType], compiled_mod, test: Callable[[FieldProperty, Any], None]
 ):

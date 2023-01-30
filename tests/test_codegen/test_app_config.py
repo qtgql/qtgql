@@ -48,9 +48,3 @@ def test_fetch_schema(mini_server, tmp_path):
     assert inspect.isclass(
         importlib.import_module(mod_id).Query
     )  # Query should always be generated
-
-
-def test_has_self_import_path(fake_module):
-    from tests.test_sample_ui.main import qtgqlconfig
-
-    assert qtgqlconfig._self_import_name() == ("tests.test_sample_ui.main", "qtgqlconfig")

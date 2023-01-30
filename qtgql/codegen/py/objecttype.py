@@ -104,13 +104,15 @@ class FieldProperty:
     def property_type(self) -> str:
         try:
             # this should raise if it is an inner type.
-            TypeHinter.from_string(self.fget_annotation, self.type_map)
+            ret = TypeHinter.from_string(self.fget_annotation, self.type_map)
+            if ret.is_optional():
+                return ret.of_type[0].stringify()
             return self.fget_annotation
         except (TypeError, NameError):
             if self.type.is_union():
                 return "QObject"  # graphql doesn't support scalars in Unions ATM.
             # might be a model, which has no type representation ATM.
-            name = self.fget_annotation.strip("Model")
+            name = self.fget_annotation.replace("Model", "")
             assert self.type_map.get(name, None), f"{self.fget_annotation} Could not be resolved"
             # This is a QGraphQLObject, avoid undefined names.
             return "QObject"
