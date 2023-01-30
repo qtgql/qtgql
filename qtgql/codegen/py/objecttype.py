@@ -1,6 +1,6 @@
 import enum
 from functools import cached_property
-from typing import List, Optional, Union
+from typing import List, Optional, Type, Union
 
 from attrs import define
 
@@ -46,9 +46,9 @@ class FieldProperty:
 
         if t in BuiltinScalars.values():
             return default
-        if t in self.scalars.values():
-            t: BaseCustomScalar
-            return f"SCALARS.{t.__name__}.{BaseCustomScalar.from_graphql.__name__}({default})"
+
+        if scalar := self.is_custom_scalar:
+            return f"SCALARS.{scalar.__name__}.{BaseCustomScalar.from_graphql.__name__}({default})"
         if t in (list, List):
             inner = type_hinter.of_type[0].type
             # handle inner type
@@ -77,9 +77,8 @@ class FieldProperty:
         if ret in BuiltinScalars.values():
             return ret.__name__
 
-        if ret in self.scalars.values():
-            ret: BaseCustomScalar
-            return f"SCALARS.{ret.__name__}"
+        if scalar := self.is_custom_scalar:
+            return f"SCALARS.{scalar.__name__}"
 
         # handle Optional, Union, List etc...
         # removing redundant prefixes.
@@ -138,9 +137,10 @@ class FieldProperty:
         )
 
     @cached_property
-    def is_custom_scalar(self) -> Optional[BaseCustomScalar]:
+    def is_custom_scalar(self) -> Optional[Type[BaseCustomScalar]]:
         if self.type.type in self.scalars.values():
             return self.type.type
+        return None
 
     @property
     def fget(self) -> str:

@@ -1,26 +1,26 @@
 from datetime import datetime
-from typing import Any, Generic, Optional, Type, TypeVar
+from typing import Any, Optional, Type, TypeVar
 
 T = TypeVar("T")
 
 
-class BaseCustomScalar(Generic[T]):
+class BaseCustomScalar:
     __slots__ = "_value"
     GRAPHQL_NAME: str
     DEFAULT_DESERIALIZED: Any = ""
 
-    def __init__(self, v: Optional[T] = None):
+    def __init__(self, v: Optional[Any] = None):
         self._value = v
 
     @classmethod
-    def from_graphql(cls, v: Optional[T] = None) -> "BaseCustomScalar[T]":
+    def from_graphql(cls, v: Optional[Any] = None) -> "BaseCustomScalar":
         raise NotImplementedError
 
     def to_qt(self) -> Any:
         raise NotImplementedError
 
 
-class DateTimeScalar(BaseCustomScalar[datetime]):
+class DateTimeScalar(BaseCustomScalar):
     GRAPHQL_NAME: str = "DateTime"
     DEFAULT_DESERIALIZED = " --- "
 

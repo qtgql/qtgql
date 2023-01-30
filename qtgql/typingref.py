@@ -95,7 +95,7 @@ class TypeHinter:
         return self.type is Optional
 
     def is_generic(self) -> bool:
-        return inspect.isclass(self.type) and issubclass(self.type, Generic)
+        return inspect.isclass(self.type) and get_origin(self.type) is Generic
 
     def is_list(self) -> bool:
         return self.type in (list, List)

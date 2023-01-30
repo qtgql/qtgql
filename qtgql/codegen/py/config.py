@@ -21,7 +21,7 @@ class QtGqlConfig:
     """mapping of custom scalars, respected by the schema evaluator."""
     template_class: Callable[[TemplateContext], str] = py_template
     """jinja template."""
-    base_object: _BaseQGraphQLObject = BaseGraphQLObject
+    base_object: Type[_BaseQGraphQLObject] = BaseGraphQLObject
     """base object to be extended by all generated types."""
 
     def fetch(self) -> None:

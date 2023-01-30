@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import inspect
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from attrs import define
 from jinja2 import Environment, PackageLoader, select_autoescape
@@ -22,16 +22,14 @@ class TemplateContext:
 
     @property
     def dependencies(self) -> list[str]:
-        def build_import_statement(obj) -> str:
-            return f"from {inspect.getmodule(obj).__name__} import {obj.__name__}"
+        def build_import_statement(t: type[Any]) -> str:
+            mod = inspect.getmodule(t)
+            assert mod
+            return f"from {mod.__name__} import {t.__name__}"
 
         ret = [build_import_statement(scalar) for scalar in self.config.custom_scalars.values()]
         ret.append(build_import_statement(self.config.base_object))
         return ret
-
-    @property
-    def config_name(self) -> str:
-        return self.config._self_import_name()[1]
 
     @property
     def custom_scalars(self) -> list[str]:
