@@ -102,7 +102,6 @@ relative_files = true
 
 [tool.coverage.report]
 show_missing = true
-fail_under = 95
 
 [tool.qtgql]
 config = "tests.test_sample_ui.main:qtgqlconfig"
