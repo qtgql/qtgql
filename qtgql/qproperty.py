@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Callable, Optional, TypeVar
+from typing import Any, Callable, Optional, TypeVar, get_type_hints
 
 from PySide6.QtCore import Property, Signal
 
@@ -10,18 +10,28 @@ T = TypeVar("T")
 
 
 def qproperty(
-    type: T,
+    type: Optional[Any] = None,
     constant: bool = False,
     fset: Optional[Callable] = None,
     notify: Optional[Signal] = None,
 ):
-    def wrapper(func) -> T:
-        ret = TypeHinter.from_annotations(type)
-        if ret.is_optional():
-            ret = ret.of_type[0]
-        return Property(type=ret.type, fset=fset, notify=notify, constant=constant)(func)
+    type_ = type
 
-    if TYPE_CHECKING:
-        return property(wrapper)
+    def inner(func: Callable[..., T]) -> T:
+        def wrapper() -> func:
+            nonlocal type_
+            if not type_:
+                try:
+                    annotation = get_type_hints(func)["return"]
+                    ret = TypeHinter.from_annotations(annotation)
+                    if ret.is_optional():
+                        type_ = ret.of_type[0].type
+                    else:
+                        type_ = ret.type
+                except NameError:
+                    type_ = "QVariant"
+            return Property(type=type_, fset=fset, notify=notify, constant=constant)(func)
 
-    return wrapper
+        return wrapper()
+
+    return inner

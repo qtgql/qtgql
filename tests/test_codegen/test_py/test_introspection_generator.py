@@ -1,14 +1,18 @@
+import typing
 import uuid
+from datetime import datetime
 from types import ModuleType
 from typing import Optional
 
 import pytest
+import strawberry.utils.str_converters
 from attr import define
 from qtgql.codegen.introspection import SchemaEvaluator, introspection_query
 from qtgql.codegen.py.bases import BaseModel, _BaseQGraphQLObject
 from qtgql.codegen.py.config import QtGqlConfig
 from qtgql.codegen.py.objecttype import GqlType
-from qtgql.codegen.py.scalars import DateTimeScalar
+from qtgql.codegen.py.scalars import BuiltinScalars, DateTimeScalar
+from qtgql.typingref import TypeHinter
 from strawberry import Schema
 
 from tests.mini_gql_server import schema
@@ -55,34 +59,29 @@ class QGQLObjectTestCase:
         self.mod = tmp_mod
         self.tested_type = res._generated_types[type_name]
 
+    def get_field_by_type(self, t):
+        for field in self.tested_type.fields:
+            if field.type.type == t:
+                return field
+
+    def get_field_by_name(self, name: str):
+        for field in self.tested_type.fields:
+            if field.name == name:
+                return field
+
+        raise Exception(f"field {name} not found in {self.tested_type}")
+
+    def strawberry_field_by_name(self, field_name: str, klass_name: Optional[str] = None):
+        if not klass_name:
+            klass_name = self.gql_type.__name__
+
+        stawberry_definition = self.schema.get_type_by_name(klass_name)
+        for sf in stawberry_definition.fields:
+            if field_name == strawberry.utils.str_converters.to_camel_case(sf.name):
+                return sf
+
 
 class ObjectTestCaseMixin:
-    def test_has_correct_annotations(self):
-        compiled = self.compiled()
-        klass = getattr(compiled.mod, compiled.tested_type.name)
-        for field in compiled.tested_type.fields:
-            annotation = field.annotation
-            assert klass.__init__.__annotations__[field.name] == annotation
-            assert getattr(klass, field.setter_name).__annotations__["v"] == annotation
-            assert getattr(klass, field.name).fget.__annotations__["return"] == field.property_type
-
-    def test_init(self):
-        compiled = self.compiled()
-        klass = getattr(compiled.mod, compiled.tested_type.name)
-        klass()
-
-    def test_property_getter(self):
-        compiled = self.compiled()
-
-        klass = getattr(compiled.mod, compiled.tested_type.name)
-        inst = klass.from_dict(None, self.initialize_dict)
-        for field in compiled.tested_type.fields:
-            v = getattr(inst, field.name)
-            if scalar := field.is_custom_scalar:
-                assert scalar.from_graphql(self.initialize_dict[field.name]).to_qt() == v
-            else:
-                assert v == self.initialize_dict[field.name]
-
     def test_property_setter_emits(self, qtbot):
         compiled = self.compiled()
         klass = getattr(compiled.mod, compiled.tested_type.name)
@@ -279,25 +278,96 @@ def test_init_no_arguments(testcase: QGQLObjectTestCase):
     assert isinstance(testcase.gql_type(None), _BaseQGraphQLObject)
 
 
-class TestObjectWithDateTimeScalar(ObjectTestCaseMixin):
-    schema = schemas.object_with_datetime.schema
-    initialize_dict = schema.execute_sync(
-        query="""
-        {
-          user {
-            name
-            age
-            birth
-          }
-        }
-        """
-    ).data["user"]
+@pytest.mark.parametrize("name, scalar", BuiltinScalars.items())
+def test_scalars_has_correct_annotations(name, scalar):
+    ScalarsTestCase.compile()
+    field = ScalarsTestCase.get_field_by_type(scalar)
+    assert field, f"field not found for {name}: {scalar}"
+    klass = ScalarsTestCase.gql_type
+    sf = ScalarsTestCase.strawberry_field_by_name(field.name)
+    assert sf
+    assert (
+        sf.type
+        == TypeHinter.from_string(
+            getattr(klass, field.setter_name).__annotations__["v"], ns=field.type_map
+        ).as_annotation()
+    )
+    assert (
+        sf.type
+        == TypeHinter.from_string(
+            getattr(klass, field.name).fget.__annotations__["return"], ns=field.type_map
+        ).as_annotation()
+    )
 
-    def test_from_dict(self, qtbot):
-        compiled = self.compiled()
-        klass = getattr(compiled.mod, compiled.tested_type.name)
-        inst = klass.from_dict(None, self.initialize_dict)
-        assert inst.birth == DateTimeScalar.from_graphql(self.initialize_dict["birth"]).to_qt()
+
+def test_custom_scalar_has_correct_annotation():
+    DateTimeTestCase.compile()
+    field = DateTimeTestCase.get_field_by_type(DateTimeScalar)
+    assert field, f"field {field} not found"
+    klass = DateTimeTestCase.gql_type
+    sf = DateTimeTestCase.strawberry_field_by_name(field.name)
+    assert sf
+    assert sf.type == datetime
+    assert field.annotation == f"SCALARS.{DateTimeScalar.__name__}"
+    assert getattr(klass, field.setter_name).__annotations__["v"] == field.annotation
+    assert getattr(klass, field.name).fget.__annotations__["return"] == field.fget_annotation
+    assert (
+        TypeHinter.from_string(
+            field.fget_annotation, ns={"Optional": typing.Optional}
+        ).as_annotation()
+        == DateTimeScalar.to_qt.__annotations__["return"]
+    )
+
+
+def test_list_of_has_correct_annotation():
+    testcase = ObjectWithListOfObjectTestCase
+    testcase.compile()
+    field = testcase.get_field_by_name("persons")
+    sf = testcase.strawberry_field_by_name(field.name)
+    assert field.annotation == sf.type_annotation.annotation
+    assert field.fget_annotation == "PersonModel"
+
+
+def test_from_dict_scalars():
+    testcase = ScalarsTestCase
+    testcase.compile()
+    klass = testcase.gql_type
+    initialize_dict = testcase.initialize_dict
+    inst = klass.from_dict(None, initialize_dict)
+    for field in testcase.tested_type.fields:
+        v = getattr(inst, field.private_name)
+        assert v == initialize_dict[field.name]
+
+
+def test_property_getter_scalars(qtbot):
+    testcase = ScalarsTestCase
+    testcase.compile()
+    klass = testcase.gql_type
+    initialize_dict = testcase.initialize_dict
+    inst = klass.from_dict(None, initialize_dict)
+    for field in testcase.tested_type.fields:
+        v = inst.property(field.name)
+        assert v == initialize_dict[field.name]
+
+
+def test_custom_scalar_property_type_is_to_qt_return_annotation():
+    testcase = DateTimeTestCase
+    testcase.compile()
+    to_qt = TypeHinter.from_annotations(DateTimeScalar.to_qt.__annotations__["return"])
+    assert testcase.get_field_by_name("birth").property_type == to_qt.stringify()
+
+
+def test_from_dict_datetime_scalar(qtbot):
+    testcase = DateTimeTestCase
+    testcase.compile()
+    klass = testcase.gql_type
+    initialize_dict = testcase.initialize_dict
+    inst = klass.from_dict(None, initialize_dict)
+    field = testcase.get_field_by_name("birth")
+    assert (
+        inst.property(field.name)
+        == DateTimeScalar.from_graphql(initialize_dict[field.name]).to_qt()
+    )
 
 
 class TestObjectWithObject(ObjectTestCaseMixin):

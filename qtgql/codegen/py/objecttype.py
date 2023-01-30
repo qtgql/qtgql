@@ -1,6 +1,6 @@
 import enum
 from functools import cached_property
-from typing import Any, List, Optional, Union
+from typing import List, Optional, Union
 
 from attrs import define
 
@@ -23,10 +23,6 @@ class Kinds(enum.Enum):
             if f.name == item:
                 return item
         raise KeyError(item, "is a wrong kind")
-
-
-def stringify_annotation(annot: Any) -> str:
-    return str(annot).replace("typing.", "").replace("qtgql.codegen.utils.", "")
 
 
 @define(slots=False)
@@ -72,7 +68,9 @@ class FieldProperty:
     @cached_property
     def annotation(self) -> str:
         """
-        :returns: Annotation of the field based on the type.
+        :returns: Annotation of the field based on the real type,
+         meaning that the private attribute would be of that type.
+         this goes for init and the property setter.
         """
         ret = self.type.as_annotation()
         # int, str, float etc...
@@ -85,18 +83,35 @@ class FieldProperty:
 
         # handle Optional, Union, List etc...
         # removing redundant prefixes.
-        return stringify_annotation(ret)
+        return TypeHinter.from_annotations(ret).stringify()
+
+    @cached_property
+    def fget_annotation(self) -> str:
+        """This annotates the value that is QML-compatible."""
+        ret = self.type
+        if ret.is_optional():
+            ret = self.type.of_type[0]
+
+        if ret.type in BuiltinScalars.values():
+            return self.annotation
+        if scalar := self.is_custom_scalar:
+            return TypeHinter.from_annotations(scalar.to_qt.__annotations__["return"]).stringify()
+        if ret.is_list():
+            return self.type_map[ret.of_type[0].type.name].model_name
+        return ret.stringify()
 
     @cached_property
     def property_type(self) -> str:
-        if (
-            self.type.type in BuiltinScalars.values()
-            or self.type.of_type in BuiltinScalars.values()
-        ):
-            return self.annotation
-        elif scalar := self.is_custom_scalar:
-            return stringify_annotation(scalar.to_qt.__annotations__["return"])
-        return "QObject"
+        try:
+            # this should raise if it is an inner type.
+            TypeHinter.from_string(self.fget_annotation, self.type_map)
+            return self.fget_annotation
+        except TypeError:
+            assert self.type_map.get(
+                self.fget_annotation, None
+            ), f"{self.fget_annotation} Could not be resolved"
+            # This is a QGraphQLObject, avoid undefined names.
+            return "QObject"
 
     @cached_property
     def setter_name(self) -> str:
@@ -109,6 +124,14 @@ class FieldProperty:
     @cached_property
     def private_name(self) -> str:
         return "_" + self.name
+
+    @cached_property
+    def is_scalar(self) -> bool:
+        return (
+            self.type.type in BuiltinScalars.values()
+            or self.type.of_type in BuiltinScalars.values()
+            and not self.is_custom_scalar
+        )
 
     @cached_property
     def is_custom_scalar(self) -> Optional[BaseCustomScalar]:

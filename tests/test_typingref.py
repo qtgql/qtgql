@@ -116,8 +116,28 @@ def test_is_union():
     assert not th.is_union()
 
 
+@pytest.mark.parametrize("list_class", (list, List))
+def test_is_list(list_class):
+    th = TypeHinter.from_annotations(list_class[int])
+    assert th.is_list()
+    th = TypeHinter.from_annotations(int)
+    assert not th.is_list()
+
+
 def test_is_optional():
     th = TypeHinter.from_annotations(Optional[str])
     assert th.is_optional()
     th = TypeHinter.from_annotations(int)
     assert not th.is_optional()
+
+
+class TestStringify:
+    @pytest.mark.parametrize("tp", [int, float, str, bool, object])
+    def test_builtins(self, tp):
+        assert TypeHinter.from_annotations(tp).stringify() == tp.__name__
+
+    @pytest.mark.parametrize(
+        "expected", ["List[int]", "Optional[str]", "list[float]", "tuple[bool]"]
+    )
+    def test_containers(self, expected):
+        assert TypeHinter.from_string(expected, {}).stringify() in (expected, expected.lower())

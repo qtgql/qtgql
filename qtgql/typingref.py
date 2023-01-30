@@ -1,5 +1,5 @@
 import inspect
-from typing import Any, Generic, Optional, Type, Union, get_args, get_origin
+from typing import Any, Generic, List, Optional, Type, Union, get_args, get_origin
 
 from attrs import define
 
@@ -81,6 +81,13 @@ class TypeHinter:
             return builder(self.of_type[0].as_annotation(object_map))
         return self.type
 
+    def stringify(self) -> str:
+        annot = self.as_annotation()
+        if inspect.isclass(annot) and not hasattr(annot, "__origin__"):
+            return annot.__name__
+
+        return str(annot).replace("typing.", "").replace("qtgql.codegen.utils.", "")
+
     def is_union(self) -> bool:
         return self.type is Union
 
@@ -89,3 +96,6 @@ class TypeHinter:
 
     def is_generic(self) -> bool:
         return inspect.isclass(self.type) and issubclass(self.type, Generic)
+
+    def is_list(self) -> bool:
+        return self.type in (list, List)

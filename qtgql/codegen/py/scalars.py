@@ -7,6 +7,7 @@ T = TypeVar("T")
 class BaseCustomScalar(Generic[T]):
     __slots__ = "_value"
     GRAPHQL_NAME: str
+    DEFAULT_DESERIALIZED: Any = ""
 
     def __init__(self, v: Optional[T] = None):
         self._value = v
@@ -21,6 +22,7 @@ class BaseCustomScalar(Generic[T]):
 
 class DateTimeScalar(BaseCustomScalar[datetime]):
     GRAPHQL_NAME: str = "DateTime"
+    DEFAULT_DESERIALIZED = " --- "
 
     @classmethod
     def from_graphql(cls, v: Optional[str] = None) -> "DateTimeScalar":
@@ -29,10 +31,10 @@ class DateTimeScalar(BaseCustomScalar[datetime]):
             return cls(datetime.fromisoformat(v))
         return cls()
 
-    def to_qt(self) -> Optional[str]:
+    def to_qt(self) -> str:
         if self._value:
             return self._value.strftime(" %H:%M: ")
-        return None
+        return self.DEFAULT_DESERIALIZED
 
 
 CustomScalarMap = dict[str, Type[BaseCustomScalar]]

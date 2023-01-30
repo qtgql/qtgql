@@ -35,8 +35,8 @@ class {{ type.name }}({{context.base_object_name}}):
         self.{{  f.private_name  }} = v
         self.{{  f.name  }}Changed.emit()
 
-    @qproperty(type={{ f.property_type }}, fset={{ f.setter_name }}, notify={{f.signal_name}})
-    def {{ f.name }}(self) -> {{ f.property_type }}:
+    @qproperty(type={{f.property_type}}, fset={{ f.setter_name }}, notify={{f.signal_name}})
+    def {{ f.name }}(self) -> {{ f.fget_annotation }}:
         {{f.fget}}
     {% endfor %}
 class {{ type.model_name }}(BaseModel):
