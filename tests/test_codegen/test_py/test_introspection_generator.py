@@ -11,7 +11,13 @@ from qtgql.codegen.introspection import SchemaEvaluator, introspection_query
 from qtgql.codegen.py.bases import BaseModel, _BaseQGraphQLObject
 from qtgql.codegen.py.config import QtGqlConfig
 from qtgql.codegen.py.objecttype import GqlType
-from qtgql.codegen.py.scalars import BaseCustomScalar, BuiltinScalars, DateTimeScalar, DecimalScalar
+from qtgql.codegen.py.scalars import (
+    BaseCustomScalar,
+    BuiltinScalars,
+    DateScalar,
+    DateTimeScalar,
+    DecimalScalar,
+)
 from qtgql.typingref import TypeHinter
 from strawberry import Schema
 
@@ -279,12 +285,28 @@ DecimalTestCase = QGQLObjectTestCase(
           }
         }
     """,
-    test_name="DateTimeTestCase",
+    test_name="DecimalTestCase",
+)
+
+DateTestCase = QGQLObjectTestCase(
+    schema=schemas.object_with_date.schema,
+    query="""
+        {
+          user {
+            name
+            age
+            birth
+          }
+        }
+        """,
+    test_name="DateTestCase",
 )
 
 all_test_cases = [
     ScalarsTestCase,
     DateTimeTestCase,
+    DateTestCase,
+    DecimalTestCase,
     OptionalScalarTestCase,
     NestedObjectTestCase,
     OptionalNestedObjectTestCase,
@@ -296,6 +318,7 @@ all_test_cases = [
 
 custom_scalar_testcases = [
     (DateTimeTestCase, DateTimeScalar, "birth"),
+    (DateTestCase, DateScalar, "birth"),
     (DecimalTestCase, DecimalScalar, "balance"),
 ]
 

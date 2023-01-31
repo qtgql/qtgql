@@ -1,10 +1,14 @@
 from abc import ABC, abstractmethod
+from datetime import date
 from decimal import Decimal
+from typing import Type
 
-from qtgql.codegen.py.scalars import DecimalScalar
+from qtgql.codegen.py.scalars import BaseCustomScalar, DateScalar, DecimalScalar
 
 
 class AbstractScalarTestCase(ABC):
+    scalar_klass: Type[BaseCustomScalar]
+
     @abstractmethod
     def test_deserialize(self):
         raise NotImplementedError
@@ -13,9 +17,10 @@ class AbstractScalarTestCase(ABC):
     def test_to_qt(self):
         raise NotImplementedError
 
-    @abstractmethod
     def test_default_value(self):
-        raise NotImplementedError
+        scalar = self.scalar_klass.from_graphql()
+        assert scalar._value is None
+        assert scalar.to_qt() == scalar.DEFAULT_DESERIALIZED
 
 
 class TestDecimalScalar(AbstractScalarTestCase):
@@ -32,3 +37,16 @@ class TestDecimalScalar(AbstractScalarTestCase):
         scalar = DecimalScalar.from_graphql()
         assert scalar._value == Decimal()
         assert scalar.to_qt() == "0"
+
+
+class TestDateScalar(AbstractScalarTestCase):
+    scalar_klass = DateScalar
+
+    def test_deserialize(self):
+        expected = date.fromisoformat(date.today().isoformat())
+        scalar = DateScalar.from_graphql(expected.isoformat())
+        assert scalar._value == expected
+
+    def test_to_qt(self):
+        scalar = DateScalar(date.today())
+        assert scalar.to_qt() == date.today().isoformat()
