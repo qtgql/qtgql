@@ -5,7 +5,8 @@ from typing import List, Optional, Type, Union
 from attrs import define
 
 from qtgql.codegen.py.bases import _BaseQGraphQLObject
-from qtgql.codegen.py.scalars import BaseCustomScalar, BuiltinScalars, CustomScalarMap
+from qtgql.codegen.py.custom_scalars import CustomScalarMap
+from qtgql.codegen.py.scalars import BaseCustomScalar, BuiltinScalars
 from qtgql.codegen.utils import AntiForwardRef
 from qtgql.typingref import TypeHinter
 

@@ -10,14 +10,9 @@ from attr import define
 from qtgql.codegen.introspection import SchemaEvaluator, introspection_query
 from qtgql.codegen.py.bases import BaseModel, _BaseQGraphQLObject
 from qtgql.codegen.py.config import QtGqlConfig
+from qtgql.codegen.py.custom_scalars import DateScalar, DateTimeScalar, DecimalScalar
 from qtgql.codegen.py.objecttype import GqlType
-from qtgql.codegen.py.scalars import (
-    BaseCustomScalar,
-    BuiltinScalars,
-    DateScalar,
-    DateTimeScalar,
-    DecimalScalar,
-)
+from qtgql.codegen.py.scalars import BaseCustomScalar, BuiltinScalars
 from qtgql.typingref import TypeHinter
 from strawberry import Schema
 

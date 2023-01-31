@@ -49,7 +49,10 @@ nav:
       - Utils: ./utilities.md
   - Codegen:
       Tutorial: ./codegen/tutorial.md
-      Custom scalars: ./codegen/custom_scalar.md
+      Scalars:
+        - Index: ./codegen/scalars/index.md
+        - Custom Scalars: ./codegen/scalars/custom_scalars.md
+        - Create a Scalar: ./codegen/scalars/create_scalar.md
   - ItemSystem:
       Intro: ./itemsystem/intro.md
 markdown_extensions:

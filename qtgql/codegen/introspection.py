@@ -7,8 +7,9 @@ from typing import TYPE_CHECKING, Optional, Union
 import graphql
 
 from qtgql.codegen.py.compiler import TemplateContext
+from qtgql.codegen.py.custom_scalars import CUSTOM_SCALARS
 from qtgql.codegen.py.objecttype import FieldProperty, GqlType, Kinds
-from qtgql.codegen.py.scalars import CUSTOM_SCALARS, BuiltinScalars
+from qtgql.codegen.py.scalars import BuiltinScalars
 from qtgql.codegen.utils import anti_forward_ref
 from qtgql.typingref import TypeHinter
 
