@@ -18,19 +18,16 @@ class Kinds(enum.Enum):
     LIST = "LIST"
     UNION = "UNION"
     NON_NULL = "NON_NULL"
-
-    def __getitem__(self, item):
-        for f in Kinds:
-            if f.name == item:
-                return item
-        raise KeyError(item, "is a wrong kind")
+    INTERFACE = "INTERFACE"
+    INPUT_OBJECT = "INPUT_OBJECT"
 
 
 @define(slots=False)
 class FieldProperty:
     name: str
     type: TypeHinter
-    type_map: dict[str, "GqlType"]
+    type_map: dict[str, "GqlTypeDefinition"]
+    enums: "EnumMap"
     scalars: CustomScalarMap
     description: Optional[str] = ""
 
@@ -62,8 +59,11 @@ class FieldProperty:
             )
         # handle inner type
         assert issubclass(t, AntiForwardRef)
+        # graphql object
         if t.name in self.type_map.keys():
             return f"cls.{_BaseQGraphQLObject.deserialize_optional_child.__name__}(parent, data, {t.name}, '{self.name}')"
+        elif t.name in self.enums.keys():
+            return f"{t.name}({default})"
         raise NotImplementedError  # pragma: no cover
 
     @cached_property
@@ -113,6 +113,9 @@ class FieldProperty:
         except (TypeError, NameError):
             if self.type.is_union():
                 return "QObject"  # graphql doesn't support scalars in Unions ATM.
+            if self.enums.get(self.fget_annotation, None):
+                # QEnum value must be int
+                return "int"
             # might be a model, which has no type representation ATM.
             name = self.fget_annotation.replace("Model", "")
             assert self.type_map.get(name, None), f"{self.fget_annotation} Could not be resolved"
@@ -153,7 +156,7 @@ class FieldProperty:
 
 
 @define(slots=False)
-class GqlType:
+class GqlTypeDefinition:
     kind: Kinds
     name: str
     fields: list["FieldProperty"]
@@ -162,3 +165,20 @@ class GqlType:
     @cached_property
     def model_name(self) -> str:
         return self.name + "Model"
+
+
+@define
+class EnumValue:
+    """encapsulates enumValues from introspection, maps to an Enum member."""
+
+    name: str
+    description: str = ""
+
+
+@define
+class GqlEnumDefinition:
+    name: str
+    members: list[EnumValue]
+
+
+EnumMap = dict[str, "GqlEnumDefinition"]

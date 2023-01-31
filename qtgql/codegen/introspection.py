@@ -8,7 +8,14 @@ import graphql
 
 from qtgql.codegen.py.compiler import TemplateContext
 from qtgql.codegen.py.custom_scalars import CUSTOM_SCALARS
-from qtgql.codegen.py.objecttype import FieldProperty, GqlType, Kinds
+from qtgql.codegen.py.objecttype import (
+    EnumMap,
+    EnumValue,
+    FieldProperty,
+    GqlEnumDefinition,
+    GqlTypeDefinition,
+    Kinds,
+)
 from qtgql.codegen.py.scalars import BuiltinScalars
 from qtgql.codegen.utils import anti_forward_ref
 from qtgql.typingref import TypeHinter
@@ -24,16 +31,17 @@ class SchemaEvaluator:
         self.template = config.template_class
         self.introspection = introspection
         self.config = config
-        self._generated_types: dict[str, GqlType] = {
-            scalar: GqlType(name=scalar, kind=Kinds.SCALAR, fields=[])
+        self._generated_types: dict[str, GqlTypeDefinition] = {
+            scalar: GqlTypeDefinition(name=scalar, kind=Kinds.SCALAR, fields=[])
             for scalar in BuiltinScalars.keys()
         }
+        self._generated_enums: EnumMap = {}
         self._evaluate()
 
     @cached_property
     def unions(self) -> list[dict]:
         return [
-            t for t in self.introspection["__schema"]["types"] if Kinds[t["kind"]] == Kinds.UNION
+            t for t in self.introspection["__schema"]["types"] if Kinds(t["kind"]) == Kinds.UNION
         ]
 
     def get_possible_types_for_union(self, name: str) -> list[dict]:
@@ -43,7 +51,7 @@ class SchemaEvaluator:
         raise ValueError(f"Union for {name} was not found")
 
     def evaluate_field_type(self, t: dict) -> TypeHinter:
-        kind = Kinds[t["kind"]]
+        kind = Kinds(t["kind"])
 
         is_optional = True
         if kind == Kinds.NON_NULL:
@@ -53,7 +61,7 @@ class SchemaEvaluator:
 
         of_type = t["ofType"]
         name = t["name"]
-        kind = Kinds[t["kind"]]
+        kind = Kinds(t["kind"])
         ret: Optional[TypeHinter] = None
 
         def optional_maybe(inner: TypeHinter) -> TypeHinter:
@@ -66,7 +74,7 @@ class SchemaEvaluator:
                 ret = TypeHinter(type=BuiltinScalars[name])
             except KeyError:
                 ret = TypeHinter(type=CUSTOM_SCALARS[name])
-        elif kind == Kinds.OBJECT:
+        elif kind in (Kinds.OBJECT, Kinds.ENUM):
             ret = TypeHinter(type=anti_forward_ref(name))
         elif kind == Kinds.UNION:
             ret = TypeHinter(
@@ -89,9 +97,10 @@ class SchemaEvaluator:
             type_map=self._generated_types,
             scalars=self.config.custom_scalars,
             description=field["description"],
+            enums=self._generated_enums,
         )
 
-    def evaluate_object_type(self, type_: dict) -> Optional[GqlType]:
+    def evaluate_object_type(self, type_: dict) -> Optional[GqlTypeDefinition]:
         # scalars are swallowed here.
         t_name: str = type_["name"]
         if t_name.startswith("__"):
@@ -99,23 +108,39 @@ class SchemaEvaluator:
         if evaluated := self._generated_types.get(t_name, None):
             return evaluated
 
-        concrete = GqlType(
+        concrete = GqlTypeDefinition(
             kind=Kinds.OBJECT,
             name=t_name,
             docstring=type_["description"],
             fields=[self.evaluate_field(f) for f in type_["fields"]],
         )
-        self._generated_types[t_name] = concrete
         return concrete
+
+    def _evaluate_enum(self, enum: dict) -> Optional[GqlEnumDefinition]:
+        name = enum["name"]
+        if self._generated_enums.get(name, None):
+            return
+
+        return GqlEnumDefinition(
+            name=name,
+            members=[
+                EnumValue(name=val["name"], description=val["description"])
+                for val in enum["enumValues"]
+            ],
+        )
 
     def _evaluate(self) -> None:
         types = self.introspection["__schema"]["types"]
         for tp in types:
-            kind = tp["kind"]
-            if kind == Kinds.SCALAR.name:
+            kind = Kinds(tp["kind"])
+            if kind is Kinds.SCALAR:
                 continue
-            if kind == Kinds.OBJECT.name:
-                self.evaluate_object_type(tp)
+            elif kind is Kinds.OBJECT:
+                if object_type := self.evaluate_object_type(tp):
+                    self._generated_types[object_type.name] = object_type
+            elif kind is Kinds.ENUM:
+                if enum := self._evaluate_enum(tp):
+                    self._generated_enums[enum.name] = enum
 
     def generate(self) -> str:
         """

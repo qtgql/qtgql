@@ -11,7 +11,7 @@ from qtgql.codegen.introspection import SchemaEvaluator, introspection_query
 from qtgql.codegen.py.bases import BaseModel, _BaseQGraphQLObject
 from qtgql.codegen.py.config import QtGqlConfig
 from qtgql.codegen.py.custom_scalars import DateScalar, DateTimeScalar, DecimalScalar, TimeScalar
-from qtgql.codegen.py.objecttype import GqlType
+from qtgql.codegen.py.objecttype import GqlTypeDefinition
 from qtgql.codegen.py.scalars import BaseCustomScalar, BuiltinScalars
 from qtgql.typingref import TypeHinter
 from strawberry import Schema
@@ -33,7 +33,7 @@ class QGQLObjectTestCase:
     test_name: str
     type_name: str = "User"
     mod: Optional[ModuleType] = None
-    tested_type: Optional[GqlType] = None
+    tested_type: Optional[GqlTypeDefinition] = None
 
     @property
     def module(self) -> ModuleType:
