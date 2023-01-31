@@ -78,7 +78,11 @@ class TestFromString:
     )
     def test_containers(self, container, inner):
         def as_str():
-            return container.__name__ + "[" + inner.__name__ + "]"
+            try:
+                cont_name = container.__name__
+            except AttributeError:  # in python 3.9 `Optional` is not a class.
+                cont_name = str(container).replace("typing.", "")
+            return cont_name + "[" + inner.__name__ + "]"
 
         th = TypeHinter.from_string(as_str(), ns={})
         assert th == TypeHinter.from_annotations(container[inner])
