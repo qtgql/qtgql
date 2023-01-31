@@ -52,7 +52,6 @@ def base_type(qtbot) -> type[_BaseType]:
 
     :return: BaseType, this is required to avoid TypeStore conflicts.
     """
-
     return get_base_type()
 
 
