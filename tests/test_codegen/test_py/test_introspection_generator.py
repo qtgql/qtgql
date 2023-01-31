@@ -255,6 +255,21 @@ ListOfUnionTestCase = QGQLObjectTestCase(
     test_name="ListOfUnionTestCase",
 )
 
+EnumTestCase = QGQLObjectTestCase(
+    schema=schemas.object_with_enum.schema,
+    query="""
+        {
+          user {
+            name
+            age
+            status
+          }
+        }
+        """,
+    test_name="EnumTestCase",
+)
+
+
 # custom scalars
 DateTimeTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_datetime.schema,
@@ -325,6 +340,7 @@ all_test_cases = [
     UnionTestCase,
     ListOfUnionTestCase,
     TimeTestCase,
+    EnumTestCase,
 ]
 
 custom_scalar_testcases = [
