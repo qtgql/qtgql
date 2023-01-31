@@ -63,7 +63,7 @@ class FieldProperty:
         assert issubclass(t, AntiForwardRef)
         if t.name in self.type_map.keys():
             return f"cls.{_BaseQGraphQLObject.deserialize_optional_child.__name__}(parent, data, {t.name}, '{self.name}')"
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     @cached_property
     def annotation(self) -> str:

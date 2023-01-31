@@ -27,7 +27,7 @@ class BaseCustomScalar(Generic[T]):
 
         **must be overridden**!
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def to_qt(self) -> Any:
         """Will be used by the property getter, This is the official value that
@@ -35,7 +35,7 @@ class BaseCustomScalar(Generic[T]):
 
         **must be overridden**!
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
 
 class DateTimeScalar(BaseCustomScalar[datetime]):

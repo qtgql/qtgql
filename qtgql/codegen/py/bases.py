@@ -19,7 +19,9 @@ class _BaseQGraphQLObject(QObject):
         super().__init__(parent)
 
     @classmethod
-    def from_dict(cls, parent: T_BaseQGraphQLObject, data: dict) -> T_BaseQGraphQLObject:
+    def from_dict(
+        cls, parent: T_BaseQGraphQLObject, data: dict
+    ) -> T_BaseQGraphQLObject:  # pragma: no cover
         raise NotImplementedError
 
     @classmethod
@@ -32,7 +34,6 @@ class _BaseQGraphQLObject(QObject):
     ) -> Optional[T_BaseQGraphQLObject]:
         if found := data.get(field_name, None):
             return child.from_dict(parent, found)  # type: ignore
-        return None
 
     @classmethod
     def deserialize_list_of(
@@ -45,7 +46,6 @@ class _BaseQGraphQLObject(QObject):
     ) -> Optional[T_BaseModel]:
         if found := data.get(field_name, None):
             return model(parent=parent, data=[of_type.from_dict(parent, data) for data in found])  # type: ignore
-        return None
 
     @classmethod
     def deserialize_union(
@@ -57,7 +57,6 @@ class _BaseQGraphQLObject(QObject):
         if found := data.get(field_name, None):
             child = cls.type_map[found["__typename"]]
             return child.from_dict(parent, found)  # type: ignore
-        return None
 
 
 class BaseModel(QAbstractListModel):
@@ -80,7 +79,6 @@ class BaseModel(QAbstractListModel):
             raise NotImplementedError(
                 f"role {role} is not a valid role for {self.__class__.__name__}"
             )
-        return None
 
     def append(self, node: T_BaseQGraphQLObject) -> None:
         count = self.rowCount()
