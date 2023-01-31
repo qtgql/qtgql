@@ -48,10 +48,7 @@ def init_dict_nestedX3() -> dict:
 
 @pytest.fixture
 def base_type(qtbot) -> type[_BaseType]:
-    """
-
-    :return: BaseType, this is required to avoid TypeStore conflicts.
-    """
+    """:return: BaseType, this is required to avoid TypeStore conflicts."""
     return get_base_type()
 
 

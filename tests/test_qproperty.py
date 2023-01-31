@@ -29,7 +29,7 @@ def test_builtins(tp, val):
 
 
 def test_optional():
-    """Optional is not supported by PySide6 `Signal`"""
+    """Optional is not supported by PySide6 `Signal`."""
 
     class A(PropertyTestCase):
         @Property(type=int, constant=True)

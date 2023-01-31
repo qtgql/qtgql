@@ -70,8 +70,8 @@ class FieldProperty:
     def annotation(self) -> str:
         """
         :returns: Annotation of the field based on the real type,
-         meaning that the private attribute would be of that type.
-         this goes for init and the property setter.
+        meaning that the private attribute would be of that type.
+        this goes for init and the property setter.
         """
         ret = self.type.as_annotation()
         # int, str, float etc...

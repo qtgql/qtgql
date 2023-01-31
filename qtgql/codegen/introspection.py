@@ -143,9 +143,7 @@ class SchemaEvaluator:
                     self._generated_enums[enum.name] = enum
 
     def generate(self) -> str:
-        """
-        :return: The generated schema module as a string.
-        """
+        """:return: The generated schema module as a string."""
         return self.template(
             TemplateContext(
                 types=[
@@ -163,8 +161,6 @@ class SchemaEvaluator:
         return evaluator
 
     def dump(self, file: Path):
-        """
-        :param file: Path to the file the codegen would dump to.
-        """
+        """:param file: Path to the file the codegen would dump to."""
         with open(file, "w") as fh:
             fh.write(self.generate())
