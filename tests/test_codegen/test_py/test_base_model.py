@@ -1,23 +1,18 @@
 import pytest
 from PySide6.QtCore import QByteArray, Qt
-from qtgql.codegen.introspection import SchemaEvaluator
-from qtgql.codegen.py.bases import BaseModel, _BaseQGraphQLObject
+from qtgql.codegen.py.bases import BaseModel
 
-from tests.test_codegen.conftest import get_introspection_for
-from tests.test_codegen.schemas import object_with_list_of_object
-from tests.test_codegen.test_py.test_introspection_generator import TestObjectWithListOfObject
+from tests.test_codegen.test_py.test_introspection_generator import ObjectWithListOfObjectTestCase
 
 
 @pytest.fixture()
-def sample_model_initialized(tmp_mod) -> BaseModel:
-    schema = object_with_list_of_object.schema
-    introspection = get_introspection_for(schema)
-    res = SchemaEvaluator(introspection)
-    generated = res.generate()
-    compiled = compile(generated, "schema", "exec")
-    exec(compiled, tmp_mod.__dict__)
-    User: _BaseQGraphQLObject = tmp_mod.User
-    user = User.from_dict(None, TestObjectWithListOfObject.initialize_dict)
+def sample_model_initialized(
+    tmp_mod,
+) -> BaseModel:
+    testcase = ObjectWithListOfObjectTestCase
+    testcase.compile()
+    user = testcase.gql_type
+    user = user.from_dict(None, testcase.initialize_dict)
     return user.persons
 
 

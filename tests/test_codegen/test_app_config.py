@@ -1,9 +1,35 @@
+import contextlib
 import importlib
 import inspect
 import sys
+import tempfile
 import uuid
+from pathlib import Path
+from types import ModuleType
 
+import pytest
 from qtgql.codegen.py.config import QtGqlConfig
+
+
+@contextlib.contextmanager
+def get_fake_module() -> ModuleType:
+    with tempfile.TemporaryDirectory() as tmp_path:
+        id_ = uuid.uuid4().hex
+        file = Path(tmp_path) / f"{id_}.py"
+        with open(file, "w") as f:
+            f.write("")
+
+        spec = importlib.util.spec_from_file_location(id_, file)
+        foo = importlib.util.module_from_spec(spec)
+        sys.modules[id_] = foo
+        spec.loader.exec_module(foo)
+        yield foo
+
+
+@pytest.fixture()
+def fake_module(tmp_path) -> ModuleType:
+    with get_fake_module() as m:
+        yield m
 
 
 def test_fetch_schema(mini_server, tmp_path):

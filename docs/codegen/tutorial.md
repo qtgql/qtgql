@@ -5,9 +5,10 @@
 TBD
 
 ## Setup
-Somewhere on your application (probably in main.py)
+Somewhere on your application (probably in config.py)
 add our codegen configurations.
 ```python
+# myapp/config.py
 from qtgql.codegen.py.config import QtGqlConfig
 from pathlib import Path
 
@@ -20,7 +21,7 @@ for `myconfig`:
 
 ```yaml
 [ tool.qtgql ]
-config = "myapp.main:myconfig"
+config = "myapp.config:myconfig"
 ```
 Now `qtgql` knows how to query your server for
 introspection data, you just need to call

@@ -1,21 +1,28 @@
+from __future__ import annotations
+
 from functools import cached_property
 from pathlib import Path
-from typing import Optional, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 import graphql
 
-from qtgql.codegen.objecttype import BuiltinScalars, FieldProperty, GqlType, Kinds
-from qtgql.codegen.py.compiler import py_template
+from qtgql.codegen.py.compiler import TemplateContext
+from qtgql.codegen.py.objecttype import FieldProperty, GqlType, Kinds
+from qtgql.codegen.py.scalars import CUSTOM_SCALARS, BuiltinScalars
 from qtgql.codegen.utils import anti_forward_ref
 from qtgql.typingref import TypeHinter
+
+if TYPE_CHECKING:
+    from qtgql.codegen.py.config import QtGqlConfig
 
 introspection_query = graphql.get_introspection_query(descriptions=True)
 
 
 class SchemaEvaluator:
-    def __init__(self, introspection: dict, compiler=py_template):
-        self.compiler = compiler
+    def __init__(self, introspection: dict, config: QtGqlConfig):
+        self.template = config.template_class
         self.introspection = introspection
+        self.config = config
         self._generated_types: dict[str, GqlType] = {
             scalar: GqlType(name=scalar, kind=Kinds.SCALAR, fields=[])
             for scalar in BuiltinScalars.keys()
@@ -54,7 +61,10 @@ class SchemaEvaluator:
         if kind == Kinds.LIST:
             ret = TypeHinter(type=list, of_type=(self.evaluate_field_type(of_type),))
         elif kind == Kinds.SCALAR:
-            ret = TypeHinter(type=BuiltinScalars[name])
+            try:
+                ret = TypeHinter(type=BuiltinScalars[name])
+            except KeyError:
+                ret = TypeHinter(type=CUSTOM_SCALARS[name])
         elif kind == Kinds.OBJECT:
             ret = TypeHinter(type=anti_forward_ref(name))
         elif kind == Kinds.UNION:
@@ -76,6 +86,7 @@ class SchemaEvaluator:
             type=self.evaluate_field_type(field["type"]),
             name=field["name"],
             type_map=self._generated_types,
+            scalars=self.config.custom_scalars,
             description=field["description"],
         )
 
@@ -109,13 +120,20 @@ class SchemaEvaluator:
         """
         :return: The generated schema module as a string.
         """
-        return self.compiler(
-            [t for name, t in self._generated_types.items() if name not in BuiltinScalars.keys()]
+        return self.template(
+            TemplateContext(
+                types=[
+                    t
+                    for name, t in self._generated_types.items()
+                    if name not in BuiltinScalars.keys()
+                ],
+                config=self.config,
+            )
         )
 
     @classmethod
-    def from_dict(cls, introspection: dict) -> "SchemaEvaluator":
-        evaluator = SchemaEvaluator(introspection)
+    def from_dict(cls, introspection: dict, config: QtGqlConfig) -> SchemaEvaluator:
+        evaluator = SchemaEvaluator(introspection, config=config)
         return evaluator
 
     def dump(self, file: Path):

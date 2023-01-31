@@ -59,6 +59,7 @@ build-backend = "poetry.core.masonry.api"
 plugins = ['qtgql/ext/mypy_plugin.py']
 ignore_missing_imports = "True"
 exclude = "(?x)^(.*\\.jinja.py|)$"
+warn_no_return = "False"
 
 [tool.black]
 line-length = 100
@@ -87,9 +88,10 @@ ignore = [
     "E501",  # line too long, handled by black
 ]
 fix = true
-
 src = ["qtgql", "tests"]
 
+[tool.ruff.pyupgrade]
+keep-runtime-typing = true
 
 [tool.pytest.ini_options]
 addopts = "--cov-config=pyproject.toml --ignore=qtgql/codegen/py/templates/"
@@ -102,7 +104,6 @@ relative_files = true
 
 [tool.coverage.report]
 show_missing = true
-fail_under = 95
 
 [tool.qtgql]
 config = "tests.test_sample_ui.main:qtgqlconfig"

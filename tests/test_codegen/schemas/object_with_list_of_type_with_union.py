@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Union
+
 import strawberry
 
 from tests.conftest import fake
@@ -13,7 +15,7 @@ class Frog:
 
 @strawberry.type
 class User:
-    who_am_i: Frog | Person
+    who_am_i: Union[Frog, Person]
 
 
 @strawberry.type()

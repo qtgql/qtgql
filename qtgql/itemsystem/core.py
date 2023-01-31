@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import types
 from functools import cached_property
-from typing import TYPE_CHECKING, Any, Callable, ClassVar, Generic, TypeVar
+from typing import TYPE_CHECKING, Any, Callable, ClassVar, Generic, Optional, Type, TypeVar, Union
 
 import attrs
 from PySide6.QtCore import QAbstractListModel, QByteArray, QEventLoop, QModelIndex, Qt, Signal
@@ -81,7 +81,7 @@ class BaseTypeMeta(type):
 
 
 class _BaseType(metaclass=BaseTypeMeta):
-    if TYPE_CHECKING:
+    if TYPE_CHECKING:  # pragma: no cover
         __types_map__: dict[str, _BaseType]
         Model: ClassVar[type[GenericModel[Self]]]  # type: ignore
 
@@ -113,7 +113,7 @@ class Role:
 
     __slots__ = ("num", "name", "qt_name", "_type", "str_type", "type_map")
 
-    def __init__(self, num: int, name: str, type: TypeHinter | str, type_map: dict):
+    def __init__(self, num: int, name: str, type: Union[TypeHinter, str], type_map: dict):
         self.num = num
         self.name = name
         self.qt_name = QByteArray(name.encode("utf-8"))
@@ -182,19 +182,19 @@ class GenericModel(Generic[_TBaseType], QAbstractListModel):
     __roles__: RoleMapper
     layoutAboutToBeChanged: Signal
     layoutChanged: Signal
-    dataChanged: Callable[[QModelIndex, QModelIndex, list[int] | None], None]
+    dataChanged: Callable[[QModelIndex, QModelIndex, Optional[list[int]]], None]
 
-    def __init__(self, *, data: list[dict] | dict | None = None, parent=None):
+    def __init__(self, *, data: Optional[Union[list[dict], dict]] = None, parent=None):
         super().__init__(parent)
         self.rowsAb = None
-        self.parent_model: GenericModel | None = parent
+        self.parent_model: Optional[GenericModel] = parent
         self.type_ = self.__roledefined_type__
         self._data: list[_TBaseType] = []
         self._child_models: list[GenericModel[Any]] = []
         if data:
             self.initialize_data(data)
 
-    def initialize_data(self, data: list[dict] | dict) -> None:
+    def initialize_data(self, data: Union[list[dict], dict]) -> None:
         """
 
         :param data: data to generate the model
@@ -272,7 +272,7 @@ class GenericModel(Generic[_TBaseType], QAbstractListModel):
         self.endInsertRows()
 
     @slot
-    def pop(self, index: int | None = None) -> None:
+    def pop(self, index: Optional[int] = None) -> None:
         index = -1 if index is None else index
         real_index = index if index > -1 else self.rowCount()
         self.beginRemoveRows(self.index(index - 1).parent(), real_index, real_index)
@@ -295,7 +295,7 @@ class GenericModel(Generic[_TBaseType], QAbstractListModel):
     # CLASS METHODS
     @classmethod
     def from_role_defined(
-        cls, type_: type[_BaseType], parent: type[GenericModel] | None = None
+        cls, type_: type[_BaseType], parent: Optional[Type[GenericModel]] = None
     ) -> type[GenericModel]:
         bases = (cls,)
         if parent:

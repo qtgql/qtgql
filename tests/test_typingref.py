@@ -1,4 +1,4 @@
-from typing import List, Optional, Union, get_args, get_origin
+from typing import Generic, List, Optional, TypeVar, Union, get_args, get_origin
 
 import pytest
 from qtgql.typingref import UNSET, TypeHinter, UnsetType
@@ -13,7 +13,7 @@ class TestFromAnnotation:
     @pytest.mark.parametrize("tp", [list[float], Optional[str]])
     def test_containers(self, tp):
         th = TypeHinter.from_annotations(tp)
-        assert th.type is get_origin(tp)
+        assert th.type[get_args(tp)[0]] == tp
         assert th.of_type[0].type is get_args(tp)[0]
 
     def test_unions(self):
@@ -78,7 +78,11 @@ class TestFromString:
     )
     def test_containers(self, container, inner):
         def as_str():
-            return container.__name__ + "[" + inner.__name__ + "]"
+            try:
+                cont_name = container.__name__
+            except AttributeError:  # in python 3.9 `Optional` is not a class.
+                cont_name = str(container).replace("typing.", "")
+            return cont_name + "[" + inner.__name__ + "]"
 
         th = TypeHinter.from_string(as_str(), ns={})
         assert th == TypeHinter.from_annotations(container[inner])
@@ -88,6 +92,14 @@ class TestFromString:
             ...
 
         assert TypeHinter.from_string("MyType", ns=locals()).type is MyType
+
+    def test_generic_types(self):
+        T = TypeVar("T")
+
+        class A(Generic[T]):
+            ...
+
+        assert TypeHinter.from_string("A", ns=locals()).type is A
 
 
 class TestUnsetType:
@@ -99,3 +111,37 @@ class TestUnsetType:
 
     def test_singleton(self):
         assert UNSET is UnsetType()
+
+
+def test_is_union():
+    th = TypeHinter.from_annotations(Union[str, int])
+    assert th.is_union()
+    th = TypeHinter.from_annotations(int)
+    assert not th.is_union()
+
+
+@pytest.mark.parametrize("list_class", (list, List))
+def test_is_list(list_class):
+    th = TypeHinter.from_annotations(list_class[int])
+    assert th.is_list()
+    th = TypeHinter.from_annotations(int)
+    assert not th.is_list()
+
+
+def test_is_optional():
+    th = TypeHinter.from_annotations(Optional[str])
+    assert th.is_optional()
+    th = TypeHinter.from_annotations(int)
+    assert not th.is_optional()
+
+
+class TestStringify:
+    @pytest.mark.parametrize("tp", [int, float, str, bool, object])
+    def test_builtins(self, tp):
+        assert TypeHinter.from_annotations(tp).stringify() == tp.__name__
+
+    @pytest.mark.parametrize(
+        "expected", ["List[int]", "Optional[str]", "list[float]", "tuple[bool]"]
+    )
+    def test_containers(self, expected):
+        assert TypeHinter.from_string(expected, {}).stringify() in (expected, expected.lower())

@@ -1,12 +1,18 @@
 from __future__ import annotations
 
-from PySide6.QtCore import Property, QObject, Signal
-from qtgql.codegen.py.bases import BaseModel, get_base_graphql_object
+from typing import Optional
 
-BaseObject = get_base_graphql_object()
+from PySide6.QtCore import QObject, Signal
+from qtgql import qproperty
+from qtgql.codegen.py.bases import BaseGraphQLObject, BaseModel
+from qtgql.codegen.py.scalars import DateTimeScalar
 
 
-class Query(BaseObject):
+class SCALARS:
+    DateTimeScalar = DateTimeScalar
+
+
+class Query(BaseGraphQLObject):
     """None."""
 
     def __init__(
@@ -36,7 +42,7 @@ class Query(BaseObject):
         self._hello = v
         self.helloChanged.emit()
 
-    @Property(type=str, fset=hello_setter, notify=helloChanged)
+    @qproperty(type=str, fset=hello_setter, notify=helloChanged)
     def hello(self) -> str:
         return self._hello
 
@@ -46,7 +52,7 @@ class Query(BaseObject):
         self._isAuthenticated = v
         self.isAuthenticatedChanged.emit()
 
-    @Property(type=str, fset=isAuthenticated_setter, notify=isAuthenticatedChanged)
+    @qproperty(type=str, fset=isAuthenticated_setter, notify=isAuthenticatedChanged)
     def isAuthenticated(self) -> str:
         return self._isAuthenticated
 
@@ -56,17 +62,17 @@ class Query(BaseObject):
         self._apples = v
         self.applesChanged.emit()
 
-    @Property(type=QObject, fset=apples_setter, notify=applesChanged)
-    def apples(self) -> list[Apple]:
+    @qproperty(type=QObject, fset=apples_setter, notify=applesChanged)
+    def apples(self) -> AppleModel:
         return self._apples
 
 
 class QueryModel(BaseModel):
-    def __init__(self, data: list[Query], parent: BaseObject | None = None):
+    def __init__(self, data: list[Query], parent: Optional[BaseGraphQLObject] = None):
         super().__init__(data, parent)
 
 
-class Apple(BaseObject):
+class Apple(BaseGraphQLObject):
     """None."""
 
     def __init__(
@@ -74,7 +80,7 @@ class Apple(BaseObject):
         parent: QObject = None,
         size: int = None,
         owner: str = None,
-        worms: list[Worm] | None = None,
+        worms: Optional[list[Worm]] = None,
         color: str = None,
     ):
         super().__init__(parent)
@@ -99,7 +105,7 @@ class Apple(BaseObject):
         self._size = v
         self.sizeChanged.emit()
 
-    @Property(type=int, fset=size_setter, notify=sizeChanged)
+    @qproperty(type=int, fset=size_setter, notify=sizeChanged)
     def size(self) -> int:
         return self._size
 
@@ -109,18 +115,18 @@ class Apple(BaseObject):
         self._owner = v
         self.ownerChanged.emit()
 
-    @Property(type=str, fset=owner_setter, notify=ownerChanged)
+    @qproperty(type=str, fset=owner_setter, notify=ownerChanged)
     def owner(self) -> str:
         return self._owner
 
     wormsChanged = Signal()
 
-    def worms_setter(self, v: list[Worm] | None) -> None:
+    def worms_setter(self, v: Optional[list[Worm]]) -> None:
         self._worms = v
         self.wormsChanged.emit()
 
-    @Property(type=QObject, fset=worms_setter, notify=wormsChanged)
-    def worms(self) -> list[Worm] | None:
+    @qproperty(type=QObject, fset=worms_setter, notify=wormsChanged)
+    def worms(self) -> WormModel:
         return self._worms
 
     colorChanged = Signal()
@@ -129,17 +135,17 @@ class Apple(BaseObject):
         self._color = v
         self.colorChanged.emit()
 
-    @Property(type=str, fset=color_setter, notify=colorChanged)
+    @qproperty(type=str, fset=color_setter, notify=colorChanged)
     def color(self) -> str:
         return self._color
 
 
 class AppleModel(BaseModel):
-    def __init__(self, data: list[Apple], parent: BaseObject | None = None):
+    def __init__(self, data: list[Apple], parent: Optional[BaseGraphQLObject] = None):
         super().__init__(data, parent)
 
 
-class Worm(BaseObject):
+class Worm(BaseGraphQLObject):
     """None."""
 
     def __init__(
@@ -169,7 +175,7 @@ class Worm(BaseObject):
         self._name = v
         self.nameChanged.emit()
 
-    @Property(type=str, fset=name_setter, notify=nameChanged)
+    @qproperty(type=str, fset=name_setter, notify=nameChanged)
     def name(self) -> str:
         return self._name
 
@@ -179,7 +185,7 @@ class Worm(BaseObject):
         self._family = v
         self.familyChanged.emit()
 
-    @Property(type=str, fset=family_setter, notify=familyChanged)
+    @qproperty(type=str, fset=family_setter, notify=familyChanged)
     def family(self) -> str:
         return self._family
 
@@ -189,17 +195,17 @@ class Worm(BaseObject):
         self._size = v
         self.sizeChanged.emit()
 
-    @Property(type=int, fset=size_setter, notify=sizeChanged)
+    @qproperty(type=int, fset=size_setter, notify=sizeChanged)
     def size(self) -> int:
         return self._size
 
 
 class WormModel(BaseModel):
-    def __init__(self, data: list[Worm], parent: BaseObject | None = None):
+    def __init__(self, data: list[Worm], parent: Optional[BaseGraphQLObject] = None):
         super().__init__(data, parent)
 
 
-class Mutation(BaseObject):
+class Mutation(BaseGraphQLObject):
     """None."""
 
     def __init__(
@@ -223,17 +229,17 @@ class Mutation(BaseObject):
         self._pseudoMutation = v
         self.pseudoMutationChanged.emit()
 
-    @Property(type=bool, fset=pseudoMutation_setter, notify=pseudoMutationChanged)
+    @qproperty(type=bool, fset=pseudoMutation_setter, notify=pseudoMutationChanged)
     def pseudoMutation(self) -> bool:
         return self._pseudoMutation
 
 
 class MutationModel(BaseModel):
-    def __init__(self, data: list[Mutation], parent: BaseObject | None = None):
+    def __init__(self, data: list[Mutation], parent: Optional[BaseGraphQLObject] = None):
         super().__init__(data, parent)
 
 
-class Subscription(BaseObject):
+class Subscription(BaseGraphQLObject):
     """None."""
 
     def __init__(
@@ -257,11 +263,11 @@ class Subscription(BaseObject):
         self._count = v
         self.countChanged.emit()
 
-    @Property(type=int, fset=count_setter, notify=countChanged)
+    @qproperty(type=int, fset=count_setter, notify=countChanged)
     def count(self) -> int:
         return self._count
 
 
 class SubscriptionModel(BaseModel):
-    def __init__(self, data: list[Subscription], parent: BaseObject | None = None):
+    def __init__(self, data: list[Subscription], parent: Optional[BaseGraphQLObject] = None):
         super().__init__(data, parent)

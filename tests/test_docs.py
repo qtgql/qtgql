@@ -3,6 +3,7 @@ from pathlib import Path
 import pytest
 from mktestdocs import check_docstring, check_md_file
 from qtgql.autoproperty import define_properties
+from qtgql.codegen.py.scalars import BaseCustomScalar
 
 docs_dir = Path(__file__).parent.parent / "docs"
 assert docs_dir.exists()
@@ -18,9 +19,7 @@ def test_md(fpath, qtbot):
 
 @pytest.mark.parametrize(
     "documented",
-    [
-        define_properties,
-    ],
+    [define_properties, BaseCustomScalar],
     ids=lambda d: d.__name__,
 )
 def test_docstring(documented):

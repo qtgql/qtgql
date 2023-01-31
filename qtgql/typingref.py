@@ -1,4 +1,5 @@
-from typing import Any, Optional, Type, Union, get_args, get_origin
+import inspect
+from typing import Any, List, Optional, Type, Union, get_args, get_origin
 
 from attrs import define
 
@@ -51,9 +52,13 @@ class TypeHinter:
     @classmethod
     def from_annotations(cls, tp: Any) -> "TypeHinter":
         if args := get_args(tp):
+            # handle optional
+            if type(None) in args:
+                return TypeHinter(type=Optional, of_type=(TypeHinter.from_annotations(args[0]),))
             new_args: list[TypeHinter] = []
             for arg in args:
                 new_args.append(TypeHinter.from_annotations(arg))
+
             return TypeHinter(type=get_origin(tp), of_type=tuple(new_args))  # type: ignore
         return TypeHinter(type=tp)
 
@@ -68,7 +73,31 @@ class TypeHinter:
         if builder := getattr(
             self.type, "__class_getitem__", getattr(self.type, "__getitem__", None)
         ):
-            if self.type is Union:
+            if self.is_generic():
+                return self.type
+
+            if self.is_union():
                 return builder(tuple(arg.as_annotation(object_map) for arg in self.of_type))
             return builder(self.of_type[0].as_annotation(object_map))
         return self.type
+
+    def stringify(self) -> str:
+        annot = self.as_annotation()
+        if inspect.isclass(annot) and not hasattr(annot, "__origin__"):
+            return annot.__name__
+
+        return str(annot).replace("typing.", "").replace("qtgql.codegen.utils.", "")
+
+    def is_union(self) -> bool:
+        return self.type is Union
+
+    def is_optional(self) -> bool:
+        return self.type is Optional
+
+    def is_generic(self) -> bool:
+        return inspect.isclass(self.type) and "Generic.__class_getitem__" in repr(
+            self.type.__class_getitem__
+        )
+
+    def is_list(self) -> bool:
+        return self.type in (list, List)
