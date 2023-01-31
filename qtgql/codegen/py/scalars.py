@@ -45,4 +45,5 @@ BuiltinScalars: dict[str, type] = {
     "String": str,
     "ID": str,
     "Boolean": bool,
+    "UUID": str,
 }

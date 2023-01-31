@@ -127,6 +127,7 @@ ScalarsTestCase = QGQLObjectTestCase(
             agePoint
             male
             id
+            uuid
           }
         }
         """,
