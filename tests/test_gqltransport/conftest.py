@@ -2,7 +2,6 @@ import pytest
 from qtgql.gqltransport.client import GqlClientMessage, GqlWsTransportClient, HandlerProto
 
 
-@staticmethod
 def get_subscription_str(operation_name="", target: int = 10, raise_on_5=False) -> str:
     return "subscription {} {{ count(target: {}, raiseOn5: {}) }}".format(
         operation_name,
