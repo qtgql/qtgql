@@ -7,7 +7,7 @@ from attrs import define
 from qtgql.codegen.introspection import SchemaEvaluator, introspection_query
 from qtgql.codegen.py.bases import BaseGraphQLObject, _BaseQGraphQLObject
 from qtgql.codegen.py.compiler import TemplateContext, py_template
-from qtgql.codegen.py.scalars import CUSTOM_SCALARS, CustomScalarMap
+from qtgql.codegen.py.custom_scalars import CUSTOM_SCALARS, CustomScalarMap
 
 
 @define

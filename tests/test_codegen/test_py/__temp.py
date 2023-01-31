@@ -5,7 +5,7 @@ from typing import Optional
 from PySide6.QtCore import QObject, Signal
 from qtgql import qproperty
 from qtgql.codegen.py.bases import BaseGraphQLObject, BaseModel
-from qtgql.codegen.py.scalars import DateTimeScalar
+from qtgql.codegen.py.custom_scalars import DateTimeScalar
 
 
 class SCALARS:

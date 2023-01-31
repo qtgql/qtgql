@@ -1,6 +1,8 @@
-# Custom scalars
 
-### Intro
+# Create Your own custom scalar
+Although **QtGQL** provides some [frequently used scalars](./custom_scalars.md), you might have your own complex scalars.
+
+## Tutorial - Country scalar
 In order to deserialize a scalar for it to be compatible with Qt we created
 `BaseCustomScalar`. For example if you have a scalar of country code, you want to show the user a readable value.
 
@@ -38,6 +40,6 @@ assert CountryCode.from_graphql('isr').to_qt() == 'israel'
     QtGqlConfig(custom_scalars={CountryCode.GRAPHQL_NAME: CountryCode}, ...)
     ```
 
-### API
+## API
 
 ::: qtgql.codegen.py.scalars
