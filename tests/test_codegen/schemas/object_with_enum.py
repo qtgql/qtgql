@@ -1,12 +1,14 @@
 from datetime import datetime
-from enum import Enum
+from enum import Enum, auto
 
 import strawberry
 
 
 @strawberry.enum
 class Status(Enum):
-    Connected, Stale, Disconnected = range(3)
+    Connected = auto()
+    Stale = auto()
+    Disconnected = auto()
 
 
 @strawberry.type

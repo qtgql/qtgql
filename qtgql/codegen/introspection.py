@@ -117,7 +117,9 @@ class SchemaEvaluator:
         return concrete
 
     def _evaluate_enum(self, enum: dict) -> Optional[GqlEnumDefinition]:
-        name = enum["name"]
+        name: str = enum["name"]
+        if name.startswith("__"):
+            return
         if self._generated_enums.get(name, None):
             return
 
@@ -146,6 +148,7 @@ class SchemaEvaluator:
         """:return: The generated schema module as a string."""
         return self.template(
             TemplateContext(
+                enums=list(self._generated_enums.values()),
                 types=[
                     t
                     for name, t in self._generated_types.items()
