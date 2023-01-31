@@ -11,7 +11,7 @@ from qtgql.codegen.introspection import SchemaEvaluator, introspection_query
 from qtgql.codegen.py.bases import BaseModel, _BaseQGraphQLObject
 from qtgql.codegen.py.config import QtGqlConfig
 from qtgql.codegen.py.objecttype import GqlType
-from qtgql.codegen.py.scalars import BuiltinScalars, DateTimeScalar
+from qtgql.codegen.py.scalars import BaseCustomScalar, BuiltinScalars, DateTimeScalar, DecimalScalar
 from qtgql.typingref import TypeHinter
 from strawberry import Schema
 
@@ -132,19 +132,6 @@ ScalarsTestCase = QGQLObjectTestCase(
     test_name="ScalarsTestCase",
 )
 
-DateTimeTestCase = QGQLObjectTestCase(
-    schema=schemas.object_with_datetime.schema,
-    query="""
-        {
-          user {
-            name
-            age
-            birth
-          }
-        }
-        """,
-    test_name="DateTimeTestCase",
-)
 
 OptionalScalarTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_optional_scalar.schema,
@@ -266,6 +253,35 @@ ListOfUnionTestCase = QGQLObjectTestCase(
     test_name="ListOfUnionTestCase",
 )
 
+# custom scalars
+DateTimeTestCase = QGQLObjectTestCase(
+    schema=schemas.object_with_datetime.schema,
+    query="""
+        {
+          user {
+            name
+            age
+            birth
+          }
+        }
+        """,
+    test_name="DateTimeTestCase",
+)
+
+DecimalTestCase = QGQLObjectTestCase(
+    schema=schemas.object_with_decimal.schema,
+    query="""
+        {
+          user {
+            name
+            age
+            balance
+          }
+        }
+    """,
+    test_name="DateTimeTestCase",
+)
+
 all_test_cases = [
     ScalarsTestCase,
     DateTimeTestCase,
@@ -276,6 +292,11 @@ all_test_cases = [
     InterfaceTestCase,
     UnionTestCase,
     ListOfUnionTestCase,
+]
+
+custom_scalar_testcases = [
+    (DateTimeTestCase, DateTimeScalar, "birth"),
+    (DecimalTestCase, DecimalScalar, "balance"),
 ]
 
 
@@ -383,18 +404,6 @@ class TestDeserializers:
             v = getattr(inst, field.private_name)
             assert v == initialize_dict[field.name]
 
-    def test_datetime_scalar(self, qtbot):
-        testcase = DateTimeTestCase
-        testcase.compile()
-        klass = testcase.gql_type
-        initialize_dict = testcase.initialize_dict
-        inst = klass.from_dict(None, initialize_dict)
-        field = testcase.get_field_by_name("birth")
-        assert (
-            inst.property(field.name)
-            == DateTimeScalar.from_graphql(initialize_dict[field.name]).to_qt()
-        )
-
     def test_nested_object_from_dict(self, qtbot):
         testcase = NestedObjectTestCase
         testcase.compile()
@@ -419,6 +428,17 @@ class TestDeserializers:
         with InterfaceTestCase as testcase:
             inst = testcase.gql_type.from_dict(None, testcase.initialize_dict)
             assert inst.name
+
+    @pytest.mark.parametrize("testcase, scalar, fname", custom_scalar_testcases)
+    def test_custom_scalars(
+        self, testcase: QGQLObjectTestCase, scalar: BaseCustomScalar, fname: str
+    ):
+        testcase.compile()
+        klass = testcase.gql_type
+        initialize_dict = testcase.initialize_dict
+        inst = klass.from_dict(None, initialize_dict)
+        field = testcase.get_field_by_name(fname)
+        assert inst.property(field.name) == scalar.from_graphql(initialize_dict[field.name]).to_qt()
 
 
 # TODO: TestObjectWithListOfScalar

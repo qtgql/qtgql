@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import Decimal
 from typing import Any, Generic, Optional, Type, TypeVar
 
 T = TypeVar("T")
@@ -14,10 +15,12 @@ class BaseCustomScalar(Generic[T]):
     """The *real* GraphQL name of the scalar (used by the codegen inspection
     pipeline)."""
     DEFAULT_DESERIALIZED: Any = ""
-    """A place holder graphql query returned null or the field wasn't
-    queried."""
+    """A place holder graphql query returned null or the field wasn't queried.
 
-    def __init__(self, v: Optional[T] = None):
+    can be used by `from_graphql()`
+    """
+
+    def __init__(self, v: T):
         self._value = v
 
     @classmethod
@@ -38,7 +41,7 @@ class BaseCustomScalar(Generic[T]):
         raise NotImplementedError  # pragma: no cover
 
 
-class DateTimeScalar(BaseCustomScalar[datetime]):
+class DateTimeScalar(BaseCustomScalar[Optional[datetime]]):
     GRAPHQL_NAME: str = "DateTime"
     DEFAULT_DESERIALIZED = " --- "
 
@@ -47,7 +50,7 @@ class DateTimeScalar(BaseCustomScalar[datetime]):
         if v:
 
             return cls(datetime.fromisoformat(v))
-        return cls()
+        return cls(None)
 
     def to_qt(self) -> str:
         if self._value:
@@ -55,9 +58,26 @@ class DateTimeScalar(BaseCustomScalar[datetime]):
         return self.DEFAULT_DESERIALIZED
 
 
+class DecimalScalar(BaseCustomScalar[Decimal]):
+    GRAPHQL_NAME = "Decimal"
+    DEFAULT_DESERIALIZED = Decimal()
+
+    @classmethod
+    def from_graphql(cls, v: Optional[str] = None) -> "DecimalScalar":
+        if v:
+            return cls(Decimal(v))
+        return cls(cls.DEFAULT_DESERIALIZED)
+
+    def to_qt(self) -> str:
+        return str(self._value)
+
+
 CustomScalarMap = dict[str, Type[BaseCustomScalar]]
 
-CUSTOM_SCALARS: CustomScalarMap = {DateTimeScalar.GRAPHQL_NAME: DateTimeScalar}
+CUSTOM_SCALARS: CustomScalarMap = {
+    DateTimeScalar.GRAPHQL_NAME: DateTimeScalar,
+    DecimalScalar.GRAPHQL_NAME: DecimalScalar,
+}
 
 BuiltinScalars: dict[str, type] = {
     "Int": int,
