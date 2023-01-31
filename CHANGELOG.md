@@ -11,5 +11,3 @@ This release adds support for strawberry builtin scalars
 - UUID -  a [UUID](https://docs.python.org/3/library/uuid.html#uuid.UUID) value serialized as a string
 
 Contributed by [ניר](https://github.com/nrbnlulu) via [PR #44](https://github.com/nrbnlulu/qtgql/pull/44/)
-
-
