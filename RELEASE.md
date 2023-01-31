@@ -5,4 +5,3 @@ This release adds support for strawberry builtin scalars
 - Time - an ISO-8601 encoded [time](https://docs.python.org/3/library/datetime.html#time-objects)
 - Decimal- a [Decimal](https://docs.python.org/3/library/decimal.html#decimal.Decimal) value serialized as a string
 - UUID -  a [UUID](https://docs.python.org/3/library/uuid.html#uuid.UUID) value serialized as a string
-- VOID -  always null, maps to Python’s None

@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
-from datetime import date
+from datetime import date, datetime, time
 from decimal import Decimal
 from typing import Type
 
-from qtgql.codegen.py.custom_scalars import DateScalar, DecimalScalar
+from qtgql.codegen.py.custom_scalars import DateScalar, DecimalScalar, TimeScalar
 from qtgql.codegen.py.scalars import BaseCustomScalar
 
 
@@ -51,3 +51,17 @@ class TestDateScalar(AbstractScalarTestCase):
     def test_to_qt(self):
         scalar = DateScalar(date.today())
         assert scalar.to_qt() == date.today().isoformat()
+
+
+class TestTimeScalar(AbstractScalarTestCase):
+    scalar_klass = TimeScalar
+
+    def test_deserialize(self):
+        expected: time = datetime.now().time()
+        scalar = TimeScalar.from_graphql(expected.isoformat())
+        assert scalar._value == expected
+
+    def test_to_qt(self):
+        now = datetime.now().time()
+        scalar = TimeScalar(now)
+        assert scalar.to_qt() == now.isoformat()

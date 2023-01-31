@@ -5,7 +5,7 @@ from typing import Optional
 from PySide6.QtCore import QObject, Signal
 from qtgql import qproperty
 from qtgql.codegen.py.bases import BaseGraphQLObject, BaseModel
-from qtgql.codegen.py.custom_scalars import DateScalar, DateTimeScalar, DecimalScalar
+from qtgql.codegen.py.custom_scalars import DateScalar, DateTimeScalar, DecimalScalar, TimeScalar
 
 
 class SCALARS:
@@ -14,6 +14,8 @@ class SCALARS:
     DecimalScalar = DecimalScalar
 
     DateScalar = DateScalar
+
+    TimeScalar = TimeScalar
 
 
 class Query(BaseGraphQLObject):
