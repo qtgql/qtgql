@@ -12,7 +12,7 @@
 !!! success "Helpers"
     - [x] [generic models](./itemsystem/intro.md) that get created from dictionaries (with update, pop, insert implemented by default)
     - [x] [`Property` classes](./utilities.md#auto-property) that are accessible from QML, with dataclasses  syntax (using attrs)
-    - [x] `@slot` - decorator to be replaced with `QtCore.Slot()` that get types from type hints.
+    - [x] [`@slot`](utilities/#slot) - decorator to be replaced with `QtCore.Slot()` that get types from type hints.
 
 ## Installation
 

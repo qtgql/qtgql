@@ -49,6 +49,7 @@ nav:
       - Utils: ./utilities.md
   - Codegen:
       Tutorial: ./codegen/tutorial.md
+      Configurations: ./codegen/config.md
       Scalars:
         - Index: ./codegen/scalars/index.md
         - Custom Scalars: ./codegen/scalars/custom_scalars.md

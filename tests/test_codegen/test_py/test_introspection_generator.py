@@ -49,7 +49,7 @@ class QGQLObjectTestCase:
     def initialize_dict(self) -> dict:
         return self.schema.execute_sync(self.query).data["user"]
 
-    def compile(self) -> None:
+    def compile(self) -> "QGQLObjectTestCase":
         tmp_mod = ModuleType(uuid.uuid4().hex)
         type_name = self.type_name
         introspection = get_introspection_for(self.schema)
@@ -59,6 +59,7 @@ class QGQLObjectTestCase:
         exec(compiled, tmp_mod.__dict__)
         self.mod = tmp_mod
         self.tested_type = res._generated_types[type_name]
+        return self
 
     def get_field_by_type(self, t):
         for field in self.tested_type.fields:
