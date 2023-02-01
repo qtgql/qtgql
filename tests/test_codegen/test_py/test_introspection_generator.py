@@ -82,41 +82,6 @@ class QGQLObjectTestCase:
             if field_name == strawberry.utils.str_converters.to_camel_case(sf.name):
                 return sf
 
-    def __enter__(self):
-        self.compile()
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        ...
-
-
-class ObjectTestCaseMixin:
-    def test_property_setter_emits(self, qtbot):
-        compiled = self.compiled()
-        klass = getattr(compiled.mod, compiled.tested_type.name)
-        inst = klass.from_dict(None, self.initialize_dict)
-        for field in compiled.tested_type.fields:
-            signal = getattr(inst, field.signal_name)
-            v = self.initialize_dict[field.name]
-            with qtbot.wait_signal(signal):
-                if scalar := field.is_custom_scalar:
-                    setattr(inst, field.private_name, scalar.from_graphql(None))
-                else:
-                    setattr(inst, field.private_name, None)
-                assert not getattr(inst, field.name)
-                if scalar := field.is_custom_scalar:
-                    v = scalar.from_graphql(v)
-                getattr(inst, field.setter_name)(v)
-                if field.is_custom_scalar:
-                    assert getattr(inst, field.name) == v.to_qt()
-                else:
-                    assert getattr(inst, field.name) == v
-
-    def test_from_dict(self, qtbot):
-        compiled = self.compiled()
-        klass = getattr(compiled.mod, compiled.tested_type.name)
-        klass.from_dict(None, self.initialize_dict)
-
 
 ScalarsTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_scalar.schema,
@@ -412,6 +377,13 @@ class TestAnnotations:
         to_qt = TypeHinter.from_annotations(DateTimeScalar.to_qt.__annotations__["return"])
         assert testcase.get_field_by_name("birth").property_type == to_qt.stringify()
 
+    def test_enums(self):
+        testcase = EnumTestCase.compile()
+        enum_field = testcase.get_field_by_name("status")
+        assert enum_field.property_type == "int"
+        assert enum_field.fget_annotation == "int"
+        assert enum_field.annotation == "Status"
+
 
 class TestPropertyGetter:
     def default_test(self, testcase: QGQLObjectTestCase, field_name: str):
@@ -444,6 +416,12 @@ class TestPropertyGetter:
     def test_union(self, qtbot):
         self.default_test(UnionTestCase, "whoAmI")
 
+    def test_enum(self):
+        testcase = EnumTestCase.compile()
+        inst = testcase.gql_type.from_dict(None, data=testcase.initialize_dict)
+        f = testcase.get_field_by_name("status")
+        assert inst.property(f.name) == testcase.module.Status.Connected.value
+
 
 class TestDeserializers:
     def test_from_dict_scalars(self, qtbot):
@@ -466,20 +444,20 @@ class TestDeserializers:
 
     def test_nested_optional_object(self):
         # TODO: remove this when implementing *placeholders*
-        with OptionalNestedObjectTestCase as testcase:
-            inst = testcase.gql_type.from_dict(None, testcase.initialize_dict)
-            assert inst.person is None
+        testcase = OptionalNestedObjectTestCase.compile()
+        inst = testcase.gql_type.from_dict(None, testcase.initialize_dict)
+        assert inst.person is None
 
     def test_object_with_list_of_object(self):
-        with ObjectWithListOfObjectTestCase as testcase:
-            inst = testcase.gql_type.from_dict(None, testcase.initialize_dict)
-            assert isinstance(inst.persons, BaseModel)
-            assert inst.persons._data[0].name
+        testcase = ObjectWithListOfObjectTestCase.compile()
+        inst = testcase.gql_type.from_dict(None, testcase.initialize_dict)
+        assert isinstance(inst.persons, BaseModel)
+        assert inst.persons._data[0].name
 
     def test_object_with_interface(self):
-        with InterfaceTestCase as testcase:
-            inst = testcase.gql_type.from_dict(None, testcase.initialize_dict)
-            assert inst.name
+        testcase = InterfaceTestCase.compile()
+        inst = testcase.gql_type.from_dict(None, testcase.initialize_dict)
+        assert inst.name
 
     @pytest.mark.parametrize("testcase, scalar, fname", custom_scalar_testcases)
     def test_custom_scalars(
@@ -491,6 +469,12 @@ class TestDeserializers:
         inst = klass.from_dict(None, initialize_dict)
         field = testcase.get_field_by_name(fname)
         assert inst.property(field.name) == scalar.from_graphql(initialize_dict[field.name]).to_qt()
+
+    def test_enum(self):
+        testcase = EnumTestCase.compile()
+        inst = testcase.gql_type.from_dict(None, data=testcase.initialize_dict)
+        f = testcase.get_field_by_name("status")
+        assert getattr(inst, f.private_name) == testcase.module.Status.Connected
 
 
 # TODO: TestObjectWithListOfScalar

@@ -89,7 +89,7 @@ class User(BaseGraphQLObject):
             parent=parent,
             name=data.get("name", None),
             age=data.get("age", None),
-            status=Status(data.get("status", None)),
+            status=Status[data.get("status", 1)],
         )
 
     nameChanged = Signal()
@@ -119,7 +119,7 @@ class User(BaseGraphQLObject):
         self.statusChanged.emit()
 
     @qproperty(type=int, fset=status_setter, notify=statusChanged)
-    def status(self) -> Status:
+    def status(self) -> int:
         return self._status
 
 

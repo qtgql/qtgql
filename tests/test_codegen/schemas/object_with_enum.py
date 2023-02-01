@@ -1,4 +1,3 @@
-from datetime import datetime
 from enum import Enum, auto
 
 import strawberry
@@ -22,7 +21,7 @@ class User:
 class Query:
     @strawberry.field
     def user(self) -> User:
-        return User(name="Patrick", age=100, birth=datetime.now())
+        return User(name="Patrick", age=100)
 
 
 schema = strawberry.Schema(query=Query)

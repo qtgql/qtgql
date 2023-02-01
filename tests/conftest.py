@@ -58,7 +58,7 @@ T = TypeVar("T")
 
 
 @define(slots=False)
-class QmlTestCase:
+class QmlBot:
     bot: QtBot
     engine: QQmlApplicationEngine = field(factory=QQmlApplicationEngine)
 
@@ -89,4 +89,4 @@ class QmlTestCase:
 
 @pytest.fixture()
 def qmlloader(qtbot):
-    return QmlTestCase(qtbot)
+    return QmlBot(qtbot)

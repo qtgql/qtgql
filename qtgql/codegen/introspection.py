@@ -74,13 +74,17 @@ class SchemaEvaluator:
                 ret = TypeHinter(type=BuiltinScalars[name])
             except KeyError:
                 ret = TypeHinter(type=CUSTOM_SCALARS[name])
-        elif kind in (Kinds.OBJECT, Kinds.ENUM):
-            ret = TypeHinter(type=anti_forward_ref(name))
+        elif kind is Kinds.ENUM:
+            ret = TypeHinter(type=anti_forward_ref(name=name, type_map=self._generated_enums))
+        elif kind is Kinds.OBJECT:
+            ret = TypeHinter(type=anti_forward_ref(name=name, type_map=self._generated_types))
         elif kind == Kinds.UNION:
             ret = TypeHinter(
                 type=Union,
                 of_type=tuple(
-                    TypeHinter(type=anti_forward_ref(possible["name"]))
+                    TypeHinter(
+                        type=anti_forward_ref(name=possible["name"], type_map=self._generated_types)
+                    )
                     for possible in self.get_possible_types_for_union(name)
                 ),
             )

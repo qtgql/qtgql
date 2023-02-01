@@ -32,8 +32,6 @@ import QtGql 1.0 as GQL
 
 Rectangle {
     property int enumValue: GQL.Enums.%s
-    anchors.fill: parent
-    Text{text: "Fdsaf"}
 }
 """
         % status.name

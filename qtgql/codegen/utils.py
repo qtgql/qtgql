@@ -1,4 +1,4 @@
-from typing import Type
+from typing import Any, Type
 
 
 class AntiForwardRef:
@@ -9,7 +9,12 @@ class AntiForwardRef:
     """
 
     name: str
+    type_map: dict
+
+    @classmethod
+    def resolve(cls) -> Any:
+        return cls.type_map[cls.name]
 
 
-def anti_forward_ref(name: str) -> Type[AntiForwardRef]:
-    return type(name, (AntiForwardRef,), {"name": name})
+def anti_forward_ref(name: str, type_map: dict) -> Type[AntiForwardRef]:
+    return type(name, (AntiForwardRef,), {"name": name, "type_map": type_map})
