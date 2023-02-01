@@ -123,9 +123,9 @@ class SchemaEvaluator:
     def _evaluate_enum(self, enum: dict) -> Optional[GqlEnumDefinition]:
         name: str = enum["name"]
         if name.startswith("__"):
-            return
+            return None
         if self._generated_enums.get(name, None):
-            return
+            return None
 
         return GqlEnumDefinition(
             name=name,
