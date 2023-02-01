@@ -7,14 +7,15 @@ from qtgql import qproperty
 from qtgql.codegen.py.bases import BaseGraphQLObject, BaseModel
 from qtgql.codegen.py.custom_scalars import DateScalar, DateTimeScalar, DecimalScalar, TimeScalar
 
+QML_IMPORT_NAME = "QtGql"
+QML_IMPORT_MAJOR_VERSION = 1
+
 
 class SCALARS:
+
     DateTimeScalar = DateTimeScalar
-
     DecimalScalar = DecimalScalar
-
     DateScalar = DateScalar
-
     TimeScalar = TimeScalar
 
 

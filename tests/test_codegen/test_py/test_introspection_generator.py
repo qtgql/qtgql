@@ -11,7 +11,7 @@ from qtgql.codegen.introspection import SchemaEvaluator, introspection_query
 from qtgql.codegen.py.bases import BaseModel, _BaseQGraphQLObject
 from qtgql.codegen.py.config import QtGqlConfig
 from qtgql.codegen.py.custom_scalars import DateScalar, DateTimeScalar, DecimalScalar, TimeScalar
-from qtgql.codegen.py.objecttype import GqlType
+from qtgql.codegen.py.objecttype import GqlTypeDefinition
 from qtgql.codegen.py.scalars import BaseCustomScalar, BuiltinScalars
 from qtgql.typingref import TypeHinter
 from strawberry import Schema
@@ -33,7 +33,7 @@ class QGQLObjectTestCase:
     test_name: str
     type_name: str = "User"
     mod: Optional[ModuleType] = None
-    tested_type: Optional[GqlType] = None
+    tested_type: Optional[GqlTypeDefinition] = None
 
     @property
     def module(self) -> ModuleType:
@@ -49,7 +49,7 @@ class QGQLObjectTestCase:
     def initialize_dict(self) -> dict:
         return self.schema.execute_sync(self.query).data["user"]
 
-    def compile(self) -> None:
+    def compile(self) -> "QGQLObjectTestCase":
         tmp_mod = ModuleType(uuid.uuid4().hex)
         type_name = self.type_name
         introspection = get_introspection_for(self.schema)
@@ -59,6 +59,7 @@ class QGQLObjectTestCase:
         exec(compiled, tmp_mod.__dict__)
         self.mod = tmp_mod
         self.tested_type = res._generated_types[type_name]
+        return self
 
     def get_field_by_type(self, t):
         for field in self.tested_type.fields:
@@ -80,41 +81,6 @@ class QGQLObjectTestCase:
         for sf in stawberry_definition.fields:
             if field_name == strawberry.utils.str_converters.to_camel_case(sf.name):
                 return sf
-
-    def __enter__(self):
-        self.compile()
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        ...
-
-
-class ObjectTestCaseMixin:
-    def test_property_setter_emits(self, qtbot):
-        compiled = self.compiled()
-        klass = getattr(compiled.mod, compiled.tested_type.name)
-        inst = klass.from_dict(None, self.initialize_dict)
-        for field in compiled.tested_type.fields:
-            signal = getattr(inst, field.signal_name)
-            v = self.initialize_dict[field.name]
-            with qtbot.wait_signal(signal):
-                if scalar := field.is_custom_scalar:
-                    setattr(inst, field.private_name, scalar.from_graphql(None))
-                else:
-                    setattr(inst, field.private_name, None)
-                assert not getattr(inst, field.name)
-                if scalar := field.is_custom_scalar:
-                    v = scalar.from_graphql(v)
-                getattr(inst, field.setter_name)(v)
-                if field.is_custom_scalar:
-                    assert getattr(inst, field.name) == v.to_qt()
-                else:
-                    assert getattr(inst, field.name) == v
-
-    def test_from_dict(self, qtbot):
-        compiled = self.compiled()
-        klass = getattr(compiled.mod, compiled.tested_type.name)
-        klass.from_dict(None, self.initialize_dict)
 
 
 ScalarsTestCase = QGQLObjectTestCase(
@@ -255,6 +221,21 @@ ListOfUnionTestCase = QGQLObjectTestCase(
     test_name="ListOfUnionTestCase",
 )
 
+EnumTestCase = QGQLObjectTestCase(
+    schema=schemas.object_with_enum.schema,
+    query="""
+        {
+          user {
+            name
+            age
+            status
+          }
+        }
+        """,
+    test_name="EnumTestCase",
+)
+
+
 # custom scalars
 DateTimeTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_datetime.schema,
@@ -325,6 +306,7 @@ all_test_cases = [
     UnionTestCase,
     ListOfUnionTestCase,
     TimeTestCase,
+    EnumTestCase,
 ]
 
 custom_scalar_testcases = [
@@ -395,6 +377,13 @@ class TestAnnotations:
         to_qt = TypeHinter.from_annotations(DateTimeScalar.to_qt.__annotations__["return"])
         assert testcase.get_field_by_name("birth").property_type == to_qt.stringify()
 
+    def test_enums(self):
+        testcase = EnumTestCase.compile()
+        enum_field = testcase.get_field_by_name("status")
+        assert enum_field.property_type == "int"
+        assert enum_field.fget_annotation == "int"
+        assert enum_field.annotation == "Status"
+
 
 class TestPropertyGetter:
     def default_test(self, testcase: QGQLObjectTestCase, field_name: str):
@@ -427,6 +416,12 @@ class TestPropertyGetter:
     def test_union(self, qtbot):
         self.default_test(UnionTestCase, "whoAmI")
 
+    def test_enum(self):
+        testcase = EnumTestCase.compile()
+        inst = testcase.gql_type.from_dict(None, data=testcase.initialize_dict)
+        f = testcase.get_field_by_name("status")
+        assert inst.property(f.name) == testcase.module.Status.Connected.value
+
 
 class TestDeserializers:
     def test_from_dict_scalars(self, qtbot):
@@ -449,20 +444,20 @@ class TestDeserializers:
 
     def test_nested_optional_object(self):
         # TODO: remove this when implementing *placeholders*
-        with OptionalNestedObjectTestCase as testcase:
-            inst = testcase.gql_type.from_dict(None, testcase.initialize_dict)
-            assert inst.person is None
+        testcase = OptionalNestedObjectTestCase.compile()
+        inst = testcase.gql_type.from_dict(None, testcase.initialize_dict)
+        assert inst.person is None
 
     def test_object_with_list_of_object(self):
-        with ObjectWithListOfObjectTestCase as testcase:
-            inst = testcase.gql_type.from_dict(None, testcase.initialize_dict)
-            assert isinstance(inst.persons, BaseModel)
-            assert inst.persons._data[0].name
+        testcase = ObjectWithListOfObjectTestCase.compile()
+        inst = testcase.gql_type.from_dict(None, testcase.initialize_dict)
+        assert isinstance(inst.persons, BaseModel)
+        assert inst.persons._data[0].name
 
     def test_object_with_interface(self):
-        with InterfaceTestCase as testcase:
-            inst = testcase.gql_type.from_dict(None, testcase.initialize_dict)
-            assert inst.name
+        testcase = InterfaceTestCase.compile()
+        inst = testcase.gql_type.from_dict(None, testcase.initialize_dict)
+        assert inst.name
 
     @pytest.mark.parametrize("testcase, scalar, fname", custom_scalar_testcases)
     def test_custom_scalars(
@@ -474,6 +469,12 @@ class TestDeserializers:
         inst = klass.from_dict(None, initialize_dict)
         field = testcase.get_field_by_name(fname)
         assert inst.property(field.name) == scalar.from_graphql(initialize_dict[field.name]).to_qt()
+
+    def test_enum(self):
+        testcase = EnumTestCase.compile()
+        inst = testcase.gql_type.from_dict(None, data=testcase.initialize_dict)
+        f = testcase.get_field_by_name("status")
+        assert getattr(inst, f.private_name) == testcase.module.Status.Connected
 
 
 # TODO: TestObjectWithListOfScalar

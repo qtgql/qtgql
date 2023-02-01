@@ -12,6 +12,11 @@ from qtgql.codegen.py.custom_scalars import CUSTOM_SCALARS, CustomScalarMap
 
 @define
 class QtGqlConfig:
+    """Encapsulates configurations for a qtgql-codegen application.
+
+    :arg url:
+    """
+
     url: str
     output: Path
     """full path for the generated output file."""
@@ -23,6 +28,8 @@ class QtGqlConfig:
     """jinja template."""
     base_object: Type[_BaseQGraphQLObject] = BaseGraphQLObject
     """base object to be extended by all generated types."""
+    qml_import_name: str = "QtGql"
+    """Enums would exist in this namespace."""
 
     def fetch(self) -> None:
         res = requests.post(self.url, json={"query": introspection_query})

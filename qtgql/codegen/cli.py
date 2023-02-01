@@ -23,7 +23,6 @@ def _find_pyproject(p: Path) -> Optional[Path]:
         return pp
     for parent in p.parents:  # pragma: no cover
         return _find_pyproject(parent)
-    return None
 
 
 def _get_app_import_path(root: Path = Path.cwd()) -> str:

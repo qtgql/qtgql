@@ -49,6 +49,7 @@ nav:
       - Utils: ./utilities.md
   - Codegen:
       Tutorial: ./codegen/tutorial.md
+      Configurations: ./codegen/config.md
       Scalars:
         - Index: ./codegen/scalars/index.md
         - Custom Scalars: ./codegen/scalars/custom_scalars.md
@@ -56,6 +57,9 @@ nav:
   - ItemSystem:
       Intro: ./itemsystem/intro.md
 markdown_extensions:
+  - def_list
+  - pymdownx.tasklist:
+      custom_checkbox: true
   - attr_list
   - md_in_html
   - pymdownx.highlight:

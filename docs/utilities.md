@@ -1,22 +1,50 @@
 ## Utilities
 general helpers for ease of development.
 
+### slot
+Creates a [slot](https://doc.qt.io/qt-6/signalsandslots.html) out of type annotation.
+
+```python
+from qtgql import slot
+from PySide6.QtCore import QObject
+
+
+class Foo(QObject):
+    def __init__(self):
+        super().__init__(None)
+        self.data: str = 'foo'
+
+    @slot
+    def set_data_from_qml(self, text: str) -> None:
+        """
+        This is reachable from QML!
+        """
+        self.data = text
+
+
+foo = Foo()
+foo.set_data_from_qml('bar')
+assert foo.data == 'bar'
+```
+::: slot.slot
+
 ### Auto-property
+Create [Properties](https://doc.qt.io/qt-6/qproperty.html) with a dataclass syntax
 
-::: autoproperty.define_properties
+Example:
+```python
+from qtgql.autoproperty import define_properties
 
- Example:
- ```python
- from qtgql.autoproperty import define_properties
-
- @define_properties
- class Apple:
+@define_properties
+class Apple:
     color: str
     size: int
 
- apple = Apple(color="red", size=92)
- apple_as_qt: Apple = apple.properties
- assert apple_as_qt.color == apple.color
- apple.color = "green"
- assert apple_as_qt.color == "green"
- ```
+apple = Apple(color="red", size=92)
+apple_as_qt: Apple = apple.properties
+assert apple_as_qt.color == apple.color
+apple.color = "green"
+assert apple_as_qt.color == "green"
+```
+
+::: autoproperty.define_properties
