@@ -8,7 +8,7 @@
 
 
 ### Disclaimer
-This project is currently under development and **it is not** production ready,
+This project is currently under development, and **it is not** production ready,
 You can play-around and tell us what is wrong / missing / awesome :smile:.
 
 

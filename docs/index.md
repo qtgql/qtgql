@@ -1,7 +1,7 @@
 # QtGQL
 
 ![Logo](./assets/logo.svg){ align=center width=350}
-*GrahpQL client from Qt and QML.*
+*GraphQL client for Qt and QML.*
 ## Features
 !!! success "[Codegen (introspection compiler)](./codegen/tutorial.md)"
     - [x] object types, for each field there is a corresponding `Property`
