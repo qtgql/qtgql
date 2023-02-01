@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+0.104.0 - 2023-02-01
+--------------------
+
+This release adds basic support for graphql enums.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #57](https://github.com/nrbnlulu/qtgql/pull/57/)
+
+
 0.103.0 - 2023-01-31
 --------------------
 
