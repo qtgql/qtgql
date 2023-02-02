@@ -12,6 +12,7 @@ from . import (
     object_with_scalar,
     object_with_time_scalar,
     object_with_union,
+    object_with_user_defined_scalar,
 )
 
 __all__ = [
@@ -28,4 +29,5 @@ __all__ = [
     object_with_date,
     object_with_time_scalar,
     object_with_enum,
+    object_with_user_defined_scalar,
 ]

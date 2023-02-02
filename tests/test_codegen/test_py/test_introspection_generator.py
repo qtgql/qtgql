@@ -1,12 +1,12 @@
 import typing
 import uuid
-from datetime import datetime
 from types import ModuleType
 from typing import Optional
 
+import attrs
 import pytest
 import strawberry.utils.str_converters
-from attr import define
+from attrs import define
 from qtgql.codegen.introspection import SchemaEvaluator, introspection_query
 from qtgql.codegen.py.bases import BaseModel, _BaseQGraphQLObject
 from qtgql.codegen.py.config import QtGqlConfig
@@ -34,6 +34,7 @@ class QGQLObjectTestCase:
     type_name: str = "User"
     mod: Optional[ModuleType] = None
     tested_type: Optional[GqlTypeDefinition] = None
+    config: QtGqlConfig = attrs.field(factory=lambda: QtGqlConfig(url=None, output=None))
 
     @property
     def module(self) -> ModuleType:
@@ -53,7 +54,7 @@ class QGQLObjectTestCase:
         tmp_mod = ModuleType(uuid.uuid4().hex)
         type_name = self.type_name
         introspection = get_introspection_for(self.schema)
-        res = SchemaEvaluator(introspection, config=QtGqlConfig(url=None, output=None))
+        res = SchemaEvaluator(introspection, config=self.config)
         generated = res.generate()
         compiled = compile(generated, "schema", "exec")
         exec(compiled, tmp_mod.__dict__)
@@ -293,6 +294,38 @@ TimeTestCase = QGQLObjectTestCase(
     test_name="TimeTestCase",
 )
 
+
+class CountryScalar(BaseCustomScalar[Optional[str]]):
+    countrymap = schemas.object_with_user_defined_scalar.countrymap
+    GRAPHQL_NAME = "Country"
+
+    @classmethod
+    def from_graphql(cls, v: Optional[str] = None) -> "BaseCustomScalar":
+        if v:
+            return cls(v)
+        return cls(None)
+
+    def to_qt(self) -> str:
+        return self._value or self.DEFAULT_DESERIALIZED
+
+
+CustomUserScalarTestCase = QGQLObjectTestCase(
+    schema=schemas.object_with_user_defined_scalar.schema,
+    config=QtGqlConfig(
+        url=None, output=None, custom_scalars={CountryScalar.GRAPHQL_NAME: CountryScalar}
+    ),
+    test_name="CustomUserScalarTestCase",
+    query="""
+            {
+          user {
+            name
+            age
+            country
+          }
+        }
+    """,
+)
+
 all_test_cases = [
     ScalarsTestCase,
     DateTimeTestCase,
@@ -307,6 +340,7 @@ all_test_cases = [
     ListOfUnionTestCase,
     TimeTestCase,
     EnumTestCase,
+    CustomUserScalarTestCase,
 ]
 
 custom_scalar_testcases = [
@@ -314,6 +348,7 @@ custom_scalar_testcases = [
     (DateTestCase, DateScalar, "birth"),
     (DecimalTestCase, DecimalScalar, "balance"),
     (TimeTestCase, TimeScalar, "whatTimeIsIt"),
+    (CustomUserScalarTestCase, CountryScalar, "country"),
 ]
 
 
@@ -345,22 +380,22 @@ class TestAnnotations:
             ).as_annotation()
         )
 
-    def test_custom_scalar(self):
-        DateTimeTestCase.compile()
-        field = DateTimeTestCase.get_field_by_type(DateTimeScalar)
+    @pytest.mark.parametrize("testcase, scalar, fname", custom_scalar_testcases)
+    def test_custom_scalars(
+        self, testcase: QGQLObjectTestCase, scalar: typing.Type[BaseCustomScalar], fname
+    ):
+        testcase.compile()
+        field = testcase.get_field_by_type(scalar)
         assert field, f"field {field} not found"
-        klass = DateTimeTestCase.gql_type
-        sf = DateTimeTestCase.strawberry_field_by_name(field.name)
-        assert sf
-        assert sf.type == datetime
-        assert field.annotation == f"SCALARS.{DateTimeScalar.__name__}"
+        klass = testcase.gql_type
+        assert field.annotation == f"SCALARS.{scalar.__name__}"
         assert getattr(klass, field.setter_name).__annotations__["v"] == field.annotation
         assert getattr(klass, field.name).fget.__annotations__["return"] == field.fget_annotation
         assert (
             TypeHinter.from_string(
                 field.fget_annotation, ns={"Optional": typing.Optional}
             ).as_annotation()
-            == DateTimeScalar.to_qt.__annotations__["return"]
+            == scalar.to_qt.__annotations__["return"]
         )
 
     def test_list_of(self):
