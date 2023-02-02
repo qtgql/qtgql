@@ -6,20 +6,6 @@ from PySide6 import QtCore as qtc
 from qtgql.typingref import TypeHinter
 
 
-def get_optional_args(annotations: list[TypeHinter]) -> list[TypeHinter]:
-    return [arg.of_type[0] for arg in annotations if arg.is_optional()]
-
-
-def get_concretes(annotations: list[TypeHinter]) -> list[TypeHinter]:
-    ret = []
-    for item in annotations:
-        annotations.remove(item)
-        if item.is_optional():
-            continue
-        ret.append(item)
-    return ret + annotations
-
-
 def get_combos(stripped_optionals: list[TypeHinter], concretes: list[TypeHinter]):
     required_annotations = tuple([th.type for th in concretes])
     combos = []
@@ -36,8 +22,8 @@ def slot(func):
         if return_ is Any:
             return_ = "QVariant"
         args = [TypeHinter.from_annotations(th) for th in anots.values()]
-        stripped_optionals = get_concretes(get_optional_args(args))
-        concretes = get_concretes(args)
+        stripped_optionals = [th.of_type[0] for th in args if th.is_optional()]
+        concretes = [th for th in args if not th.is_optional()]
 
         if stripped_optionals:
             combos = get_combos(stripped_optionals, concretes)
