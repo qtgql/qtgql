@@ -3,6 +3,7 @@ from typing import Any, List, Optional, Type, Union, get_args, get_origin
 
 from attrs import define
 
+
 class UnsetType:
     __instance: Optional["UnsetType"] = None
 

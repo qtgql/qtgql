@@ -9,6 +9,7 @@ from qtgql.typingref import TypeHinter
 def get_optional_args(annotations: list[TypeHinter]) -> list[TypeHinter]:
     return [arg.of_type[0] for arg in annotations if arg.is_optional()]
 
+
 def get_concretes(annotations: list[TypeHinter]) -> list[TypeHinter]:
     ret = []
     for item in annotations:
@@ -17,6 +18,7 @@ def get_concretes(annotations: list[TypeHinter]) -> list[TypeHinter]:
             continue
         ret.append(item)
     return ret + annotations
+
 
 def get_combos(stripped_optionals: list[TypeHinter], concretes: list[TypeHinter]):
     required_annotations = tuple([th.type for th in concretes])
