@@ -3,11 +3,6 @@ from typing import Any, List, Optional, Type, Union, get_args, get_origin
 
 from attrs import define
 
-
-def is_optional(field) -> bool:
-    return get_origin(field) is Union and type(None) in get_args(field)
-
-
 class UnsetType:
     __instance: Optional["UnsetType"] = None
 

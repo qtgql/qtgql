@@ -1,29 +1,30 @@
 import itertools
-from typing import Any, Optional, get_args
+from typing import Any
 
 from PySide6 import QtCore as qtc
 
-from qtgql.typingref import is_optional
+from qtgql.typingref import TypeHinter
 
 
-def get_optional_args(annotations: list[Any]) -> list[Any]:
-    return [get_args(arg)[0] for arg in annotations if is_optional(arg)]
+def get_optional_args(annotations: list[TypeHinter]) -> list[TypeHinter]:
+    return [arg.of_type[0] for arg in annotations if arg.is_optional()]
 
-
-def get_concrete(annotation: Any) -> Optional[type]:
-    return getattr(annotation, "__origin__", None)
-
-
-def get_concretes(annotations: list) -> list:
+def get_concretes(annotations: list[TypeHinter]) -> list[TypeHinter]:
     ret = []
     for item in annotations:
-        if is_optional(item):
-            annotations.remove(item)
+        annotations.remove(item)
+        if item.is_optional():
             continue
-        if concrete := get_concrete(item):
-            ret.append(concrete)
-            annotations.remove(item)
+        ret.append(item)
     return ret + annotations
+
+def get_combos(stripped_optionals: list[TypeHinter], concretes: list[TypeHinter]):
+    required_annotations = tuple([th.type for th in concretes])
+    combos = []
+    for i in range(len(stripped_optionals) + 1):
+        for subset in itertools.combinations([th.type for th in stripped_optionals], i):
+            combos.append(subset + required_annotations)
+    return combos
 
 
 def slot(func):
@@ -32,21 +33,17 @@ def slot(func):
         return_ = anots.pop("return", None)
         if return_ is Any:
             return_ = "QVariant"
-        args = list(anots.values())
+        args = [TypeHinter.from_annotations(th) for th in anots.values()]
         stripped_optionals = get_concretes(get_optional_args(args))
         concretes = get_concretes(args)
 
         if stripped_optionals:
-            required_annotations = tuple(concretes)
-            combos = []
-            for i in range(len(stripped_optionals) + 1):
-                for subset in itertools.combinations(stripped_optionals, i):
-                    combos.append(subset)
+            combos = get_combos(stripped_optionals, concretes)
             for combo in combos:
-                func = qtc.Slot(*combo + required_annotations, result=return_)(func)
-
+                func = qtc.Slot(*combo, result=return_)(func)
             return func
 
+        concretes = [th.type for th in concretes]
         return qtc.Slot(*concretes, result=return_)(func)
 
     return wrapper(func)
