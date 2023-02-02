@@ -311,8 +311,10 @@ class CountryScalar(BaseCustomScalar[Optional[str]]):
 
 
 CustomUserScalarTestCase = QGQLObjectTestCase(
-    schema=schemas.object_with_user_defined_scalar,
-    config=QtGqlConfig(url=None, output=None),
+    schema=schemas.object_with_user_defined_scalar.schema,
+    config=QtGqlConfig(
+        url=None, output=None, custom_scalars={CountryScalar.GRAPHQL_NAME: CountryScalar}
+    ),
     test_name="CustomUserScalarTestCase",
     query="""
             {
