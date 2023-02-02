@@ -126,10 +126,7 @@ class FieldProperty:
                 # QEnum value must be int
                 return "int"
             # might be a model, which is also QObject
-            if self.is_model:
-                ensure(self.type.of_type[0].type.resolve(), GqlTypeDefinition)
-            else:
-                assert self.is_object_type
+            assert self.is_model or self.is_object_type
             return "QObject"
 
     @cached_property
@@ -157,13 +154,22 @@ class FieldProperty:
             t = self.type.of_type[0].type
         with contextlib.suppress(TypeError):
             if issubclass(t, AntiForwardRef):
-                return t.resolve()
+                ret = t.resolve()
+                if isinstance(ret, GqlTypeDefinition):
+                    return ret
 
     @cached_property
-    def is_model(self) -> bool:
-        if self.type.is_optional():
-            return self.type.of_type[0].is_list()
-        return self.type.is_list()
+    def is_model(self) -> Optional[GqlTypeDefinition]:
+        th = self.type
+        if th.is_optional():
+            th = th.of_type[0]
+        if th.is_list():
+            th = th.of_type[0]
+        with contextlib.suppress(TypeError):
+            if issubclass(th.type, AntiForwardRef):
+                ret = th.type.resolve()
+                if isinstance(ret, GqlTypeDefinition):
+                    return ret
 
     @cached_property
     def is_scalar(self) -> bool:
@@ -205,7 +211,7 @@ class GqlTypeDefinition:
 
     @cached_property
     def model_name(self) -> str:
-        return self.name + "Model__"
+        return "Q" + self.name + "Model"
 
 
 @define

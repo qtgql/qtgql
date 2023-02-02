@@ -133,3 +133,5 @@ dmypy.json
 
 # cached files
 *~
+#codegen
+__temp.py
