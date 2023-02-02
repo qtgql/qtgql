@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+0.104.1 - 2023-02-02
+--------------------
+
+This release fixes [issue #58](https://github.com/nrbnlulu/qtgql/issues/58)
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #60](https://github.com/nrbnlulu/qtgql/pull/60/)
+
+
 0.104.0 - 2023-02-01
 --------------------
 
