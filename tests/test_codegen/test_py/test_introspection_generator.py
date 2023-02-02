@@ -404,7 +404,7 @@ class TestAnnotations:
         field = testcase.get_field_by_name("persons")
         sf = testcase.strawberry_field_by_name(field.name)
         assert field.annotation == sf.type_annotation.annotation
-        assert field.fget_annotation == "PersonModel"
+        assert field.fget_annotation == field.type.of_type[0].type.resolve().model_name
 
     def test_custom_scalar_property_type_is_to_qt_return_annotation(self):
         testcase = DateTimeTestCase
