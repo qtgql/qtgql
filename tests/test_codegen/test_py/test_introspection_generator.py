@@ -1,6 +1,5 @@
 import typing
 import uuid
-from datetime import datetime
 from types import ModuleType
 from typing import Optional
 
@@ -349,6 +348,7 @@ custom_scalar_testcases = [
     (DateTestCase, DateScalar, "birth"),
     (DecimalTestCase, DecimalScalar, "balance"),
     (TimeTestCase, TimeScalar, "whatTimeIsIt"),
+    (CustomUserScalarTestCase, CountryScalar, "country"),
 ]
 
 
@@ -380,26 +380,23 @@ class TestAnnotations:
             ).as_annotation()
         )
 
-    def test_custom_scalar(self):
-        DateTimeTestCase.compile()
-        field = DateTimeTestCase.get_field_by_type(DateTimeScalar)
+    @pytest.mark.parametrize("testcase, scalar, fname", custom_scalar_testcases)
+    def test_custom_scalars(
+        self, testcase: QGQLObjectTestCase, scalar: typing.Type[BaseCustomScalar], fname
+    ):
+        testcase.compile()
+        field = testcase.get_field_by_type(scalar)
         assert field, f"field {field} not found"
-        klass = DateTimeTestCase.gql_type
-        sf = DateTimeTestCase.strawberry_field_by_name(field.name)
-        assert sf
-        assert sf.type == datetime
-        assert field.annotation == f"SCALARS.{DateTimeScalar.__name__}"
+        klass = testcase.gql_type
+        assert field.annotation == f"SCALARS.{scalar.__name__}"
         assert getattr(klass, field.setter_name).__annotations__["v"] == field.annotation
         assert getattr(klass, field.name).fget.__annotations__["return"] == field.fget_annotation
         assert (
             TypeHinter.from_string(
                 field.fget_annotation, ns={"Optional": typing.Optional}
             ).as_annotation()
-            == DateTimeScalar.to_qt.__annotations__["return"]
+            == scalar.to_qt.__annotations__["return"]
         )
-
-    def test_user_defined_scalar(self):
-        raise NotImplementedError
 
     def test_list_of(self):
         testcase = ObjectWithListOfObjectTestCase

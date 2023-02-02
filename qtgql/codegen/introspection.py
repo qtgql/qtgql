@@ -7,7 +7,6 @@ from typing import TYPE_CHECKING, Optional, Union
 import graphql
 
 from qtgql.codegen.py.compiler import TemplateContext
-from qtgql.codegen.py.custom_scalars import CUSTOM_SCALARS
 from qtgql.codegen.py.objecttype import (
     EnumMap,
     EnumValue,
@@ -73,7 +72,7 @@ class SchemaEvaluator:
             try:
                 ret = TypeHinter(type=BuiltinScalars[name])
             except KeyError:
-                ret = TypeHinter(type=CUSTOM_SCALARS[name])
+                ret = TypeHinter(type=self.config.custom_scalars[name])
         elif kind is Kinds.ENUM:
             ret = TypeHinter(type=anti_forward_ref(name=name, type_map=self._generated_enums))
         elif kind is Kinds.OBJECT:
