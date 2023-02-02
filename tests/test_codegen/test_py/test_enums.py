@@ -1,4 +1,5 @@
 from enum import Enum
+from textwrap import dedent
 
 import pytest
 from PySide6.QtCore import QObject
@@ -25,15 +26,15 @@ def test_generates_qobject_class_with_all_the_enums():
 
 @pytest.mark.parametrize("status", iter(object_with_enum.Status))
 def test_accessible_from_qml(qmlloader, status):
-    qml = (
+    qml = dedent(
         """
-import QtQuick
-import QtGql 1.0 as GQL
+        import QtQuick
+        import QtGql 1.0 as GQL
 
-Rectangle {
-    property int enumValue: GQL.Enums.%s
-}
-"""
+        Rectangle {
+            property int enumValue: GQL.Enums.%s
+        }
+        """
         % status.name
     )
 
