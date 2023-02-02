@@ -1,16 +1,22 @@
 import socket
 import subprocess
 import time
-from dataclasses import dataclass
 from pathlib import Path
+from typing import TypeVar
 
 import pytest
+from attr import field
+from attrs import define
 from faker import Faker
+from PySide6.QtCore import QUrl
+from PySide6.QtQml import QQmlApplicationEngine, QQmlComponent
+from PySide6.QtQuick import QQuickItem
+from pytestqt.qtbot import QtBot
 
 fake = Faker()
 
 
-@dataclass
+@define
 class MiniServer:
     process: subprocess.Popen
     address: str
@@ -46,3 +52,41 @@ def mini_server() -> MiniServer:
     yield ms
     if p.poll() is None:
         p.terminate()
+
+
+T = TypeVar("T")
+
+
+@define(slots=False)
+class QmlBot:
+    bot: QtBot
+    engine: QQmlApplicationEngine = field(factory=QQmlApplicationEngine)
+
+    def __attrs_post_init__(self):
+        main = Path(__file__).parent / "qmltester.qml"
+        self.engine.load(main.resolve(True))
+
+    @property
+    def _loader(self) -> QQuickItem:
+        self.root = self.engine.rootObjects()[0]
+        return self.root.findChild(QQuickItem, "contentloader")
+
+    def load(self, path: Path) -> QQuickItem:
+        self.bot.wait(100)
+        self._loader.setProperty("source", str(path.resolve(True)))
+        return self._loader.property("item")
+
+    def loads(self, content: str) -> QQuickItem:
+        self.comp = QQmlComponent(self.engine)
+        self.comp.setData(content.encode("utf-8"), QUrl())
+        self._loader.setProperty("source", "")
+        self._loader.setProperty("sourceComponent", self.comp)
+        return self._loader.property("item")
+
+    def find(self, objectname: str, type: T = QQuickItem) -> T:
+        return self.window.findChild(type, objectname)
+
+
+@pytest.fixture()
+def qmlloader(qtbot):
+    return QmlBot(qtbot)

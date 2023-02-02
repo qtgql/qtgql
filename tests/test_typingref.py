@@ -1,7 +1,7 @@
 from typing import Generic, List, Optional, TypeVar, Union, get_args, get_origin
 
 import pytest
-from qtgql.typingref import UNSET, TypeHinter, UnsetType
+from qtgql.typingref import UNSET, TypeHinter, UnsetType, ensure
 
 
 class TestFromAnnotation:
@@ -145,3 +145,13 @@ class TestStringify:
     )
     def test_containers(self, expected):
         assert TypeHinter.from_string(expected, {}).stringify() in (expected, expected.lower())
+
+
+def test_ensure_success():
+    hello = "hello"
+    assert ensure(hello, str) == hello
+
+
+def test_ensure_fails():
+    with pytest.raises(TypeError):
+        ensure("hello", int)

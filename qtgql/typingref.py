@@ -1,5 +1,5 @@
 import inspect
-from typing import Any, List, Optional, Type, Union, get_args, get_origin
+from typing import Any, List, Optional, Type, TypeVar, Union, get_args, get_origin
 
 from attrs import define
 
@@ -97,3 +97,12 @@ class TypeHinter:
 
     def is_list(self) -> bool:
         return self.type in (list, List)
+
+
+T = TypeVar("T")
+
+
+def ensure(inst: T, tp: Type[T]) -> T:
+    if not isinstance(inst, tp):
+        raise TypeError(f"{inst} is not of type {tp}")
+    return inst

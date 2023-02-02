@@ -1,3 +1,4 @@
+import contextlib
 import enum
 from functools import cached_property
 from typing import List, Optional, Type, Union
@@ -8,7 +9,7 @@ from qtgql.codegen.py.bases import _BaseQGraphQLObject
 from qtgql.codegen.py.custom_scalars import CustomScalarMap
 from qtgql.codegen.py.scalars import BaseCustomScalar, BuiltinScalars
 from qtgql.codegen.utils import AntiForwardRef
-from qtgql.typingref import TypeHinter
+from qtgql.typingref import TypeHinter, ensure
 
 
 class Kinds(enum.Enum):
@@ -18,19 +19,16 @@ class Kinds(enum.Enum):
     LIST = "LIST"
     UNION = "UNION"
     NON_NULL = "NON_NULL"
-
-    def __getitem__(self, item):
-        for f in Kinds:
-            if f.name == item:
-                return item
-        raise KeyError(item, "is a wrong kind")
+    INTERFACE = "INTERFACE"
+    INPUT_OBJECT = "INPUT_OBJECT"
 
 
 @define(slots=False)
 class FieldProperty:
     name: str
     type: TypeHinter
-    type_map: dict[str, "GqlType"]
+    type_map: dict[str, "GqlTypeDefinition"]
+    enums: "EnumMap"
     scalars: CustomScalarMap
     description: Optional[str] = ""
 
@@ -54,24 +52,29 @@ class FieldProperty:
             inner = type_hinter.of_type[0].type
             # handle inner type
             assert issubclass(inner, AntiForwardRef)
-            gql_type = self.type_map[inner.name]
+            # enums are not supported in lists yet (valid graphql spec though)
+            gql_type = ensure(inner.resolve(), GqlTypeDefinition)
+            assert gql_type
             return f"cls.{_BaseQGraphQLObject.deserialize_list_of.__name__}(parent, data, {gql_type.model_name}, '{self.name}', {gql_type.name})"
         if t is Union:
             return (
                 f"cls.{_BaseQGraphQLObject.deserialize_union.__name__}(parent, data, '{self.name}')"
             )
-        # handle inner type
+        # handle inner type if it was optional above
         assert issubclass(t, AntiForwardRef)
-        if t.name in self.type_map.keys():
+        # graphql object
+        if isinstance(t.resolve(), GqlTypeDefinition):
             return f"cls.{_BaseQGraphQLObject.deserialize_optional_child.__name__}(parent, data, {t.name}, '{self.name}')"
+        elif isinstance(t.resolve(), GqlEnumDefinition):
+            return f"{t.name}[data.get('{self.name}', 1)]"  # graphql enums evaluates to string of the name.
         raise NotImplementedError  # pragma: no cover
 
     @cached_property
     def annotation(self) -> str:
         """
         :returns: Annotation of the field based on the real type,
-         meaning that the private attribute would be of that type.
-         this goes for init and the property setter.
+        meaning that the private attribute would be of that type.
+        this goes for init and the property setter.
         """
         ret = self.type.as_annotation()
         # int, str, float etc...
@@ -80,7 +83,8 @@ class FieldProperty:
 
         if scalar := self.is_custom_scalar:
             return f"SCALARS.{scalar.__name__}"
-
+        if gql_enum := self.is_enum:
+            return gql_enum.name
         # handle Optional, Union, List etc...
         # removing redundant prefixes.
         return TypeHinter.from_annotations(ret).stringify()
@@ -98,6 +102,9 @@ class FieldProperty:
             return TypeHinter.from_annotations(scalar.to_qt.__annotations__["return"]).stringify()
         if ret.is_list():
             return self.type_map[ret.of_type[0].type.name].model_name
+        if self.is_enum:
+            return "int"
+
         return ret.stringify()
 
     @cached_property
@@ -113,6 +120,9 @@ class FieldProperty:
         except (TypeError, NameError):
             if self.type.is_union():
                 return "QObject"  # graphql doesn't support scalars in Unions ATM.
+            if self.is_enum:
+                # QEnum value must be int
+                return "int"
             # might be a model, which has no type representation ATM.
             name = self.fget_annotation.replace("Model", "")
             assert self.type_map.get(name, None), f"{self.fget_annotation} Could not be resolved"
@@ -131,6 +141,12 @@ class FieldProperty:
     def private_name(self) -> str:
         return "_" + self.name
 
+    @staticmethod
+    def unwrap_optional(th: TypeHinter) -> TypeHinter:
+        if th.is_optional():
+            return th.of_type[0]
+        return th
+
     @cached_property
     def is_scalar(self) -> bool:
         return (
@@ -140,20 +156,30 @@ class FieldProperty:
         )
 
     @cached_property
+    def is_enum(self) -> Optional["GqlEnumDefinition"]:
+        tp = self.unwrap_optional(self.type)
+        with contextlib.suppress(TypeError):
+            if issubclass(tp.type, AntiForwardRef):
+                if isinstance(tp.type.resolve(), GqlEnumDefinition):
+                    return tp.type.resolve()
+
+    @cached_property
     def is_custom_scalar(self) -> Optional[Type[BaseCustomScalar]]:
-        if self.type.type in self.scalars.values():
-            return self.type.type
-        return None
+        tp = self.unwrap_optional(self.type)
+        if tp.type in self.scalars.values():
+            return tp.type
 
     @property
     def fget(self) -> str:
         if self.is_custom_scalar:
             return f"return self.{self.private_name}.{BaseCustomScalar.to_qt.__name__}()"
+        if self.is_enum:
+            return f"return self.{self.private_name}.value"
         return f"return self.{self.private_name}"
 
 
 @define(slots=False)
-class GqlType:
+class GqlTypeDefinition:
     kind: Kinds
     name: str
     fields: list["FieldProperty"]
@@ -162,3 +188,20 @@ class GqlType:
     @cached_property
     def model_name(self) -> str:
         return self.name + "Model"
+
+
+@define
+class EnumValue:
+    """encapsulates enumValues from introspection, maps to an Enum member."""
+
+    name: str
+    description: str = ""
+
+
+@define
+class GqlEnumDefinition:
+    name: str
+    members: list[EnumValue]
+
+
+EnumMap = dict[str, "GqlEnumDefinition"]

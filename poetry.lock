@@ -973,14 +973,14 @@ mkdocs = ">=1.1"
 
 [[package]]
 name = "mkdocs-material"
-version = "9.0.6"
+version = "9.0.9"
 description = "Documentation that simply works"
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "mkdocs_material-9.0.6-py3-none-any.whl", hash = "sha256:4a71195ddc100dddf07d4b23b53373f36c5f0f1010fa4ea301ca7a8e949dd9e7"},
-    {file = "mkdocs_material-9.0.6.tar.gz", hash = "sha256:6065b573e38746dc267d7fc84252be31b73da955b2ce553687806b6030e51ee0"},
+    {file = "mkdocs_material-9.0.9-py3-none-any.whl", hash = "sha256:29ebb2aa81e8cfb39e497bdafcacf4cc4aaa20ae31ce334f520c317c5bead1ba"},
+    {file = "mkdocs_material-9.0.9.tar.gz", hash = "sha256:c8fa9b1f0fded744a42317e594e5c21f4e3b56f1a0497e7d16951b3bd47784bf"},
 ]
 
 [package.dependencies]
@@ -1798,14 +1798,14 @@ files = [
 
 [[package]]
 name = "strawberry-graphql"
-version = "0.155.2"
+version = "0.155.3"
 description = "A library for creating GraphQL APIs"
 category = "dev"
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "strawberry_graphql-0.155.2-py3-none-any.whl", hash = "sha256:b92bc7ee52348cd983781a7742c408567319d569e521ea568831ca3f61ca73b2"},
-    {file = "strawberry_graphql-0.155.2.tar.gz", hash = "sha256:2589e8bcd65e724532e960a14af8c4efac621952e208c9bd36f97873401a2f44"},
+    {file = "strawberry_graphql-0.155.3-py3-none-any.whl", hash = "sha256:ec258f2821e7ce2d73aeb499a4be603cc8642e5806c4682e5c34b0625dcab90e"},
+    {file = "strawberry_graphql-0.155.3.tar.gz", hash = "sha256:bf41d91ab2858360ca26d06cf21ddb3b4ff831017cd9eb11290aeb69a9e7a59c"},
 ]
 
 [package.dependencies]

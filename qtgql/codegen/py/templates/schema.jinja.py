@@ -1,17 +1,40 @@
 from __future__ import annotations
-from PySide6.QtCore import Property, Signal, QObject
+from PySide6.QtCore import Property, Signal, QObject, QEnum
+from PySide6.QtQml import QmlElement
+from enum import Enum, auto
 from typing import Optional, Union
 from qtgql import qproperty
 from qtgql.codegen.py.bases import BaseModel
 from qtgql.codegen.py.config import QtGqlConfig
+
+
 {% for dep in context.dependencies %}
-{{dep}}
+{{dep}}{% endfor %}
+
+
+QML_IMPORT_NAME = "QtGql"
+QML_IMPORT_MAJOR_VERSION = 1
+
+
+{% for enum in context.enums %}
+class {{enum.name}}(Enum):
+    {% for member in enum.members %}
+    {{member.name}} = auto()
+    """{{member.description}}"""{% endfor %}
+
 {% endfor %}
+
+{% if context.enums %}
+@QmlElement
+class Enums(QObject):
+    {% for enum in context.enums %}
+    QEnum({{enum.name}})
+    {% endfor %}
+{% endif %}
 
 class SCALARS:
     {% for scalar in context.custom_scalars %}
-    {{scalar}} = {{scalar}}
-    {% endfor %}
+    {{scalar}} = {{scalar}}{% endfor %}
 
 {% for type in context.types %}
 class {{ type.name }}({{context.base_object_name}}):

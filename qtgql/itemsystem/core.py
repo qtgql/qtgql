@@ -95,9 +95,7 @@ count = 1
 
 
 def get_base_type() -> type[_BaseType]:
-    """
-    :return: BaseType to use for generating `GenericModel`'s
-    """
+    """:return: BaseType to use for generating `GenericModel`'s"""
     global count
     cls: type[_BaseType] = types.new_class(
         name=f"BaseType{count}", kwds={"metaclass": BaseTypeMeta}
@@ -195,11 +193,7 @@ class GenericModel(Generic[_TBaseType], QAbstractListModel):
             self.initialize_data(data)
 
     def initialize_data(self, data: Union[list[dict], dict]) -> None:
-        """
-
-        :param data: data to generate the model
-
-        """
+        """:param data: data to generate the model"""
         self.layoutAboutToBeChanged.emit()
         QEventLoop().processEvents()
         # search for children and initialize them as models
