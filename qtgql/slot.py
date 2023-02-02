@@ -45,7 +45,6 @@ def slot(func):
                 func = qtc.Slot(*combo, result=return_)(func)
             return func
 
-        concretes = [th.type for th in concretes]
-        return qtc.Slot(*concretes, result=return_)(func)
+        return qtc.Slot(*[th.type for th in concretes], result=return_)(func)
 
     return wrapper(func)
