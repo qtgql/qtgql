@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+0.104.3 - 2023-02-05
+--------------------
+
+This release adds `currentObject` property for codegen BaseModel.
+This is useful in QML where you have to access the current selected object outside
+the delegate.
+Fixes [#65](https://github.com/nrbnlulu/qtgql/issues/65)
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #66](https://github.com/nrbnlulu/qtgql/pull/66/)
+
+
 0.104.2 - 2023-02-02
 --------------------
 
