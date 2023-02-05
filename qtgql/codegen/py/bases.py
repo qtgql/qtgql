@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from typing import Optional, TypeVar
 
-from PySide6.QtCore import QAbstractListModel, QByteArray, QObject, Qt
+from PySide6.QtCore import QAbstractListModel, QByteArray, QObject, Qt, Signal
 
-from qtgql import slot
+from qtgql import qproperty, slot
 
 __all__ = ["BaseModel", "get_base_graphql_object"]
 
@@ -61,10 +61,20 @@ class _BaseQGraphQLObject(QObject):
 
 class BaseModel(QAbstractListModel):
     OBJECT_ROLE = Qt.ItemDataRole.UserRole + 1
+    currentObjectChanged = Signal()
 
     def __init__(self, data: list[T_BaseQGraphQLObject], parent: Optional[QObject] = None):
         super().__init__(parent)
         self._data = data
+        self._current_object: Optional[T_BaseQGraphQLObject] = None
+
+    def set_current_object(self, obj: T_BaseQGraphQLObject) -> None:
+        self._current_object = obj
+        self.currentObjectChanged.emit()
+
+    @qproperty(QObject, fset=set_current_object, notify=currentObjectChanged)  # type: ignore
+    def currentObject(self) -> Optional[T_BaseQGraphQLObject]:
+        return self._current_object
 
     def rowCount(self, *args, **kwargs) -> int:
         return len(self._data)
