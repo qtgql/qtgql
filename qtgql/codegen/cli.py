@@ -10,6 +10,7 @@ from qtgql.codegen.py.config import QtGqlConfig
 
 console = rich.console.Console()
 
+
 # these lines are covered coverage failed to catch them.
 def _get_pyproject(p: Path) -> Optional[Path]:
     pproject = p / "pyproject.toml"
