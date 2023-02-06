@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+0.104.4 - 2023-02-06
+--------------------
+
+migrate slot to use types from typingref
+This release fixes [issue #3](https://github.com/nrbnlulu/qtgql/issues/3)
+
+Contributed by [xiangxw](https://github.com/xiangxw) via [PR #59](https://github.com/nrbnlulu/qtgql/pull/59/)
+
+
 0.104.3 - 2023-02-05
 --------------------
 
