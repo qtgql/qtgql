@@ -40,16 +40,18 @@ class SCALARS:
 class {{ type.name }}({{context.base_object_name}}):
     """{{  type.docstring  }}"""
 
-    def __init__(self, parent: QObject = None, {% for f in type.fields %} {{f.name}}: {{f.annotation}} = None, {% endfor %}):
+    def __init__(self, parent: QObject = None, {% for f in type.fields %} {{f.name}}: {{f.annotation}} = {{f.default_value}}, {% endfor %}):
         super().__init__(parent){% for f in type.fields %}
         self.{{  f.private_name  }} = {{f.name}}{% endfor %}
 
     @classmethod
     def from_dict(cls, parent,  data: dict) -> {{type.name}}:
-        return cls(
-        parent=parent,{% for f in type.fields %}
-        {{f.name}} = {{f.deserializer}},{% endfor %}
-        )
+        inst = cls(parent=parent)
+        {% for f in type.fields %}
+        if {{f.name}} := {{f.deserializer}}:
+            inst.{{f.private_name}} = {{f.name}}{% endfor %}
+
+        return inst
 
     {% for f in type.fields %}
     {{ f.signal_name }} = Signal()

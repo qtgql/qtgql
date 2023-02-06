@@ -1,4 +1,4 @@
-from typing import Any, Generic, Optional, TypeVar
+from typing import Any, Generic, NamedTuple, Optional, TypeVar
 
 T = TypeVar("T")
 
@@ -39,11 +39,36 @@ class BaseCustomScalar(Generic[T]):
         raise NotImplementedError  # pragma: no cover
 
 
-BuiltinScalars: dict[str, type] = {
-    "Int": int,
-    "Float": float,
-    "String": str,
-    "ID": str,
-    "Boolean": bool,
-    "UUID": str,
-}
+class BuiltinScalar(NamedTuple):
+    tp: type
+    default_value: Any
+    graphql_name: str
+
+
+class BuiltinScalars:
+    scalars = [
+        BuiltinScalar(int, 0, graphql_name="Int"),
+        BuiltinScalar(float, 0.0, graphql_name="Float"),
+        BuiltinScalar(str, " - ", graphql_name="String"),
+        BuiltinScalar(str, "", graphql_name="ID"),
+        BuiltinScalar(bool, False, "Boolean"),
+        BuiltinScalar(str, "", "UUID"),
+    ]
+
+    @classmethod
+    def by_graphql_name(cls, name: str) -> Optional[BuiltinScalar]:
+        for scalar in cls.scalars:
+            if scalar.graphql_name == name:
+                return scalar
+
+    @classmethod
+    def by_python_type(cls, tp: type) -> Optional[BuiltinScalar]:
+        for scalar in cls.scalars:
+            if scalar.tp is tp:
+                return scalar
+
+    _keys = [scalar.graphql_name for scalar in scalars]
+
+    @classmethod
+    def keys(cls) -> list[str]:
+        return cls._keys

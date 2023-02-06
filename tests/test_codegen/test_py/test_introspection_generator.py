@@ -12,7 +12,7 @@ from qtgql.codegen.py.bases import BaseModel, _BaseQGraphQLObject
 from qtgql.codegen.py.config import QtGqlConfig
 from qtgql.codegen.py.custom_scalars import DateScalar, DateTimeScalar, DecimalScalar, TimeScalar
 from qtgql.codegen.py.objecttype import GqlTypeDefinition
-from qtgql.codegen.py.scalars import BaseCustomScalar, BuiltinScalars
+from qtgql.codegen.py.scalars import BaseCustomScalar, BuiltinScalar, BuiltinScalars
 from qtgql.typingref import TypeHinter
 from strawberry import Schema
 
@@ -359,11 +359,11 @@ def test_init_no_arguments(testcase: QGQLObjectTestCase):
 
 
 class TestAnnotations:
-    @pytest.mark.parametrize("name, scalar", BuiltinScalars.items())
-    def test_scalars(self, name, scalar):
+    @pytest.mark.parametrize("scalar", BuiltinScalars.scalars, ids=lambda v: v.graphql_name)
+    def test_scalars(self, scalar: BuiltinScalar):
         ScalarsTestCase.compile()
-        field = ScalarsTestCase.get_field_by_type(scalar)
-        assert field, f"field not found for {name}: {scalar}"
+        field = ScalarsTestCase.get_field_by_type(scalar.tp)
+        assert field, f"field not found for {scalar.graphql_name}: {scalar}"
         klass = ScalarsTestCase.gql_type
         sf = ScalarsTestCase.strawberry_field_by_name(field.name)
         assert sf
@@ -459,7 +459,7 @@ class TestPropertyGetter:
 
 
 class TestDeserializers:
-    def test_from_dict_scalars(self, qtbot):
+    def test_scalars(self, qtbot):
         testcase = ScalarsTestCase
         testcase.compile()
         klass = testcase.gql_type

@@ -30,10 +30,7 @@ class SchemaEvaluator:
         self.template = config.template_class
         self.introspection = introspection
         self.config = config
-        self._generated_types: dict[str, GqlTypeDefinition] = {
-            scalar: GqlTypeDefinition(name=scalar, kind=Kinds.SCALAR, fields=[])
-            for scalar in BuiltinScalars.keys()
-        }
+        self._generated_types: dict[str, GqlTypeDefinition] = {}
         self._generated_enums: EnumMap = {}
         self._evaluate()
 
@@ -69,9 +66,9 @@ class SchemaEvaluator:
         if kind == Kinds.LIST:
             ret = TypeHinter(type=list, of_type=(self.evaluate_field_type(of_type),))
         elif kind == Kinds.SCALAR:
-            try:
-                ret = TypeHinter(type=BuiltinScalars[name])
-            except KeyError:
+            if builtin_scalar := BuiltinScalars.by_graphql_name(name):
+                ret = TypeHinter(type=builtin_scalar.tp)
+            else:
                 ret = TypeHinter(type=self.config.custom_scalars[name])
         elif kind is Kinds.ENUM:
             ret = TypeHinter(type=anti_forward_ref(name=name, type_map=self._generated_enums))

@@ -23,6 +23,16 @@ class TestFromAnnotation:
         for index, type_ in enumerate(th.of_type):
             assert type_.type is get_args(tp)[index]
 
+    def test_union_with_optionals(self):
+        """Union with one optional basically means that the type is the union
+        is optional."""
+        tp = Union[Optional[str], Optional[int]]
+        th = TypeHinter.from_annotations(tp)
+        assert th.type is Optional
+        inner = th.of_type[0]
+        assert inner.of_type[0].type is str
+        assert inner.of_type[1].type is int
+
     def test_nested(self):
         tp = list[Union[str, int]]
         th = TypeHinter.from_annotations(tp)
@@ -145,6 +155,25 @@ class TestStringify:
     )
     def test_containers(self, expected):
         assert TypeHinter.from_string(expected, {}).stringify() in (expected, expected.lower())
+
+
+class TestUnwrapOptional:
+    def test_flat(self):
+        th = TypeHinter.from_annotations(Optional[str]).strip_optionals()
+        assert th.type is str
+
+    def test_inner_optional(self):
+        th = TypeHinter.from_annotations(list[Optional[str]]).strip_optionals()
+
+        assert th.type is list
+        assert th.of_type[0].type is str
+
+    def test_union(self):
+        th = TypeHinter.from_annotations(Union[Optional[str], Optional[int], float])
+        th = th.strip_optionals()
+        assert th.of_type[0].type is str
+        assert th.of_type[1].type is int
+        assert th.of_type[2].type is float
 
 
 def test_ensure_success():

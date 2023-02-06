@@ -9,7 +9,7 @@ from attrs import define
 
 from qtgql.codegen.py.bases import _BaseQGraphQLObject
 from qtgql.codegen.py.custom_scalars import CustomScalarMap
-from qtgql.codegen.py.scalars import BaseCustomScalar, BuiltinScalars
+from qtgql.codegen.py.scalars import BaseCustomScalar, BuiltinScalar, BuiltinScalars
 from qtgql.codegen.utils import AntiForwardRef
 from qtgql.typingref import TypeHinter, ensure
 
@@ -34,6 +34,17 @@ class FieldProperty:
     scalars: CustomScalarMap
     description: Optional[str] = ""
 
+    def __attrs_post_init__(self):
+        self.type = self.type.strip_optionals()
+
+    @cached_property
+    def default_value(self):
+        if builtin_scalar := self.is_builtin_scalar:
+            if builtin_scalar.tp is str:
+                return f"'{builtin_scalar.default_value}'"
+            return f"{builtin_scalar.default_value}"
+        return "None"
+
     @cached_property
     def deserializer(self) -> str:
         """If the field is optional this would be."""
@@ -45,7 +56,7 @@ class FieldProperty:
             t = self.type.of_type[0].type
             type_hinter = self.type.of_type[0]
 
-        if t in BuiltinScalars.values():
+        if self.is_builtin_scalar:
             return default
 
         if scalar := self.is_custom_scalar:
@@ -80,7 +91,7 @@ class FieldProperty:
         """
         ret = self.type.as_annotation()
         # int, str, float etc...
-        if ret in BuiltinScalars.values():
+        if BuiltinScalars.by_python_type(ret):
             return ret.__name__
 
         if scalar := self.is_custom_scalar:
@@ -98,8 +109,9 @@ class FieldProperty:
         if ret.is_optional():
             ret = self.type.of_type[0]
 
-        if ret.type in BuiltinScalars.values():
-            return self.annotation
+        if scalar := self.is_builtin_scalar:
+            return scalar.tp.__name__
+
         if scalar := self.is_custom_scalar:
             return TypeHinter.from_annotations(scalar.to_qt.__annotations__["return"]).stringify()
         if ret.is_list():
@@ -172,20 +184,18 @@ class FieldProperty:
                     return ret
 
     @cached_property
-    def is_scalar(self) -> bool:
-        return (
-            self.type.type in BuiltinScalars.values()
-            or self.type.of_type in BuiltinScalars.values()
-            and not self.is_custom_scalar
-        )
-
-    @cached_property
     def is_enum(self) -> Optional["GqlEnumDefinition"]:
         tp = self.unwrap_optional(self.type)
         with contextlib.suppress(TypeError):
             if issubclass(tp.type, AntiForwardRef):
                 if isinstance(tp.type.resolve(), GqlEnumDefinition):
                     return tp.type.resolve()
+
+    @cached_property
+    def is_builtin_scalar(self) -> Optional[BuiltinScalar]:
+        with contextlib.suppress(AttributeError):
+            if scalar := BuiltinScalars.by_python_type(self.type.type):
+                return scalar
 
     @cached_property
     def is_custom_scalar(self) -> Optional[Type[BaseCustomScalar]]:

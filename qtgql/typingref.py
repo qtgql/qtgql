@@ -50,6 +50,21 @@ class TypeHinter:
         if args := get_args(tp):
             # handle optional
             if type(None) in args:
+                # optional union, 2 is default for optionals
+                if len(args) > 2:
+                    return TypeHinter(
+                        type=Optional,
+                        of_type=(
+                            TypeHinter(
+                                type=Union,
+                                of_type=tuple(
+                                    TypeHinter.from_annotations(arg)
+                                    for arg in args
+                                    if arg is not type(None)
+                                ),
+                            ),
+                        ),
+                    )
                 return TypeHinter(type=Optional, of_type=(TypeHinter.from_annotations(args[0]),))
             new_args: list[TypeHinter] = []
             for arg in args:
@@ -97,6 +112,13 @@ class TypeHinter:
 
     def is_list(self) -> bool:
         return self.type in (list, List)
+
+    def strip_optionals(self) -> "TypeHinter":
+        th = self
+        if self.is_optional():
+            th = self.of_type[0]
+
+        return TypeHinter(type=th.type, of_type=tuple(tp.strip_optionals() for tp in th.of_type))
 
 
 T = TypeVar("T")
