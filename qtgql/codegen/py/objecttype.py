@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import contextlib
 import enum
 from functools import cached_property
@@ -27,7 +29,7 @@ class Kinds(enum.Enum):
 class FieldProperty:
     name: str
     type: TypeHinter
-    type_map: dict[str, "GqlTypeDefinition"]
+    type_map: dict[str, GqlTypeDefinition]
     enums: "EnumMap"
     scalars: CustomScalarMap
     description: Optional[str] = ""
@@ -63,8 +65,8 @@ class FieldProperty:
         # handle inner type if it was optional above
         assert issubclass(t, AntiForwardRef)
         # graphql object
-        if isinstance(t.resolve(), GqlTypeDefinition):
-            return f"cls.{_BaseQGraphQLObject.deserialize_optional_child.__name__}(parent, data, {t.name}, '{self.name}')"
+        if gql_type := self.is_object_type:
+            return f"cls.{_BaseQGraphQLObject.deserialize_optional_child.__name__}(parent, data, {gql_type.name}, '{self.name}')"
         elif isinstance(t.resolve(), GqlEnumDefinition):
             return f"{t.name}[data.get('{self.name}', 1)]"  # graphql enums evaluates to string of the name.
         raise NotImplementedError  # pragma: no cover
@@ -123,10 +125,8 @@ class FieldProperty:
             if self.is_enum:
                 # QEnum value must be int
                 return "int"
-            # might be a model, which has no type representation ATM.
-            name = self.fget_annotation.replace("Model", "")
-            assert self.type_map.get(name, None), f"{self.fget_annotation} Could not be resolved"
-            # This is a QGraphQLObject, avoid undefined names.
+            # might be a model, which is also QObject
+            assert self.is_model or self.is_object_type
             return "QObject"
 
     @cached_property
@@ -146,6 +146,30 @@ class FieldProperty:
         if th.is_optional():
             return th.of_type[0]
         return th
+
+    @cached_property
+    def is_object_type(self) -> Optional[GqlTypeDefinition]:
+        t = self.type.type
+        if self.type.is_optional():
+            t = self.type.of_type[0].type
+        with contextlib.suppress(TypeError):
+            if issubclass(t, AntiForwardRef):
+                ret = t.resolve()
+                if isinstance(ret, GqlTypeDefinition):
+                    return ret
+
+    @cached_property
+    def is_model(self) -> Optional[GqlTypeDefinition]:
+        th = self.type
+        if th.is_optional():
+            th = th.of_type[0]
+        if th.is_list():
+            th = th.of_type[0]
+        with contextlib.suppress(TypeError):
+            if issubclass(th.type, AntiForwardRef):
+                ret = th.type.resolve()
+                if isinstance(ret, GqlTypeDefinition):
+                    return ret
 
     @cached_property
     def is_scalar(self) -> bool:
@@ -182,12 +206,12 @@ class FieldProperty:
 class GqlTypeDefinition:
     kind: Kinds
     name: str
-    fields: list["FieldProperty"]
+    fields: list[FieldProperty]
     docstring: Optional[str] = ""
 
     @cached_property
     def model_name(self) -> str:
-        return self.name + "Model"
+        return "Q" + self.name + "Model"
 
 
 @define

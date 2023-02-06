@@ -1,5 +1,5 @@
 import pytest
-from PySide6.QtCore import QByteArray, Qt
+from PySide6.QtCore import QByteArray, QObject, Qt
 from qtgql.codegen.py.bases import BaseModel
 
 from tests.test_codegen.test_py.test_introspection_generator import ObjectWithListOfObjectTestCase
@@ -47,3 +47,19 @@ def test_append(qtbot, sample_model_initialized):
     with qtbot.wait_signal(sample_model_initialized.rowsAboutToBeInserted):
         sample_model_initialized.append("foo")
     assert "foo" in sample_model_initialized._data
+
+
+def test_current_object_property_getter(qtbot, sample_model_initialized):
+    obj = QObject()
+    sample_model_initialized._current_object = obj
+    assert sample_model_initialized.currentObject is obj
+    assert sample_model_initialized.property("currentObject") is obj
+
+
+def test_current_object_setter(qtbot, sample_model_initialized):
+    obj = QObject()
+    assert not sample_model_initialized.currentObject
+    sample_model_initialized.set_current_object(obj)
+    assert sample_model_initialized.currentObject
+    with qtbot.wait_signal(sample_model_initialized.currentObjectChanged):
+        sample_model_initialized.set_current_object(obj)
