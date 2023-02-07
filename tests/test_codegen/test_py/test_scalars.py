@@ -20,8 +20,8 @@ class AbstractScalarTestCase(ABC):
 
     def test_default_value(self):
         scalar = self.scalar_klass.from_graphql()
-        assert scalar._value is None
-        assert scalar.to_qt() == scalar.DEFAULT_VALUE
+        assert scalar._value == scalar.DEFAULT_VALUE
+        assert scalar.to_qt() == self.scalar_klass(scalar.DEFAULT_VALUE).to_qt()
 
 
 class TestDecimalScalar(AbstractScalarTestCase):

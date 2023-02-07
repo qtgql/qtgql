@@ -298,7 +298,7 @@ TimeTestCase = QGQLObjectTestCase(
 class CountryScalar(BaseCustomScalar[Optional[str]]):
     countrymap = schemas.object_with_user_defined_scalar.countrymap
     GRAPHQL_NAME = "Country"
-    DEFAULT_VALUE = countrymap["isr"]
+    DEFAULT_VALUE = "isr"
 
     @classmethod
     def from_graphql(cls, v: Optional[str] = None) -> "BaseCustomScalar":
@@ -476,10 +476,9 @@ class TestDeserializers:
         assert inst.person.age == 100
 
     def test_nested_optional_object(self):
-        # TODO: remove this when implementing *placeholders*
         testcase = OptionalNestedObjectTestCase.compile()
         inst = testcase.gql_type.from_dict(None, testcase.initialize_dict)
-        assert inst.person is None
+        assert inst.person
 
     def test_object_with_list_of_object(self):
         testcase = ObjectWithListOfObjectTestCase.compile()
@@ -499,6 +498,7 @@ class TestDeserializers:
         testcase.compile()
         klass = testcase.gql_type
         initialize_dict = testcase.initialize_dict
+        initialize_dict["country"] = "isr"
         inst = klass.from_dict(None, initialize_dict)
         field = testcase.get_field_by_name(fname)
         assert inst.property(field.name) == scalar.from_graphql(initialize_dict[field.name]).to_qt()
@@ -552,3 +552,7 @@ class TestDefaultConstructor:
             == testcase.module.Status(1)
             == testcase.module.Status.Connected
         )
+
+    def test_union(self):
+        testcase = UnionTestCase.compile()
+        testcase.gql_type()

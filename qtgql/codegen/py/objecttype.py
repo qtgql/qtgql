@@ -52,12 +52,12 @@ class FieldProperty:
         if enum_def := self.type.is_enum:
             return f"{enum_def.name}(1)"  # 1 is where auto() starts.
 
-        raise NotImplementedError  # pragma no cover
+        return "None"  # Unions are not supported yet.
 
     @cached_property
     def deserializer(self) -> str:
-        # TODO: lots of redundant checks here since we have default constructor.
-        """If the field is optional this would be."""
+        """This gets the dict from graphql and passes the data to init, goes to
+        `from_graphql` on the J2 template."""
         # every thing is possibly optional since you can query for only so or so fields.
         default = f"data.get('{self.name}', None)"
 
@@ -73,7 +73,6 @@ class FieldProperty:
                 f"cls.{_BaseQGraphQLObject.deserialize_union.__name__}(parent, data, '{self.name}')"
             )
 
-        # graphql object or enum
         if gql_type := self.type.is_object_type:
             return f"cls.{_BaseQGraphQLObject.deserialize_optional_child.__name__}(parent, data, {gql_type.name}, '{self.name}')"
         if enum_def := self.type.is_enum:
