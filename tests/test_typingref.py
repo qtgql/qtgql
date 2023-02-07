@@ -157,20 +157,20 @@ class TestStringify:
         assert TypeHinter.from_string(expected, {}).stringify() in (expected, expected.lower())
 
 
-class TestUnwrapOptional:
+class TestStripOptionals:
     def test_flat(self):
-        th = TypeHinter.from_annotations(Optional[str]).strip_optionals()
+        th = TypeHinter.strip_optionals(TypeHinter.from_annotations(Optional[str]))
         assert th.type is str
 
     def test_inner_optional(self):
-        th = TypeHinter.from_annotations(list[Optional[str]]).strip_optionals()
+        th = TypeHinter.strip_optionals(TypeHinter.from_annotations(list[Optional[str]]))
 
         assert th.type is list
         assert th.of_type[0].type is str
 
     def test_union(self):
         th = TypeHinter.from_annotations(Union[Optional[str], Optional[int], float])
-        th = th.strip_optionals()
+        th = TypeHinter.strip_optionals(th)
         assert th.of_type[0].type is str
         assert th.of_type[1].type is int
         assert th.of_type[2].type is float

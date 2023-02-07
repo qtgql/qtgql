@@ -1,4 +1,6 @@
-from typing import Any, Generic, NamedTuple, Optional, TypeVar
+from typing import Any, Generic, Optional, TypeVar
+
+from attr import define
 
 T = TypeVar("T")
 
@@ -39,7 +41,8 @@ class BaseCustomScalar(Generic[T]):
         raise NotImplementedError  # pragma: no cover
 
 
-class BuiltinScalar(NamedTuple):
+@define
+class BuiltinScalar:
     tp: type
     default_value: Any
     graphql_name: str

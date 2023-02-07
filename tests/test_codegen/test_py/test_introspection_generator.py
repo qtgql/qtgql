@@ -362,19 +362,17 @@ class TestAnnotations:
     @pytest.mark.parametrize("scalar", BuiltinScalars.scalars, ids=lambda v: v.graphql_name)
     def test_scalars(self, scalar: BuiltinScalar):
         ScalarsTestCase.compile()
-        field = ScalarsTestCase.get_field_by_type(scalar.tp)
+        field = ScalarsTestCase.get_field_by_type(scalar)
         assert field, f"field not found for {scalar.graphql_name}: {scalar}"
         klass = ScalarsTestCase.gql_type
-        sf = ScalarsTestCase.strawberry_field_by_name(field.name)
-        assert sf
         assert (
-            sf.type
+            scalar.tp
             == TypeHinter.from_string(
                 getattr(klass, field.setter_name).__annotations__["v"], ns=field.type_map
             ).as_annotation()
         )
         assert (
-            sf.type
+            scalar.tp
             == TypeHinter.from_string(
                 getattr(klass, field.name).fget.__annotations__["return"], ns=field.type_map
             ).as_annotation()
@@ -402,9 +400,8 @@ class TestAnnotations:
         testcase = ObjectWithListOfObjectTestCase
         testcase.compile()
         field = testcase.get_field_by_name("persons")
-        sf = testcase.strawberry_field_by_name(field.name)
-        assert field.annotation == sf.type_annotation.annotation
-        assert field.fget_annotation == field.type.of_type[0].type.resolve().model_name
+        assert field.annotation == field.type.is_model.model_name
+        assert field.fget_annotation == field.type.is_model.model_name
 
     def test_custom_scalar_property_type_is_to_qt_return_annotation(self):
         testcase = DateTimeTestCase
@@ -512,4 +509,12 @@ class TestDeserializers:
         assert getattr(inst, f.private_name) == testcase.module.Status.Connected
 
 
-# TODO: TestObjectWithListOfScalar
+class TestDefaultConstructor:
+    @pytest.mark.parametrize("scalar", BuiltinScalars.scalars, ids=lambda v: v.graphql_name)
+    def test_builtin_scalars(self, scalar: BuiltinScalar):
+        testcase = ScalarsTestCase
+        testcase.compile()
+        klass = testcase.gql_type
+        inst = klass()
+        f = testcase.get_field_by_type(scalar)
+        assert getattr(inst, f.private_name) == scalar.default_value

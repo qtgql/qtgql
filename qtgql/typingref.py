@@ -1,8 +1,6 @@
 import inspect
 from typing import Any, List, Optional, Type, TypeVar, Union, get_args, get_origin
 
-from attrs import define
-
 
 class UnsetType:
     __instance: Optional["UnsetType"] = None
@@ -26,10 +24,14 @@ class UnsetType:
 UNSET: Any = UnsetType()
 
 
-@define
 class TypeHinter:
-    type: Any  # noqa: A003
-    of_type: tuple["TypeHinter", ...] = ()
+    def __init__(
+        self,
+        type: Any,  # noqa: A003
+        of_type: tuple["TypeHinter", ...] = (),
+    ):
+        self.type = type
+        self.of_type = of_type
 
     @classmethod
     def from_string(cls, tp: str, ns: dict) -> "TypeHinter":
@@ -52,26 +54,26 @@ class TypeHinter:
             if type(None) in args:
                 # optional union, 2 is default for optionals
                 if len(args) > 2:
-                    return TypeHinter(
+                    return cls(
                         type=Optional,
                         of_type=(
-                            TypeHinter(
+                            cls(
                                 type=Union,
                                 of_type=tuple(
-                                    TypeHinter.from_annotations(arg)
+                                    cls.from_annotations(arg)
                                     for arg in args
                                     if arg is not type(None)
                                 ),
                             ),
                         ),
                     )
-                return TypeHinter(type=Optional, of_type=(TypeHinter.from_annotations(args[0]),))
+                return cls(type=Optional, of_type=(cls.from_annotations(args[0]),))
             new_args: list[TypeHinter] = []
             for arg in args:
-                new_args.append(TypeHinter.from_annotations(arg))
+                new_args.append(cls.from_annotations(arg))
 
-            return TypeHinter(type=get_origin(tp), of_type=tuple(new_args))  # type: ignore
-        return TypeHinter(type=tp)
+            return cls(type=get_origin(tp), of_type=tuple(new_args))  # type: ignore
+        return cls(type=tp)
 
     def as_annotation(self, object_map: Optional[dict[str, Any]] = None) -> Any:
         if self.type is str:
@@ -113,12 +115,13 @@ class TypeHinter:
     def is_list(self) -> bool:
         return self.type in (list, List)
 
-    def strip_optionals(self) -> "TypeHinter":
-        th = self
-        if self.is_optional():
-            th = self.of_type[0]
+    @classmethod
+    def strip_optionals(cls, inst: "TypeHinter") -> "TypeHinter":
+        th = inst
+        if inst.is_optional():
+            th = inst.of_type[0]
 
-        return TypeHinter(type=th.type, of_type=tuple(tp.strip_optionals() for tp in th.of_type))
+        return cls(type=th.type, of_type=tuple(cls.strip_optionals(tp) for tp in th.of_type))
 
 
 T = TypeVar("T")
