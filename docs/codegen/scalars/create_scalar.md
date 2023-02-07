@@ -20,7 +20,7 @@ country_map = {
 
 class CountryCode(BaseCustomScalar[str]):
     GRAPHQL_NAME = "CountryCode"
-    DEFAULT_VALUE = " - "  # this would be the default value.
+    DEFAULT_VALUE = "israel"  # this would be the default value.
 
     @classmethod
     def from_graphql(cls, v: Optional[str] = None) -> CountryCode:
@@ -32,7 +32,7 @@ class CountryCode(BaseCustomScalar[str]):
         return self._value
 
 
-assert CountryCode.from_graphql('isr').to_qt() == 'israel'
+assert CountryCode.from_graphql('isr').to_qt() == 'israel' == CountryCode().to_qt()
 ```
 !!! Note
     You would need to add this in your config

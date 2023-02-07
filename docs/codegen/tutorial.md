@@ -41,6 +41,35 @@ $ poetry run qtgql gen
 
 And your typed are generated...
 
+## Note about optionals
+This library assumes that there is no such thing as optional datatypes,
+This reduces unexpected bugs significantly.
+For instance if in QML you are expecting that a type would have an inner type,
+and you wanted to create a binding to that type you would need to have a custom
+JS function on every property:
+```qml
+Item{
+    property int size: object?.size
+}
+```
+If `object` would be null property assignment would fail since
+you can't assign `undefined` to `int`.
+
+Therefore, **every generated type** has a default value,
+including scalars and custom-scalars.
+### Defaults mapping
+| datatype                                                    | Default                                         |
+|-------------------------------------------------------------|-------------------------------------------------|
+| `Int`                                                       | `0`                                             |
+| `String`                                                    | `" - "`                                         |
+| `Float`                                                     | `0.0`                                           |
+| `ID`                                                        | `str()`                                         |
+| `Boolean`                                                   | `False`                                         |
+| `UUID`                                                      | `str()`                                         |
+| `List` or in our context a `QAbstractListModel`             | `<modelname>` The corresponding generated model |
+| `ObjectType` or in our context an `QObject` with properties | `<typename>` The corresponding generated object |
+
+
 ## Usage
 
 (TBD)
