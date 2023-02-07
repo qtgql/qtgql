@@ -7,7 +7,6 @@ from typing import Any, Optional, Type
 
 from attrs import define
 
-from qtgql.codegen.py.bases import _BaseQGraphQLObject
 from qtgql.codegen.py.custom_scalars import CustomScalarMap
 from qtgql.codegen.py.scalars import BaseCustomScalar, BuiltinScalar
 from qtgql.codegen.utils import AntiForwardRef
@@ -57,24 +56,25 @@ class FieldProperty:
     @cached_property
     def deserializer(self) -> str:
         """This gets the dict from graphql and passes the data to init, goes to
-        `from_graphql` on the J2 template."""
+        `from_graphql` on the J2 template
+        The J2 template in this context provides the data for the field (if was existed
+        in the dict) using walrus operator (attribute name is the field name).
+        ."""
         # every thing is possibly optional since you can query for only so or so fields.
-        default = f"data.get('{self.name}', None)"
 
         if self.type.is_builtin_scalar:
-            return default
+            return self.name
 
         if scalar := self.type.is_custom_scalar(self.scalars):
-            return f"SCALARS.{scalar.__name__}.{BaseCustomScalar.from_graphql.__name__}({default})"
-        if model_of := self.type.is_model:
-            return f"cls.{_BaseQGraphQLObject.deserialize_list_of.__name__}(parent, data, {model_of.model_name}, '{self.name}', {model_of.name})"
-        if self.type.is_union():
             return (
-                f"cls.{_BaseQGraphQLObject.deserialize_union.__name__}(parent, data, '{self.name}')"
+                f"SCALARS.{scalar.__name__}.{BaseCustomScalar.from_graphql.__name__}({self.name})"
             )
-
+        if model_of := self.type.is_model:
+            return f"{model_of.model_name}(parent=parent, data=[{model_of.name}.from_dict(parent, data) for data in {self.name}])"
+        if self.type.is_union():
+            return f"cls.type_map[{self.name}['__typename']].from_dict(parent, {self.name})"
         if gql_type := self.type.is_object_type:
-            return f"cls.{_BaseQGraphQLObject.deserialize_optional_child.__name__}(parent, data, {gql_type.name}, '{self.name}')"
+            return f"{gql_type.name}.from_dict(parent, {self.name})"
         if enum_def := self.type.is_enum:
             return f"{enum_def.name}[data.get('{self.name}', {self.default_value})]"  # graphql enums evaluates to string of the name.
         raise NotImplementedError  # pragma: no cover

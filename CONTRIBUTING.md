@@ -17,4 +17,3 @@ Your changes require to update the docs?
 We use mkdocs-material
 
 run `poetry run mkdocs serve` for a local server.
-
