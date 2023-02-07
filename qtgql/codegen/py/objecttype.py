@@ -76,7 +76,7 @@ class FieldProperty:
         if gql_type := self.type.is_object_type:
             return f"cls.{_BaseQGraphQLObject.deserialize_optional_child.__name__}(parent, data, {gql_type.name}, '{self.name}')"
         if enum_def := self.type.is_enum:
-            return f"{enum_def.name}[data.get('{self.name}', 1)]"  # graphql enums evaluates to string of the name.
+            return f"{enum_def.name}[data.get('{self.name}', {self.default_value})]"  # graphql enums evaluates to string of the name.
         raise NotImplementedError  # pragma: no cover
 
     @cached_property

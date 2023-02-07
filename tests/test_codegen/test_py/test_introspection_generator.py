@@ -457,6 +457,11 @@ class TestPropertyGetter:
 
 
 class TestDeserializers:
+    @pytest.mark.parametrize("testcase", all_test_cases, ids=lambda x: x.test_name)
+    def test_blank_dict(self, testcase: QGQLObjectTestCase):
+        testcase.compile()
+        assert isinstance(testcase.gql_type.from_dict(None, {}), testcase.gql_type)
+
     def test_scalars(self, qtbot):
         testcase = ScalarsTestCase
         testcase.compile()
