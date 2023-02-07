@@ -24,40 +24,6 @@ class _BaseQGraphQLObject(QObject):
     ) -> T_BaseQGraphQLObject:  # pragma: no cover
         raise NotImplementedError
 
-    @classmethod
-    def deserialize_optional_child(
-        cls,
-        parent: Optional[T_BaseQGraphQLObject],
-        data: dict,
-        child: type[T_BaseQGraphQLObject],
-        field_name: str,
-    ) -> Optional[T_BaseQGraphQLObject]:
-        if found := data.get(field_name, None):
-            return child.from_dict(parent, found)  # type: ignore
-
-    @classmethod
-    def deserialize_list_of(
-        cls,
-        parent: Optional[T_BaseQGraphQLObject],
-        data: dict,
-        model: type[T_BaseModel],
-        field_name: str,
-        of_type: type[T_BaseQGraphQLObject],
-    ) -> Optional[T_BaseModel]:
-        if found := data.get(field_name, None):
-            return model(parent=parent, data=[of_type.from_dict(parent, data) for data in found])  # type: ignore
-
-    @classmethod
-    def deserialize_union(
-        cls,
-        parent: Optional[T_BaseQGraphQLObject],
-        data: dict,
-        field_name: str,
-    ) -> Optional[T_BaseModel]:
-        if found := data.get(field_name, None):
-            child = cls.type_map[found["__typename"]]
-            return child.from_dict(parent, found)  # type: ignore
-
 
 class BaseModel(QAbstractListModel):
     OBJECT_ROLE = Qt.ItemDataRole.UserRole + 1
