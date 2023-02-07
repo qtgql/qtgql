@@ -19,7 +19,7 @@ from qtgql.codegen.py.objecttype import (
 from qtgql.codegen.py.scalars import BuiltinScalars
 from qtgql.codegen.utils import anti_forward_ref
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from qtgql.codegen.py.config import QtGqlConfig
 
 introspection_query = graphql.get_introspection_query(descriptions=True)
@@ -44,7 +44,7 @@ class SchemaEvaluator:
         for union in self.unions:
             if union["name"] == name:
                 return union["possibleTypes"]
-        raise ValueError(f"Union for {name} was not found")
+        raise ValueError(f"Union for {name} was not found")  # pragma: no cover
 
     def evaluate_field_type(self, t: dict) -> GqlTypeHinter:
         kind = Kinds(t["kind"])
@@ -84,7 +84,7 @@ class SchemaEvaluator:
         if ret:
             return ret
 
-        raise NotImplementedError(f"kind {kind} not supported yet")
+        raise NotImplementedError(f"kind {kind} not supported yet")  # pragma: no cover
 
     def evaluate_field(self, field: dict) -> FieldProperty:
         """we don't really know what is the field type just it's name."""

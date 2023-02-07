@@ -99,9 +99,6 @@ class TypeHinter:
         if builder := getattr(
             self.type, "__class_getitem__", getattr(self.type, "__getitem__", None)
         ):
-            if self.is_generic():
-                return self.type
-
             if self.is_union():
                 return builder(tuple(arg.as_annotation(object_map) for arg in self.of_type))
             return builder(self.of_type[0].as_annotation(object_map))

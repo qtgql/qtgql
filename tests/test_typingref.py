@@ -77,6 +77,15 @@ class TestToAnnotation:
         th = TypeHinter(type=Optional, of_type=(TypeHinter(type=SomeHiddenType.__name__),))
         assert th.as_annotation({SomeHiddenType.__name__: SomeHiddenType}) == tp
 
+    @pytest.mark.skip(reason="This is not implemented")
+    def test_generics(self):
+        T = TypeVar("T")
+
+        class A(Generic[T]):
+            ...
+
+        assert TypeHinter.from_annotations(A[int]).as_annotation() == A[int]
+
 
 class TestFromString:
     @pytest.mark.parametrize("tp", [int, float, str, bool, object])
