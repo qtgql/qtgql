@@ -40,15 +40,22 @@ class SCALARS:
 class {{ type.name }}({{context.base_object_name}}):
     """{{  type.docstring  }}"""
 
+    DEFAULT_INIT_DICT = dict({% for f in type.fields %}
+        {{f.name}}=None,{% endfor %}
+    )
     def __init__(self, parent: QObject = None, {% for f in type.fields %} {{f.name}}: {{f.annotation}} = None, {% endfor %}):
         super().__init__(parent){% for f in type.fields %}
-        self.{{  f.private_name  }} = {{f.name}}{% endfor %}
+        self.{{  f.private_name  }} = {{f.name}} if {{f.name}} else {{f.default_value}}{% endfor %}
 
     @classmethod
     def from_dict(cls, parent,  data: dict) -> {{type.name}}:
+        init_dict = cls.DEFAULT_INIT_DICT.copy()
+        {% for f in type.fields %}
+        if {{f.name}} := data.get('{{f.name}}', None):
+            init_dict['{{f.name}}'] = {{f.deserializer}}{% endfor %}
         return cls(
-        parent=parent,{% for f in type.fields %}
-        {{f.name}} = {{f.deserializer}},{% endfor %}
+            parent=parent,
+            **init_dict
         )
 
     {% for f in type.fields %}

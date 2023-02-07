@@ -12,7 +12,7 @@ from qtgql.codegen.py.bases import BaseModel, _BaseQGraphQLObject
 from qtgql.codegen.py.config import QtGqlConfig
 from qtgql.codegen.py.custom_scalars import DateScalar, DateTimeScalar, DecimalScalar, TimeScalar
 from qtgql.codegen.py.objecttype import GqlTypeDefinition
-from qtgql.codegen.py.scalars import BaseCustomScalar, BuiltinScalars
+from qtgql.codegen.py.scalars import BaseCustomScalar, BuiltinScalar, BuiltinScalars
 from qtgql.typingref import TypeHinter
 from strawberry import Schema
 
@@ -298,15 +298,16 @@ TimeTestCase = QGQLObjectTestCase(
 class CountryScalar(BaseCustomScalar[Optional[str]]):
     countrymap = schemas.object_with_user_defined_scalar.countrymap
     GRAPHQL_NAME = "Country"
+    DEFAULT_VALUE = "isr"
 
     @classmethod
     def from_graphql(cls, v: Optional[str] = None) -> "BaseCustomScalar":
         if v:
-            return cls(v)
-        return cls(None)
+            return cls(cls.countrymap[v])
+        return cls()
 
     def to_qt(self) -> str:
-        return self._value or self.DEFAULT_DESERIALIZED
+        return self._value
 
 
 CustomUserScalarTestCase = QGQLObjectTestCase(
@@ -359,22 +360,20 @@ def test_init_no_arguments(testcase: QGQLObjectTestCase):
 
 
 class TestAnnotations:
-    @pytest.mark.parametrize("name, scalar", BuiltinScalars.items())
-    def test_scalars(self, name, scalar):
+    @pytest.mark.parametrize("scalar", BuiltinScalars.scalars, ids=lambda v: v.graphql_name)
+    def test_scalars(self, scalar: BuiltinScalar):
         ScalarsTestCase.compile()
         field = ScalarsTestCase.get_field_by_type(scalar)
-        assert field, f"field not found for {name}: {scalar}"
+        assert field, f"field not found for {scalar.graphql_name}: {scalar}"
         klass = ScalarsTestCase.gql_type
-        sf = ScalarsTestCase.strawberry_field_by_name(field.name)
-        assert sf
         assert (
-            sf.type
+            scalar.tp
             == TypeHinter.from_string(
                 getattr(klass, field.setter_name).__annotations__["v"], ns=field.type_map
             ).as_annotation()
         )
         assert (
-            sf.type
+            scalar.tp
             == TypeHinter.from_string(
                 getattr(klass, field.name).fget.__annotations__["return"], ns=field.type_map
             ).as_annotation()
@@ -402,9 +401,8 @@ class TestAnnotations:
         testcase = ObjectWithListOfObjectTestCase
         testcase.compile()
         field = testcase.get_field_by_name("persons")
-        sf = testcase.strawberry_field_by_name(field.name)
-        assert field.annotation == sf.type_annotation.annotation
-        assert field.fget_annotation == field.type.of_type[0].type.resolve().model_name
+        assert field.annotation == field.type.is_model.model_name
+        assert field.fget_annotation == field.type.is_model.model_name
 
     def test_custom_scalar_property_type_is_to_qt_return_annotation(self):
         testcase = DateTimeTestCase
@@ -459,7 +457,12 @@ class TestPropertyGetter:
 
 
 class TestDeserializers:
-    def test_from_dict_scalars(self, qtbot):
+    @pytest.mark.parametrize("testcase", all_test_cases, ids=lambda x: x.test_name)
+    def test_blank_dict(self, testcase: QGQLObjectTestCase):
+        testcase.compile()
+        assert isinstance(testcase.gql_type.from_dict(None, {}), testcase.gql_type)
+
+    def test_scalars(self, qtbot):
         testcase = ScalarsTestCase
         testcase.compile()
         klass = testcase.gql_type
@@ -478,10 +481,9 @@ class TestDeserializers:
         assert inst.person.age == 100
 
     def test_nested_optional_object(self):
-        # TODO: remove this when implementing *placeholders*
         testcase = OptionalNestedObjectTestCase.compile()
         inst = testcase.gql_type.from_dict(None, testcase.initialize_dict)
-        assert inst.person is None
+        assert inst.person
 
     def test_object_with_list_of_object(self):
         testcase = ObjectWithListOfObjectTestCase.compile()
@@ -501,6 +503,7 @@ class TestDeserializers:
         testcase.compile()
         klass = testcase.gql_type
         initialize_dict = testcase.initialize_dict
+        initialize_dict["country"] = "isr"
         inst = klass.from_dict(None, initialize_dict)
         field = testcase.get_field_by_name(fname)
         assert inst.property(field.name) == scalar.from_graphql(initialize_dict[field.name]).to_qt()
@@ -512,4 +515,49 @@ class TestDeserializers:
         assert getattr(inst, f.private_name) == testcase.module.Status.Connected
 
 
-# TODO: TestObjectWithListOfScalar
+class TestDefaultConstructor:
+    @pytest.mark.parametrize("scalar", BuiltinScalars.scalars, ids=lambda v: v.graphql_name)
+    def test_builtin_scalars(self, scalar: BuiltinScalar):
+        testcase = ScalarsTestCase
+        testcase.compile()
+        klass = testcase.gql_type
+        inst = klass()
+        f = testcase.get_field_by_type(scalar)
+        assert getattr(inst, f.private_name) == scalar.default_value
+
+    def test_nested_object_from_dict(self, qtbot):
+        testcase = NestedObjectTestCase.compile()
+        klass = testcase.gql_type
+        inst = klass()
+        assert inst.person.name == BuiltinScalars.by_python_type(str).default_value
+        assert inst.person.age == BuiltinScalars.by_python_type(int).default_value
+
+    def test_object_with_list_of_object(self):
+        testcase = ObjectWithListOfObjectTestCase.compile()
+        inst = testcase.gql_type()
+        assert isinstance(inst.persons, BaseModel)
+        # by default there is no need for initializing delegates.
+        assert len(inst.persons._data) == 0
+
+    @pytest.mark.parametrize("testcase, scalar, fname", custom_scalar_testcases)
+    def test_custom_scalars(
+        self, testcase: QGQLObjectTestCase, scalar: BaseCustomScalar, fname: str
+    ):
+        testcase.compile()
+        inst = testcase.gql_type()
+        field = testcase.get_field_by_name(fname)
+        assert getattr(inst, field.private_name).to_qt() == scalar().to_qt()
+
+    def test_enum(self):
+        testcase = EnumTestCase.compile()
+        inst = testcase.gql_type()
+        f = testcase.get_field_by_name("status")
+        assert (
+            getattr(inst, f.private_name)
+            == testcase.module.Status(1)
+            == testcase.module.Status.Connected
+        )
+
+    def test_union(self):
+        testcase = UnionTestCase.compile()
+        testcase.gql_type()
