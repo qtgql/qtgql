@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+0.105.0 - 2023-02-07
+--------------------
+
+This release adds default values for every type in the `__init__` method.
+Resolves [issue #39](https://github.com/nrbnlulu/qtgql/issues/39)
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #72](https://github.com/nrbnlulu/qtgql/pull/72/)
+
+
 0.104.4 - 2023-02-06
 --------------------
 
