@@ -176,6 +176,20 @@ class TestStripOptionals:
         assert th.of_type[2].type is float
 
 
+class TestCompare:
+    def test_ne(self):
+        assert TypeHinter.from_annotations(str) != TypeHinter.from_annotations(int)
+
+    def test_eq(self):
+        assert TypeHinter.from_annotations(str) == TypeHinter.from_annotations(str)
+
+    def test_nested_ne(self):
+        assert TypeHinter.from_annotations(list[str]) != TypeHinter.from_annotations(list[int])
+
+    def test_nested_eq(self):
+        assert TypeHinter.from_annotations(list[str]) == TypeHinter.from_annotations(list[str])
+
+
 def test_ensure_success():
     hello = "hello"
     assert ensure(hello, str) == hello
