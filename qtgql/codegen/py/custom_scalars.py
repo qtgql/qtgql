@@ -6,69 +6,65 @@ from _decimal import Decimal
 from qtgql.codegen.py.scalars import BaseCustomScalar
 
 
-class DateTimeScalar(BaseCustomScalar[Optional[datetime]]):
+class DateTimeScalar(BaseCustomScalar[datetime]):
     """An ISO-8601 encoded datetime."""
 
     GRAPHQL_NAME: str = "DateTime"
-    DEFAULT_DESERIALIZED = " --- "
+    DEFAULT_VALUE = datetime.now()
 
     @classmethod
     def from_graphql(cls, v: Optional[str] = None) -> "DateTimeScalar":
         if v:
             return cls(datetime.fromisoformat(v))
-        return cls(None)
+        return cls()
 
     def to_qt(self) -> str:
-        if self._value:
-            return self._value.strftime(" %H:%M: ")
-        return self.DEFAULT_DESERIALIZED
+        return self._value.strftime("%H:%M (%m/%d/%Y)")
 
 
-class DateScalar(BaseCustomScalar[Optional[date]]):
+class DateScalar(BaseCustomScalar[date]):
     """An ISO-8601 encoded date."""
 
     GRAPHQL_NAME = "Date"
+    DEFAULT_VALUE = date(year=1998, month=8, day=23)
 
     @classmethod
     def from_graphql(cls, v: Optional[str] = None) -> "DateScalar":
         if v:
             return cls(date.fromisoformat(v))
-        return cls(None)
+        return cls()
 
     def to_qt(self) -> str:
-        if self._value:
-            return self._value.isoformat()
-        return self.DEFAULT_DESERIALIZED
+        return self._value.isoformat()
 
 
-class TimeScalar(BaseCustomScalar[Optional[time]]):
+class TimeScalar(BaseCustomScalar[time]):
     """an ISO-8601 encoded time."""
 
     GRAPHQL_NAME = "Time"
+    DEFAULT_VALUE = time()
 
     @classmethod
     def from_graphql(cls, v: Optional[str] = None) -> "TimeScalar":
         if v:
             return cls(time.fromisoformat(v))
-        return cls(None)
+        return cls()
 
     def to_qt(self) -> str:
-        if self._value:
-            return self._value.isoformat()
-        return self.DEFAULT_DESERIALIZED
+        return self._value.isoformat()
 
 
 class DecimalScalar(BaseCustomScalar[Decimal]):
     """A Decimal value serialized as a string."""
 
     GRAPHQL_NAME = "Decimal"
-    DEFAULT_DESERIALIZED = Decimal()
+    DEFAULT_VALUE = Decimal()
 
     @classmethod
     def from_graphql(cls, v: Optional[str] = None) -> "DecimalScalar":
         if v:
             return cls(Decimal(v))
-        return cls(cls.DEFAULT_DESERIALIZED)
+        return cls()
 
     def to_qt(self) -> str:
         return str(self._value)

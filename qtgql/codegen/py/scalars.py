@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from typing import Any, Generic, Optional, TypeVar
 
 from attr import define
@@ -7,23 +8,26 @@ T = TypeVar("T")
 __all__ = ["BaseCustomScalar", "BuiltinScalars"]
 
 
-class BaseCustomScalar(Generic[T]):
+class BaseCustomScalar(Generic[T], ABC):
     """Class to extend by user defined scalars."""
 
     __slots__ = "_value"
     GRAPHQL_NAME: str
     """The *real* GraphQL name of the scalar (used by the codegen inspection
     pipeline)."""
-    DEFAULT_DESERIALIZED: Any = " --- "
+    DEFAULT_VALUE: T
     """A place holder graphql query returned null or the field wasn't queried.
 
     can be used by `from_graphql()`
     """
 
-    def __init__(self, v: T):
-        self._value = v
+    def __init__(self, v: Optional[T] = None):
+        if not v:
+            self._value = self.DEFAULT_VALUE
+        else:
+            self._value = v
 
-    @classmethod
+    @abstractmethod
     def from_graphql(cls, v: Optional[Any] = None) -> "BaseCustomScalar":
         """Deserializes data fetched from graphql, This is useful when you want
         to set a first-of value that will later be used by `to_qt()`.
@@ -32,6 +36,7 @@ class BaseCustomScalar(Generic[T]):
         """
         raise NotImplementedError  # pragma: no cover
 
+    @abstractmethod
     def to_qt(self) -> Any:
         """Will be used by the property getter, This is the official value that
         Qt should "understand".

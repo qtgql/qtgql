@@ -40,10 +40,23 @@ class FieldProperty:
             if builtin_scalar.tp is str:
                 return f"'{builtin_scalar.default_value}'"
             return f"{builtin_scalar.default_value}"
-        return "None"
+        if object_def := self.type.is_object_type:
+            return f"{object_def.name}(parent=self)"
+
+        if model_def := self.type.is_model:
+            return f"{model_def.model_name}(parent=self, data = [])"
+
+        if custom_scalar := self.type.is_custom_scalar(self.scalars):
+            return f"SCALARS.{custom_scalar.__name__}()"
+
+        if enum_def := self.type.is_enum:
+            return f"{enum_def.name}(1)"  # 1 is where auto() starts.
+
+        raise NotImplementedError  # pragma no cover
 
     @cached_property
     def deserializer(self) -> str:
+        # TODO: lots of redundant checks here since we have default constructor.
         """If the field is optional this would be."""
         # every thing is possibly optional since you can query for only so or so fields.
         default = f"data.get('{self.name}', None)"

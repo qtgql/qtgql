@@ -40,9 +40,9 @@ class SCALARS:
 class {{ type.name }}({{context.base_object_name}}):
     """{{  type.docstring  }}"""
 
-    def __init__(self, parent: QObject = None, {% for f in type.fields %} {{f.name}}: {{f.annotation}} = {{f.default_value}}, {% endfor %}):
+    def __init__(self, parent: QObject = None, {% for f in type.fields %} {{f.name}}: {{f.annotation}} = None, {% endfor %}):
         super().__init__(parent){% for f in type.fields %}
-        self.{{  f.private_name  }} = {{f.name}}{% endfor %}
+        self.{{  f.private_name  }} = {{f.name}} if {{f.name}} else {{f.default_value}}{% endfor %}
 
     @classmethod
     def from_dict(cls, parent,  data: dict) -> {{type.name}}:

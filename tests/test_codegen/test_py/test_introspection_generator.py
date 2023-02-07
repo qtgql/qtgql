@@ -298,15 +298,16 @@ TimeTestCase = QGQLObjectTestCase(
 class CountryScalar(BaseCustomScalar[Optional[str]]):
     countrymap = schemas.object_with_user_defined_scalar.countrymap
     GRAPHQL_NAME = "Country"
+    DEFAULT_VALUE = countrymap["isr"]
 
     @classmethod
     def from_graphql(cls, v: Optional[str] = None) -> "BaseCustomScalar":
         if v:
-            return cls(v)
-        return cls(None)
+            return cls(cls.countrymap[v])
+        return cls()
 
     def to_qt(self) -> str:
-        return self._value or self.DEFAULT_DESERIALIZED
+        return self._value
 
 
 CustomUserScalarTestCase = QGQLObjectTestCase(
@@ -518,3 +519,36 @@ class TestDefaultConstructor:
         inst = klass()
         f = testcase.get_field_by_type(scalar)
         assert getattr(inst, f.private_name) == scalar.default_value
+
+    def test_nested_object_from_dict(self, qtbot):
+        testcase = NestedObjectTestCase.compile()
+        klass = testcase.gql_type
+        inst = klass()
+        assert inst.person.name == BuiltinScalars.by_python_type(str).default_value
+        assert inst.person.age == BuiltinScalars.by_python_type(int).default_value
+
+    def test_object_with_list_of_object(self):
+        testcase = ObjectWithListOfObjectTestCase.compile()
+        inst = testcase.gql_type()
+        assert isinstance(inst.persons, BaseModel)
+        # by default there is no need for initializing delegates.
+        assert len(inst.persons._data) == 0
+
+    @pytest.mark.parametrize("testcase, scalar, fname", custom_scalar_testcases)
+    def test_custom_scalars(
+        self, testcase: QGQLObjectTestCase, scalar: BaseCustomScalar, fname: str
+    ):
+        testcase.compile()
+        inst = testcase.gql_type()
+        field = testcase.get_field_by_name(fname)
+        assert getattr(inst, field.private_name).to_qt() == scalar().to_qt()
+
+    def test_enum(self):
+        testcase = EnumTestCase.compile()
+        inst = testcase.gql_type()
+        f = testcase.get_field_by_name("status")
+        assert (
+            getattr(inst, f.private_name)
+            == testcase.module.Status(1)
+            == testcase.module.Status.Connected
+        )
