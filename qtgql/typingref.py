@@ -33,8 +33,10 @@ class TypeHinter:
         self.type = type
         self.of_type = of_type
 
-    def __eq__(self, other: "TypeHinter"):
-        assert isinstance(other, TypeHinter)
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, TypeHinter):
+            return False
+
         if not self.type == other.type:
             return False
 

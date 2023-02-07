@@ -189,6 +189,9 @@ class TestCompare:
     def test_nested_eq(self):
         assert TypeHinter.from_annotations(list[str]) == TypeHinter.from_annotations(list[str])
 
+    def test_not_th_instance(self):
+        assert TypeHinter.from_annotations(str) != object()
+
 
 def test_ensure_success():
     hello = "hello"
