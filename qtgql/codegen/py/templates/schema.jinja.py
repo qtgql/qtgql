@@ -46,12 +46,10 @@ class {{ type.name }}({{context.base_object_name}}):
 
     @classmethod
     def from_dict(cls, parent,  data: dict) -> {{type.name}}:
-        inst = cls(parent=parent)
-        {% for f in type.fields %}
-        if {{f.name}} := {{f.deserializer}}:
-            inst.{{f.private_name}} = {{f.name}}{% endfor %}
-
-        return inst
+        return cls(
+            parent=parent,{% for f in type.fields %}
+            {{f.name}}={{f.deserializer}},{% endfor %}
+        )
 
     {% for f in type.fields %}
     {{ f.signal_name }} = Signal()
