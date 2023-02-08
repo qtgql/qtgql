@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+0.105.2 - 2023-02-08
+--------------------
+
+This release drops generation of model for each type instead
+it uses Generic to annotate the model inner type. resolves [#81](https://github.com/nrbnlulu/qtgql/issues/81)
+Also, it adds a default currentObject.
+resolves [#80](https://github.com/nrbnlulu/qtgql/issues/80)
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #82](https://github.com/nrbnlulu/qtgql/pull/82/)
+
+
 0.105.1 - 2023-02-07
 --------------------
 

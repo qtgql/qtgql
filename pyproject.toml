@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "qtgql"
-version = "0.105.1"
+version = "0.105.2"
 packages = [{ include = "qtgql" }]
 description = "Qt framework for building graphql driven QML applications"
 authors = ["Nir <88795475+nrbnlulu@users.noreply.github.com>"]
