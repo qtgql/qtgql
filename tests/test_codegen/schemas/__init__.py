@@ -1,4 +1,5 @@
 from . import (
+    object_reference_each_other,
     object_with_date,
     object_with_datetime,
     object_with_decimal,
@@ -30,4 +31,5 @@ __all__ = [
     object_with_time_scalar,
     object_with_enum,
     object_with_user_defined_scalar,
+    object_reference_each_other,
 ]

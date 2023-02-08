@@ -40,8 +40,8 @@ class FieldProperty:
             if builtin_scalar.tp is str:
                 return f"'{builtin_scalar.default_value}'"
             return f"{builtin_scalar.default_value}"
-        if object_def := self.type.is_object_type:
-            return f"{object_def.name}(parent=self)"
+        if self.type.is_object_type:
+            return "None"
 
         if model_of := self.type.is_model:
             return (
@@ -232,7 +232,7 @@ class GqlTypeHinter(TypeHinter):
         if model_of := self.is_model:
             return f"{QGraphQListModel.__name__}[{model_of.name}]"
         if object_def := self.is_object_type:
-            return object_def.name
+            return f"Optional[{object_def.name}]"
         if self.is_union():
             return "Union[" + ",".join((th.annotation(scalars) for th in self.of_type)) + "]"
         raise NotImplementedError  # pragma no cover

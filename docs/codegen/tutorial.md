@@ -42,11 +42,14 @@ $ poetry run qtgql gen
 And your typed are generated...
 
 ## Note about optionals
-This library assumes that there is no such thing as optional datatypes,
+This library will try to set default values for fields if they were not fetched by the query
+or to be used by `QGraphQListModel.currentObject`,
 This reduces unexpected bugs significantly.
-For instance if in QML you are expecting that a type would have an inner type,
-and you wanted to create a binding to that type you would need to have a custom
-JS function on every property:
+
+!!! Note
+    Object types are currently optional because two types
+    can refer each-other and cause recursion error, see [#84](https://github.com/nrbnlulu/qtgql/issues/84)
+
 ```qml
 Item{
     property int size: object?.size
@@ -58,16 +61,17 @@ you can't assign `undefined` to `int`.
 Therefore, **every generated type** has a default value,
 including scalars and custom-scalars.
 ### Defaults mapping
-| GraphQL type                                                | Default                                    |
-|-------------------------------------------------------------|--------------------------------------------|
-| `Int`                                                       | `0`                                        |
-| `String`                                                    | `" - "`                                    |
-| `Float`                                                     | `0.0`                                      |
-| `ID`                                                        | `'9b2a0828-880d-4023-9909-de067984523c'`                                    |
-| `Boolean`                                                   | `False`                                    |
-| `UUID`                                                      | `'9b2a0828-880d-4023-9909-de067984523c'`                                         |
-| `List` or in our context a `QAbstractListModel`             | `<modelname>` The corresponding generated model |
-| `ObjectType` or in our context an `QObject` with properties | `<typename>` The corresponding generated object |
+| GraphQL type                                                | Default                                           |
+|-------------------------------------------------------------|---------------------------------------------------|
+| `Int`                                                       | `0`                                               |
+| `String`                                                    | `" - "`                                           |
+| `Float`                                                     | `0.0`                                             |
+| `ID`                                                        | `'9b2a0828-880d-4023-9909-de067984523c'`          |
+| `Boolean`                                                   | `False`                                           |
+| `UUID`                                                      | `'9b2a0828-880d-4023-9909-de067984523c'`          |
+| `List` or in our context a `QAbstractListModel`             | `<modelname>` Blank corresponding generated model |
+| `ObjectType` or in our context an `QObject` with properties | `None`                                            |
+| `SCALAR`                                                    | Provided by scalar implementation.                |
 
 
 ## Usage
