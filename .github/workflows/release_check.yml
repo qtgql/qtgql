@@ -30,12 +30,14 @@ jobs:
         if: ${{ steps.check_release.outputs.release!='' }}
         name: add failed release comment
         with:
+          repo-token: ${{ secrets.BOT_TOKEN }}
           message: |
             ${{ steps.check_release.outputs.release }}
       - uses: mshick/add-pr-comment@v2
         if: ${{ steps.check_release.outputs.release=='' }}
         name: add release comment
         with:
+          repo-token: ${{ secrets.BOT_TOKEN }}
           message-path: ./RELEASE.md
 
       - name: fail if check failed
