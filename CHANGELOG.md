@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+0.105.3 - 2023-02-08
+--------------------
+
+This release fixes [#84](https://github.com/nrbnlulu/qtgql/issues/84).
+By setting default value for object type to null.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #85](https://github.com/nrbnlulu/qtgql/pull/85/)
+
+
 0.105.2 - 2023-02-08
 --------------------
 
