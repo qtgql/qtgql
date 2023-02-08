@@ -4,8 +4,9 @@ from PySide6.QtQml import QmlElement
 from enum import Enum, auto
 from typing import Optional, Union
 from qtgql import qproperty
-from qtgql.codegen.py.bases import BaseModel
+from qtgql.codegen.py.bases import QGraphQListModel
 from qtgql.codegen.py.config import QtGqlConfig
+
 
 
 {% for dep in context.dependencies %}
@@ -69,9 +70,6 @@ class {{ type.name }}({{context.base_object_name}}):
     def {{ f.name }}(self) -> {{ f.fget_annotation }}:
         {{f.fget}}
     {% endfor %}
-class {{ type.model_name }}(BaseModel):
-    def __init__(self, data: list[{{  type.name  }}], parent: Optional[{{context.base_object_name}}] = None):
-        super().__init__(data, parent)
 
 
 {% endfor %}

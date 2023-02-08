@@ -53,30 +53,36 @@ class BuiltinScalar:
     graphql_name: str
 
 
-class BuiltinScalars:
-    scalars = [
-        BuiltinScalar(int, 0, graphql_name="Int"),
-        BuiltinScalar(float, 0.0, graphql_name="Float"),
-        BuiltinScalar(str, " - ", graphql_name="String"),
-        BuiltinScalar(str, "", graphql_name="ID"),
-        BuiltinScalar(bool, False, "Boolean"),
-        BuiltinScalar(str, "", "UUID"),
-    ]
+class _BuiltinScalars:
+    INT = BuiltinScalar(int, 0, graphql_name="Int")
+    FLOAT = BuiltinScalar(float, 0.0, graphql_name="Float")
+    STRING = BuiltinScalar(str, " - ", graphql_name="String")
+    ID = BuiltinScalar(str, "9b2a0828-880d-4023-9909-de067984523c", graphql_name="ID")
+    BOOLEAN = BuiltinScalar(bool, False, graphql_name="Boolean")
+    UUID = BuiltinScalar(str, "9b2a0828-880d-4023-9909-de067984523c", graphql_name="UUID")
 
     @classmethod
-    def by_graphql_name(cls, name: str) -> Optional[BuiltinScalar]:
-        for scalar in cls.scalars:
+    def __iter__(cls):
+        for name, member in cls.__dict__.items():
+            if name.isupper():
+                yield member
+
+    def by_graphql_name(self, name: str) -> Optional[BuiltinScalar]:
+        for scalar in self:
             if scalar.graphql_name == name:
                 return scalar
 
-    @classmethod
-    def by_python_type(cls, tp: type) -> Optional[BuiltinScalar]:
-        for scalar in cls.scalars:
+    def by_python_type(self, tp: type) -> Optional[BuiltinScalar]:
+        for scalar in self:
             if scalar.tp is tp:
                 return scalar
 
-    _keys = [scalar.graphql_name for scalar in scalars]
+    def keys(self) -> list[str]:
+        return [scalar.graphql_name for scalar in self]
 
-    @classmethod
-    def keys(cls) -> list[str]:
-        return cls._keys
+
+BuiltinScalars = _BuiltinScalars()
+
+if __name__ == "__main__":
+    for s in BuiltinScalars:
+        print(s)

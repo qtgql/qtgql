@@ -58,14 +58,14 @@ you can't assign `undefined` to `int`.
 Therefore, **every generated type** has a default value,
 including scalars and custom-scalars.
 ### Defaults mapping
-| datatype                                                    | Default                                         |
-|-------------------------------------------------------------|-------------------------------------------------|
-| `Int`                                                       | `0`                                             |
-| `String`                                                    | `" - "`                                         |
-| `Float`                                                     | `0.0`                                           |
-| `ID`                                                        | `str()`                                         |
-| `Boolean`                                                   | `False`                                         |
-| `UUID`                                                      | `str()`                                         |
+| GraphQL type                                                | Default                                    |
+|-------------------------------------------------------------|--------------------------------------------|
+| `Int`                                                       | `0`                                        |
+| `String`                                                    | `" - "`                                    |
+| `Float`                                                     | `0.0`                                      |
+| `ID`                                                        | `'9b2a0828-880d-4023-9909-de067984523c'`                                    |
+| `Boolean`                                                   | `False`                                    |
+| `UUID`                                                      | `'9b2a0828-880d-4023-9909-de067984523c'`                                         |
 | `List` or in our context a `QAbstractListModel`             | `<modelname>` The corresponding generated model |
 | `ObjectType` or in our context an `QObject` with properties | `<typename>` The corresponding generated object |
 

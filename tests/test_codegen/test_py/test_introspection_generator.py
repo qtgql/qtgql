@@ -8,7 +8,7 @@ import pytest
 import strawberry.utils.str_converters
 from attrs import define
 from qtgql.codegen.introspection import SchemaEvaluator, introspection_query
-from qtgql.codegen.py.bases import BaseModel, _BaseQGraphQLObject
+from qtgql.codegen.py.bases import QGraphQListModel, _BaseQGraphQLObject
 from qtgql.codegen.py.config import QtGqlConfig
 from qtgql.codegen.py.custom_scalars import DateScalar, DateTimeScalar, DecimalScalar, TimeScalar
 from qtgql.codegen.py.objecttype import GqlTypeDefinition
@@ -360,7 +360,7 @@ def test_init_no_arguments(testcase: QGQLObjectTestCase):
 
 
 class TestAnnotations:
-    @pytest.mark.parametrize("scalar", BuiltinScalars.scalars, ids=lambda v: v.graphql_name)
+    @pytest.mark.parametrize("scalar", BuiltinScalars, ids=lambda v: v.graphql_name)
     def test_scalars(self, scalar: BuiltinScalar):
         ScalarsTestCase.compile()
         field = ScalarsTestCase.get_field_by_type(scalar)
@@ -401,8 +401,8 @@ class TestAnnotations:
         testcase = ObjectWithListOfObjectTestCase
         testcase.compile()
         field = testcase.get_field_by_name("persons")
-        assert field.annotation == field.type.is_model.model_name
-        assert field.fget_annotation == field.type.is_model.model_name
+        assert field.annotation == f"{QGraphQListModel.__name__}[{field.type.is_model.name}]"
+        assert field.fget_annotation == f"{QGraphQListModel.__name__}[{field.type.is_model.name}]"
 
     def test_custom_scalar_property_type_is_to_qt_return_annotation(self):
         testcase = DateTimeTestCase
@@ -488,7 +488,7 @@ class TestDeserializers:
     def test_object_with_list_of_object(self):
         testcase = ObjectWithListOfObjectTestCase.compile()
         inst = testcase.gql_type.from_dict(None, testcase.initialize_dict)
-        assert isinstance(inst.persons, BaseModel)
+        assert isinstance(inst.persons, QGraphQListModel)
         assert inst.persons._data[0].name
 
     def test_object_with_interface(self):
@@ -516,7 +516,7 @@ class TestDeserializers:
 
 
 class TestDefaultConstructor:
-    @pytest.mark.parametrize("scalar", BuiltinScalars.scalars, ids=lambda v: v.graphql_name)
+    @pytest.mark.parametrize("scalar", BuiltinScalars, ids=lambda v: v.graphql_name)
     def test_builtin_scalars(self, scalar: BuiltinScalar):
         testcase = ScalarsTestCase
         testcase.compile()
@@ -535,7 +535,7 @@ class TestDefaultConstructor:
     def test_object_with_list_of_object(self):
         testcase = ObjectWithListOfObjectTestCase.compile()
         inst = testcase.gql_type()
-        assert isinstance(inst.persons, BaseModel)
+        assert isinstance(inst.persons, QGraphQListModel)
         # by default there is no need for initializing delegates.
         assert len(inst.persons._data) == 0
 

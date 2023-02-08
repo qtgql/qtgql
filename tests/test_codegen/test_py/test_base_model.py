@@ -1,14 +1,12 @@
 import pytest
 from PySide6.QtCore import QByteArray, QObject, Qt
-from qtgql.codegen.py.bases import BaseModel
+from qtgql.codegen.py.bases import QGraphQListModel
 
 from tests.test_codegen.test_py.test_introspection_generator import ObjectWithListOfObjectTestCase
 
 
 @pytest.fixture()
-def sample_model_initialized(
-    tmp_mod,
-) -> BaseModel:
+def sample_model_initialized() -> QGraphQListModel:
     testcase = ObjectWithListOfObjectTestCase
     testcase.compile()
     user = testcase.gql_type
@@ -30,7 +28,10 @@ def test_row_count(sample_model_initialized):
 def test_returns_data(sample_model_initialized):
     sample_model_initialized._data[0] = 2
     assert (
-        sample_model_initialized.data(sample_model_initialized.index(0), BaseModel.OBJECT_ROLE) == 2
+        sample_model_initialized.data(
+            sample_model_initialized.index(0), QGraphQListModel.OBJECT_ROLE
+        )
+        == 2
     )
 
 
@@ -49,17 +50,30 @@ def test_append(qtbot, sample_model_initialized):
     assert "foo" in sample_model_initialized._data
 
 
-def test_current_object_property_getter(qtbot, sample_model_initialized):
-    obj = QObject()
-    sample_model_initialized._current_object = obj
-    assert sample_model_initialized.currentObject is obj
-    assert sample_model_initialized.property("currentObject") is obj
+class TestCurrentObject:
+    def test_getter(self, qtbot, sample_model_initialized):
+        expected = QObject()
+        sample_model_initialized._data.insert(0, expected)
+        sample_model_initialized.set_current_index(0)
+        assert sample_model_initialized.property("currentObject") is expected
 
+    def test_setter(self, qtbot, sample_model_initialized):
+        first = sample_model_initialized._data[0]
+        second = QObject()
+        sample_model_initialized._data.insert(1, second)
+        assert sample_model_initialized.currentObject is first
+        with qtbot.wait_signal(sample_model_initialized.currentIndexChanged):
+            sample_model_initialized.set_current_index(1)
+            assert sample_model_initialized.currentObject is second
 
-def test_current_object_setter(qtbot, sample_model_initialized):
-    obj = QObject()
-    assert not sample_model_initialized.currentObject
-    sample_model_initialized.set_current_object(obj)
-    assert sample_model_initialized.currentObject
-    with qtbot.wait_signal(sample_model_initialized.currentObjectChanged):
-        sample_model_initialized.set_current_object(obj)
+    def test_is_first_element_when_initialized(self, sample_model_initialized):
+        first = sample_model_initialized._data[0]
+        assert sample_model_initialized.currentObject is first
+        assert sample_model_initialized.property("currentObject") is first
+
+    def test_is_default_when_initialized_with_no_data(self, sample_model_initialized):
+        testcase = ObjectWithListOfObjectTestCase.compile()
+        user = testcase.gql_type
+        user = user()
+        model = user.persons
+        assert model.property("currentObject") is testcase.module.Person.default_instance()
