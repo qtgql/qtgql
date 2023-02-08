@@ -7,6 +7,7 @@ from typing import Any, Optional, Type
 
 from attrs import define
 
+from qtgql.codegen.py.bases import QGraphQListModel, _BaseQGraphQLObject
 from qtgql.codegen.py.custom_scalars import CustomScalarMap
 from qtgql.codegen.py.scalars import BaseCustomScalar, BuiltinScalar
 from qtgql.codegen.utils import AntiForwardRef
@@ -42,8 +43,11 @@ class FieldProperty:
         if object_def := self.type.is_object_type:
             return f"{object_def.name}(parent=self)"
 
-        if model_def := self.type.is_model:
-            return f"{model_def.model_name}(parent=self, data = [])"
+        if model_of := self.type.is_model:
+            return (
+                f"{QGraphQListModel.__name__}(parent=self, data=[], "
+                f"default_object={model_of.name}.{_BaseQGraphQLObject.default_instance.__name__}())"
+            )
 
         if custom_scalar := self.type.is_custom_scalar(self.scalars):
             return f"SCALARS.{custom_scalar.__name__}()"
@@ -70,7 +74,13 @@ class FieldProperty:
                 f"SCALARS.{scalar.__name__}.{BaseCustomScalar.from_graphql.__name__}({self.name})"
             )
         if model_of := self.type.is_model:
-            return f"{model_of.model_name}(parent=parent, data=[{model_of.name}.from_dict(parent, data) for data in {self.name}])"
+            return (
+                f"{QGraphQListModel.__name__}("
+                f"parent=parent, "
+                f"data=[{model_of.name}.from_dict(parent, data) for data in {self.name}], "
+                f"default_object={model_of.name}.{_BaseQGraphQLObject.default_instance.__name__}()"
+                f")"
+            )
         if self.type.is_union():
             return f"cls.type_map[{self.name}['__typename']].from_dict(parent, {self.name})"
         if gql_type := self.type.is_object_type:
@@ -98,7 +108,7 @@ class FieldProperty:
         if self.type.is_enum:
             return "int"
 
-        return self.type.annotation(self.scalars)
+        return self.annotation
 
     @cached_property
     def property_type(self) -> str:
@@ -145,10 +155,6 @@ class GqlTypeDefinition:
     name: str
     fields: list[FieldProperty]
     docstring: Optional[str] = ""
-
-    @cached_property
-    def model_name(self) -> str:
-        return "Q" + self.name + "Model"
 
 
 @define
@@ -223,8 +229,8 @@ class GqlTypeHinter(TypeHinter):
             return gql_enum.name
         # handle Optional, Union, List etc...
         # removing redundant prefixes.
-        if model_def := self.is_model:
-            return model_def.model_name
+        if model_of := self.is_model:
+            return f"{QGraphQListModel.__name__}[{model_of.name}]"
         if object_def := self.is_object_type:
             return object_def.name
         if self.is_union():

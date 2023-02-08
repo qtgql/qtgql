@@ -1,16 +1,19 @@
 from __future__ import annotations
 
-from typing import Optional, TypeVar
+from typing import Generic, Optional, TypeVar
 
 from PySide6.QtCore import QAbstractListModel, QByteArray, QObject, Qt, Signal
+from typing_extensions import Self
 
 from qtgql import qproperty, slot
 
-__all__ = ["BaseModel", "get_base_graphql_object"]
+__all__ = ["QGraphQListModel", "get_base_graphql_object"]
 
 
 class _BaseQGraphQLObject(QObject):
     type_map: dict[str, type[_BaseQGraphQLObject]]
+
+    __singleton__: _BaseQGraphQLObject
 
     def __init_subclass__(cls, **kwargs):
         cls.type_map[cls.__name__] = cls
@@ -19,34 +22,61 @@ class _BaseQGraphQLObject(QObject):
         super().__init__(parent)
 
     @classmethod
+    def default_instance(cls) -> Self:  # type: ignore
+        try:
+            return cls.__singleton__
+        except AttributeError:
+            cls.__singleton__ = cls()
+            return cls.__singleton__
+
+    @classmethod
     def from_dict(
         cls, parent: T_BaseQGraphQLObject, data: dict
     ) -> T_BaseQGraphQLObject:  # pragma: no cover
         raise NotImplementedError
 
 
-class BaseModel(QAbstractListModel):
+T_BaseQGraphQLObject = TypeVar("T_BaseQGraphQLObject", bound=_BaseQGraphQLObject)
+
+
+class QGraphQListModel(QAbstractListModel, Generic[T_BaseQGraphQLObject]):
     OBJECT_ROLE = Qt.ItemDataRole.UserRole + 1
-    currentObjectChanged = Signal()
+    _role_names = {OBJECT_ROLE: QByteArray("object")}  # type: ignore
+    currentIndexChanged = Signal()
 
-    def __init__(self, data: list[T_BaseQGraphQLObject], parent: Optional[QObject] = None):
+    def __init__(
+        self,
+        parent: Optional[QObject],
+        default_object: T_BaseQGraphQLObject,
+        data: list[T_BaseQGraphQLObject],
+    ):
         super().__init__(parent)
+
         self._data = data
-        self._current_object: Optional[T_BaseQGraphQLObject] = None
+        self._default_object = default_object
+        self._current_index: int = 0
 
-    def set_current_object(self, obj: T_BaseQGraphQLObject) -> None:
-        self._current_object = obj
-        self.currentObjectChanged.emit()
+    @slot
+    def set_current_index(self, i: int) -> None:
+        self._current_index = i
+        self.currentIndexChanged.emit()
 
-    @qproperty(QObject, fset=set_current_object, notify=currentObjectChanged)  # type: ignore
+    @qproperty(int, notify=currentIndexChanged, fset=set_current_index)
+    def currentIndex(self) -> int:
+        return self._current_index
+
+    @qproperty(QObject, notify=currentIndexChanged)  # type: ignore
     def currentObject(self) -> Optional[T_BaseQGraphQLObject]:
-        return self._current_object
+        try:
+            return self._data[self._current_index]
+        except IndexError:
+            return self._default_object
 
     def rowCount(self, *args, **kwargs) -> int:
         return len(self._data)
 
     def roleNames(self) -> dict:
-        return {self.OBJECT_ROLE: QByteArray("object")}  # type: ignore
+        return self._role_names  # type: ignore
 
     def data(self, index, role=...) -> Optional[T_BaseQGraphQLObject]:
         if index.row() < len(self._data) and index.isValid():
@@ -82,5 +112,4 @@ def get_base_graphql_object(name: str) -> type[_BaseQGraphQLObject]:
 
 BaseGraphQLObject = get_base_graphql_object("BaseGraphQLObject")
 
-T_BaseModel = TypeVar("T_BaseModel", bound=BaseModel)
-T_BaseQGraphQLObject = TypeVar("T_BaseQGraphQLObject", bound=_BaseQGraphQLObject)
+T_BaseModel = TypeVar("T_BaseModel", bound=QGraphQListModel)
