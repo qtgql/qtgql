@@ -498,10 +498,10 @@ class TestDeserializers:
         assert inst.person.name == "Patrick"
         assert inst.person.age == 100
 
-    def test_nested_optional_object(self):
+    def test_nested_optional_object_is_null(self):
         testcase = OptionalNestedObjectTestCase.compile()
         inst = testcase.gql_type.from_dict(None, testcase.initialize_dict)
-        assert inst.person
+        assert inst.person is None
 
     def test_object_with_list_of_object(self):
         testcase = ObjectWithListOfObjectTestCase.compile()
@@ -544,11 +544,12 @@ class TestDefaultConstructor:
         assert getattr(inst, f.private_name) == scalar.default_value
 
     def test_nested_object_from_dict(self, qtbot):
+        # types that refer each-other can cause recursion error
+        # This is why we set object types to null.
         testcase = NestedObjectTestCase.compile()
         klass = testcase.gql_type
         inst = klass()
-        assert inst.person.name == BuiltinScalars.by_python_type(str).default_value
-        assert inst.person.age == BuiltinScalars.by_python_type(int).default_value
+        assert inst.person is None
 
     def test_object_with_list_of_object(self):
         testcase = ObjectWithListOfObjectTestCase.compile()
