@@ -82,7 +82,3 @@ class _BuiltinScalars:
 
 
 BuiltinScalars = _BuiltinScalars()
-
-if __name__ == "__main__":
-    for s in BuiltinScalars:
-        print(s)

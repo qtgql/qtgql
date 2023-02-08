@@ -50,6 +50,16 @@ def test_append(qtbot, sample_model_initialized):
     assert "foo" in sample_model_initialized._data
 
 
+class TestCurrentIndexProp:
+    def test_is_0_on_init(self, qtbot, sample_model_initialized):
+        assert sample_model_initialized.property("currentIndex") == 0
+
+    def test_setter_emits(self, qtbot, sample_model_initialized):
+        with qtbot.wait_signal(sample_model_initialized.currentIndexChanged):
+            sample_model_initialized.set_current_index(2)
+            assert sample_model_initialized.property("currentIndex") == 2
+
+
 class TestCurrentObject:
     def test_getter(self, qtbot, sample_model_initialized):
         expected = QObject()
