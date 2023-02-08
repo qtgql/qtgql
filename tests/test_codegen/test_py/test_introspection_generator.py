@@ -293,6 +293,22 @@ TimeTestCase = QGQLObjectTestCase(
         """,
     test_name="TimeTestCase",
 )
+ObjectsThatReferenceEachOtherTestCase = QGQLObjectTestCase(
+    schema=schemas.object_reference_each_other.schema,
+    test_name="ObjectsThatReferenceEachOtherTestCase",
+    query="""
+    {
+      user {
+        password
+        person {
+          name
+          age
+          user
+        }
+      }
+    }
+""",
+)
 
 
 class CountryScalar(BaseCustomScalar[Optional[str]]):
@@ -327,6 +343,7 @@ CustomUserScalarTestCase = QGQLObjectTestCase(
     """,
 )
 
+
 all_test_cases = [
     ScalarsTestCase,
     DateTimeTestCase,
@@ -342,6 +359,7 @@ all_test_cases = [
     TimeTestCase,
     EnumTestCase,
     CustomUserScalarTestCase,
+    ObjectsThatReferenceEachOtherTestCase,
 ]
 
 custom_scalar_testcases = [
@@ -560,4 +578,8 @@ class TestDefaultConstructor:
 
     def test_union(self):
         testcase = UnionTestCase.compile()
+        testcase.gql_type()
+
+    def test_wont_recursive(self):
+        testcase = ObjectsThatReferenceEachOtherTestCase.compile()
         testcase.gql_type()
