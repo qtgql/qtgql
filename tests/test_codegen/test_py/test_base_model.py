@@ -1,6 +1,6 @@
 import pytest
 from PySide6.QtCore import QByteArray, QObject, Qt
-from qtgql.codegen.py.bases import QGraphQListModel
+from qtgql.codegen.py.runtime.bases import QGraphQListModel
 
 from tests.test_codegen.test_py.test_introspection_generator import ObjectWithListOfObjectTestCase
 

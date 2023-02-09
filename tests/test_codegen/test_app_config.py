@@ -8,7 +8,7 @@ from pathlib import Path
 from types import ModuleType
 
 import pytest
-from qtgql.codegen.py.config import QtGqlConfig
+from qtgql.codegen.py.compiler.config import QtGqlConfig
 
 
 @contextlib.contextmanager

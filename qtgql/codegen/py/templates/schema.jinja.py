@@ -4,8 +4,8 @@ from PySide6.QtQml import QmlElement
 from enum import Enum, auto
 from typing import Optional, Union
 from qtgql import qproperty
-from qtgql.codegen.py.bases import QGraphQListModel
-from qtgql.codegen.py.config import QtGqlConfig
+from qtgql.codegen.py.runtime.bases import QGraphQListModel
+from qtgql.codegen.py.compiler.config import QtGqlConfig
 
 
 

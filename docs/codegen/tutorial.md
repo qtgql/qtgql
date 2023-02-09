@@ -9,7 +9,7 @@ Somewhere on your application (probably in config.py)
 add our codegen configurations.
 ```python
 # myapp/config.py
-from qtgql.codegen.py.config import QtGqlConfig
+from qtgql.codegen.py.compiler.config import QtGqlConfig
 from pathlib import Path
 
 myconfig = QtGqlConfig(url="http://localhost:8000/graphql",

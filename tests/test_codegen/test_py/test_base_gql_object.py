@@ -1,4 +1,4 @@
-from qtgql.codegen.py.bases import get_base_graphql_object
+from qtgql.codegen.py.runtime.bases import get_base_graphql_object
 
 
 def test_default_is_singleton():

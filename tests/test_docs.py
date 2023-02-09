@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 from mktestdocs import check_docstring, check_md_file
 from qtgql.autoproperty import define_properties
-from qtgql.codegen.py.scalars import BaseCustomScalar
+from qtgql.codegen.py.runtime.custom_scalars import BaseCustomScalar
 
 docs_dir = Path(__file__).parent.parent / "docs"
 assert docs_dir.exists()

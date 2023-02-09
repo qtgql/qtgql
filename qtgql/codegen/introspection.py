@@ -6,7 +6,8 @@ from typing import TYPE_CHECKING, Optional, Union
 
 import graphql
 
-from qtgql.codegen.py.compiler import TemplateContext
+from qtgql.codegen.py.compiler.builtin_scalars import BuiltinScalars
+from qtgql.codegen.py.compiler.template import TemplateContext
 from qtgql.codegen.py.objecttype import (
     EnumMap,
     EnumValue,
@@ -16,11 +17,10 @@ from qtgql.codegen.py.objecttype import (
     GqlTypeHinter,
     Kinds,
 )
-from qtgql.codegen.py.scalars import BuiltinScalars
 from qtgql.codegen.utils import anti_forward_ref
 
 if TYPE_CHECKING:  # pragma: no cover
-    from qtgql.codegen.py.config import QtGqlConfig
+    from qtgql.codegen.py.compiler.config import QtGqlConfig
 
 introspection_query = graphql.get_introspection_query(descriptions=True)
 

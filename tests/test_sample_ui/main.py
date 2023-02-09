@@ -8,7 +8,7 @@ from PySide6 import QtCore, QtGui, QtQml, QtQuick
 from PySide6.QtCore import QObject, Signal
 from PySide6.QtQml import QQmlApplicationEngine
 from qtgql import slot
-from qtgql.codegen.py.config import QtGqlConfig
+from qtgql.codegen.py.compiler.config import QtGqlConfig
 from qtgql.gqltransport.client import GqlClientMessage, GqlWsTransportClient, HandlerProto
 
 try:

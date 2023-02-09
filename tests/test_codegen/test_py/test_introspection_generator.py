@@ -8,11 +8,17 @@ import pytest
 import strawberry.utils.str_converters
 from attrs import define
 from qtgql.codegen.introspection import SchemaEvaluator, introspection_query
-from qtgql.codegen.py.bases import QGraphQListModel, _BaseQGraphQLObject
-from qtgql.codegen.py.config import QtGqlConfig
-from qtgql.codegen.py.custom_scalars import DateScalar, DateTimeScalar, DecimalScalar, TimeScalar
+from qtgql.codegen.py.compiler.builtin_scalars import BuiltinScalar, BuiltinScalars
+from qtgql.codegen.py.compiler.config import QtGqlConfig
 from qtgql.codegen.py.objecttype import GqlTypeDefinition
-from qtgql.codegen.py.scalars import BaseCustomScalar, BuiltinScalar, BuiltinScalars
+from qtgql.codegen.py.runtime.bases import QGraphQListModel, _BaseQGraphQLObject
+from qtgql.codegen.py.runtime.custom_scalars import (
+    BaseCustomScalar,
+    DateScalar,
+    DateTimeScalar,
+    DecimalScalar,
+    TimeScalar,
+)
 from qtgql.typingref import TypeHinter
 from strawberry import Schema
 

@@ -10,7 +10,7 @@ Here is a simple implementation
 
 ```python
 from __future__ import annotations
-from qtgql.codegen.py.scalars import BaseCustomScalar
+from qtgql.codegen.py.runtime.custom_scalars import BaseCustomScalar
 from typing import Optional
 
 country_map = {

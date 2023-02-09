@@ -3,8 +3,12 @@ from datetime import date, datetime, time
 from decimal import Decimal
 from typing import Type
 
-from qtgql.codegen.py.custom_scalars import DateScalar, DecimalScalar, TimeScalar
-from qtgql.codegen.py.scalars import BaseCustomScalar
+from qtgql.codegen.py.runtime.custom_scalars import (
+    BaseCustomScalar,
+    DateScalar,
+    DecimalScalar,
+    TimeScalar,
+)
 
 
 class AbstractScalarTestCase(ABC):
