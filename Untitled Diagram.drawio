@@ -1,1 +1,47 @@
-<mxfile host="app.diagrams.net" modified="2023-02-12T13:23:24.128Z" agent="5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36" etag="76XWkQBZqTc_VuTyw3S8" version="20.8.20" type="github"><diagram name="Page-1" id="kSJdXDSHzsTl4Mddqtbs">zVhdT9swFP01kbaHonw0KX2EAkPakGAIsT0hk9wm1hw7OA5t9+tnJ86nIW3RoLw09s31dXzO9T12LW+Rrr9xlCVXLAJiuXa0trwzy3UdL7DlQ1k22jKfBZUl5jjSttZwi/+CNuqBcYEjyHuOgjEicNY3hoxSCEXPhjhnq77bkpH+rBmKwTDchoiY1nsciaSyHruz1n4JOE7qmZ1gXr1JUe2sV5InKGKrjsk7t7wFZ0xUrXS9AKLQq3Gpxl288rb5MA5U7DLgD7cf7jbB93Rz4mZX9sPEf3qaODrMMyKFXrH+WrGpIQAanSgkZS8kKM9xaHmniUiJNDiyyVlBI1Cz2LIHayx+ddq/VfvI172zdefV2UZ3qikhMqho16ZNOSt4CCMLmuocQTwGMeLnNwzI3AWWguAbOW7Vcuxr3pIOvbWNA0ECP/c/F+lUi5twzQzXDMuFuLbeF9OpjqN3xWQ+s/sxqnXqYV1SB5G8+TCSO4hUIWFEko3OwltTmTT7JJBrJNA1h8nPggqcgpFL+QqnBFHZO10lWMBthko6V7J89LNKhwUuYD2eFSaLNczuABzHqS0dnhuvLtHOkJAuqT0M9wVsauC1kFUzBqqXlsvnUwEcl60lZ6l83Fz9UB1MSqNg8ucS0YgAV/1HlMvt59qM6rEKA4oU/AFKFa70Mc8aTLtbmxBZSP8XGyMJ8ipHQZ8iz+THCV7ix3kvfsyCeKMRjUCWP14ijWlDSsjSjFHQu+tzgevO+uj6L6D7UvYfvxe4ZrEwUAsL/lyKiUJmP+nJZa0TtT9lZZXZQVpG69pWwakPJdsEZ3pIwXH6eeDYb5SbiTNQLncY6RW5kaygTcctUw75uwiSZ+TYYcVoVHwa/f4Y8fENbE6yjOBQ5lYpHksQYaI0ZqgbAZHfdvrIZStWrVahvhSyxKniuMQUoq8HqYLeeBX0+zk7PXQVdEwaFrWKlPqeILXnJLA7MGEF9l0OlUYppZS3HmjvQ6ValecFkYA5OKkOEUeKRw4hqAojuUQCWQqRC1U6ZT3l+Wfkdbpd3D746DDbLm+f4jI1Wji3Kp6/o+I5B71jeYOzT5MLe1+xBrcId5g/b75hyW57/a/c239RvPN/</diagram></mxfile>
+<mxfile host="app.diagrams.net" modified="2023-02-12T13:25:14.251Z" agent="5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36" etag="w7chudV3OLb9paweCNSE" version="20.8.20" type="github">
+  <diagram name="Page-1" id="kSJdXDSHzsTl4Mddqtbs">
+    <mxGraphModel dx="1360" dy="1976" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="kr0_Uy6KmyA2pM0_-5qq-11" value="" style="endArrow=classic;html=1;rounded=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="kr0_Uy6KmyA2pM0_-5qq-4" target="kr0_Uy6KmyA2pM0_-5qq-5" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="440" y="-970" as="sourcePoint" />
+            <mxPoint x="390" y="-920" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kr0_Uy6KmyA2pM0_-5qq-12" value="Pre-Runtime" style="swimlane;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="450" y="-1120" width="420" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="kr0_Uy6KmyA2pM0_-5qq-4" value="Codegen pares queries from QML files to Handlers based on query name&amp;nbsp;" style="ellipse;whiteSpace=wrap;html=1;" parent="kr0_Uy6KmyA2pM0_-5qq-12" vertex="1">
+          <mxGeometry x="60" y="30" width="160" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="kr0_Uy6KmyA2pM0_-5qq-1" value="Query declared in QML component" style="ellipse;whiteSpace=wrap;html=1;" parent="kr0_Uy6KmyA2pM0_-5qq-12" vertex="1">
+          <mxGeometry x="270" y="50" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="kr0_Uy6KmyA2pM0_-5qq-2" value="" style="curved=1;endArrow=classic;html=1;rounded=0;startArrow=none;" parent="kr0_Uy6KmyA2pM0_-5qq-12" source="kr0_Uy6KmyA2pM0_-5qq-1" target="kr0_Uy6KmyA2pM0_-5qq-4" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="10" y="100" as="sourcePoint" />
+            <mxPoint x="-140" y="200" as="targetPoint" />
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kr0_Uy6KmyA2pM0_-5qq-13" value="Runtime" style="swimlane;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="40" y="-1120" width="390" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="kr0_Uy6KmyA2pM0_-5qq-5" value="Application fetches&amp;nbsp;&lt;br&gt;queries (use defined)" style="ellipse;whiteSpace=wrap;html=1;" parent="kr0_Uy6KmyA2pM0_-5qq-13" vertex="1">
+          <mxGeometry x="250" y="40" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="kr0_Uy6KmyA2pM0_-5qq-15" value="Components that uses&amp;nbsp;&lt;br&gt;`UseQuery` are connected to the&lt;br&gt;handler. (receive data / errors)" style="ellipse;whiteSpace=wrap;html=1;" parent="kr0_Uy6KmyA2pM0_-5qq-13" vertex="1">
+          <mxGeometry x="40" y="50" width="160" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="kr0_Uy6KmyA2pM0_-5qq-17" value="" style="endArrow=classic;html=1;rounded=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" parent="kr0_Uy6KmyA2pM0_-5qq-13" source="kr0_Uy6KmyA2pM0_-5qq-5" target="kr0_Uy6KmyA2pM0_-5qq-15" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="370" y="160" as="sourcePoint" />
+            <mxPoint x="320" y="210" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
