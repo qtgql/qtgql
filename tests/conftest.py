@@ -1,3 +1,4 @@
+import hashlib
 import socket
 import subprocess
 import time
@@ -12,6 +13,7 @@ from PySide6.QtCore import QUrl
 from PySide6.QtQml import QQmlApplicationEngine, QQmlComponent
 from PySide6.QtQuick import QQuickItem
 from pytestqt.qtbot import QtBot
+from strawberry import Schema
 
 fake = Faker()
 
@@ -78,15 +80,26 @@ class QmlBot:
 
     def loads(self, content: str) -> QQuickItem:
         self.comp = QQmlComponent(self.engine)
-        self.comp.setData(content.encode("utf-8"), QUrl())
+        self.comp.setData(content.encode("utf-8"), QUrl("./"))
         self._loader.setProperty("source", "")
         self._loader.setProperty("sourceComponent", self.comp)
         return self._loader.property("item")
 
+    def loads_many(self, components: dict[str, str]):
+        for name, content in components.items():
+            comp = QQmlComponent(self.engine)
+            comp.setData(content.encode("utf-8"), QUrl("./"))
+
+        self.loads(components["main.qml"])
+
     def find(self, objectname: str, type: T = QQuickItem) -> T:
-        return self.window.findChild(type, objectname)
+        return self._loader.findChild(type, objectname)
 
 
 @pytest.fixture()
-def qmlloader(qtbot):
+def qmlbot(qtbot):
     return QmlBot(qtbot)
+
+
+def hash_schema(schema: Schema) -> int:
+    return int(hashlib.sha256(str(schema).encode("utf-8")).hexdigest(), 16) % 10**8

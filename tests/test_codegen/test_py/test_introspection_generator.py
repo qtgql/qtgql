@@ -1,7 +1,10 @@
+import tempfile
 import typing
 import uuid
+from contextlib import contextmanager
 from functools import cached_property
 from pathlib import Path
+from textwrap import dedent
 from types import ModuleType
 from typing import Optional
 
@@ -21,9 +24,11 @@ from qtgql.codegen.py.runtime.custom_scalars import (
     DecimalScalar,
     TimeScalar,
 )
+from qtgql.codegen.py.runtime.environment import ENV_MAP, QtGqlEnvironment
 from qtgql.typingref import TypeHinter
 from strawberry import Schema
 
+from tests.conftest import QmlBot, hash_schema
 from tests.mini_gql_server import schema
 from tests.test_codegen import schemas
 from tests.test_codegen.conftest import get_introspection_for
@@ -40,15 +45,24 @@ class QGQLObjectTestCase:
     schema: Schema
     test_name: str
     type_name: str = "User"
-    qml_dir: Path = None
     mod: Optional[ModuleType] = None
     tested_type: Optional[GqlTypeDefinition] = None
-    config: QtGqlConfig = attrs.field(factory=lambda: QtGqlConfig(url=None, output=None))
+    config: QtGqlConfig = attrs.field(
+        factory=lambda: QtGqlConfig(url=None, output=None, qml_dir=Path(__file__).parent)
+    )
+    qml_files: dict[str, str] = None
 
     @cached_property
     def evaluator(self) -> SchemaEvaluator:
         introspection = get_introspection_for(self.schema)
         return SchemaEvaluator(introspection, config=self.config)
+
+    def get_environment(self) -> QtGqlEnvironment:
+        return ENV_MAP[self.config.env_name]
+
+    def load_qml(self, qmlbot: QmlBot):
+        qmlbot.loads_many(self.qml_files)
+        qmlbot.bot.wait_until(self.get_environment().client.isValid)
 
     @property
     def module(self) -> ModuleType:
@@ -64,12 +78,22 @@ class QGQLObjectTestCase:
     def initialize_dict(self) -> dict:
         return self.schema.execute_sync(self.query).data["user"]
 
-    def compile(self) -> "QGQLObjectTestCase":
+    @contextmanager
+    def tmp_qml_dir(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_dir = Path(tmp_dir)
+            for fname, content in self.qml_files.items():
+                with open(tmp_dir / fname, "w") as f:
+                    f.write(content)
+            yield tmp_dir
+
+    def compile(self, url: Optional[str] = None) -> "QGQLObjectTestCase":
+        self.config.url = url.replace("graphql", f"{hash_schema(self.schema)}")
         tmp_mod = ModuleType(uuid.uuid4().hex)
         type_name = self.type_name
-        self.evaluator.evaluate_concretes()
-
-        generated = self.evaluator.dumps()
+        with self.tmp_qml_dir() as tmp_dir:
+            self.config.qml_dir = tmp_dir
+            generated = self.evaluator.dumps()
         compiled = compile(generated, "schema", "exec")
         exec(compiled, tmp_mod.__dict__)
         self.mod = tmp_mod
@@ -98,11 +122,8 @@ class QGQLObjectTestCase:
                 return sf
 
 
-PROJECTS_DIR = (Path(__file__).parent.parent / "test_projects").resolve(True)
-
 ScalarsTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_scalar.schema,
-    qml_dir=PROJECTS_DIR / "scalars",
     query="""
         {
           user {
@@ -116,6 +137,30 @@ ScalarsTestCase = QGQLObjectTestCase(
         }
         """,
     test_name="ScalarsTestCase",
+    qml_files={
+        "main.qml": dedent(
+            """
+            import QtQuick
+            import QtGql 1.0 as Gql
+            Item{
+                objectName: "rootItem"
+             Gql.RootQuery{
+              graphql: `query RootQuery {
+              user {
+                name
+                age
+                agePoint
+                male
+                id
+                uuid
+              }
+            }
+            `
+             }
+            }
+        """
+        )
+    },
 )
 
 

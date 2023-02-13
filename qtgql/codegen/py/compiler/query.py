@@ -2,22 +2,12 @@ import re
 from typing import NamedTuple
 
 from qtgql.codegen.py.objecttype import GqlFieldDefinition
-from qtgql.gqltransport.client import HandlerProto
+
+pattern = re.compile(r"(?s)(?<=graphql: `).*?(?=`)")
 
 
-class UseQueryHandler(HandlerProto):
-    ...
-
-
-pattern = re.compile(r"(?s)(?<=graphql`).*?(?=`)")
-
-
-def find_gql(string: str) -> list:
+def find_gql(string: str) -> list[str]:
     return pattern.findall(string)
-
-
-def hash_query(query: str) -> int:
-    return hash(query)
 
 
 class GqlQueryDefinition(NamedTuple):
@@ -26,3 +16,8 @@ class GqlQueryDefinition(NamedTuple):
     field: GqlFieldDefinition
     directives: list[str] = []
     fragments: list[str] = []
+
+    @property
+    def root_type(self) -> str:
+        rt = self.field.type.is_object_type
+        return rt.name

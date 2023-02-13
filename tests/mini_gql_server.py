@@ -8,6 +8,9 @@ from faker import Faker
 from strawberry.aiohttp.views import GraphQLView
 from strawberry.types import Info
 
+from tests.conftest import hash_schema
+from tests.test_codegen.schemas import __all__ as all_schemas
+
 fake = Faker()
 
 
@@ -69,6 +72,8 @@ schema = strawberry.Schema(query=Query, subscription=Subscription, mutation=Muta
 def init_func(argv):
     app = web.Application()
     app.router.add_route("*", "/graphql", GraphQLView(schema=schema))
+    for mod in all_schemas:
+        app.router.add_route("*", f"/{hash_schema(mod.schema)}", GraphQLView(schema=schema))
     return app
 
 

@@ -1,14 +1,15 @@
 from __future__ import annotations
 
+import glob
 from functools import cached_property
 from pathlib import Path
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, NewType, Optional, Union
 
 import graphql
 from graphql import OperationType, parse
 
 from qtgql.codegen.py.compiler.builtin_scalars import BuiltinScalars
-from qtgql.codegen.py.compiler.query import GqlQueryDefinition, find_gql, hash_query
+from qtgql.codegen.py.compiler.query import GqlQueryDefinition, find_gql
 from qtgql.codegen.py.compiler.template import TemplateContext
 from qtgql.codegen.py.objecttype import (
     EnumMap,
@@ -27,6 +28,9 @@ if TYPE_CHECKING:  # pragma: no cover
 introspection_query = graphql.get_introspection_query(descriptions=True)
 
 
+OperationName = NewType("OperationName", str)
+
+
 class SchemaEvaluator:
     def __init__(self, introspection: dict, config: QtGqlConfig):
         self.template = config.template_class
@@ -35,7 +39,7 @@ class SchemaEvaluator:
         self._generated_types: dict[str, GqlTypeDefinition] = {}
         self._generated_enums: EnumMap = {}
         self._fragments_store: dict[int, str] = {}
-        self._queries_store: dict[int, GqlQueryDefinition] = {}
+        self._queries_store: dict[OperationName, GqlQueryDefinition] = {}
 
     @cached_property
     def unions(self) -> list[dict]:
@@ -53,7 +57,7 @@ class SchemaEvaluator:
                 return union["possibleTypes"]
         raise ValueError(f"Union for {name} was not found")  # pragma: no cover
 
-    def evaluate_field_type(self, t: dict) -> GqlTypeHinter:
+    def _evaluate_field_type(self, t: dict) -> GqlTypeHinter:
         kind = Kinds(t["kind"])
 
         if kind == Kinds.NON_NULL:
@@ -68,7 +72,7 @@ class SchemaEvaluator:
         ret: Optional[GqlTypeHinter] = None
 
         if kind == Kinds.LIST:
-            ret = GqlTypeHinter(type=list, of_type=(self.evaluate_field_type(of_type),))
+            ret = GqlTypeHinter(type=list, of_type=(self._evaluate_field_type(of_type),))
         elif kind == Kinds.SCALAR:
             if builtin_scalar := BuiltinScalars.by_graphql_name(name):
                 ret = GqlTypeHinter(type=builtin_scalar)
@@ -93,10 +97,10 @@ class SchemaEvaluator:
 
         raise NotImplementedError(f"kind {kind} not supported yet")  # pragma: no cover
 
-    def evaluate_field(self, field: dict) -> GqlFieldDefinition:
+    def _evaluate_field(self, field: dict) -> GqlFieldDefinition:
         """we don't really know what is the field type just it's name."""
         return GqlFieldDefinition(
-            type=self.evaluate_field_type(field["type"]),
+            type=self._evaluate_field_type(field["type"]),
             name=field["name"],
             type_map=self._generated_types,
             scalars=self.config.custom_scalars,
@@ -104,7 +108,7 @@ class SchemaEvaluator:
             enums=self._generated_enums,
         )
 
-    def evaluate_object_type(self, type_: dict) -> Optional[GqlTypeDefinition]:
+    def _evaluate_object_type(self, type_: dict) -> Optional[GqlTypeDefinition]:
         # scalars are swallowed here.
         t_name: str = type_["name"]
         if t_name.startswith("__"):
@@ -116,7 +120,7 @@ class SchemaEvaluator:
             kind=Kinds.OBJECT,
             name=t_name,
             docstring=type_["description"],
-            fields=[self.evaluate_field(f) for f in type_["fields"]],
+            fields=[self._evaluate_field(f) for f in type_["fields"]],
         )
         return concrete
 
@@ -135,39 +139,49 @@ class SchemaEvaluator:
             ],
         )
 
-    def evaluate_concretes(self) -> None:
+    def parse_schema_concretes(self) -> None:
         types = self.introspection["__schema"]["types"]
         for tp in types:
             kind = Kinds(tp["kind"])
             if kind is Kinds.SCALAR:
                 continue
             elif kind is Kinds.OBJECT:
-                if object_type := self.evaluate_object_type(tp):
+                if object_type := self._evaluate_object_type(tp):
                     self._generated_types[object_type.name] = object_type
             elif kind is Kinds.ENUM:
                 if enum := self._evaluate_enum(tp):
                     self._generated_enums[enum.name] = enum
 
-    def _evaluate_query(self, qml_file: str) -> str:
-        for node in find_gql(qml_file):
-            ast = parse(node)
-            for definition in ast.definitions:
-                field_name = definition.selection_set.selections[0].name.value
-                field = None
-                if definition.operation is OperationType.QUERY:
-                    for f in self.query_type.fields:
-                        if f.name == field_name:
-                            field = f
-                    assert field
-                    self._queries_store[hash_query(node)] = GqlQueryDefinition(
-                        query=node,
-                        name=definition.name.value,
-                        field=field,
-                        directives=definition.directives,
-                    )
+    def parse_qml_operations(self) -> None:
+        qml_files = glob.glob("**/*.qml", root_dir=self.config.qml_dir, recursive=True)
+        for relative in qml_files:
+            file = self.config.qml_dir / relative
+            with open(file) as f:
+                for node in find_gql(f.read()):
+                    ast = parse(node)
+                    for definition in ast.definitions:
+                        field_name = definition.selection_set.selections[0].name.value
+                        field = None
+                        if definition.operation is OperationType.QUERY:
+                            for f in self.query_type.fields:
+                                if f.name == field_name:
+                                    field = f
+                            assert field
+                            self._queries_store[OperationName(node)] = GqlQueryDefinition(
+                                query=node,
+                                name=definition.name.value,
+                                field=field,
+                                directives=definition.directives,
+                            )
+
+    def evaluate(self) -> None:
+        self.ev
+        self.parse_qml_operations()
 
     def dumps(self) -> str:
         """:return: The generated schema module as a string."""
+        self.parse_schema_concretes()
+        self.parse_qml_operations()
         return self.template(
             TemplateContext(
                 enums=list(self._generated_enums.values()),
@@ -184,7 +198,7 @@ class SchemaEvaluator:
     @classmethod
     def from_dict(cls, introspection: dict, config: QtGqlConfig) -> SchemaEvaluator:
         evaluator = SchemaEvaluator(introspection, config=config)
-        evaluator.evaluate_concretes()
+        evaluator.parse_schema_concretes()
         return evaluator
 
     def dump(self, file: Path):
