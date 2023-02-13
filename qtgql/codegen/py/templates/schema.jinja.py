@@ -5,7 +5,10 @@ from enum import Enum, auto
 from typing import Optional, Union
 from qtgql import qproperty
 from qtgql.codegen.py.runtime.bases import QGraphQListModel
+from qtgql.codegen.py.runtime.environment import QtGqlEnvironment
+from qtgql.codegen.py.runtime.queryhandler import BaseQueryHandler
 from qtgql.codegen.py.compiler.config import QtGqlConfig
+
 
 
 
@@ -15,6 +18,7 @@ from qtgql.codegen.py.compiler.config import QtGqlConfig
 
 QML_IMPORT_NAME = "QtGql"
 QML_IMPORT_MAJOR_VERSION = 1
+environment = QtGqlEnvironment.from_url("{{context.config.url}}")
 
 
 {% for enum in context.enums %}
@@ -71,5 +75,13 @@ class {{ type.name }}({{context.base_object_name}}):
         {{f.fget}}
     {% endfor %}
 
+{% endfor %}
+
+
+{% for query in context.queries %}
+
+class {{query.name}}(BaseQueryHandler):
+    def on_data(self) -> None:
+        for h
 
 {% endfor %}

@@ -26,7 +26,7 @@ class Kinds(enum.Enum):
 
 
 @define(slots=False)
-class FieldProperty:
+class GqlFieldDefinition:
     name: str
     type: GqlTypeHinter
     type_map: dict[str, GqlTypeDefinition]
@@ -153,7 +153,7 @@ class FieldProperty:
 class GqlTypeDefinition:
     kind: Kinds
     name: str
-    fields: list[FieldProperty]
+    fields: list[GqlFieldDefinition]
     docstring: Optional[str] = ""
 
 

@@ -30,6 +30,7 @@ class QtGqlConfig:
     """base object to be extended by all generated types."""
     qml_import_name: str = "QtGql"
     """Enums would exist in this namespace."""
+    queries: dict[str, str] = {}
 
     def fetch(self) -> None:
         res = requests.post(self.url, json={"query": introspection_query})

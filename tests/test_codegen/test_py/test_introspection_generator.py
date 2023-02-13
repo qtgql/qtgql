@@ -1,5 +1,7 @@
 import typing
 import uuid
+from functools import cached_property
+from pathlib import Path
 from types import ModuleType
 from typing import Optional
 
@@ -32,15 +34,21 @@ def introspected():
     return schema.execute_sync(introspection_query)
 
 
-@define
+@define(slots=False)
 class QGQLObjectTestCase:
     query: str
     schema: Schema
     test_name: str
     type_name: str = "User"
+    qml_dir: Path = None
     mod: Optional[ModuleType] = None
     tested_type: Optional[GqlTypeDefinition] = None
     config: QtGqlConfig = attrs.field(factory=lambda: QtGqlConfig(url=None, output=None))
+
+    @cached_property
+    def evaluator(self) -> SchemaEvaluator:
+        introspection = get_introspection_for(self.schema)
+        return SchemaEvaluator(introspection, config=self.config)
 
     @property
     def module(self) -> ModuleType:
@@ -59,13 +67,13 @@ class QGQLObjectTestCase:
     def compile(self) -> "QGQLObjectTestCase":
         tmp_mod = ModuleType(uuid.uuid4().hex)
         type_name = self.type_name
-        introspection = get_introspection_for(self.schema)
-        res = SchemaEvaluator(introspection, config=self.config)
-        generated = res.generate()
+        self.evaluator.evaluate_concretes()
+
+        generated = self.evaluator.dumps()
         compiled = compile(generated, "schema", "exec")
         exec(compiled, tmp_mod.__dict__)
         self.mod = tmp_mod
-        self.tested_type = res._generated_types[type_name]
+        self.tested_type = self.evaluator._generated_types[type_name]
         return self
 
     def get_field_by_type(self, t):
@@ -90,8 +98,11 @@ class QGQLObjectTestCase:
                 return sf
 
 
+PROJECTS_DIR = (Path(__file__).parent.parent / "test_projects").resolve(True)
+
 ScalarsTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_scalar.schema,
+    qml_dir=PROJECTS_DIR / "scalars",
     query="""
         {
           user {

@@ -5,14 +5,16 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Optional, Union
 
 import graphql
+from graphql import OperationType, parse
 
 from qtgql.codegen.py.compiler.builtin_scalars import BuiltinScalars
+from qtgql.codegen.py.compiler.query import GqlQueryDefinition, find_gql, hash_query
 from qtgql.codegen.py.compiler.template import TemplateContext
 from qtgql.codegen.py.objecttype import (
     EnumMap,
     EnumValue,
-    FieldProperty,
     GqlEnumDefinition,
+    GqlFieldDefinition,
     GqlTypeDefinition,
     GqlTypeHinter,
     Kinds,
@@ -32,13 +34,18 @@ class SchemaEvaluator:
         self.config = config
         self._generated_types: dict[str, GqlTypeDefinition] = {}
         self._generated_enums: EnumMap = {}
-        self._evaluate()
+        self._fragments_store: dict[int, str] = {}
+        self._queries_store: dict[int, GqlQueryDefinition] = {}
 
     @cached_property
     def unions(self) -> list[dict]:
         return [
             t for t in self.introspection["__schema"]["types"] if Kinds(t["kind"]) == Kinds.UNION
         ]
+
+    @property
+    def query_type(self) -> GqlTypeDefinition:
+        return self._generated_types[self.introspection["__schema"]["queryType"]["name"]]
 
     def get_possible_types_for_union(self, name: str) -> list[dict]:
         for union in self.unions:
@@ -86,9 +93,9 @@ class SchemaEvaluator:
 
         raise NotImplementedError(f"kind {kind} not supported yet")  # pragma: no cover
 
-    def evaluate_field(self, field: dict) -> FieldProperty:
+    def evaluate_field(self, field: dict) -> GqlFieldDefinition:
         """we don't really know what is the field type just it's name."""
-        return FieldProperty(
+        return GqlFieldDefinition(
             type=self.evaluate_field_type(field["type"]),
             name=field["name"],
             type_map=self._generated_types,
@@ -128,7 +135,7 @@ class SchemaEvaluator:
             ],
         )
 
-    def _evaluate(self) -> None:
+    def evaluate_concretes(self) -> None:
         types = self.introspection["__schema"]["types"]
         for tp in types:
             kind = Kinds(tp["kind"])
@@ -141,7 +148,25 @@ class SchemaEvaluator:
                 if enum := self._evaluate_enum(tp):
                     self._generated_enums[enum.name] = enum
 
-    def generate(self) -> str:
+    def _evaluate_query(self, qml_file: str) -> str:
+        for node in find_gql(qml_file):
+            ast = parse(node)
+            for definition in ast.definitions:
+                field_name = definition.selection_set.selections[0].name.value
+                field = None
+                if definition.operation is OperationType.QUERY:
+                    for f in self.query_type.fields:
+                        if f.name == field_name:
+                            field = f
+                    assert field
+                    self._queries_store[hash_query(node)] = GqlQueryDefinition(
+                        query=node,
+                        name=definition.name.value,
+                        field=field,
+                        directives=definition.directives,
+                    )
+
+    def dumps(self) -> str:
         """:return: The generated schema module as a string."""
         return self.template(
             TemplateContext(
@@ -151,6 +176,7 @@ class SchemaEvaluator:
                     for name, t in self._generated_types.items()
                     if name not in BuiltinScalars.keys()
                 ],
+                queries=list(self._queries_store.values()),
                 config=self.config,
             )
         )
@@ -158,9 +184,10 @@ class SchemaEvaluator:
     @classmethod
     def from_dict(cls, introspection: dict, config: QtGqlConfig) -> SchemaEvaluator:
         evaluator = SchemaEvaluator(introspection, config=config)
+        evaluator.evaluate_concretes()
         return evaluator
 
     def dump(self, file: Path):
         """:param file: Path to the file the codegen would dump to."""
         with open(file, "w") as fh:
-            fh.write(self.generate())
+            fh.write(self.dumps())
