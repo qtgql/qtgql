@@ -24,9 +24,9 @@ class QueryPayload(Generic[T], EncodeAble):
     variables: Optional[Union[dict, T]] = UNSET
 
     def __attrs_post_init__(self):
-        match = re.search(r"(subscription|mutation|query)(.*?({|\())", self.query)
-        op_name = match.group(2).replace(" ", "").strip("{").strip("(")
-        if op_name:
+        if not self.operationName:
+            match = re.search(r"(subscription|mutation|query)(.*?({|\())", self.query)
+            op_name = match.group(2).replace(" ", "").strip("{").strip("(")
             self.operationName = op_name
 
 

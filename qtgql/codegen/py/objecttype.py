@@ -7,9 +7,9 @@ from typing import Any, Optional, Type
 
 from attrs import define
 
-from qtgql.codegen.py.bases import QGraphQListModel, _BaseQGraphQLObject
-from qtgql.codegen.py.custom_scalars import CustomScalarMap
-from qtgql.codegen.py.scalars import BaseCustomScalar, BuiltinScalar
+from qtgql.codegen.py.compiler.builtin_scalars import BuiltinScalar
+from qtgql.codegen.py.runtime.bases import QGraphQListModel, _BaseQGraphQLObject
+from qtgql.codegen.py.runtime.custom_scalars import BaseCustomScalar, CustomScalarMap
 from qtgql.codegen.utils import AntiForwardRef
 from qtgql.typingref import TypeHinter
 
@@ -26,7 +26,7 @@ class Kinds(enum.Enum):
 
 
 @define(slots=False)
-class FieldProperty:
+class GqlFieldDefinition:
     name: str
     type: GqlTypeHinter
     type_map: dict[str, GqlTypeDefinition]
@@ -153,7 +153,7 @@ class FieldProperty:
 class GqlTypeDefinition:
     kind: Kinds
     name: str
-    fields: list[FieldProperty]
+    fields: list[GqlFieldDefinition]
     docstring: Optional[str] = ""
 
 

@@ -6,7 +6,7 @@ import rich
 import toml
 import typer
 
-from qtgql.codegen.py.config import QtGqlConfig
+from qtgql.codegen.py.compiler.config import QtGqlConfig
 
 console = rich.console.Console()
 

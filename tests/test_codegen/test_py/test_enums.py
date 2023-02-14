@@ -5,7 +5,7 @@ import pytest
 from PySide6.QtCore import QObject
 
 from tests.test_codegen.schemas import object_with_enum
-from tests.test_codegen.test_py.test_introspection_generator import EnumTestCase
+from tests.test_codegen.test_py.testcases import EnumTestCase
 
 
 def test_generates_valid_python_enum():
@@ -25,7 +25,7 @@ def test_generates_qobject_class_with_all_the_enums():
 
 
 @pytest.mark.parametrize("status", iter(object_with_enum.Status))
-def test_accessible_from_qml(qmlloader, status):
+def test_accessible_from_qml(qmlbot, status):
     qml = dedent(
         """
         import QtQuick
@@ -39,5 +39,5 @@ def test_accessible_from_qml(qmlloader, status):
     )
 
     EnumTestCase.compile()
-    item = qmlloader.loads(qml)
+    item = qmlbot.loads(qml)
     assert item.property("enumValue") == status.value

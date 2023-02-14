@@ -6,8 +6,10 @@ from typing import TYPE_CHECKING, Any
 from attrs import define
 from jinja2 import Environment, PackageLoader, select_autoescape
 
+from qtgql.codegen.py.compiler.query import QueryHandlerDefinition
+
 if TYPE_CHECKING:  # pragma: no cover
-    from qtgql.codegen.py.config import QtGqlConfig
+    from qtgql.codegen.py.compiler.config import QtGqlConfig
     from qtgql.codegen.py.objecttype import GqlEnumDefinition, GqlTypeDefinition
 
 env = Environment(loader=PackageLoader("qtgql.codegen.py"), autoescape=select_autoescape())
@@ -19,6 +21,7 @@ SchemaTemplate = env.get_template("schema.jinja.py")
 class TemplateContext:
     enums: list[GqlEnumDefinition]
     types: list[GqlTypeDefinition]
+    queries: list[QueryHandlerDefinition]
     config: QtGqlConfig
 
     @property

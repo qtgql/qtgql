@@ -44,18 +44,20 @@ plugins:
 
 
 nav:
-  - Home:
+  - QtGql:
       - Overview: ./index.md
-      - Utils: ./utilities.md
-  - Codegen:
-      Tutorial: ./codegen/tutorial.md
-      Configurations: ./codegen/config.md
-      Scalars:
+      - Tutorial: ./codegen/tutorial.md
+      - Configurations: ./codegen/config.md
+      - Scalars:
         - Index: ./codegen/scalars/index.md
         - Custom Scalars: ./codegen/scalars/custom_scalars.md
         - Create a Scalar: ./codegen/scalars/create_scalar.md
-  - ItemSystem:
-      Intro: ./itemsystem/intro.md
+
+  - Helpers:
+    - Item-System: ./helpers/itemsystem.md
+    - Utils: ./helpers/utilities.md
+
+
 markdown_extensions:
   - def_list
   - pymdownx.tasklist:

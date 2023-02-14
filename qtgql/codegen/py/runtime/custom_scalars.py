@@ -1,9 +1,50 @@
+from abc import ABC, abstractmethod
 from datetime import date, datetime, time
-from typing import Optional, Type
+from typing import Any, Generic, Optional, Type, TypeVar
 
 from _decimal import Decimal
 
-from qtgql.codegen.py.scalars import BaseCustomScalar
+T = TypeVar("T")
+
+__all__ = ["BaseCustomScalar"]
+
+
+class BaseCustomScalar(Generic[T], ABC):
+    """Class to extend by user defined scalars."""
+
+    __slots__ = "_value"
+    GRAPHQL_NAME: str
+    """The *real* GraphQL name of the scalar (used by the codegen inspection
+    pipeline)."""
+    DEFAULT_VALUE: T
+    """A place holder graphql query returned null or the field wasn't queried.
+
+    can be used by `from_graphql()`
+    """
+
+    def __init__(self, v: Optional[T] = None):
+        if not v:
+            self._value = self.DEFAULT_VALUE
+        else:
+            self._value = v
+
+    @abstractmethod
+    def from_graphql(cls, v: Optional[Any] = None) -> "BaseCustomScalar":
+        """Deserializes data fetched from graphql, This is useful when you want
+        to set a first-of value that will later be used by `to_qt()`.
+
+        **must be overridden**!
+        """
+        raise NotImplementedError  # pragma: no cover
+
+    @abstractmethod
+    def to_qt(self) -> Any:
+        """Will be used by the property getter, This is the official value that
+        Qt should "understand".
+
+        **must be overridden**!
+        """
+        raise NotImplementedError  # pragma: no cover
 
 
 class DateTimeScalar(BaseCustomScalar[datetime]):

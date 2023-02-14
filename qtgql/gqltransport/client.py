@@ -94,7 +94,7 @@ class GqlWsTransportClient(qtws.QWebSocket):
         url: str,
         parent=None,
         ping_interval: int = 50000,
-        ping_timeout: int = 1000,
+        ping_timeout: int = 5000,
         auto_reconnect: bool = False,
         reconnect_timeout: int = 5000,
         headers: Optional[dict[bytes, bytes]] = None,

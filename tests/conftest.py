@@ -1,3 +1,5 @@
+import hashlib
+import os
 import socket
 import subprocess
 import time
@@ -12,6 +14,7 @@ from PySide6.QtCore import QUrl
 from PySide6.QtQml import QQmlApplicationEngine, QQmlComponent
 from PySide6.QtQuick import QQuickItem
 from pytestqt.qtbot import QtBot
+from strawberry import Schema
 
 fake = Faker()
 
@@ -24,7 +27,7 @@ class MiniServer:
 
 
 @pytest.fixture(scope="session")
-def mini_server() -> MiniServer:
+def schemas_server() -> MiniServer:
     sock = socket.socket()
     sock.bind(("", 0))
     port = str(sock.getsockname()[1])
@@ -39,9 +42,10 @@ def mini_server() -> MiniServer:
             "-H",
             "localhost",
             f"-P {port}",
-            "mini_gql_server:init_func",
+            "tests.mini_gql_server:init_func",
         ],
-        cwd=Path(__file__).parent,
+        env=os.environ.copy(),
+        cwd=Path(__file__).parent.parent,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
     )
@@ -68,8 +72,8 @@ class QmlBot:
 
     @property
     def _loader(self) -> QQuickItem:
-        self.root = self.engine.rootObjects()[0]
-        return self.root.findChild(QQuickItem, "contentloader")
+        self.window = self.engine.rootObjects()[0]
+        return self.window.findChild(QQuickItem, "contentloader")
 
     def load(self, path: Path) -> QQuickItem:
         self.bot.wait(100)
@@ -78,15 +82,31 @@ class QmlBot:
 
     def loads(self, content: str) -> QQuickItem:
         self.comp = QQmlComponent(self.engine)
-        self.comp.setData(content.encode("utf-8"), QUrl())
+        self.comp.setData(content.encode("utf-8"), QUrl("./"))
         self._loader.setProperty("source", "")
         self._loader.setProperty("sourceComponent", self.comp)
         return self._loader.property("item")
 
+    def loads_many(self, components: dict[str, str]):
+        for name, content in components.items():
+            comp = QQmlComponent(self.engine)
+            comp.setData(content.encode("utf-8"), QUrl("./"))
+
+        self.loads(components["main.qml"])
+
     def find(self, objectname: str, type: T = QQuickItem) -> T:
-        return self.window.findChild(type, objectname)
+        return self._loader.findChild(type, objectname)
+
+    def cleanup(self):
+        self.window.close()
 
 
 @pytest.fixture()
-def qmlloader(qtbot):
-    return QmlBot(qtbot)
+def qmlbot(qtbot):
+    bot = QmlBot(qtbot)
+    yield bot
+    bot.cleanup()
+
+
+def hash_schema(schema: Schema) -> int:
+    return int(hashlib.sha256(str(schema).encode("utf-8")).hexdigest(), 16) % 10**8

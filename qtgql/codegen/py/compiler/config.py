@@ -5,9 +5,9 @@ import requests  # type: ignore
 from attrs import define
 
 from qtgql.codegen.introspection import SchemaEvaluator, introspection_query
-from qtgql.codegen.py.bases import BaseGraphQLObject, _BaseQGraphQLObject
-from qtgql.codegen.py.compiler import TemplateContext, py_template
-from qtgql.codegen.py.custom_scalars import CUSTOM_SCALARS, CustomScalarMap
+from qtgql.codegen.py.compiler.template import TemplateContext, py_template
+from qtgql.codegen.py.runtime.bases import BaseGraphQLObject, _BaseQGraphQLObject
+from qtgql.codegen.py.runtime.custom_scalars import CUSTOM_SCALARS, CustomScalarMap
 
 
 @define
@@ -29,7 +29,12 @@ class QtGqlConfig:
     base_object: Type[_BaseQGraphQLObject] = BaseGraphQLObject
     """base object to be extended by all generated types."""
     qml_import_name: str = "QtGql"
-    """Enums would exist in this namespace."""
+    """QMl generated imports would be under this namespace."""
+    qml_dir: Path = Path.cwd()
+    """Will be used to search qml files for queries, mutations, subscriptions
+    and fragments."""
+    env_name: str = "DEFAULT"
+    """The generated environment would be found in env_map under this name."""
 
     def fetch(self) -> None:
         res = requests.post(self.url, json={"query": introspection_query})

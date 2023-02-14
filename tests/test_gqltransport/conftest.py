@@ -2,7 +2,7 @@ import pytest
 from qtgql.gqltransport.client import GqlClientMessage, GqlWsTransportClient, HandlerProto
 
 
-def get_subscription_str(operation_name="", target: int = 10, raise_on_5=False) -> str:
+def get_subscription_str(operation_name="defaultOpName", target: int = 10, raise_on_5=False) -> str:
     return "subscription {} {{ count(target: {}, raiseOn5: {}) }}".format(
         operation_name,
         target,
@@ -16,8 +16,8 @@ def default_handler() -> "PseudoHandler":
 
 
 @pytest.fixture
-def default_client(qtbot, mini_server) -> GqlWsTransportClient:
-    client = GqlWsTransportClient(url=mini_server.address)
+def default_client(qtbot, schemas_server) -> GqlWsTransportClient:
+    client = GqlWsTransportClient(url=schemas_server.address)
     qtbot.wait_until(client.gql_is_valid)
     yield client
     assert client.gql_is_valid()
