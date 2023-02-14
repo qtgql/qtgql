@@ -153,7 +153,7 @@ class SchemaEvaluator:
                     self._generated_enums[enum.name] = enum
 
     def parse_qml_operations(self) -> None:
-        qml_files = glob.glob("**/*.qml", root_dir=self.config.qml_dir, recursive=True)
+        qml_files = glob.glob(f"{str(self.config.qml_dir)}/**/*.qml", recursive=True)
         for relative in qml_files:
             file = self.config.qml_dir / relative
             with open(file) as f:
