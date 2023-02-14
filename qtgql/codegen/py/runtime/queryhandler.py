@@ -77,14 +77,16 @@ class BaseQueryHandler(Generic[T_QObject], QObject, metaclass=QSingleton):
     def fetch(self) -> None:
         self.environment.client.query(self)  # type: ignore
 
-    def on_data(self, message: dict) -> None:
+    def on_data(self, message: dict) -> None:  # pragma: no cover
+        # real is on derived class.
         raise NotImplementedError
 
     def on_completed(self) -> None:
         self._completed = True
         self.completedChanged.emit()
 
-    def on_error(self, message: list[dict[str, Any]]) -> None:
+    def on_error(self, message: list[dict[str, Any]]) -> None:  # pragma: no cover
+        # This (unlike `on_data` is not implemented for real)
         raise NotImplementedError
 
     def connectNotify(self, signal) -> None:

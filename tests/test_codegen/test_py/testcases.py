@@ -45,6 +45,7 @@ class QGQLObjectTestCase:
     qml_files: dict[str, str] = {}
 
     def __attrs_post_init__(self):
+        self.query = dedent(self.query)
         if not self.qml_files:
             self.qml_files = {
                 "main.qml": dedent(
