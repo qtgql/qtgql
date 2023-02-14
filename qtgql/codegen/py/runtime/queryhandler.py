@@ -9,7 +9,7 @@ from qtgql.gqltransport.client import GqlClientMessage
 T_QObject = TypeVar("T_QObject", bound=QObject)
 
 
-class QSingleton(type(QObject), type):
+class QSingleton(type(QObject)):  # type: ignore
     def __init__(cls, name, bases, dict):
         super().__init__(name, bases, dict)
         cls.instance = None
@@ -35,8 +35,8 @@ class BaseQueryHandler(Generic[T_QObject], QObject, metaclass=QSingleton):
 
     def __init__(self, parent: Optional[QObject] = None):
         super().__init__(parent)
-        self._query = None
-        self._completed = bool
+        self._query: str = ""
+        self._completed: bool = False
         self._data: Optional[T_QObject] = None
         self.environment = get_default_env()
         self.setObjectName(self.__class__.__name__)
@@ -48,8 +48,6 @@ class BaseQueryHandler(Generic[T_QObject], QObject, metaclass=QSingleton):
 
     @consumers.setter
     def consumers(self, v: int):
-        if self._consumers_count == 0:
-            self.fetch()
         self._consumers_count = v
 
     @slot
@@ -77,7 +75,7 @@ class BaseQueryHandler(Generic[T_QObject], QObject, metaclass=QSingleton):
         return self._completed
 
     def fetch(self) -> None:
-        self.environment.client.query(self)
+        self.environment.client.query(self)  # type: ignore
 
     def on_data(self, message: dict) -> None:
         raise NotImplementedError
@@ -90,5 +88,5 @@ class BaseQueryHandler(Generic[T_QObject], QObject, metaclass=QSingleton):
         raise NotImplementedError
 
     def connectNotify(self, signal) -> None:
-        if signal.name().toStdString() in self.signalNames:
-            self._consumers_count += 1
+        if signal.name().toStdString() == "dataChanged":
+            self.consumers += 1

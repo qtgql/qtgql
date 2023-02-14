@@ -20,4 +20,5 @@ class QueryHandlerDefinition(NamedTuple):
     @property
     def root_type(self) -> str:
         rt = self.field.type.is_object_type
+        assert rt
         return rt.name

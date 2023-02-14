@@ -160,23 +160,19 @@ class SchemaEvaluator:
                 for node in find_gql(f.read()):
                     ast = parse(node)
                     for definition in ast.definitions:
-                        field_name = definition.selection_set.selections[0].name.value
+                        field_name = definition.selection_set.selections[0].name.value  # type: ignore
                         field = None
-                        if definition.operation is OperationType.QUERY:
-                            for f in self.query_type.fields:
-                                if f.name == field_name:
-                                    field = f
+                        if definition.operation is OperationType.QUERY:  # type: ignore
+                            for field_iml in self.query_type.fields:
+                                if field_iml.name == field_name:
+                                    field = field_iml
                             assert field
                             self._query_handlers[OperationName(node)] = QueryHandlerDefinition(
                                 query=node,
-                                name=definition.name.value,
+                                name=definition.name.value,  # type: ignore
                                 field=field,
-                                directives=definition.directives,
+                                directives=definition.directives,  # type: ignore
                             )
-
-    def evaluate(self) -> None:
-        self.ev
-        self.parse_qml_operations()
 
     def dumps(self) -> str:
         """:return: The generated schema module as a string."""
