@@ -6,7 +6,7 @@ from qtgql.gqltransport.client import GqlWsTransportClient
 from tests.test_codegen.test_py.testcases import ScalarsTestCase
 
 
-def test_query_handler_from_qml(qmlbot, mini_server, testcase):
+def test_query_handler_from_qml(qmlbot, mini_server):
     testcase = ScalarsTestCase.compile(mini_server.address).load_qml(qmlbot)
     rq = testcase.qml_queryhandler
     qmlbot.bot.wait_until(lambda: bool(rq._data))
