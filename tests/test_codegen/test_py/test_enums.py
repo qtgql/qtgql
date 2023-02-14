@@ -5,7 +5,7 @@ import pytest
 from PySide6.QtCore import QObject
 
 from tests.test_codegen.schemas import object_with_enum
-from tests.test_codegen.test_py.test_introspection_generator import EnumTestCase
+from tests.test_codegen.test_py.testcases import EnumTestCase
 
 
 def test_generates_valid_python_enum():

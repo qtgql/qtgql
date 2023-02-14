@@ -1,4 +1,4 @@
-from tests.test_codegen.test_py.test_introspection_generator import ScalarsTestCase
+from tests.test_codegen.test_py.testcases import ScalarsTestCase
 
 
 def test_query_handler_from_qml(qmlbot, mini_server):
