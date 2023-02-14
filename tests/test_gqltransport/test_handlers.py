@@ -33,7 +33,7 @@ def test_subscriber_called_with_on_gql_complete(qtbot, default_client, default_h
     qtbot.wait_until(lambda: default_handler.completed)
 
 
-def test_subscribe_complete_pops_subscriber_with_this_id(qtbot, mini_server, default_handler):
+def test_subscribe_complete_pops_subscriber_with_this_id(qtbot, schemas_server, default_handler):
     subscriber_id = None
 
     class CatchComplete(GqlWsTransportClient):
@@ -47,7 +47,7 @@ def test_subscribe_complete_pops_subscriber_with_this_id(qtbot, mini_server, def
             assert self.isValid()
             assert not self.handlers.get(message.id, None)
 
-    client = CatchComplete(ping_timeout=90000, url=mini_server.address)
+    client = CatchComplete(ping_timeout=90000, url=schemas_server.address)
     qtbot.wait(500)
     client.subscribe(default_handler)
 
@@ -70,8 +70,10 @@ def test_gql_error_sends_error_to_subscriber(qtbot, default_client, default_hand
     assert default_handler.data["count"] == 9
 
 
-def test_when_not_valid_pends_a_message_and_sends_on_connect(qtbot, mini_server, default_handler):
-    client = GqlWsTransportClient(url=mini_server.address)
+def test_when_not_valid_pends_a_message_and_sends_on_connect(
+    qtbot, schemas_server, default_handler
+):
+    client = GqlWsTransportClient(url=schemas_server.address)
     qtbot.wait(300)
     assert client.isValid()
     req = client.request()
@@ -109,11 +111,11 @@ def test_query(qtbot, default_client):
     assert not default_client.handlers
 
 
-def test_header_authentications_headers(qtbot, mini_server):
+def test_header_authentications_headers(qtbot, schemas_server):
     subscriber = PseudoHandler("query MyQuery {isAuthenticated}")
     token = "FakeToken"
     authorized_client = GqlWsTransportClient(
-        url=mini_server.address, headers={b"Authorization": token.encode()}
+        url=schemas_server.address, headers={b"Authorization": token.encode()}
     )
     authorized_client.query(subscriber)
 

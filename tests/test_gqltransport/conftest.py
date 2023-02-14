@@ -16,8 +16,8 @@ def default_handler() -> "PseudoHandler":
 
 
 @pytest.fixture
-def default_client(qtbot, mini_server) -> GqlWsTransportClient:
-    client = GqlWsTransportClient(url=mini_server.address)
+def default_client(qtbot, schemas_server) -> GqlWsTransportClient:
+    client = GqlWsTransportClient(url=schemas_server.address)
     qtbot.wait_until(client.gql_is_valid)
     yield client
     assert client.gql_is_valid()

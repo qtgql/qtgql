@@ -26,7 +26,7 @@ class MiniServer:
 
 
 @pytest.fixture(scope="session")
-def mini_server() -> MiniServer:
+def schemas_server() -> MiniServer:
     sock = socket.socket()
     sock.bind(("", 0))
     port = str(sock.getsockname()[1])
