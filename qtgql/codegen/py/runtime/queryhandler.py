@@ -92,3 +92,4 @@ class BaseQueryHandler(Generic[T_QObject], QObject, metaclass=QSingleton):
     def connectNotify(self, signal) -> None:
         if signal.name().toStdString() == "dataChanged":
             self.consumers += 1
+        super().connectNotify(signal)
