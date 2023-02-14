@@ -1,15 +1,14 @@
 import asyncio
-import hashlib
 import random
 from typing import AsyncGenerator, Optional
 
 import strawberry
 from aiohttp import web
 from faker import Faker
-from strawberry import Schema
 from strawberry.aiohttp.views import GraphQLView
 from strawberry.types import Info
 
+from tests.conftest import hash_schema
 from tests.test_codegen.schemas import __all__ as all_schemas
 
 fake = Faker()
@@ -68,10 +67,6 @@ class Subscription:
 
 
 schema = strawberry.Schema(query=Query, subscription=Subscription, mutation=Mutation)
-
-
-def hash_schema(schema: Schema) -> int:
-    return int(hashlib.sha256(str(schema).encode("utf-8")).hexdigest(), 16) % 10**8
 
 
 def init_func(argv):

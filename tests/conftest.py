@@ -1,4 +1,5 @@
 import hashlib
+import os
 import socket
 import subprocess
 import time
@@ -41,9 +42,10 @@ def schemas_server() -> MiniServer:
             "-H",
             "localhost",
             f"-P {port}",
-            "mini_gql_server:init_func",
+            "tests.mini_gql_server:init_func",
         ],
-        cwd=Path(__file__).parent,
+        env=os.environ.copy(),
+        cwd=Path(__file__).parent.parent,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
     )
