@@ -29,11 +29,6 @@ class _BuiltinScalars:
             if scalar.graphql_name == name:
                 return scalar
 
-    def by_python_type(self, tp: type) -> Optional[BuiltinScalar]:
-        for scalar in self:
-            if scalar.tp is tp:
-                return scalar
-
     def keys(self) -> list[str]:
         return [scalar.graphql_name for scalar in self]
 
