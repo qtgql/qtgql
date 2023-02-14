@@ -52,7 +52,7 @@ class QGQLObjectTestCase:
     config: QtGqlConfig = attrs.field(
         factory=lambda: QtGqlConfig(url=None, output=None, qml_dir=Path(__file__).parent)
     )
-    qml_files: dict[str, str] = None
+    qml_files: dict[str, str] = {}
 
     @cached_property
     def evaluator(self) -> SchemaEvaluator:
@@ -65,7 +65,6 @@ class QGQLObjectTestCase:
     def load_qml(self, qmlbot: QmlBot):
         self.qmlbot = qmlbot
         qmlbot.loads_many(self.qml_files)
-        qmlbot.bot.wait_until(self.get_environment().client.isValid)
         return self
 
     @property

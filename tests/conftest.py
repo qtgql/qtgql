@@ -70,8 +70,8 @@ class QmlBot:
 
     @property
     def _loader(self) -> QQuickItem:
-        self.root = self.engine.rootObjects()[0]
-        return self.root.findChild(QQuickItem, "contentloader")
+        self.window = self.engine.rootObjects()[0]
+        return self.window.findChild(QQuickItem, "contentloader")
 
     def load(self, path: Path) -> QQuickItem:
         self.bot.wait(100)
@@ -95,10 +95,15 @@ class QmlBot:
     def find(self, objectname: str, type: T = QQuickItem) -> T:
         return self._loader.findChild(type, objectname)
 
+    def cleanup(self):
+        self.window.close()
+
 
 @pytest.fixture()
 def qmlbot(qtbot):
-    return QmlBot(qtbot)
+    bot = QmlBot(qtbot)
+    yield bot
+    bot.cleanup()
 
 
 def hash_schema(schema: Schema) -> int:

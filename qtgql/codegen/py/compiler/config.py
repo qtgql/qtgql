@@ -30,7 +30,7 @@ class QtGqlConfig:
     """base object to be extended by all generated types."""
     qml_import_name: str = "QtGql"
     """QMl generated imports would be under this namespace."""
-    qml_dir: Path = (Path.cwd(),)
+    qml_dir: Path = Path.cwd()
     """Will be used to search qml files for queries, mutations, subscriptions
     and fragments."""
     env_name: str = "DEFAULT"
