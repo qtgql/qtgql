@@ -18,6 +18,7 @@ class BaseQueryHandler(Generic[T_QObject], QObject):
     """Each handler will be exposed to QML and."""
 
     operationName: ClassVar[str]
+    _message_template: ClassVar[GqlClientMessage]
 
     graphqlChanged = Signal()
     dataChanged = Signal()
@@ -27,8 +28,10 @@ class BaseQueryHandler(Generic[T_QObject], QObject):
     def __init__(self, parent: Optional[QObject] = None):
         super().__init__(parent)
         self._query = None
+        self._completed = bool
         self._data: Optional[T_QObject] = None
         self.environment = get_default_env()
+        self.setObjectName(self.__class__.__name__)
 
     @slot
     def set_graphql(self, query: str) -> None:
@@ -39,7 +42,8 @@ class BaseQueryHandler(Generic[T_QObject], QObject):
     @property
     def message(self) -> GqlClientMessage:
         assert self._query
-        return GqlClientMessage.from_query(self._query)
+        self._message_template.payload.query = self._query
+        return self._message_template
 
     @qproperty(str, fset=set_graphql, notify=graphqlChanged)
     def graphql(self):
@@ -49,6 +53,10 @@ class BaseQueryHandler(Generic[T_QObject], QObject):
     def data(self) -> Optional[QObject]:
         return self._data
 
+    @qproperty(bool, notify=completedChanged)
+    def completed(self):
+        return self._completed
+
     def fetch(self) -> None:
         self.environment.client.query(self)
 
@@ -56,7 +64,8 @@ class BaseQueryHandler(Generic[T_QObject], QObject):
         raise NotImplementedError
 
     def on_completed(self) -> None:
-        raise NotImplementedError
+        self._completed = True
+        self.completedChanged.emit()
 
     def on_error(self, message: list[dict[str, Any]]) -> None:
         raise NotImplementedError

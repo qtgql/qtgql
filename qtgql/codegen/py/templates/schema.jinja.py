@@ -6,6 +6,7 @@ from typing import Optional, Union
 from qtgql import qproperty
 from qtgql.codegen.py.runtime.bases import QGraphQListModel
 from qtgql.codegen.py.runtime.environment import QtGqlEnvironment, ENV_MAP
+from qtgql.gqltransport.client import  GqlClientMessage, QueryPayload
 from qtgql.codegen.py.runtime.queryhandler import BaseQueryHandler
 from qtgql.codegen.py.compiler.config import QtGqlConfig
 
@@ -81,6 +82,8 @@ class {{ type.name }}({{context.base_object_name}}):
 {% for query in context.queries %}
 @QmlElement
 class {{query.name}}(BaseQueryHandler[{{query.root_type}}]):
+
+    _message_template = GqlClientMessage(payload=QueryPayload(query="", operationName="{{query.name}}"))
     def on_data(self, message: dict) -> None:
         parent = self.parent()
         if {{query.field.name}} := message.get('{{query.field.name}}', None):

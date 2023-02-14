@@ -9,7 +9,7 @@ import graphql
 from graphql import OperationType, parse
 
 from qtgql.codegen.py.compiler.builtin_scalars import BuiltinScalars
-from qtgql.codegen.py.compiler.query import GqlQueryDefinition, find_gql
+from qtgql.codegen.py.compiler.query import QueryHandlerDefinition, find_gql
 from qtgql.codegen.py.compiler.template import TemplateContext
 from qtgql.codegen.py.objecttype import (
     EnumMap,
@@ -39,7 +39,7 @@ class SchemaEvaluator:
         self._generated_types: dict[str, GqlTypeDefinition] = {}
         self._generated_enums: EnumMap = {}
         self._fragments_store: dict[int, str] = {}
-        self._queries_store: dict[OperationName, GqlQueryDefinition] = {}
+        self._query_handlers: dict[OperationName, QueryHandlerDefinition] = {}
 
     @cached_property
     def unions(self) -> list[dict]:
@@ -167,7 +167,7 @@ class SchemaEvaluator:
                                 if f.name == field_name:
                                     field = f
                             assert field
-                            self._queries_store[OperationName(node)] = GqlQueryDefinition(
+                            self._query_handlers[OperationName(node)] = QueryHandlerDefinition(
                                 query=node,
                                 name=definition.name.value,
                                 field=field,
@@ -190,7 +190,7 @@ class SchemaEvaluator:
                     for name, t in self._generated_types.items()
                     if name not in BuiltinScalars.keys()
                 ],
-                queries=list(self._queries_store.values()),
+                queries=list(self._query_handlers.values()),
                 config=self.config,
             )
         )

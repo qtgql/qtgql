@@ -25,6 +25,7 @@ from qtgql.codegen.py.runtime.custom_scalars import (
     TimeScalar,
 )
 from qtgql.codegen.py.runtime.environment import ENV_MAP, QtGqlEnvironment
+from qtgql.codegen.py.runtime.queryhandler import BaseQueryHandler
 from qtgql.typingref import TypeHinter
 from strawberry import Schema
 
@@ -47,6 +48,7 @@ class QGQLObjectTestCase:
     type_name: str = "User"
     mod: Optional[ModuleType] = None
     tested_type: Optional[GqlTypeDefinition] = None
+    qmlbot: Optional[QmlBot] = None
     config: QtGqlConfig = attrs.field(
         factory=lambda: QtGqlConfig(url=None, output=None, qml_dir=Path(__file__).parent)
     )
@@ -61,8 +63,14 @@ class QGQLObjectTestCase:
         return ENV_MAP[self.config.env_name]
 
     def load_qml(self, qmlbot: QmlBot):
+        self.qmlbot = qmlbot
         qmlbot.loads_many(self.qml_files)
         qmlbot.bot.wait_until(self.get_environment().client.isValid)
+        return self
+
+    @property
+    def qml_queryhandler(self) -> BaseQueryHandler:
+        return self.qmlbot.find("MainQuery", BaseQueryHandler)
 
     @property
     def module(self) -> ModuleType:
@@ -88,7 +96,8 @@ class QGQLObjectTestCase:
             yield tmp_dir
 
     def compile(self, url: Optional[str] = None) -> "QGQLObjectTestCase":
-        self.config.url = url.replace("graphql", f"{hash_schema(self.schema)}")
+        if url:
+            self.config.url = url.replace("graphql", f"{hash_schema(self.schema)}")
         tmp_mod = ModuleType(uuid.uuid4().hex)
         type_name = self.type_name
         with self.tmp_qml_dir() as tmp_dir:
@@ -143,9 +152,9 @@ ScalarsTestCase = QGQLObjectTestCase(
             import QtQuick
             import QtGql 1.0 as Gql
             Item{
-                objectName: "rootItem"
-             Gql.RootQuery{
-              graphql: `query RootQuery {
+
+             Gql.MainQuery{
+              graphql: `query MainQuery {
               user {
                 name
                 age

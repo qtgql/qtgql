@@ -10,7 +10,7 @@ def find_gql(string: str) -> list[str]:
     return pattern.findall(string)
 
 
-class GqlQueryDefinition(NamedTuple):
+class QueryHandlerDefinition(NamedTuple):
     query: str
     name: str
     field: GqlFieldDefinition

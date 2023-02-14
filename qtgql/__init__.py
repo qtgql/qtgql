@@ -1,8 +1,5 @@
 import os
 
-# This is for QML imports
-from qtgql.codegen.py.runtime import imports  # noqa
-
 from .qproperty import qproperty
 from .slot import slot
 

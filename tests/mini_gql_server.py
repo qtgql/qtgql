@@ -73,7 +73,7 @@ def init_func(argv):
     app = web.Application()
     app.router.add_route("*", "/graphql", GraphQLView(schema=schema))
     for mod in all_schemas:
-        app.router.add_route("*", f"/{hash_schema(mod.schema)}", GraphQLView(schema=schema))
+        app.router.add_route("*", f"/{hash_schema(mod.schema)}", GraphQLView(schema=mod.schema))
     return app
 
 
