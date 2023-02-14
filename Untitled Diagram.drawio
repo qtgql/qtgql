@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2023-02-12T13:25:14.251Z" agent="5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36" etag="w7chudV3OLb9paweCNSE" version="20.8.20" type="github">
+<mxfile host="app.diagrams.net" modified="2023-02-14T11:31:13.762Z" agent="5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36" etag="3ygoSCiZZhYih3KHAXI0" version="20.8.20" type="github">
   <diagram name="Page-1" id="kSJdXDSHzsTl4Mddqtbs">
     <mxGraphModel dx="1360" dy="1976" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -13,7 +13,7 @@
         <mxCell id="kr0_Uy6KmyA2pM0_-5qq-12" value="Pre-Runtime" style="swimlane;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="450" y="-1120" width="420" height="170" as="geometry" />
         </mxCell>
-        <mxCell id="kr0_Uy6KmyA2pM0_-5qq-4" value="Codegen pares queries from QML files to Handlers based on query name&amp;nbsp;" style="ellipse;whiteSpace=wrap;html=1;" parent="kr0_Uy6KmyA2pM0_-5qq-12" vertex="1">
+        <mxCell id="kr0_Uy6KmyA2pM0_-5qq-4" value="Codegen pares queries from QML files by regex to Handlers based on operationName&amp;nbsp;" style="ellipse;whiteSpace=wrap;html=1;" parent="kr0_Uy6KmyA2pM0_-5qq-12" vertex="1">
           <mxGeometry x="60" y="30" width="160" height="110" as="geometry" />
         </mxCell>
         <mxCell id="kr0_Uy6KmyA2pM0_-5qq-1" value="Query declared in QML component" style="ellipse;whiteSpace=wrap;html=1;" parent="kr0_Uy6KmyA2pM0_-5qq-12" vertex="1">
@@ -29,10 +29,10 @@
         <mxCell id="kr0_Uy6KmyA2pM0_-5qq-13" value="Runtime" style="swimlane;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="40" y="-1120" width="390" height="170" as="geometry" />
         </mxCell>
-        <mxCell id="kr0_Uy6KmyA2pM0_-5qq-5" value="Application fetches&amp;nbsp;&lt;br&gt;queries (use defined)" style="ellipse;whiteSpace=wrap;html=1;" parent="kr0_Uy6KmyA2pM0_-5qq-13" vertex="1">
+        <mxCell id="kr0_Uy6KmyA2pM0_-5qq-5" value="Application fetches&amp;nbsp;&lt;br&gt;queries (user defined or when the graphql property is set)" style="ellipse;whiteSpace=wrap;html=1;" parent="kr0_Uy6KmyA2pM0_-5qq-13" vertex="1">
           <mxGeometry x="250" y="40" width="120" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="kr0_Uy6KmyA2pM0_-5qq-15" value="Components that uses&amp;nbsp;&lt;br&gt;`UseQuery` are connected to the&lt;br&gt;handler. (receive data / errors)" style="ellipse;whiteSpace=wrap;html=1;" parent="kr0_Uy6KmyA2pM0_-5qq-13" vertex="1">
+        <mxCell id="kr0_Uy6KmyA2pM0_-5qq-15" value="data parsed via deserializers." style="ellipse;whiteSpace=wrap;html=1;" parent="kr0_Uy6KmyA2pM0_-5qq-13" vertex="1">
           <mxGeometry x="40" y="50" width="160" height="110" as="geometry" />
         </mxCell>
         <mxCell id="kr0_Uy6KmyA2pM0_-5qq-17" value="" style="endArrow=classic;html=1;rounded=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" parent="kr0_Uy6KmyA2pM0_-5qq-13" source="kr0_Uy6KmyA2pM0_-5qq-5" target="kr0_Uy6KmyA2pM0_-5qq-15" edge="1">
