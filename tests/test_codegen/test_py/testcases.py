@@ -44,6 +44,27 @@ class QGQLObjectTestCase:
     )
     qml_files: dict[str, str] = {}
 
+    def __attrs_post_init__(self):
+        if not self.qml_files:
+            self.qml_files = {
+                "main.qml": dedent(
+                    """
+            import QtQuick
+            import QtGql 1.0 as Gql
+            Item{
+
+             Gql.MainQuery{id: backend
+              graphql: `query MainQuery %s`
+             }
+             Text{
+                text: backend.data
+             }
+            }
+        """
+                    % self.query.replace("query", "")
+                )
+            }
+
     @cached_property
     def evaluator(self) -> SchemaEvaluator:
         introspection = get_introspection_for(self.schema)
@@ -135,30 +156,6 @@ ScalarsTestCase = QGQLObjectTestCase(
         }
         """,
     test_name="ScalarsTestCase",
-    qml_files={
-        "main.qml": dedent(
-            """
-            import QtQuick
-            import QtGql 1.0 as Gql
-            Item{
-
-             Gql.MainQuery{
-              graphql: `query MainQuery {
-              user {
-                name
-                age
-                agePoint
-                male
-                id
-                uuid
-              }
-            }
-            `
-             }
-            }
-        """
-        )
-    },
 )
 OptionalScalarTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_optional_scalar.schema,

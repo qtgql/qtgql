@@ -1,4 +1,3 @@
-from enum import Enum
 from typing import Any, ClassVar, Generic, Optional, TypeVar
 
 from PySide6.QtCore import QObject, Signal
@@ -10,11 +9,18 @@ from qtgql.gqltransport.client import GqlClientMessage
 T_QObject = TypeVar("T_QObject", bound=QObject)
 
 
-class SignalName(Enum):
-    Data, Completed, Error = range(3)
+class QSingleton(type(QObject), type):
+    def __init__(cls, name, bases, dict):
+        super().__init__(name, bases, dict)
+        cls.instance = None
+
+    def __call__(cls, *args, **kw):
+        if cls.instance is None:
+            cls.instance = super().__call__(*args, **kw)
+        return cls.instance
 
 
-class BaseQueryHandler(Generic[T_QObject], QObject):
+class BaseQueryHandler(Generic[T_QObject], QObject, metaclass=QSingleton):
     """Each handler will be exposed to QML and."""
 
     operationName: ClassVar[str]
@@ -25,6 +31,8 @@ class BaseQueryHandler(Generic[T_QObject], QObject):
     completedChanged = Signal()
     errorChanged = Signal()
 
+    signalNames = ("graphqlChanged", "dataChanged", "completedChanged", "errorChanged")
+
     def __init__(self, parent: Optional[QObject] = None):
         super().__init__(parent)
         self._query = None
@@ -32,6 +40,17 @@ class BaseQueryHandler(Generic[T_QObject], QObject):
         self._data: Optional[T_QObject] = None
         self.environment = get_default_env()
         self.setObjectName(self.__class__.__name__)
+        self._consumers_count: int = 0
+
+    @property
+    def consumers(self):
+        return self._consumers_count
+
+    @consumers.setter
+    def consumers(self, v: int):
+        if self._consumers_count == 0:
+            self.fetch()
+        self._consumers_count = v
 
     @slot
     def set_graphql(self, query: str) -> None:
@@ -69,3 +88,7 @@ class BaseQueryHandler(Generic[T_QObject], QObject):
 
     def on_error(self, message: list[dict[str, Any]]) -> None:
         raise NotImplementedError
+
+    def connectNotify(self, signal) -> None:
+        if signal.name().toStdString() in self.signalNames:
+            self._consumers_count += 1
