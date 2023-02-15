@@ -20,10 +20,11 @@ from tests.test_codegen.test_py.testcases import (
     ObjectWithListOfObjectTestCase,
     OptionalNestedObjectTestCase,
     QGQLObjectTestCase,
+    RootListOfTestCase,
     ScalarsTestCase,
     UnionTestCase,
     all_test_cases,
-    custom_scalar_testcases, RootListOfTestCase,
+    custom_scalar_testcases,
 )
 
 
@@ -100,21 +101,21 @@ class TestAnnotations:
 class TestPropertyGetter:
     def default_test(self, testcase: QGQLObjectTestCase, field_name: str):
         testcase.compile()
-        klass = testcase.gql_type
         initialize_dict = testcase.initialize_dict
-        handler._data = klass.from_dict(None, initialize_dict)
+        handler = testcase.query_handler()
+        handler.on_data(initialize_dict)
         field = testcase.get_field_by_name(field_name)
         assert handler._data.property(field.name)
 
     def test_scalars(self, qtbot):
         testcase = ScalarsTestCase
         testcase.compile()
-        klass = testcase.gql_type
+        handler = testcase.query_handler()
         initialize_dict = testcase.initialize_dict
-        handler._data = klass.from_dict(None, initialize_dict)
+        handler.on_data(initialize_dict)
         for field in testcase.tested_type.fields:
             v = handler._data.property(field.name)
-            assert v == initialize_dict[field.name]
+            assert v == initialize_dict[testcase.first_field][field.name]
 
     def test_datetime_scalar(self, qtbot):
         self.default_test(DateTimeTestCase, "birth")
@@ -130,9 +131,9 @@ class TestPropertyGetter:
 
     def test_enum(self):
         testcase = EnumTestCase.compile()
-        handler._data = testcase.gql_type.from_dict(None, data=testcase.initialize_dict)
+        inst = testcase.gql_type.from_dict(None, data=testcase.initialize_dict)
         f = testcase.get_field_by_name("status")
-        assert handler._data.property(f.name) == testcase.module.Status.Connected.value
+        assert inst.property(f.name) == testcase.module.Status.Connected.value
 
 
 class TestDeserializers:
@@ -198,11 +199,12 @@ class TestDeserializers:
         f = testcase.get_field_by_name("status")
         assert getattr(handler._data, f.private_name) == testcase.module.Status.Connected
 
-
     def test_root_field_list_of_object(self):
         testcase = RootListOfTestCase.compile()
         handler = testcase.query_handler()
         handler.on_data(testcase.initialize_dict)
+
+
 class TestDefaultConstructor:
     @pytest.mark.parametrize("scalar", BuiltinScalars, ids=lambda v: v.graphql_name)
     def test_builtin_scalars(self, scalar: BuiltinScalar):
