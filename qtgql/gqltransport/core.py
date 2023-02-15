@@ -5,6 +5,7 @@ from typing import Generic, Optional, TypeVar, Union
 
 from attr import asdict, define
 
+from qtgql.utils.graphql import get_operation_name
 from qtgql.utils.typingref import UNSET
 
 
@@ -25,9 +26,7 @@ class QueryPayload(Generic[T], EncodeAble):
 
     def __attrs_post_init__(self):
         if not self.operationName:
-            match = re.search(r"(subscription|mutation|query)(.*?({|\())", self.query)
-            op_name = match.group(2).replace(" ", "").strip("{").strip("(")
-            self.operationName = op_name
+            self.operationName = get_operation_name(self.query)
 
 
 @define(kw_only=True, repr=False)

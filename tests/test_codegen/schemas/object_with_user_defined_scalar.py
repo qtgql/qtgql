@@ -6,8 +6,8 @@ countrymap = {"isr": "Israel", "uk": "United Kingdom"}
 @strawberry.scalar(
     name="Country",
     description="countries by codename",
-    serialize=lambda v: countrymap[v],
-    parse_value=lambda v: v,
+    serialize=lambda v: v,
+    parse_value=lambda v: countrymap[v],
 )
 class Country:
     ...
