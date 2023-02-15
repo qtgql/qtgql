@@ -10,6 +10,7 @@ class User:
     name: str
     age: int
 
+
 @strawberry.type
 class Query:
     @strawberry.field

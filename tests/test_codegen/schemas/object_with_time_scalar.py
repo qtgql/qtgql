@@ -14,7 +14,9 @@ class User:
 class Query:
     @strawberry.field
     def user(self) -> User:
-        return User(name="Patrick", age=100, whatTimeIsIt=(datetime.now() - timedelta(hours=5)).time())
+        return User(
+            name="Patrick", age=100, whatTimeIsIt=(datetime.now() - timedelta(hours=5)).time()
+        )
 
 
 schema = strawberry.Schema(query=Query)

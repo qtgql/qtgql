@@ -1,5 +1,4 @@
 import re
-from typing import Optional
 
 
 def get_operation_name(query: str) -> str:

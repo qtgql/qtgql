@@ -25,7 +25,6 @@ from qtgql.codegen.py.runtime.environment import ENV_MAP, QtGqlEnvironment
 from qtgql.codegen.py.runtime.queryhandler import BaseQueryHandler
 from strawberry import Schema
 
-from qtgql.utils.graphql import get_operation_name
 from tests.conftest import QmlBot, hash_schema
 from tests.test_codegen import schemas
 from tests.test_codegen.conftest import get_introspection_for
@@ -45,7 +44,8 @@ class QGQLObjectTestCase:
     )
     qml_files: dict[str, str] = {}
     query_operationName: str = "MainQuery"
-    first_field: str = 'user'
+    first_field: str = "user"
+
     def __attrs_post_init__(self):
         self.query = dedent(self.query)
         if not self.qml_files:
@@ -67,7 +67,6 @@ class QGQLObjectTestCase:
                     % self.query.replace("query", "")
                 )
             }
-
 
     @cached_property
     def evaluator(self) -> SchemaEvaluator:
