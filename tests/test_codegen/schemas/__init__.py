@@ -14,7 +14,7 @@ from . import (
     object_with_time_scalar,
     object_with_union,
     object_with_user_defined_scalar,
-    root_list_of_object
+    root_list_of_object,
 )
 
 __all__ = [
@@ -33,5 +33,5 @@ __all__ = [
     object_with_enum,
     object_with_user_defined_scalar,
     object_reference_each_other,
-    root_list_of_object
+    root_list_of_object,
 ]

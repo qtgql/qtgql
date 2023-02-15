@@ -20,10 +20,11 @@ from tests.test_codegen.test_py.testcases import (
     ObjectWithListOfObjectTestCase,
     OptionalNestedObjectTestCase,
     QGQLObjectTestCase,
+    RootListOfTestCase,
     ScalarsTestCase,
     UnionTestCase,
     all_test_cases,
-    custom_scalar_testcases, RootListOfTestCase,
+    custom_scalar_testcases,
 )
 
 
@@ -198,11 +199,12 @@ class TestDeserializers:
         f = testcase.get_field_by_name("status")
         assert getattr(handler._data, f.private_name) == testcase.module.Status.Connected
 
-
     def test_root_field_list_of_object(self):
         testcase = RootListOfTestCase.compile()
         handler = testcase.query_handler()
         handler.on_data(testcase.initialize_dict)
+
+
 class TestDefaultConstructor:
     @pytest.mark.parametrize("scalar", BuiltinScalars, ids=lambda v: v.graphql_name)
     def test_builtin_scalars(self, scalar: BuiltinScalar):
