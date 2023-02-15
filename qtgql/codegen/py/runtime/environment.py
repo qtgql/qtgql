@@ -1,11 +1,17 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Protocol
 
-from qtgql.gqltransport.client import GqlWsTransportClient
+from qtgql.gqltransport.client import GqlWsTransportClient, HandlerProto
 
 if TYPE_CHECKING:  # pragma: no cover
     from qtgql.codegen.py.runtime.queryhandler import BaseQueryHandler
+
+
+class NetworkProto(Protocol):
+    def execute(self, handler: HandlerProto) -> None:
+        """accepts a handler and expected to call the handler's `on_data` /
+        `on_error` / 'on_completed' when the operation is completed."""
 
 
 class QtGqlEnvironment:
@@ -16,7 +22,7 @@ class QtGqlEnvironment:
     instantiated directly.
     """
 
-    def __init__(self, client: GqlWsTransportClient):
+    def __init__(self, client: NetworkProto):
         self.client = client
         self.query_handlers: dict[int, BaseQueryHandler] = {}
 

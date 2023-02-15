@@ -63,7 +63,7 @@ class EntryPoint(QObject):
         self.qml_engine = QQmlApplicationEngine()
         self.gql_client = GqlWsTransportClient(url="ws://localhost:8080/graphql")
         self.apple_query_handler = self.AppleHandler(self)
-        self.gql_client.query(self.apple_query_handler)
+        self.gql_client.execute(self.apple_query_handler)
         self._root_query: Optional[Query] = None
         QtQml.qmlRegisterSingletonInstance(EntryPoint, "com.props", 1, 0, "EntryPoint", self)  # type: ignore
         # for some reason the app won't initialize without this event processing here.

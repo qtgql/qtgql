@@ -75,7 +75,7 @@ class BaseQueryHandler(Generic[T_QObject], QObject, metaclass=QSingleton):
         return self._completed
 
     def fetch(self) -> None:
-        self.environment.client.query(self)  # type: ignore
+        self.environment.client.execute(self)  # type: ignore
 
     def on_data(self, message: dict) -> None:  # pragma: no cover
         # real is on derived class.
