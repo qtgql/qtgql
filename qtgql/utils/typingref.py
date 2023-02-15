@@ -54,7 +54,7 @@ class TypeHinter:
         ns.update(locals())
 
         def tmp(t: tp):  # type: ignore
-            ...
+            ...  # pragma: no cover
 
         annotation = get_type_hints(tmp, localns=ns, globalns=globals())["t"]
 
@@ -116,11 +116,6 @@ class TypeHinter:
 
     def is_optional(self) -> bool:
         return self.type is Optional
-
-    def is_generic(self) -> bool:
-        return inspect.isclass(self.type) and "Generic.__class_getitem__" in repr(
-            self.type.__class_getitem__
-        )
 
     def is_list(self) -> bool:
         return self.type in (list, List)
