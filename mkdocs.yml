@@ -40,7 +40,7 @@ plugins:
           paths: [ qtgql ]
           options:
             annotations_path: source
-            docstring_style: sphinx
+            docstring_style: google
 
 
 nav:

@@ -12,10 +12,8 @@ from qtgql.codegen.py.runtime.custom_scalars import CUSTOM_SCALARS, CustomScalar
 
 @define
 class QtGqlConfig:
-    """Encapsulates configurations for a qtgql-codegen application.
-
-    :arg url:
-    """
+    """Encapsulates configurations for a qtgql-codegen application per GraphQL
+    schema."""
 
     url: str
     output: Path

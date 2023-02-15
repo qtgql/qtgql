@@ -1,10 +1,11 @@
 import pytest
-from qtgql.codegen.py.runtime.environment import ENV_MAP, QtGqlEnvironment
+from qtgql.codegen.py.runtime.environment import _ENV_MAP, QtGqlEnvironment, set_gql_env
 from qtgql.gqltransport.client import GqlWsTransportClient
 
 
 @pytest.fixture()
 def pseudo_environment():
-    ENV_MAP["DEFAULT"] = QtGqlEnvironment(GqlWsTransportClient(url=""))
-    yield ENV_MAP["DEFAULT"]
-    ENV_MAP.pop("DEFAULT")
+    env = QtGqlEnvironment(GqlWsTransportClient(url=""), name="PSEUDO")
+    set_gql_env(env)
+    yield env
+    _ENV_MAP.pop(env.name)

@@ -2,7 +2,7 @@ from typing import Any, ClassVar, Generic, Optional, TypeVar
 
 from PySide6.QtCore import QObject, Signal
 
-from qtgql.codegen.py.runtime.environment import get_default_env
+from qtgql.codegen.py.runtime.environment import get_gql_env
 from qtgql.gqltransport.client import GqlClientMessage
 from qtgql.tools import qproperty, slot
 
@@ -23,6 +23,7 @@ class QSingleton(type(QObject)):  # type: ignore
 class BaseQueryHandler(Generic[T_QObject], QObject, metaclass=QSingleton):
     """Each handler will be exposed to QML and."""
 
+    ENV_NAME: ClassVar[str]
     operationName: ClassVar[str]
     _message_template: ClassVar[GqlClientMessage]
 
@@ -38,7 +39,7 @@ class BaseQueryHandler(Generic[T_QObject], QObject, metaclass=QSingleton):
         self._query: str = ""
         self._completed: bool = False
         self._data: Optional[T_QObject] = None
-        self.environment = get_default_env()
+        self.environment = get_gql_env(self.ENV_NAME)
         self.setObjectName(self.__class__.__name__)
         self._consumers_count: int = 0
 
@@ -87,7 +88,7 @@ class BaseQueryHandler(Generic[T_QObject], QObject, metaclass=QSingleton):
 
     def on_error(self, message: list[dict[str, Any]]) -> None:  # pragma: no cover
         # This (unlike `on_data` is not implemented for real)
-        raise NotImplementedError
+        raise NotImplementedError(message)
 
     def connectNotify(self, signal) -> None:
         if signal.name().toStdString() == "dataChanged":

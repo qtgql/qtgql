@@ -21,8 +21,9 @@ from qtgql.codegen.py.runtime.custom_scalars import (
     DecimalScalar,
     TimeScalar,
 )
-from qtgql.codegen.py.runtime.environment import ENV_MAP, QtGqlEnvironment
+from qtgql.codegen.py.runtime.environment import QtGqlEnvironment, set_gql_env
 from qtgql.codegen.py.runtime.queryhandler import BaseQueryHandler
+from qtgql.gqltransport.client import GqlWsTransportClient
 from strawberry import Schema
 
 from tests.conftest import QmlBot, hash_schema
@@ -40,7 +41,9 @@ class QGQLObjectTestCase:
     tested_type: Optional[GqlTypeDefinition] = None
     qmlbot: Optional[QmlBot] = None
     config: QtGqlConfig = attrs.field(
-        factory=lambda: QtGqlConfig(url=None, output=None, qml_dir=Path(__file__).parent)
+        factory=lambda: QtGqlConfig(
+            url=None, output=None, qml_dir=Path(__file__).parent, env_name="TESTENV"
+        )
     )
     qml_files: dict[str, str] = {}
     query_operationName: str = "MainQuery"
@@ -72,9 +75,6 @@ class QGQLObjectTestCase:
     def evaluator(self) -> SchemaEvaluator:
         introspection = get_introspection_for(self.schema)
         return SchemaEvaluator(introspection, config=self.config)
-
-    def get_environment(self) -> QtGqlEnvironment:
-        return ENV_MAP[self.config.env_name]
 
     def load_qml(self, qmlbot: QmlBot):
         self.qmlbot = qmlbot
@@ -112,9 +112,10 @@ class QGQLObjectTestCase:
                     f.write(content)
             yield tmp_dir
 
-    def compile(self, url: Optional[str] = None) -> "QGQLObjectTestCase":
-        if url:
-            self.config.url = url.replace("graphql", f"{hash_schema(self.schema)}")
+    def compile(self, url: Optional[str] = "") -> "QGQLObjectTestCase":
+        url = url.replace("graphql", f"{hash_schema(self.schema)}")
+        env = QtGqlEnvironment(client=GqlWsTransportClient(url=url), name=self.config.env_name)
+        set_gql_env(env)
         tmp_mod = ModuleType(uuid.uuid4().hex)
         type_name = self.type_name
         with self.tmp_qml_dir() as tmp_dir:
