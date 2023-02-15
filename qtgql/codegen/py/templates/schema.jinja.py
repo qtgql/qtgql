@@ -81,7 +81,7 @@ class {{ type.name }}({{context.base_object_name}}):
 
 {% for query in context.queries %}
 @QmlElement
-class {{query.name}}(BaseQueryHandler[{{query.root_type}}]):
+class {{query.name}}(BaseQueryHandler[{{query.field.annotation}}]):
 
     _message_template = GqlClientMessage(payload=QueryPayload(query="", operationName="{{query.name}}"))
     def on_data(self, message: dict) -> None:
