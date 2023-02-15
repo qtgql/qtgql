@@ -13,7 +13,7 @@ from typing import (
 
 from PySide6.QtCore import Property, Signal
 
-from qtgql.typingref import TypeHinter
+from qtgql.utils.typingref import TypeHinter
 
 __all__ = ["qproperty"]
 

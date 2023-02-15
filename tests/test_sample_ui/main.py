@@ -7,9 +7,9 @@ from typing import Optional
 from PySide6 import QtCore, QtGui, QtQml, QtQuick
 from PySide6.QtCore import QObject, Signal
 from PySide6.QtQml import QQmlApplicationEngine
-from qtgql import slot
 from qtgql.codegen.py.compiler.config import QtGqlConfig
 from qtgql.gqltransport.client import GqlClientMessage, GqlWsTransportClient, HandlerProto
+from qtgql.tools import slot
 
 try:
     from tests.test_sample_ui.__temp import Query

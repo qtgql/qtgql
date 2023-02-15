@@ -3,7 +3,7 @@ from typing import Any
 
 from PySide6 import QtCore as qtc
 
-from qtgql.typingref import TypeHinter
+from qtgql.utils.typingref import TypeHinter
 
 
 def get_combos(stripped_optionals: list[TypeHinter], concretes: list[TypeHinter]):

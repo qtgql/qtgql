@@ -5,7 +5,7 @@ from functools import cached_property
 from pathlib import Path
 from textwrap import dedent
 from types import ModuleType
-from typing import Optional
+from typing import Optional, Type
 
 import attrs
 import strawberry.utils
@@ -43,6 +43,8 @@ class QGQLObjectTestCase:
         factory=lambda: QtGqlConfig(url=None, output=None, qml_dir=Path(__file__).parent)
     )
     qml_files: dict[str, str] = {}
+    query_operationName: str = "MainQuery"
+    first_field: str = "user"
 
     def __attrs_post_init__(self):
         self.query = dedent(self.query)
@@ -94,8 +96,12 @@ class QGQLObjectTestCase:
         return getattr(self.module, self.tested_type.name)
 
     @property
+    def query_handler(self) -> Type[BaseQueryHandler]:
+        return getattr(self.module, self.query_operationName)
+
+    @property
     def initialize_dict(self) -> dict:
-        return self.schema.execute_sync(self.query).data["user"]
+        return self.schema.execute_sync(self.query).data
 
     @contextmanager
     def tmp_qml_dir(self):
@@ -212,6 +218,20 @@ ObjectWithListOfObjectTestCase = QGQLObjectTestCase(
     """,
     test_name="ObjectWithListOfObjectTestCase",
 )
+
+RootListOfTestCase = QGQLObjectTestCase(
+    schema=schemas.root_list_of_object.schema,
+    query="""
+    query {
+        users{
+            name
+            age
+        }
+    }
+    """,
+    test_name="RootListOfTestCase",
+)
+
 InterfaceTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_interface.schema,
     query="""
@@ -385,6 +405,8 @@ CustomUserScalarTestCase = QGQLObjectTestCase(
         }
     """,
 )
+
+
 all_test_cases = [
     ScalarsTestCase,
     DateTimeTestCase,
@@ -401,6 +423,7 @@ all_test_cases = [
     EnumTestCase,
     CustomUserScalarTestCase,
     ObjectsThatReferenceEachOtherTestCase,
+    RootListOfTestCase,
 ]
 custom_scalar_testcases = [
     (DateTimeTestCase, DateTimeScalar, "birth"),

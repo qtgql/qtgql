@@ -1,4 +1,4 @@
-from qtgql.itemsystem import GenericModel, role
+from qtgql.tools.itemsystem import GenericModel, role
 
 from tests.test_itemsystem.conftest import FullClass, init_dict_fullClass
 

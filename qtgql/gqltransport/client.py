@@ -11,9 +11,9 @@ from PySide6 import QtCore as qtc
 from PySide6 import QtNetwork as qtn
 from PySide6 import QtWebSockets as qtws
 
-from qtgql import slot
 from qtgql.gqltransport.core import EncodeAble, GqlEncoder, QueryPayload, T
-from qtgql.typingref import UNSET
+from qtgql.tools import slot
+from qtgql.utils.typingref import UNSET
 
 logger = logging.getLogger(__name__)
 

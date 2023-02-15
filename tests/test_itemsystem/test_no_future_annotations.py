@@ -1,4 +1,4 @@
-from qtgql.itemsystem import role
+from qtgql.tools.itemsystem import role
 
 
 def test_builtin(base_type):

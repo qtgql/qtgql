@@ -8,7 +8,7 @@ from qtgql.codegen.py.runtime.custom_scalars import (
     BaseCustomScalar,
     DateTimeScalar,
 )
-from qtgql.typingref import TypeHinter
+from qtgql.utils.typingref import TypeHinter
 
 from tests.mini_gql_server import schema
 from tests.test_codegen.test_py.testcases import (
@@ -20,6 +20,7 @@ from tests.test_codegen.test_py.testcases import (
     ObjectWithListOfObjectTestCase,
     OptionalNestedObjectTestCase,
     QGQLObjectTestCase,
+    RootListOfTestCase,
     ScalarsTestCase,
     UnionTestCase,
     all_test_cases,
@@ -100,21 +101,21 @@ class TestAnnotations:
 class TestPropertyGetter:
     def default_test(self, testcase: QGQLObjectTestCase, field_name: str):
         testcase.compile()
-        klass = testcase.gql_type
         initialize_dict = testcase.initialize_dict
-        inst = klass.from_dict(None, initialize_dict)
+        handler = testcase.query_handler()
+        handler.on_data(initialize_dict)
         field = testcase.get_field_by_name(field_name)
-        assert inst.property(field.name)
+        assert handler._data.property(field.name)
 
     def test_scalars(self, qtbot):
         testcase = ScalarsTestCase
         testcase.compile()
-        klass = testcase.gql_type
+        handler = testcase.query_handler()
         initialize_dict = testcase.initialize_dict
-        inst = klass.from_dict(None, initialize_dict)
+        handler.on_data(initialize_dict)
         for field in testcase.tested_type.fields:
-            v = inst.property(field.name)
-            assert v == initialize_dict[field.name]
+            v = handler._data.property(field.name)
+            assert v == initialize_dict[testcase.first_field][field.name]
 
     def test_datetime_scalar(self, qtbot):
         self.default_test(DateTimeTestCase, "birth")
@@ -144,54 +145,64 @@ class TestDeserializers:
     def test_scalars(self, qtbot):
         testcase = ScalarsTestCase
         testcase.compile()
-        klass = testcase.gql_type
         initialize_dict = testcase.initialize_dict
-        inst = klass.from_dict(None, initialize_dict)
+        handler = testcase.query_handler()
+        handler.on_data(initialize_dict)
         for field in testcase.tested_type.fields:
-            v = getattr(inst, field.private_name)
-            assert v == initialize_dict[field.name]
+            v = getattr(handler._data, field.private_name)
+            assert v == initialize_dict[testcase.first_field][field.name]
 
     def test_nested_object_from_dict(self, qtbot):
         testcase = NestedObjectTestCase
         testcase.compile()
-        klass = testcase.gql_type
-        inst = klass.from_dict(None, testcase.initialize_dict)
-        assert inst.person.name == "Patrick"
-        assert inst.person.age == 100
+        handler = testcase.query_handler()
+        handler.on_data(testcase.initialize_dict)
+        assert handler._data.person.name == "Patrick"
+        assert handler._data.person.age == 100
 
     def test_nested_optional_object_is_null(self):
         testcase = OptionalNestedObjectTestCase.compile()
-        inst = testcase.gql_type.from_dict(None, testcase.initialize_dict)
-        assert inst.person is None
+        handler = testcase.query_handler()
+        handler.on_data(testcase.initialize_dict)
+        assert handler._data.person is None
 
     def test_object_with_list_of_object(self):
         testcase = ObjectWithListOfObjectTestCase.compile()
-        inst = testcase.gql_type.from_dict(None, testcase.initialize_dict)
-        assert isinstance(inst.persons, QGraphQListModel)
-        assert inst.persons._data[0].name
+        handler = testcase.query_handler()
+        handler.on_data(testcase.initialize_dict)
+        assert isinstance(handler._data.persons, QGraphQListModel)
+        assert handler._data.persons._data[0].name
 
     def test_object_with_interface(self):
         testcase = InterfaceTestCase.compile()
-        inst = testcase.gql_type.from_dict(None, testcase.initialize_dict)
-        assert inst.name
+        handler = testcase.query_handler()
+        handler.on_data(testcase.initialize_dict)
+        assert handler._data.name
 
     @pytest.mark.parametrize("testcase, scalar, fname", custom_scalar_testcases)
     def test_custom_scalars(
         self, testcase: QGQLObjectTestCase, scalar: BaseCustomScalar, fname: str
     ):
         testcase.compile()
-        klass = testcase.gql_type
         initialize_dict = testcase.initialize_dict
-        initialize_dict["country"] = "isr"
-        inst = klass.from_dict(None, initialize_dict)
         field = testcase.get_field_by_name(fname)
-        assert inst.property(field.name) == scalar.from_graphql(initialize_dict[field.name]).to_qt()
+        raw_value = initialize_dict[testcase.first_field][field.name]
+        expected = scalar.from_graphql(raw_value).to_qt()
+        handler = testcase.query_handler()
+        handler.on_data(initialize_dict)
+        assert handler._data.property(field.name) == expected
 
     def test_enum(self):
         testcase = EnumTestCase.compile()
-        inst = testcase.gql_type.from_dict(None, data=testcase.initialize_dict)
+        handler = testcase.query_handler()
+        handler.on_data(testcase.initialize_dict)
         f = testcase.get_field_by_name("status")
-        assert getattr(inst, f.private_name) == testcase.module.Status.Connected
+        assert getattr(handler._data, f.private_name) == testcase.module.Status.Connected
+
+    def test_root_field_list_of_object(self):
+        testcase = RootListOfTestCase.compile()
+        handler = testcase.query_handler()
+        handler.on_data(testcase.initialize_dict)
 
 
 class TestDefaultConstructor:

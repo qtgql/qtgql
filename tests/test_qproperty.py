@@ -2,7 +2,7 @@ from typing import Optional
 
 import pytest
 from PySide6.QtCore import Property, QObject
-from qtgql.qproperty import qproperty
+from qtgql.tools import qproperty
 
 
 class PropertyTestCase(QObject):

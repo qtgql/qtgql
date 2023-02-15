@@ -5,7 +5,7 @@ from typing import Generic, Optional, TypeVar
 from PySide6.QtCore import QAbstractListModel, QByteArray, QObject, Qt, Signal
 from typing_extensions import Self
 
-from qtgql import qproperty, slot
+from qtgql.tools import qproperty, slot
 
 __all__ = ["QGraphQListModel", "get_base_graphql_object"]
 

@@ -3,7 +3,7 @@ from PySide6.QtCore import Property, Signal, QObject, QEnum
 from PySide6.QtQml import QmlElement, QmlSingleton
 from enum import Enum, auto
 from typing import Optional, Union
-from qtgql import qproperty
+from qtgql.tools import qproperty
 from qtgql.codegen.py.runtime.bases import QGraphQListModel
 from qtgql.codegen.py.runtime.environment import QtGqlEnvironment, ENV_MAP
 from qtgql.gqltransport.client import  GqlClientMessage, QueryPayload
@@ -81,7 +81,7 @@ class {{ type.name }}({{context.base_object_name}}):
 
 {% for query in context.queries %}
 @QmlElement
-class {{query.name}}(BaseQueryHandler[{{query.root_type}}]):
+class {{query.name}}(BaseQueryHandler[{{query.field.annotation}}]):
 
     _message_template = GqlClientMessage(payload=QueryPayload(query="", operationName="{{query.name}}"))
     def on_data(self, message: dict) -> None:
