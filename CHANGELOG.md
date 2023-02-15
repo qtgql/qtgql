@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+0.106.2 - 2023-02-15
+--------------------
+
+This release adds support for custom network access
+by implementing the `NetworkLayerProto` protocol.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #101](https://github.com/nrbnlulu/qtgql/pull/101/)
+
+
 0.106.1 - 2023-02-15
 --------------------
 
