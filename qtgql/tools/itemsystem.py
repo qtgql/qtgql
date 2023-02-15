@@ -8,8 +8,8 @@ import attrs
 from PySide6.QtCore import QAbstractListModel, QByteArray, QEventLoop, QModelIndex, Qt, Signal
 from typing_extensions import Self, dataclass_transform
 
-from qtgql.tools import slot
 from qtgql.exceptions import QtGqlException
+from qtgql.tools import slot
 from qtgql.utils.typingref import UNSET, TypeHinter
 
 IS_GQL = "is_gql"
@@ -17,6 +17,7 @@ IS_ROLE = "is_role"
 OLD_NAME = "old_name"
 
 __all__ = ["role", "get_base_type", "GenericModel", "RoleDoesNotExist", "asdict"]
+
 
 def asdict(t: _BaseType) -> dict:
     return attrs.asdict(t)  # type: ignore

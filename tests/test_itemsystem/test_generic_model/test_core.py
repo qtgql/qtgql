@@ -4,8 +4,7 @@ from unittest.mock import patch
 
 import pytest
 from PySide6 import QtCore as qtc
-from qtgql.tools.itemsystem import GenericModel, RoleDoesNotExist, role
-from qtgql.tools.itemsystem import RoleMapper
+from qtgql.tools.itemsystem import GenericModel, RoleDoesNotExist, RoleMapper, role
 
 from tests.test_itemsystem.conftest import (
     CHILD,
