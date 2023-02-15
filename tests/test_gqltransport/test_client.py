@@ -42,7 +42,7 @@ def test_subscribe_data(qtbot, schemas_server, default_handler):
 
     client = CatchNext(ping_timeout=10000000, url=schemas_server.address)
     qtbot.wait(100)
-    client.subscribe(default_handler)
+    client.execute(default_handler)
 
     def cond():
         assert target == 9
@@ -64,7 +64,7 @@ def test_subscribe_compete_protocol(qtbot, schemas_server, default_handler):
 
     client = CatchComplete(ping_timeout=90000, url=schemas_server.address)
     qtbot.wait(500)
-    client.subscribe(default_handler)
+    client.execute(default_handler)
     qtbot.wait(300)
     assert reached
 

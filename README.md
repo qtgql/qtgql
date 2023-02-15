@@ -11,7 +11,7 @@
 This project is currently under development, and **it is not** production ready,
 You can play-around and tell us what is wrong / missing / awesome :smile:.
 
-
+[Visit the docs for more info](https://nrbnlulu.github.io/qtgql/)
 
 
 ### Features
@@ -19,6 +19,7 @@ You can play-around and tell us what is wrong / missing / awesome :smile:.
 - [x] object types, for each field there is a corresponding `Property`
 - [x] enums
 - [x] custom scalars
+- [x] query handlers
 #### Runtime
 - [x] "Qt-native" graphql-transport-ws network manager (supports subscriptions).
 #### Helpers
@@ -46,5 +47,3 @@ for data-driven applications.
 
 although it is tempting to just use `relay` or other `JS` graphql lib
 there is a point where you would suffer from performance issues (react-native).
-
-[Visit the docs for more info](https://nrbnlulu.github.io/qtgql/)

@@ -146,16 +146,13 @@ class GqlWsTransportClient(qtws.QWebSocket):
         valid."""
         return self.isValid() and self._connection_ack
 
-    def subscribe(self, handler: HandlerProto) -> None:
+    def execute(self, handler: HandlerProto) -> None:
         client_id = handler.message.id
         self.handlers[client_id] = handler
         if self.isValid():
             self.run_subscription(handler.message)
         else:
             self.pending_messages.append(handler.message)
-
-    # this might be helpful in the future for handling single operations.
-    query = subscribe
 
     def run_subscription(self, message: GqlClientMessage) -> None:
         self.sendTextMessage(self.dumps(message))
