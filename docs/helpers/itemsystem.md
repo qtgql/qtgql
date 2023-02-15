@@ -54,4 +54,4 @@ app.check_apple_color()
 ```
 
 
-::: tools.itemsystem.core
+::: tools.itemsystem
