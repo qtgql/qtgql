@@ -5,7 +5,7 @@ from typing import Generic, Optional, TypeVar, Union
 
 from attr import asdict, define
 
-from qtgql.typingref import UNSET
+from qtgql.utils.typingref import UNSET
 
 
 @define

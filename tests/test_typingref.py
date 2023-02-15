@@ -1,7 +1,7 @@
 from typing import Generic, List, Optional, TypeVar, Union, get_args, get_origin
 
 import pytest
-from qtgql.typingref import UNSET, TypeHinter, UnsetType, ensure
+from qtgql.utils.typingref import UNSET, TypeHinter, UnsetType, ensure
 
 
 class TestFromAnnotation:

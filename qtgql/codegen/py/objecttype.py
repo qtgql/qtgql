@@ -11,7 +11,7 @@ from qtgql.codegen.py.compiler.builtin_scalars import BuiltinScalar
 from qtgql.codegen.py.runtime.bases import QGraphQListModel, _BaseQGraphQLObject
 from qtgql.codegen.py.runtime.custom_scalars import BaseCustomScalar, CustomScalarMap
 from qtgql.codegen.utils import AntiForwardRef
-from qtgql.typingref import TypeHinter
+from qtgql.utils.typingref import TypeHinter
 
 
 class Kinds(enum.Enum):

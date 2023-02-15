@@ -5,7 +5,7 @@ general helpers for ease of development.
 Creates a [slot](https://doc.qt.io/qt-6/signalsandslots.html) out of type annotation.
 
 ```python
-from qtgql import slot
+from qtgql.tools import slot
 from PySide6.QtCore import QObject
 
 
@@ -26,14 +26,14 @@ foo = Foo()
 foo.set_data_from_qml('bar')
 assert foo.data == 'bar'
 ```
-::: slot.slot
+::: tools.slot.slot
 
 ### Auto-property
 Create [Properties](https://doc.qt.io/qt-6/qproperty.html) with a dataclass syntax
 
 Example:
 ```python
-from qtgql.autoproperty import define_properties
+from qtgql.tools import define_properties
 
 @define_properties
 class Apple:
@@ -47,4 +47,4 @@ apple.color = "green"
 assert apple_as_qt.color == "green"
 ```
 
-::: autoproperty.define_properties
+::: tools.autoproperty.define_properties

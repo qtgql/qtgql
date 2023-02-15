@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING, Any, Optional
 
 from PySide6 import QtCore as qtc
-from qtgql.autoproperty import define_properties
+from qtgql.tools import define_properties
 
 if TYPE_CHECKING:
 

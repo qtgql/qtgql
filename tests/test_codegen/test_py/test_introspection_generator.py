@@ -8,7 +8,7 @@ from qtgql.codegen.py.runtime.custom_scalars import (
     BaseCustomScalar,
     DateTimeScalar,
 )
-from qtgql.typingref import TypeHinter
+from qtgql.utils.typingref import TypeHinter
 
 from tests.mini_gql_server import schema
 from tests.test_codegen.test_py.testcases import (

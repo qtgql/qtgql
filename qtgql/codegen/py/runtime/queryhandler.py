@@ -2,7 +2,7 @@ from typing import Any, ClassVar, Generic, Optional, TypeVar
 
 from PySide6.QtCore import QObject, Signal
 
-from qtgql import qproperty, slot
+from qtgql.tools import qproperty, slot
 from qtgql.codegen.py.runtime.environment import get_default_env
 from qtgql.gqltransport.client import GqlClientMessage
 

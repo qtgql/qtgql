@@ -3,7 +3,7 @@ from typing import Any, Optional, Type
 import pytest
 from attr import define
 from PySide6.QtCore import QMetaMethod, QObject, Signal, Slot
-from qtgql import slot
+from qtgql.tools import slot
 
 
 class QObjectHelper(QObject):

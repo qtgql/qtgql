@@ -3,7 +3,7 @@ from PySide6.QtCore import Property, Signal, QObject, QEnum
 from PySide6.QtQml import QmlElement, QmlSingleton
 from enum import Enum, auto
 from typing import Optional, Union
-from qtgql import qproperty
+from qtgql.tools import qproperty
 from qtgql.codegen.py.runtime.bases import QGraphQListModel
 from qtgql.codegen.py.runtime.environment import QtGqlEnvironment, ENV_MAP
 from qtgql.gqltransport.client import  GqlClientMessage, QueryPayload
