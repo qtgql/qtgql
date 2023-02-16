@@ -15,9 +15,18 @@ class QtGqlConfig:
     """Encapsulates configurations for a qtgql-codegen application per GraphQL
     schema."""
 
-    url: str
-    output: Path
-    """full path for the generated output file."""
+    graphql_dir: Path
+    """A directory contains [schema.graphql, query.graphql, mutation.graphql,
+    subscription.graphql] generated types come from the schema.
+
+    and queries, mutations, subscription handlers would be generated
+    from the corresponding `.graphql` files.
+    """
+    env_name: str = "QGqlEnv"
+    """The generated types would find the environment by this name.
+
+    Also the generated QML imports would fall under this namespace.
+    """
     evaluator: Type[SchemaEvaluator] = SchemaEvaluator
     """evaluates the schema and generates types."""
     custom_scalars: CustomScalarMap = CUSTOM_SCALARS
@@ -26,13 +35,6 @@ class QtGqlConfig:
     """jinja template."""
     base_object: Type[_BaseQGraphQLObject] = BaseGraphQLObject
     """base object to be extended by all generated types."""
-    qml_import_name: str = "QtGql"
-    """QMl generated imports would be under this namespace."""
-    qml_dir: Path = Path.cwd()
-    """Will be used to search qml files for queries, mutations, subscriptions
-    and fragments."""
-    env_name: str = "DEFAULT"
-    """The generated environment would be found in env_map under this name."""
 
     def fetch(self) -> None:
         res = requests.post(self.url, json={"query": introspection_query})

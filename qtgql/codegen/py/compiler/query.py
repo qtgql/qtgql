@@ -1,18 +1,16 @@
-import re
-from typing import NamedTuple
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, NamedTuple
 
 from qtgql.codegen.py.objecttype import GqlFieldDefinition
 
-pattern = re.compile(r"(?s)(?<=graphql: `).*?(?=`)")
-
-
-def find_gql(string: str) -> list[str]:
-    return pattern.findall(string)
+if TYPE_CHECKING:
+    from qtgql.codegen.introspection import OperationName
 
 
 class QueryHandlerDefinition(NamedTuple):
     query: str
-    name: str
+    name: OperationName
     field: GqlFieldDefinition
     directives: list[str] = []
     fragments: list[str] = []

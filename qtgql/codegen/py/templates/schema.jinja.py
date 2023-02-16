@@ -1,13 +1,15 @@
 from __future__ import annotations
-from PySide6.QtCore import Property, Signal, QObject, QEnum
+from PySide6.QtCore import Signal, QObject, QEnum
 from PySide6.QtQml import QmlElement, QmlSingleton
+from PySide6.QtQuick import QQuickItem
 from enum import Enum, auto
 from typing import Optional, Union
+
+from qtgql.codegen.py.runtime.imports import UseQueryABC
 from qtgql.tools import qproperty
 from qtgql.codegen.py.runtime.bases import QGraphQListModel
 from qtgql.gqltransport.client import  GqlClientMessage, QueryPayload
 from qtgql.codegen.py.runtime.queryhandler import BaseQueryHandler
-from qtgql.codegen.py.compiler.config import QtGqlConfig
 
 
 
@@ -16,7 +18,7 @@ from qtgql.codegen.py.compiler.config import QtGqlConfig
 {{dep}}{% endfor %}
 
 
-QML_IMPORT_NAME = "{{context.config.qml_import_name}}"
+QML_IMPORT_NAME = "{{context.config.env_name}}"
 QML_IMPORT_MAJOR_VERSION = 1
 
 
@@ -79,6 +81,7 @@ class {{ type.name }}({{context.base_object_name}}):
 
 {% for query in context.queries %}
 @QmlElement
+@QmlSingleton
 class {{query.name}}(BaseQueryHandler[{{query.field.annotation}}]):
     ENV_NAME = "{{context.config.env_name}}"
     _message_template = GqlClientMessage(payload=QueryPayload(query="", operationName="{{query.name}}"))
@@ -89,3 +92,8 @@ class {{query.name}}(BaseQueryHandler[{{query.field.annotation}}]):
             self.dataChanged.emit()
 
 {% endfor %}
+
+
+
+class UseQuery(UseQueryABC):
+    ENV_NAME = "{{context.config.env_name}}"

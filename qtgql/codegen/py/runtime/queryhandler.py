@@ -3,26 +3,17 @@ from typing import Any, ClassVar, Generic, Optional, TypeVar
 from PySide6.QtCore import QObject, Signal
 
 from qtgql.codegen.py.runtime.environment import get_gql_env
+from qtgql.exceptions import QtGqlException
 from qtgql.gqltransport.client import GqlClientMessage
 from qtgql.tools import qproperty, slot
 
 T_QObject = TypeVar("T_QObject", bound=QObject)
 
 
-class QSingleton(type(QObject)):  # type: ignore
-    def __init__(cls, name, bases, dict):
-        super().__init__(name, bases, dict)
-        cls.instance = None
-
-    def __call__(cls, *args, **kw):
-        if cls.instance is None:
-            cls.instance = super().__call__(*args, **kw)
-        return cls.instance
-
-
-class BaseQueryHandler(Generic[T_QObject], QObject, metaclass=QSingleton):
+class BaseQueryHandler(Generic[T_QObject], QObject):
     """Each handler will be exposed to QML and."""
 
+    __instance__: "Optional[ClassVar[BaseQueryHandler]]" = None
     ENV_NAME: ClassVar[str]
     operationName: ClassVar[str]
     _message_template: ClassVar[GqlClientMessage]
@@ -36,11 +27,16 @@ class BaseQueryHandler(Generic[T_QObject], QObject, metaclass=QSingleton):
 
     def __init__(self, parent: Optional[QObject] = None):
         super().__init__(parent)
+        name = self.__class__.__name__
+        if self.__instance__:
+            raise QtGqlException("Query handlers should be instantiated only once")
+        self.__instance__ = self
         self._query: str = ""
         self._completed: bool = False
         self._data: Optional[T_QObject] = None
         self.environment = get_gql_env(self.ENV_NAME)
-        self.setObjectName(self.__class__.__name__)
+        self.environment.add_query_handler(self)
+        self.setObjectName(name)
         self._consumers_count: int = 0
 
     @property

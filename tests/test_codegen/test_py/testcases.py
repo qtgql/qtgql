@@ -1,6 +1,5 @@
 import tempfile
 import uuid
-from contextlib import contextmanager
 from functools import cached_property
 from pathlib import Path
 from textwrap import dedent
@@ -28,7 +27,6 @@ from strawberry import Schema
 
 from tests.conftest import QmlBot, hash_schema
 from tests.test_codegen import schemas
-from tests.test_codegen.conftest import get_introspection_for
 
 
 @define(slots=False)
@@ -41,9 +39,7 @@ class QGQLObjectTestCase:
     tested_type: Optional[GqlTypeDefinition] = None
     qmlbot: Optional[QmlBot] = None
     config: QtGqlConfig = attrs.field(
-        factory=lambda: QtGqlConfig(
-            url=None, output=None, qml_dir=Path(__file__).parent, env_name="TESTENV"
-        )
+        factory=lambda: QtGqlConfig(graphql_dir=Path(__file__).parent, env_name="TestEnv")
     )
     qml_files: dict[str, str] = {}
     query_operationName: str = "MainQuery"
@@ -56,25 +52,21 @@ class QGQLObjectTestCase:
                 "main.qml": dedent(
                     """
             import QtQuick
-            import QtGql 1.0 as Gql
-            Item{
-
-             Gql.MainQuery{id: backend
-              graphql: `query MainQuery %s`
-             }
-             Text{
-                text: backend.data
-             }
+            import TestEnv as Env
+             Env.UseQuery{
+                operationName: 'MainQuery'
+                Text{
+                    text: Env.MainQuery.data
+                }
             }
+        }
         """
-                    % self.query.replace("query", "")
                 )
             }
 
     @cached_property
     def evaluator(self) -> SchemaEvaluator:
-        introspection = get_introspection_for(self.schema)
-        return SchemaEvaluator(introspection, config=self.config)
+        return SchemaEvaluator(config=self.config)
 
     def load_qml(self, qmlbot: QmlBot):
         self.qmlbot = qmlbot
@@ -103,24 +95,22 @@ class QGQLObjectTestCase:
     def initialize_dict(self) -> dict:
         return self.schema.execute_sync(self.query).data
 
-    @contextmanager
-    def tmp_qml_dir(self):
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            tmp_dir = Path(tmp_dir)
-            for fname, content in self.qml_files.items():
-                with open(tmp_dir / fname, "w") as f:
-                    f.write(content)
-            yield tmp_dir
-
     def compile(self, url: Optional[str] = "") -> "QGQLObjectTestCase":
         url = url.replace("graphql", f"{hash_schema(self.schema)}")
         env = QtGqlEnvironment(client=GqlWsTransportClient(url=url), name=self.config.env_name)
         set_gql_env(env)
         tmp_mod = ModuleType(uuid.uuid4().hex)
         type_name = self.type_name
-        with self.tmp_qml_dir() as tmp_dir:
-            self.config.qml_dir = tmp_dir
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_dir = Path(tmp_dir)
+            self.config.graphql_dir = tmp_dir
+            with open(tmp_dir / "operations.graphql", "w") as f:
+                f.write(self.query)
+            with open(tmp_dir / "schema.graphql", "w") as f:
+                f.write(str(self.schema))
+
             generated = self.evaluator.dumps()
+
         compiled = compile(generated, "schema", "exec")
         exec(compiled, tmp_mod.__dict__)
         self.mod = tmp_mod
@@ -152,7 +142,7 @@ class QGQLObjectTestCase:
 ScalarsTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_scalar.schema,
     query="""
-        {
+        query MainQuery {
           user {
             name
             age
@@ -168,7 +158,7 @@ ScalarsTestCase = QGQLObjectTestCase(
 OptionalScalarTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_optional_scalar.schema,
     query="""
-    query {
+    query MainQuery {
         user{
             name
             age
@@ -180,7 +170,7 @@ OptionalScalarTestCase = QGQLObjectTestCase(
 NestedObjectTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_object.schema,
     query="""
-    query {
+    query MainQuery {
         user{
             person{
                 name
@@ -194,7 +184,7 @@ NestedObjectTestCase = QGQLObjectTestCase(
 OptionalNestedObjectTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_optional_object.schema,
     query="""
-    query {
+    query MainQuery {
         user{
             person{
                 name
@@ -208,7 +198,7 @@ OptionalNestedObjectTestCase = QGQLObjectTestCase(
 ObjectWithListOfObjectTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_list_of_object.schema,
     query="""
-    query {
+    query MainQuery {
         user{
             persons{
                 name
@@ -223,7 +213,7 @@ ObjectWithListOfObjectTestCase = QGQLObjectTestCase(
 RootListOfTestCase = QGQLObjectTestCase(
     schema=schemas.root_list_of_object.schema,
     query="""
-    query {
+    query MainQuery {
         users{
             name
             age
@@ -236,7 +226,7 @@ RootListOfTestCase = QGQLObjectTestCase(
 InterfaceTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_interface.schema,
     query="""
-    query {
+    query MainQuery {
         user{
             name
             age
@@ -248,7 +238,7 @@ InterfaceTestCase = QGQLObjectTestCase(
 UnionTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_union.schema,
     query="""
-        {
+        query MainQuery {
           user {
             whoAmI {
               ... on Frog {
@@ -270,7 +260,7 @@ UnionTestCase = QGQLObjectTestCase(
 ListOfUnionTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_list_of_type_with_union.schema,
     query="""
-        {
+        query MainQuery {
           userManager {
             users {
               whoAmI {
@@ -295,7 +285,7 @@ ListOfUnionTestCase = QGQLObjectTestCase(
 EnumTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_enum.schema,
     query="""
-        {
+        query MainQuery {
           user {
             name
             age
@@ -308,7 +298,7 @@ EnumTestCase = QGQLObjectTestCase(
 DateTimeTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_datetime.schema,
     query="""
-        {
+       query MainQuery {
           user {
             name
             age
@@ -321,7 +311,7 @@ DateTimeTestCase = QGQLObjectTestCase(
 DecimalTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_decimal.schema,
     query="""
-        {
+       query MainQuery {
           user {
             name
             age
@@ -334,7 +324,7 @@ DecimalTestCase = QGQLObjectTestCase(
 DateTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_date.schema,
     query="""
-        {
+       query MainQuery {
           user {
             name
             age
@@ -347,7 +337,7 @@ DateTestCase = QGQLObjectTestCase(
 TimeTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_time_scalar.schema,
     query="""
-        {
+      query MainQuery {
           user {
             name
             age
@@ -361,7 +351,7 @@ ObjectsThatReferenceEachOtherTestCase = QGQLObjectTestCase(
     schema=schemas.object_reference_each_other.schema,
     test_name="ObjectsThatReferenceEachOtherTestCase",
     query="""
-    {
+    query MainQuery {
       user {
         password
         person {
@@ -393,11 +383,11 @@ class CountryScalar(BaseCustomScalar[Optional[str]]):
 CustomUserScalarTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_user_defined_scalar.schema,
     config=QtGqlConfig(
-        url=None, output=None, custom_scalars={CountryScalar.GRAPHQL_NAME: CountryScalar}
+        graphql_dir=None, custom_scalars={CountryScalar.GRAPHQL_NAME: CountryScalar}
     ),
     test_name="CustomUserScalarTestCase",
     query="""
-            {
+     query MainQuery {
           user {
             name
             age
@@ -406,7 +396,6 @@ CustomUserScalarTestCase = QGQLObjectTestCase(
         }
     """,
 )
-
 
 all_test_cases = [
     ScalarsTestCase,

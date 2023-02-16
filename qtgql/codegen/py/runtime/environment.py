@@ -30,8 +30,14 @@ class QtGqlEnvironment:
         the generated handlers based on the configurations.
         """
         self.client = client
-        self.query_handlers: dict[int, BaseQueryHandler] = {}
+        self._query_handlers: dict[str, BaseQueryHandler] = {}
         self.name = name
+
+    def add_query_handler(self, handler: BaseQueryHandler) -> None:
+        self._query_handlers[handler.objectName()] = handler
+
+    def get_handler(self, handler_name: str):
+        return self._query_handlers[handler_name]
 
 
 _ENV_MAP: dict[str, QtGqlEnvironment] = {}
