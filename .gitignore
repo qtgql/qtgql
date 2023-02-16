@@ -2,9 +2,10 @@
 __pycache__/
 *.py[cod]
 *$py.class
-# Pycharm
+# IDE's
 .idea
 .fleet
+.vscode
 
 # C extensions
 *.so
