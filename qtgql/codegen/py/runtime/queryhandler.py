@@ -12,7 +12,7 @@ from qtgql.tools import qproperty, slot
 T_QObject = TypeVar("T_QObject", bound=QObject)
 
 
-class QSingletonMeta(type(QObject)):
+class QSingletonMeta(type(QObject)):  # type: ignore
     def __init__(cls, name, bases, dict):
         super().__init__(name, bases, dict)
         cls.instance = None
@@ -26,7 +26,7 @@ class QSingletonMeta(type(QObject)):
 class BaseQueryHandler(Generic[T_QObject], QObject, metaclass=QSingletonMeta):
     """Each handler will be exposed to QML and."""
 
-    instance: "Optional[ClassVar[BaseQueryHandler]]" = None
+    instance: "ClassVar[Optional[BaseQueryHandler]]" = None
     ENV_NAME: ClassVar[str]
     operationName: ClassVar[str]
     _message_template: ClassVar[GqlClientMessage]
@@ -98,7 +98,7 @@ class UseQueryABC(QQuickItem):
     # signals
     operationNameChanged = Signal()
 
-    def __init__(self, parent: Optional[QObject] = None):
+    def __init__(self, parent: Optional[QQuickItem] = None):
         super().__init__(parent)
         self._operationName: Optional[str] = None
         self.env = get_gql_env(self.ENV_NAME)
@@ -116,4 +116,5 @@ class UseQueryABC(QQuickItem):
         return self._operationName
 
     def deleteLater(self) -> None:
+        assert self.handler
         self.handler.remove_consumer(self)

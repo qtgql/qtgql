@@ -21,7 +21,6 @@ from qtgql.codegen.py.objecttype import (
     GqlFieldDefinition,
     GqlTypeDefinition,
     GqlTypeHinter,
-    Kinds,
 )
 from qtgql.codegen.utils import anti_forward_ref
 
@@ -52,17 +51,11 @@ class SchemaEvaluator:
         with open(self.config.graphql_dir / "schema.graphql", "r") as f:
             return graphql.build_schema(f.read())
 
-    @cached_property
-    def unions(self) -> list[dict]:
-        return [
-            t
-            for t in self.schema_definition["__schema"]["types"]
-            if Kinds(t["kind"]) == Kinds.UNION
-        ]
-
     @property
     def query_type(self) -> GqlTypeDefinition:
-        return self._generated_types[self.schema_definition.query_type.name]
+        query_type = self.schema_definition.query_type
+        assert query_type
+        return self._generated_types[query_type.name]
 
     def _evaluate_field_type(self, t: gql_def.GraphQLType) -> GqlTypeHinter:
         if non_null := is_non_null_definition(t):
@@ -135,7 +128,7 @@ class SchemaEvaluator:
         return GqlEnumDefinition(
             name=name,
             members=[
-                EnumValue(name=name, description=val.description)
+                EnumValue(name=name, description=val.description or "")
                 for name, val in enum.values.items()
             ],
         )
