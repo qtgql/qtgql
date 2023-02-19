@@ -11,6 +11,8 @@ from qtgql.codegen.py.compiler.config import QtGqlConfig
 from qtgql.gqltransport.client import GqlClientMessage, GqlWsTransportClient, HandlerProto
 from qtgql.tools import slot
 
+from tests.mini_gql_server import schema
+
 try:
     from tests.test_sample_ui.__temp import Query
 except ImportError:
@@ -114,9 +116,9 @@ class EntryPoint(QObject):
         super().deleteLater()
 
 
-qtgqlconfig = QtGqlConfig(
-    url="http://localhost:8080/graphql", output=Path(__file__).parent / "__temp.py"
-)
+graphql_dir = Path(__file__).parent / "graphql"
+(graphql_dir / "schema.graphql").write_text(str(schema))
+qtgqlconfig = QtGqlConfig(graphql_dir=graphql_dir)
 
 
 def main():  # pragma: no cover

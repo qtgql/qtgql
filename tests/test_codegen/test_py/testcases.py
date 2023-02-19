@@ -1,3 +1,4 @@
+import sys
 import tempfile
 import uuid
 from functools import cached_property
@@ -29,78 +30,47 @@ from tests.conftest import QmlBot, hash_schema
 from tests.test_codegen import schemas
 
 
-@define(slots=False)
+@define(slots=False, kw_only=True)
 class QGQLObjectTestCase:
     query: str
     schema: Schema
     test_name: str
     type_name: str = "User"
-    mod: Optional[ModuleType] = None
-    tested_type: Optional[GqlTypeDefinition] = None
     qmlbot: Optional[QmlBot] = None
     config: QtGqlConfig = attrs.field(
         factory=lambda: QtGqlConfig(graphql_dir=Path(__file__).parent, env_name="TestEnv")
     )
-    qml_files: dict[str, str] = {}
     query_operationName: str = "MainQuery"
     first_field: str = "user"
+    qml_file: str = dedent(
+        """
+            import QtQuick
+            import generated.TestEnv as Env
+
+             Env.UseQuery{
+                objectName: "rootObject"
+                anchors.fill: parent;
+                operationName: "MainQuery"
+
+            }
+        """
+    )
 
     def __attrs_post_init__(self):
         self.query = dedent(self.query)
-        if not self.qml_files:
-            self.qml_files = {
-                "main.qml": dedent(
-                    """
-            import QtQuick
-            import TestEnv as Env
-             Env.UseQuery{
-                operationName: 'MainQuery'
-                Text{
-                    text: Env.MainQuery.data
-                }
-            }
-        }
-        """
-                )
-            }
 
     @cached_property
     def evaluator(self) -> SchemaEvaluator:
         return SchemaEvaluator(config=self.config)
 
-    def load_qml(self, qmlbot: QmlBot):
-        self.qmlbot = qmlbot
-        qmlbot.loads_many(self.qml_files)
-        return self
-
-    @property
-    def qml_queryhandler(self) -> BaseQueryHandler:
-        return self.qmlbot.find("MainQuery", BaseQueryHandler)
-
-    @property
-    def module(self) -> ModuleType:
-        assert self.mod
-        return self.mod
-
-    @property
-    def gql_type(self) -> _BaseQGraphQLObject:
-        assert self.tested_type
-        return getattr(self.module, self.tested_type.name)
-
-    @property
-    def query_handler(self) -> Type[BaseQueryHandler]:
-        return getattr(self.module, self.query_operationName)
-
     @property
     def initialize_dict(self) -> dict:
         return self.schema.execute_sync(self.query).data
 
-    def compile(self, url: Optional[str] = "") -> "QGQLObjectTestCase":
+    def compile(self, url: Optional[str] = "") -> "CompiledTestCase":
         url = url.replace("graphql", f"{hash_schema(self.schema)}")
         env = QtGqlEnvironment(client=GqlWsTransportClient(url=url), name=self.config.env_name)
         set_gql_env(env)
-        tmp_mod = ModuleType(uuid.uuid4().hex)
-        type_name = self.type_name
         with tempfile.TemporaryDirectory() as tmp_dir:
             tmp_dir = Path(tmp_dir)
             self.config.graphql_dir = tmp_dir
@@ -110,12 +80,45 @@ class QGQLObjectTestCase:
                 f.write(str(self.schema))
 
             generated = self.evaluator.dumps()
+        types_module = ModuleType(uuid.uuid4().hex)
+        handlers_mod = ModuleType(uuid.uuid4().hex)
+        exec(compile(generated["objecttypes"], "gen_shcema", "exec"), types_module.__dict__)
+        sys.modules["objecttypes"] = types_module
+        exec(compile(generated["handlers"], "gen_imports", "exec"), handlers_mod.__dict__)
+        handlers_mod.init()
+        return CompiledTestCase(
+            objecttypes_mod=types_module,
+            handlers_mod=handlers_mod,
+            config=self.config,
+            query=self.query,
+            schema=self.schema,
+            qml_file=self.qml_file,
+            query_operationName=self.query_operationName,
+            first_field=self.first_field,
+            test_name=self.test_name,
+            tested_type=self.evaluator._generated_types[self.type_name],
+        )
 
-        compiled = compile(generated, "schema", "exec")
-        exec(compiled, tmp_mod.__dict__)
-        self.mod = tmp_mod
-        self.tested_type = self.evaluator._generated_types[type_name]
-        return self
+
+@define
+class CompiledTestCase(QGQLObjectTestCase):
+    objecttypes_mod: ModuleType
+    handlers_mod: ModuleType
+    config: QtGqlConfig
+    tested_type: GqlTypeDefinition
+
+    @property
+    def module(self) -> ModuleType:
+        return self.objecttypes_mod
+
+    @property
+    def gql_type(self) -> Type[_BaseQGraphQLObject]:
+        assert self.tested_type
+        return getattr(self.objecttypes_mod, self.tested_type.name)
+
+    @property
+    def query_handler(self) -> Type[BaseQueryHandler]:
+        return getattr(self.handlers_mod, self.query_operationName)()
 
     def get_field_by_type(self, t):
         for field in self.tested_type.fields:
@@ -137,6 +140,10 @@ class QGQLObjectTestCase:
         for sf in stawberry_definition.fields:
             if field_name == strawberry.utils.str_converters.to_camel_case(sf.name):
                 return sf
+
+    def load_qml(self, qmlbot: QmlBot):
+        qmlbot.loads(self.qml_file)
+        return self
 
 
 ScalarsTestCase = QGQLObjectTestCase(
@@ -351,13 +358,12 @@ ObjectsThatReferenceEachOtherTestCase = QGQLObjectTestCase(
     schema=schemas.object_reference_each_other.schema,
     test_name="ObjectsThatReferenceEachOtherTestCase",
     query="""
-    query MainQuery {
+  query MainQuery {
       user {
         password
         person {
           name
           age
-          user
         }
       }
     }

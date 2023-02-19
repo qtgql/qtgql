@@ -1,0 +1,26 @@
+type Apple {
+  size: Int!
+  owner: String!
+  worms: [Worm!]
+  color: String!
+}
+
+type Mutation {
+  pseudoMutation: Boolean!
+}
+
+type Query {
+  hello: String!
+  isAuthenticated: String!
+  apples: [Apple!]!
+}
+
+type Subscription {
+  count(target: Int! = 10, raiseOn5: Boolean! = false): Int!
+}
+
+type Worm {
+  name: String!
+  family: String!
+  size: Int!
+}

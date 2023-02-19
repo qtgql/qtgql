@@ -42,9 +42,6 @@ def test_cant_find_pyproject(monkeypatch, monkey_pyproject, tmp_path):
     assert isinstance(res.exception, KeyError)
 
 
-def test_fetch_success(monkey_pyproject, monkeypatch, schemas_server):
-    from tests.test_sample_ui.main import qtgqlconfig
-
-    monkeypatch.setattr(qtgqlconfig, "url", schemas_server.address.replace("ws", "http"))
+def test_generate_success(monkey_pyproject, monkeypatch):
     res = runner.invoke(app, ["gen"])
     assert res.exit_code == 0

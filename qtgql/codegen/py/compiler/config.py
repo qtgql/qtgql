@@ -1,11 +1,10 @@
 from pathlib import Path
 from typing import Callable, Type
 
-import requests  # type: ignore
 from attrs import define
 
-from qtgql.codegen.introspection import SchemaEvaluator, introspection_query
-from qtgql.codegen.py.compiler.template import TemplateContext, py_template
+from qtgql.codegen.introspection import SchemaEvaluator
+from qtgql.codegen.py.compiler.template import TemplateContext, schema_types_template
 from qtgql.codegen.py.runtime.bases import BaseGraphQLObject, _BaseQGraphQLObject
 from qtgql.codegen.py.runtime.custom_scalars import CUSTOM_SCALARS, CustomScalarMap
 
@@ -31,15 +30,29 @@ class QtGqlConfig:
     """evaluates the schema and generates types."""
     custom_scalars: CustomScalarMap = CUSTOM_SCALARS
     """mapping of custom scalars, respected by the schema evaluator."""
-    template_class: Callable[[TemplateContext], str] = py_template
+    template_class: Callable[[TemplateContext], str] = schema_types_template
     """jinja template."""
     base_object: Type[_BaseQGraphQLObject] = BaseGraphQLObject
     """base object to be extended by all generated types."""
 
-    def fetch(self) -> None:
-        res = requests.post(self.url, json={"query": introspection_query})
-        introspected = res.json()["data"]
-        self.evaluator.from_dict(introspected, config=self).dump(self.output)
+    @property
+    def schema_path(self) -> Path:
+        return self.graphql_dir / "schema.graphql"
+
+    @property
+    def operations_dir(self) -> Path:
+        return self.graphql_dir / "operations.graphql"
+
+    @property
+    def generated_types_dir(self) -> Path:
+        return self.graphql_dir / "objecttypes.py"
+
+    @property
+    def generated_handlers_dir(self) -> Path:
+        return self.graphql_dir / "handlers.py"
+
+    def generate(self) -> None:
+        self.evaluator(self).dump()
 
     def __attrs_post_init__(self):
         if self.custom_scalars != CUSTOM_SCALARS:

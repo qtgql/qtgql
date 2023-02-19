@@ -5,16 +5,18 @@
 TBD
 
 ## Setup
-Somewhere on your application (probably in config.py)
-add our codegen configurations.
+Set up a `.graphql` dir inside it create a file named `schema.graphql` (dump your schema SDL there)
+and another file named `operations.graphql` and declare the queries you want to use there.
+
+Point your config to that directory
 ```python
 # myapp/config.py
 from qtgql.codegen.py.compiler.config import QtGqlConfig
 from pathlib import Path
+# normally you would use `Path(__file__).parent` though this doc is tested
+# and has no __file__...
 
-myconfig = QtGqlConfig(url="http://localhost:8000/graphql",
-                       output=Path.cwd().parent / '__generated.py'
-                       )
+myconfig = QtGqlConfig(graphql_dir= Path.cwd() / '.graphql')
 ```
 Now in your `pyproject.toml` add the full import path
 for `myconfig`:

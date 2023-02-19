@@ -36,8 +36,8 @@ class QtGqlEnvironment:
     def add_query_handler(self, handler: BaseQueryHandler) -> None:
         self._query_handlers[handler.objectName()] = handler
 
-    def get_handler(self, handler_name: str):
-        return self._query_handlers[handler_name]
+    def get_handler(self, operationName: str) -> BaseQueryHandler:
+        return self._query_handlers[operationName]
 
 
 _ENV_MAP: dict[str, QtGqlEnvironment] = {}

@@ -8,7 +8,7 @@ from tests.test_codegen.test_py.testcases import ObjectWithListOfObjectTestCase
 @pytest.fixture()
 def sample_model_initialized() -> QGraphQListModel:
     testcase = ObjectWithListOfObjectTestCase.compile()
-    handler = testcase.query_handler()
+    handler = testcase.query_handler
     handler.on_data(testcase.initialize_dict)
     return handler._data.persons
 

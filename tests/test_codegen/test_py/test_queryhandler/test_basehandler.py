@@ -1,6 +1,6 @@
-from unittest.mock import MagicMock
+from qtgql.codegen.py.runtime.queryhandler import BaseQueryHandler, UseQueryABC
 
-from qtgql.codegen.py.runtime.queryhandler import BaseQueryHandler
+from tests.test_codegen.test_py.testcases import ScalarsTestCase
 
 
 def test_is_singleton(pseudo_environment):
@@ -17,12 +17,10 @@ def test_is_singleton(pseudo_environment):
     assert Bar() is not Foo()
 
 
-def test_fetch_when_graphql_is_set(pseudo_environment):
-    class Foo(BaseQueryHandler):
-        ENV_NAME = pseudo_environment.name
-        ...
-
-    inst = Foo()
-    inst.fetch = MagicMock()
-    Foo().set_graphql("bar")
-    assert inst.fetch.called
+def test_fetched_when_first_use_query_consumes_the_operation(qtbot, schemas_server):
+    testcase = ScalarsTestCase.compile()
+    handler: BaseQueryHandler = getattr(testcase.handlers_mod, testcase.query_operationName)()
+    assert not handler._operation_on_the_fly
+    use_query: UseQueryABC = testcase.handlers_mod.UseQuery()
+    use_query.set_operationName(testcase.query_operationName)
+    assert handler._operation_on_the_fly

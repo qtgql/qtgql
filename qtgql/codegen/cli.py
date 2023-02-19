@@ -58,9 +58,9 @@ def gen():
     with console.status("Fetching schema and generating types...") as s:
         config = _get_config()
         s.update("[bold blue]Configuration file loaded")
-        config.fetch()
+        config.generate()
     console.print(
-        f"[bold green]Types were generated to [link={config.output.resolve()}]file://{config.output.resolve()}[/link] successfully!"
+        f"[bold green]Types were generated to [link={config.generated_types_dir.resolve()}]file://{config.generated_types_dir.resolve()}[/link] successfully!"
     )
 
 
