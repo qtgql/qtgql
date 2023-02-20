@@ -2,7 +2,7 @@ Release type: minor
 
 This release adds `UseQuery` instead of using just the singleton generated type.
 ```qml
-import Generated 1.0 as G
+import generated.<Environment name> 1.0 as G
 G.UseQuery{
     operationName: 'MainQuery'
     Text{
