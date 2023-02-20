@@ -2,6 +2,7 @@ import hashlib
 import os
 import socket
 import subprocess
+import tempfile
 import time
 from pathlib import Path
 from typing import TypeVar
@@ -11,8 +12,7 @@ from attr import field
 from attrs import define
 from faker import Faker
 from PySide6.QtCore import QUrl
-from PySide6.QtQml import QQmlApplicationEngine, QQmlComponent
-from PySide6.QtQuick import QQuickItem
+from PySide6.QtQuick import QQuickItem, QQuickView
 from pytestqt.qtbot import QtBot
 from strawberry import Schema
 
@@ -64,48 +64,39 @@ T = TypeVar("T")
 @define(slots=False)
 class QmlBot:
     bot: QtBot
-    engine: QQmlApplicationEngine = field(factory=QQmlApplicationEngine)
-
-    def __attrs_post_init__(self):
-        main = Path(__file__).parent / "qmltester.qml"
-        self.engine.load(main.resolve(True))
+    qquickiew: QQuickView = field(factory=QQuickView)
 
     @property
-    def _loader(self) -> QQuickItem:
-        self.window = self.engine.rootObjects()[0]
-        return self.window.findChild(QQuickItem, "contentloader")
+    def engine(self):
+        return self.qquickiew.engine()
 
     def load(self, path: Path) -> QQuickItem:
-        self.bot.wait(100)
-        self._loader.setProperty("source", str(path.resolve(True)))
-        return self._loader.property("item")
+        self.engine.clearComponentCache()
+        self.qquickiew.setSource(QUrl(path.as_uri()))
+        if errors := self.qquickiew.errors():
+            raise RuntimeError("errors in view", errors)
+        self.qquickiew.show()
+        return self.find("rootObject")
 
     def loads(self, content: str) -> QQuickItem:
-        self.comp = QQmlComponent(self.engine)
-        self.comp.setData(content.encode("utf-8"), QUrl("./"))
-        self._loader.setProperty("source", "")
-        self._loader.setProperty("sourceComponent", self.comp)
-        return self._loader.property("item")
-
-    def loads_many(self, components: dict[str, str]):
-        for name, content in components.items():
-            comp = QQmlComponent(self.engine)
-            comp.setData(content.encode("utf-8"), QUrl("./"))
-
-        self.loads(components["main.qml"])
+        with tempfile.TemporaryDirectory() as d:
+            target = Path(d) / "TestComp.qml"
+            target.write_text(content)
+            return self.load(target)
 
     def find(self, objectname: str, type: T = QQuickItem) -> T:
-        return self._loader.findChild(type, objectname)
+        return self.qquickiew.findChild(type, objectname)
 
     def cleanup(self):
-        self.window.close()
+        self.qquickiew.close()
+        self.qquickiew.engine().deleteLater()
+        self.qquickiew.deleteLater()
 
 
 @pytest.fixture()
 def qmlbot(qtbot):
     bot = QmlBot(qtbot)
     yield bot
-    bot.cleanup()
 
 
 def hash_schema(schema: Schema) -> int:

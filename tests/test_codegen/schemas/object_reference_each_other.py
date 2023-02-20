@@ -24,7 +24,7 @@ class Person:
 class Query:
     @strawberry.field
     def user(self) -> User:
-        return User(password="fake.password")
+        return User(password="fake.password", person=Person(user=self))
 
 
 schema = strawberry.Schema(query=Query)

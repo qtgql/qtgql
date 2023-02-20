@@ -1,6 +1,5 @@
 import contextlib
 import importlib
-import inspect
 import sys
 import tempfile
 import uuid
@@ -9,6 +8,9 @@ from types import ModuleType
 
 import pytest
 from qtgql.codegen.py.compiler.config import QtGqlConfig
+from qtgql.exceptions import QtGqlException
+
+from tests.test_codegen.test_py.testcases import ScalarsTestCase
 
 
 @contextlib.contextmanager
@@ -32,19 +34,18 @@ def fake_module(tmp_path) -> ModuleType:
         yield m
 
 
-def test_fetch_schema(schemas_server, tmp_path):
-    file = tmp_path / "generate.py"
-    assert not file.exists()
-    config = QtGqlConfig(url=schemas_server.address.replace("ws", "http"), output=file)
-    config.fetch()
-    with open(file) as f:
-        assert f.read(), "module was empty"
-    mod_id = uuid.uuid4().hex
-    spec = importlib.util.spec_from_file_location(mod_id, file)
-    foo = importlib.util.module_from_spec(spec)
-    sys.modules[mod_id] = foo
+def test_generate_from_schema(tmp_path):
+    config = QtGqlConfig(graphql_dir=tmp_path)
+    config.schema_path.write_text(str(ScalarsTestCase.schema))
+    config.operations_dir.write_text(ScalarsTestCase.query)
+    config.generate()
+    assert config.generated_types_dir.read_text()
+    assert config.generated_handlers_dir.read_text()
 
-    spec.loader.exec_module(foo)
-    assert inspect.isclass(
-        importlib.import_module(mod_id).Query
-    )  # Query should always be generated
+
+def test_invalid_operation_raises(tmp_path):
+    config = QtGqlConfig(graphql_dir=tmp_path)
+    config.schema_path.write_text(str(ScalarsTestCase.schema))
+    config.operations_dir.write_text("query OpName{NoSuchField}")
+    with pytest.raises(QtGqlException):
+        config.generate()

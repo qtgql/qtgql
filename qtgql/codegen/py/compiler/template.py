@@ -14,7 +14,8 @@ if TYPE_CHECKING:  # pragma: no cover
 
 env = Environment(loader=PackageLoader("qtgql.codegen.py"), autoescape=select_autoescape())
 
-SchemaTemplate = env.get_template("schema.jinja.py")
+SCHEMA_TEMPLATE = env.get_template("schema.jinja.py")
+HANDLERS_TEMPLATE = env.get_template("handlers.jinja.py")
 
 
 @define
@@ -44,5 +45,9 @@ class TemplateContext:
         return self.config.base_object.__name__
 
 
-def py_template(context: TemplateContext) -> str:
-    return SchemaTemplate.render(context=context)
+def schema_types_template(context: TemplateContext) -> str:
+    return SCHEMA_TEMPLATE.render(context=context)
+
+
+def handlers_template(context: TemplateContext) -> str:
+    return HANDLERS_TEMPLATE.render(context=context)

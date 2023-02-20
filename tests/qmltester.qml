@@ -8,12 +8,13 @@ Window {
     visible: true
     Material.theme: Material.Dark
     Material.accent: Material.Cyan
-
+    objectName: "rootWindow"
     Pane {
+        objectName: "MainPane"
         anchors.fill: parent
         Loader {
             objectName: "contentloader"
-            source: ""
+            anchors.fill: parent
         }
     }
 }

@@ -1,13 +1,15 @@
 from __future__ import annotations
-from PySide6.QtCore import Property, Signal, QObject, QEnum
-from PySide6.QtQml import QmlElement, QmlSingleton
-from enum import Enum, auto
+from PySide6.QtCore import Signal, QObject, QEnum
+
+from PySide6.QtQuick import QQuickItem
 from typing import Optional, Union
+from enum import Enum, auto
+from PySide6.QtQml import QmlElement, QmlSingleton
+
 from qtgql.tools import qproperty
 from qtgql.codegen.py.runtime.bases import QGraphQListModel
-from qtgql.gqltransport.client import  GqlClientMessage, QueryPayload
-from qtgql.codegen.py.runtime.queryhandler import BaseQueryHandler
-from qtgql.codegen.py.compiler.config import QtGqlConfig
+
+
 
 
 
@@ -16,8 +18,9 @@ from qtgql.codegen.py.compiler.config import QtGqlConfig
 {{dep}}{% endfor %}
 
 
-QML_IMPORT_NAME = "{{context.config.qml_import_name}}"
+QML_IMPORT_NAME = "generated.{{context.config.env_name}}.types"
 QML_IMPORT_MAJOR_VERSION = 1
+
 
 
 {% for enum in context.enums %}
@@ -35,6 +38,7 @@ class Enums(QObject):
     QEnum({{enum.name}})
     {% endfor %}
 {% endif %}
+
 
 class SCALARS:
     {% for scalar in context.custom_scalars %}
@@ -77,15 +81,4 @@ class {{ type.name }}({{context.base_object_name}}):
 {% endfor %}
 
 
-{% for query in context.queries %}
-@QmlElement
-class {{query.name}}(BaseQueryHandler[{{query.field.annotation}}]):
-    ENV_NAME = "{{context.config.env_name}}"
-    _message_template = GqlClientMessage(payload=QueryPayload(query="", operationName="{{query.name}}"))
-    def on_data(self, message: dict) -> None:
-        parent = self.parent()
-        if {{query.field.name}} := message.get('{{query.field.name}}', None):
-            self._data = {{query.field.deserializer}}
-            self.dataChanged.emit()
 
-{% endfor %}

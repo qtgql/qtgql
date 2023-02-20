@@ -1,0 +1,12 @@
+query MainQuery {
+              apples {
+                color
+                owner
+                size
+                worms {
+                  family
+                  name
+                  size
+                }
+              }
+            }

@@ -151,7 +151,6 @@ class GqlFieldDefinition:
 
 @define(slots=False)
 class GqlTypeDefinition:
-    kind: Kinds
     name: str
     fields: list[GqlFieldDefinition]
     docstring: Optional[str] = ""
