@@ -72,7 +72,7 @@ class QmlBot:
 
     def load(self, path: Path) -> QQuickItem:
         self.engine.clearComponentCache()
-        self.qquickiew.setSource(QUrl(path.as_posix()))
+        self.qquickiew.setSource(QUrl(path.as_uri()))
         if errors := self.qquickiew.errors():
             raise RuntimeError("errors in view", errors)
         self.qquickiew.show()
