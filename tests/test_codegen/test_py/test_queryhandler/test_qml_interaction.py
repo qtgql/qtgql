@@ -19,3 +19,13 @@ def test_on_completed_emits(qmlbot, schemas_server):
     with qmlbot.bot.wait_signal(testcase.query_handler.completedChanged):
         ...
     assert testcase.query_handler.property("completed") is True
+
+
+def test_consumer_deleted_decrease_consumers_count(qmlbot):
+    testcase = ScalarsTestCase.compile("").load_qml(qmlbot)
+    handler = testcase.query_handler
+    qmlbot.bot.wait_until(lambda: bool(handler._consumers_count))
+    assert handler._consumers_count
+    qmlbot.cleanup()
+    qmlbot.bot.wait_until(lambda: not handler._consumers_count)
+    assert not handler._consumers_count

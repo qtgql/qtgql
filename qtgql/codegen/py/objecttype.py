@@ -234,7 +234,6 @@ class GqlTypeHinter(TypeHinter):
             return f"Optional[{object_def.name}]"
         if self.is_union():
             return "Union[" + ",".join((th.annotation(scalars) for th in self.of_type)) + "]"
-        self.is_builtin_scalar
         raise NotImplementedError  # pragma no cover
 
     def as_annotation(self, object_map=None):  # pragma: no cover

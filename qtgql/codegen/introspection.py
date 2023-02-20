@@ -23,6 +23,7 @@ from qtgql.codegen.py.objecttype import (
     GqlTypeHinter,
 )
 from qtgql.codegen.utils import anti_forward_ref
+from qtgql.exceptions import QtGqlException
 
 if TYPE_CHECKING:  # pragma: no cover
     from qtgql.codegen.py.compiler.config import QtGqlConfig
@@ -150,7 +151,7 @@ class SchemaEvaluator:
             queries = graphql.parse(f.read())
 
         if errors := graphql.validate(self.schema_definition, queries):
-            raise Exception([error.formatted for error in errors])
+            raise QtGqlException([error.formatted for error in errors])
 
         for definition in queries.definitions:
             field_name = definition.selection_set.selections[0].name.value  # type: ignore

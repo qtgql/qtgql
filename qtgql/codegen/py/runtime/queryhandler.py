@@ -47,19 +47,18 @@ class BaseQueryHandler(Generic[T_QObject], QObject, metaclass=QSingletonMeta):
         self._data: Optional[T_QObject] = None
         self.environment = get_gql_env(self.ENV_NAME)
         self.environment.add_query_handler(self)
-        self._consumers: list[UseQueryABC] = []
+        self._consumers_count: int = 0
         self._operation_on_the_fly: bool = False
 
-    def remove_consumer(self, consumer: UseQueryABC) -> None:
-        self._consumers.remove(consumer)
-        # if len(self._consumers) == 0:
+    def unconsume(self) -> None:
+        self._consumers_count -= 1
 
-    def add_consumer(self, consumer: UseQueryABC) -> None:
+    def consume(self) -> None:
         # if it is the first consumer fetch the data here.
-        if not self._operation_on_the_fly:
+        if not self._operation_on_the_fly and not self._completed:
             self.fetch()
 
-        self._consumers.append(consumer)
+        self._consumers_count += 1
 
     @property
     def message(self) -> GqlClientMessage:
@@ -100,6 +99,7 @@ class UseQueryABC(QQuickItem):
 
     def __init__(self, parent: Optional[QQuickItem] = None):
         super().__init__(parent)
+        self.destroyed.connect(self.unconsume)
         self._operationName: Optional[str] = None
         self.env = get_gql_env(self.ENV_NAME)
         self.handler: Optional[BaseQueryHandler] = None
@@ -108,13 +108,14 @@ class UseQueryABC(QQuickItem):
     def set_operationName(self, graphql: str) -> None:
         self._operationName = graphql
         self.handler = self.env.get_handler(graphql)
-        self.handler.add_consumer(self)
+        self.handler.consume()
         self.operationNameChanged.emit()  # type: ignore
 
     @qproperty(str, fset=set_operationName, notify=operationNameChanged)
     def operationName(self):
         return self._operationName
 
-    def deleteLater(self) -> None:
+    @slot
+    def unconsume(self) -> None:
         assert self.handler
-        self.handler.remove_consumer(self)
+        self.handler.unconsume()

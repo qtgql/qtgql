@@ -89,6 +89,7 @@ class QmlBot:
 
     def cleanup(self):
         self.qquickiew.close()
+        self.qquickiew.engine().deleteLater()
         self.qquickiew.deleteLater()
 
 

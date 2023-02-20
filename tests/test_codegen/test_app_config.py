@@ -8,6 +8,7 @@ from types import ModuleType
 
 import pytest
 from qtgql.codegen.py.compiler.config import QtGqlConfig
+from qtgql.exceptions import QtGqlException
 
 from tests.test_codegen.test_py.testcases import ScalarsTestCase
 
@@ -40,3 +41,11 @@ def test_generate_from_schema(tmp_path):
     config.generate()
     assert config.generated_types_dir.read_text()
     assert config.generated_handlers_dir.read_text()
+
+
+def test_invalid_operation_raises(tmp_path):
+    config = QtGqlConfig(graphql_dir=tmp_path)
+    config.schema_path.write_text(str(ScalarsTestCase.schema))
+    config.operations_dir.write_text("query OpName{NoSuchField}")
+    with pytest.raises(QtGqlException):
+        config.generate()

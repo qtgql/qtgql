@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, NamedTuple
 
 from qtgql.codegen.py.objecttype import GqlFieldDefinition
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from qtgql.codegen.introspection import OperationName
 
 
