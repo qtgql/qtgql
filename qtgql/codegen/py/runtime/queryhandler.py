@@ -99,7 +99,7 @@ class UseQueryABC(QQuickItem):
 
     def __init__(self, parent: Optional[QQuickItem] = None):
         super().__init__(parent)
-        self.destroyed.connect(self.unconsume)
+        self.destroyed.connect(self.unconsume)  # type: ignore
         self._operationName: Optional[str] = None
         self.env = get_gql_env(self.ENV_NAME)
         self.handler: Optional[BaseQueryHandler] = None
