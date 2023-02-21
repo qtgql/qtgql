@@ -112,13 +112,34 @@ class SchemaEvaluator:
             return None
         if evaluated := self._generated_types.get(t_name, None):
             return evaluated
-
-        concrete = GqlTypeDefinition(
+        root_types = (
+            self.schema_definition.get_root_type(OperationType.QUERY),
+            self.schema_definition.get_root_type(OperationType.MUTATION),
+            self.schema_definition.get_root_type(OperationType.SUBSCRIPTION),
+        )
+        if type_ not in root_types:
+            try:
+                id_field = type_.fields["id"]
+                if nonull := is_non_null_definition(id_field.type):
+                    id_scalar = graphql.type.scalars.GraphQLID
+                    if nonull.of_type is not id_scalar:
+                        raise QtGqlException(
+                            f"id field type must be of the {id_scalar} scalar!"
+                            f"\n Got: {nonull.of_type}"
+                        )
+                else:
+                    raise QtGqlException("id field should not be nullable!" f"\n Got: {id_field}")
+            except KeyError:
+                raise QtGqlException(
+                    "QtGql enforces types to have ID field"
+                    f"type {type_} does not not define an id field.\n"
+                    f"fields: {type_.fields}"
+                )
+        return GqlTypeDefinition(
             name=t_name,
             docstring=type_.description,
             fields=[self._evaluate_field(name, field) for name, field in type_.fields.items()],
         )
-        return concrete
 
     def _evaluate_enum(self, enum: gql_def.GraphQLEnumType) -> Optional[GqlEnumDefinition]:
         name: str = enum.name
@@ -210,5 +231,4 @@ is_enum_definition = definition_identifier_factory(gql_def.GraphQLEnumType)
 is_list_definition = definition_identifier_factory(gql_def.GraphQLList)
 is_scalar_definition = definition_identifier_factory(gql_def.GraphQLScalarType)
 is_union_definition = definition_identifier_factory(gql_def.GraphQLUnionType)
-
 is_non_null_definition = definition_identifier_factory(gql_def.GraphQLNonNull)

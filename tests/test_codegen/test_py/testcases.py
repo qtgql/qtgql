@@ -403,6 +403,24 @@ CustomUserScalarTestCase = QGQLObjectTestCase(
     """,
 )
 
+TypeWithNoIDTestCase = QGQLObjectTestCase(
+    schema=schemas.type_with_no_id.schema,
+    query="""query MainQuery {users{name}}""",
+    test_name="TypeWithNoIDTestCase",
+)
+
+TypeWithNullAbleIDTestCase = QGQLObjectTestCase(
+    schema=schemas.type_with_nullable_id.schema,
+    query="""query MainQuery {users{name}}""",
+    test_name="TypeWithNullAbleIDTestCase",
+)
+
+TypeWithWrongIDTypeTestCase = QGQLObjectTestCase(
+    schema=schemas.wrogn_id_type.schema,
+    query="""query MainQuery {users{name}}""",
+    test_name="TypeWithWrongIDTypeTestCase",
+)
+
 all_test_cases = [
     ScalarsTestCase,
     DateTimeTestCase,

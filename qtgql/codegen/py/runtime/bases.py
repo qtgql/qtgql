@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Generic, Optional, TypeVar
 
 from PySide6.QtCore import QAbstractListModel, QByteArray, QObject, Qt, Signal
-from typing_extensions import Self
+from typing_extensions import ClassVar, Self
 
 from qtgql.tools import qproperty, slot
 
@@ -13,10 +13,13 @@ __all__ = ["QGraphQListModel", "get_base_graphql_object"]
 class _BaseQGraphQLObject(QObject):
     type_map: dict[str, type[_BaseQGraphQLObject]]
 
+    id: str
     __singleton__: _BaseQGraphQLObject
+    __store__: ClassVar[QGraphQLObjectStore[Self]]
 
     def __init_subclass__(cls, **kwargs):
-        cls.type_map[cls.__name__] = cls
+        cls.type_map[cls.__name__] = cls  # required to instantiate unions.
+        cls.__store__ = QGraphQLObjectStore()
 
     def __init__(self, parent: Optional[QObject] = None):
         super().__init__(parent)
@@ -35,8 +38,23 @@ class _BaseQGraphQLObject(QObject):
     ) -> T_BaseQGraphQLObject:  # pragma: no cover
         raise NotImplementedError
 
+    def update(self, data: dict) -> Self:  # pragma: no cover
+        raise NotImplementedError
+
 
 T_BaseQGraphQLObject = TypeVar("T_BaseQGraphQLObject", bound=_BaseQGraphQLObject)
+
+
+class QGraphQLObjectStore(Generic[T_BaseQGraphQLObject]):
+    def __init__(self) -> None:
+        self._data: dict[str, T_BaseQGraphQLObject] = {}
+
+    def get_node(self, id_: str) -> Optional[T_BaseQGraphQLObject]:
+        return self._data.get(id_, None)
+
+    def add_node(self, node: T_BaseQGraphQLObject) -> None:
+        assert node not in self._data.values()
+        self._data[node.id] = node
 
 
 class QGraphQListModel(QAbstractListModel, Generic[T_BaseQGraphQLObject]):
@@ -107,7 +125,7 @@ def get_base_graphql_object(name: str) -> type[_BaseQGraphQLObject]:
     :returns: A type to be extended by all generated types.
     """
     type_map: dict[str, type[_BaseQGraphQLObject]] = {}
-    return type(name, (_BaseQGraphQLObject,), {"type_map": type_map})  # type: ignore
+    return type(name, (_BaseQGraphQLObject,), {"type_map": type_map, "__store__": QGraphQLObjectStore()})  # type: ignore
 
 
 BaseGraphQLObject = get_base_graphql_object("BaseGraphQLObject")

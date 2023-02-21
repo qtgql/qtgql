@@ -15,6 +15,9 @@ from . import (
     object_with_union,
     object_with_user_defined_scalar,
     root_list_of_object,
+    type_with_no_id,
+    type_with_nullable_id,
+    wrogn_id_type,
 )
 
 __all__ = [
@@ -34,4 +37,7 @@ __all__ = [
     object_with_user_defined_scalar,
     object_reference_each_other,
     root_list_of_object,
+    type_with_no_id,
+    type_with_nullable_id,
+    wrogn_id_type,
 ]

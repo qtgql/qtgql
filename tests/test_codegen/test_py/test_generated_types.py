@@ -200,6 +200,10 @@ class TestDeserializers:
         handler.on_data(testcase.initialize_dict)
 
 
+class TestUpdates:
+    ...
+
+
 class TestDefaultConstructor:
     @pytest.mark.parametrize("scalar", BuiltinScalars, ids=lambda v: v.graphql_name)
     def test_builtin_scalars(self, scalar: BuiltinScalar):
