@@ -223,6 +223,16 @@ relative_files = true
 
 [tool.coverage.report]
 show_missing = true
+exclude_lines = [
+  "pragma: no cover",
+  "def __repr__",
+  "def __str__",
+  "raise AssertionError",
+  "raise NotImplementedError",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+  "if typing.TYPE_CHECKING:"
+]
 
 [tool.qtgql]
 config = "tests.test_sample_ui.main:qtgqlconfig"
