@@ -45,4 +45,3 @@ class GqlEncoder(json.JSONEncoder):
             return str(obj)
         elif isinstance(obj, (EncodeAble, QueryPayload)):
             return obj.asdict()
-        return None

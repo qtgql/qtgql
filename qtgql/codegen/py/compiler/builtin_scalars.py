@@ -28,7 +28,6 @@ class _BuiltinScalars:
         for scalar in self:
             if scalar.graphql_name == name:
                 return scalar
-        return None
 
     def keys(self) -> list[str]:
         return [scalar.graphql_name for scalar in self]

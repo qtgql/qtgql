@@ -278,7 +278,6 @@ def definition_identifier_factory(
     def type_guarder(definition: gql_def.GraphQLType) -> Optional[T_Definition]:
         if isinstance(definition, expected):
             return definition
-        return None
 
     return type_guarder
 
@@ -300,7 +299,6 @@ def ast_identifier_factory(
     def type_guarder(node: gql_lang.ast.Node) -> Optional[T_AST_Node]:
         if isinstance(node, expected):
             return node
-        return None
 
     return type_guarder
 

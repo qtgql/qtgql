@@ -203,7 +203,7 @@ ignore = [
     "TRY",
     "SIM300",
     "SIM114",
-
+    "ANN200",
     "DJ008",
 ]
 fix = true
@@ -211,6 +211,7 @@ src = ["qtgql", "tests"]
 
 [tool.ruff.pyupgrade]
 keep-runtime-typing = true
+
 
 [tool.pytest.ini_options]
 addopts = "--cov-config=pyproject.toml --ignore=qtgql/codegen/py/templates/"

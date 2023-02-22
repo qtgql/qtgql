@@ -101,7 +101,6 @@ class QGraphQListModel(QAbstractListModel, Generic[T_BaseQGraphQLObject]):
             raise NotImplementedError(
                 f"role {role} is not a valid role for {self.__class__.__name__}"
             )
-        return None
 
     def append(self, node: T_BaseQGraphQLObject) -> None:
         count = self.rowCount()

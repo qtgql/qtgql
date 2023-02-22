@@ -130,7 +130,6 @@ class CompiledTestCase(QGQLObjectTestCase):
         for field in self.tested_type.fields:
             if field.type.type == t:
                 return field
-        return None
 
     def get_field_by_name(self, name: str):
         for field in self.tested_type.fields:
@@ -147,7 +146,6 @@ class CompiledTestCase(QGQLObjectTestCase):
         for sf in stawberry_definition.fields:
             if field_name == strawberry.utils.str_converters.to_camel_case(sf.name):
                 return sf
-        return None
 
     def load_qml(self, qmlbot: QmlBot):
         qmlbot.loads(self.qml_file)

@@ -191,15 +191,12 @@ class GqlTypeHinter(TypeHinter):
                 ret = self.type.resolve()
                 if isinstance(ret, GqlTypeDefinition):
                     return ret
-                return None
-            return None
 
     @property
     def is_model(self) -> Optional[GqlTypeDefinition]:
         if self.is_list():
             # enums are not supported in lists yet (valid graphql spec though)
             return self.of_type[0].is_object_type
-        return None
 
     @property
     def is_enum(self) -> Optional[GqlEnumDefinition]:
@@ -207,19 +204,15 @@ class GqlTypeHinter(TypeHinter):
             if issubclass(self.type, AntiForwardRef):
                 if isinstance(self.type.resolve(), GqlEnumDefinition):
                     return self.type.resolve()
-                return None
-            return None
 
     @property
     def is_builtin_scalar(self) -> Optional[BuiltinScalar]:
         if isinstance(self.type, BuiltinScalar):
             return self.type
-        return None
 
     def is_custom_scalar(self, scalars: CustomScalarMap) -> Optional[Type[BaseCustomScalar]]:
         if self.type in scalars.values():
             return self.type
-        return None
 
     def annotation(self, scalars: CustomScalarMap) -> str:
         """
