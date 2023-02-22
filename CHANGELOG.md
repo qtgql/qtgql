@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+0.109.0 - 2023-02-22
+--------------------
+
+This release adds initial support for type-store.
+The type store is the source of truth for a given type.
+All CRUD operations will occur on store level.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #106](https://github.com/nrbnlulu/qtgql/pull/106/)
+
+
 0.108.0 - 2023-02-20
 --------------------
 
