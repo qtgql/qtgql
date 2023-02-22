@@ -1,4 +1,5 @@
-type Apple {
+type Apple implements Node {
+  id: ID!
   size: Int!
   owner: String!
   worms: [Worm!]
@@ -7,6 +8,10 @@ type Apple {
 
 type Mutation {
   pseudoMutation: Boolean!
+}
+
+interface Node {
+  id: ID!
 }
 
 type Query {
@@ -19,7 +24,8 @@ type Subscription {
   count(target: Int! = 10, raiseOn5: Boolean! = false): Int!
 }
 
-type Worm {
+type Worm implements Node {
+  id: ID!
   name: String!
   family: String!
   size: Int!

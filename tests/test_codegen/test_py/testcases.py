@@ -65,7 +65,9 @@ class QGQLObjectTestCase:
 
     @property
     def initialize_dict(self) -> dict:
-        return self.schema.execute_sync(self.query).data
+        return self.schema.execute_sync(
+            self.evaluator._query_handlers[self.query_operationName].query
+        ).data
 
     def compile(self, url: Optional[str] = "") -> "CompiledTestCase":
         url = url.replace("graphql", f"{hash_schema(self.schema)}")
@@ -87,6 +89,7 @@ class QGQLObjectTestCase:
         exec(compile(generated["handlers"], "gen_imports", "exec"), handlers_mod.__dict__)
         handlers_mod.init()
         return CompiledTestCase(
+            evaluator=self.evaluator,
             objecttypes_mod=types_module,
             handlers_mod=handlers_mod,
             config=self.config,
@@ -106,6 +109,7 @@ class CompiledTestCase(QGQLObjectTestCase):
     handlers_mod: ModuleType
     config: QtGqlConfig
     tested_type: GqlTypeDefinition
+    evaluator: SchemaEvaluator
 
     @property
     def module(self) -> ModuleType:
@@ -117,7 +121,7 @@ class CompiledTestCase(QGQLObjectTestCase):
         return getattr(self.objecttypes_mod, self.tested_type.name)
 
     @property
-    def query_handler(self) -> Type[BaseQueryHandler]:
+    def query_handler(self) -> BaseQueryHandler:
         return getattr(self.handlers_mod, self.query_operationName)()
 
     def get_field_by_type(self, t):

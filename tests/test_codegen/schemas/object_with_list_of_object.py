@@ -12,7 +12,7 @@ class User(Node):
 
 
 @strawberry.type()
-class Person:
+class Person(Node):
     name: str
     age: int
 

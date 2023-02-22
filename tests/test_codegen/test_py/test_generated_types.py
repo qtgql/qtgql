@@ -126,18 +126,19 @@ class TestPropertyGetter:
     def test_union(self, qtbot):
         self.default_test(UnionTestCase, "whoAmI")
 
-    def test_enum(self):
+    def test_enum(self, qtbot):
         testcase = EnumTestCase.compile()
-        inst = testcase.gql_type.from_dict(None, data=testcase.initialize_dict)
+        handler = testcase.query_handler
+        handler.on_data(testcase.initialize_dict)
         f = testcase.get_field_by_name("status")
-        assert inst.property(f.name) == testcase.module.Status.Connected.value
+        assert handler._data.property(f.name) == testcase.module.Status.Connected.value
 
 
 class TestDeserializers:
     @pytest.mark.parametrize("testcase", all_test_cases, ids=lambda x: x.test_name)
-    def test_blank_dict(self, testcase: QGQLObjectTestCase):
+    def test_blank_dict(self, testcase: QGQLObjectTestCase, qtbot):
         testcase = testcase.compile()
-        assert isinstance(testcase.gql_type.from_dict(None, {}), testcase.gql_type)
+        assert isinstance(testcase.gql_type.from_dict(None, {"id": ""}), testcase.gql_type)
 
     def test_scalars(self, qtbot):
         testcase = ScalarsTestCase.compile()

@@ -6,7 +6,6 @@ from typing import (
     Callable,
     List,
     Optional,
-    Tuple,
     Type,
     TypedDict,
     TypeVar,
@@ -48,8 +47,10 @@ class GeneratedNamespace(TypedDict):
     objecttypes: str
 
 
-def has_id_field(selection_set: Tuple[gql_lang.SelectionNode]) -> bool:
-    for field in selection_set:
+def has_id_field(selection_set: gql_lang.SelectionSetNode) -> bool:
+    if hasattr(selection_set, "__has_id__"):
+        return True
+    for field in selection_set.selections:
         assert isinstance(field, gql_lang.FieldNode)
         if field.name.value == "id":
             return True
@@ -65,12 +66,15 @@ class IDInjectionVisitor(visitor.Visitor):
         super().__init__()
         self.modified_source: str = ""
 
-    def enter_selection_set(self, node, key, parent, path, ancestors):
-        if is_operation_def_node(parent):
+    def enter_field(self, node: gql_def.FieldNode, key, parent, path, ancestors):
+        # root field grand parent is an operation.
+        if is_operation_def_node(ancestors[-2]):
             return
-        if selection_set := is_selection_set(node):
-            if not has_id_field(selection_set.selections):
-                selection_set.selections = (self.ID_SELECTION_NODE, *selection_set.selections)
+        selection_set: gql_lang.SelectionSetNode = ancestors[-1]
+        assert is_selection_set(selection_set)
+        if not has_id_field(selection_set):
+            selection_set.selections = (self.ID_SELECTION_NODE, *selection_set.selections)
+            selection_set.__has_id__ = True
 
 
 class OperationMinerVisitor(visitor.Visitor):

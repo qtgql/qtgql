@@ -10,12 +10,13 @@ from strawberry.types import Info
 
 from tests.conftest import hash_schema
 from tests.test_codegen.schemas import __all__ as all_schemas
+from tests.test_codegen.schemas.node_interface import Node
 
 fake = Faker()
 
 
 @strawberry.type
-class Worm:
+class Worm(Node):
     name: str = strawberry.field(default_factory=fake.name)
     family: str = strawberry.field(
         default_factory=lambda: random.choice(
@@ -26,7 +27,7 @@ class Worm:
 
 
 @strawberry.type
-class Apple:
+class Apple(Node):
     size: int = strawberry.field(default_factory=lambda: random.randint(10, 100))
     owner: str = strawberry.field(default_factory=fake.name)
     worms: Optional[list[Worm]] = strawberry.field()
