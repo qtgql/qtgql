@@ -123,7 +123,7 @@ qtgqlconfig = QtGqlConfig(graphql_dir=graphql_dir)
 
 def main():  # pragma: no cover
     app = QtGui.QGuiApplication(sys.argv)
-    ep = EntryPoint()
+    EntryPoint()
     ret = app.exec()
     sys.exit(ret)
 

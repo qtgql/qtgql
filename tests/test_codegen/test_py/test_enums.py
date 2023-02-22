@@ -41,6 +41,6 @@ def test_accessible_from_qml(qmlbot, status):
         % status.name
     )
 
-    testcase = EnumTestCase.compile()
+    EnumTestCase.compile()
     item = qmlbot.loads(qml)
     assert item.property("enumValue") == status.value
