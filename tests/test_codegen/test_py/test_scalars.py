@@ -48,13 +48,13 @@ class TestDateScalar(AbstractScalarTestCase):
     scalar_klass = DateScalar
 
     def test_deserialize(self):
-        expected = date.fromisoformat(datetime.now(tz=timezone.utc).isoformat())
+        expected = date.fromisoformat(datetime.now(tz=timezone.utc).date().isoformat())
         scalar = DateScalar.from_graphql(expected.isoformat())
         assert scalar._value == expected
 
     def test_to_qt(self):
-        scalar = DateScalar(datetime.now(tz=timezone.utc))
-        assert scalar.to_qt() == datetime.now(tz=timezone.utc).isoformat()
+        scalar = DateScalar(datetime.now(tz=timezone.utc).date())
+        assert scalar.to_qt() == datetime.now(tz=timezone.utc).date().isoformat()
 
 
 class TestTimeScalar(AbstractScalarTestCase):
