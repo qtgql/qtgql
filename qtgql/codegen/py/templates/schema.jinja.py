@@ -55,16 +55,28 @@ class {{ type.name }}({{context.base_object_name}}):
         super().__init__(parent){% for f in type.fields %}
         self.{{  f.private_name  }} = {{f.name}} if {{f.name}} else {{f.default_value}}{% endfor %}
 
-    @classmethod
-    def from_dict(cls, parent,  data: dict) -> {{type.name}}:
-        init_dict = cls.DEFAULT_INIT_DICT.copy()
+    def update(self, data: dict):
+        parent = self.parent()
         {% for f in type.fields %}
         if {{f.name}} := data.get('{{f.name}}', None):
-            init_dict['{{f.name}}'] = {{f.deserializer}}{% endfor %}
-        return cls(
-            parent=parent,
-            **init_dict
-        )
+            deserialized = {{f.deserializer}}
+            if self.{{f.name}} != deserialized:
+                self.{{f.setter_name}}(deserialized)
+        return self{% endfor %}
+
+    @classmethod
+    def from_dict(cls, parent,  data: dict) -> {{type.name}}:
+        if instance := cls.__store__.get_node(data['id']):
+            return instance.update(data)
+        else:
+            init_dict = cls.DEFAULT_INIT_DICT.copy()
+            {% for f in type.fields %}
+            if {{f.name}} := data.get('{{f.name}}', None):
+                init_dict['{{f.name}}'] = {{f.deserializer}}{% endfor %}
+            return cls(
+                parent=parent,
+                **init_dict
+            )
 
     {% for f in type.fields %}
     {{ f.signal_name }} = Signal()

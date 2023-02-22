@@ -3,15 +3,16 @@ from __future__ import annotations
 import strawberry
 
 from tests.conftest import fake
+from tests.test_codegen.schemas.node_interface import Node
 
 
 @strawberry.type
-class User:
+class User(Node):
     persons: list[Person]
 
 
 @strawberry.type()
-class Person:
+class Person(Node):
     name: str
     age: int
 

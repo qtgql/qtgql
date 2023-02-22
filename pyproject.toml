@@ -18,7 +18,7 @@ python = ">=3.9,<3.12"
 PySide6 = "^6.4.2"
 attrs = "^22.2.0"
 # codegen
-graphql-core = {version = "^3.2.3", optional=true}
+graphql-core = {version = "<3.3.0", optional=true}
 jinja2 = {version = "^3.1.2", optional=true}
 typer = {extras = ["all"], version = "^0.7.0", optional=true}
 toml = {version = "^0.10.2", optional=true}
@@ -29,9 +29,8 @@ toml = {version = "^0.10.2", optional=true}
 pytest-qt = "^4.2.0"
 pytest-cov = "^4.0.0"
 pre-commit = "^2.20.0"
-strawberry-graphql = ">=0.142.2"
 aiohttp = {extras = ["speedups"], version = "^3.8.3"}
-mypy = "^0.991"
+
 faker = "^15.3.4"
 types-toml = "^0.10.8.1"
 # doc deps
@@ -41,6 +40,8 @@ markdown-include = "^0.8.0"
 mkdocstrings = {extras = ["python"], version = "^0.19.1"}
 pygments = "^2.14.0"
 mktestdocs = "^0.2.0"
+mypy = "^1.0.1"
+strawberry-graphql = "^0.158.2"
 
 
 

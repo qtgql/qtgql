@@ -5,27 +5,28 @@ from typing import Union
 import strawberry
 
 from tests.conftest import fake
+from tests.test_codegen.schemas.node_interface import Node
 
 
 @strawberry.type()
-class Frog:
+class Frog(Node):
     name: str = fake.name()
     color: str = "green"
 
 
 @strawberry.type
-class User:
+class User(Node):
     who_am_i: Union[Frog, Person]
 
 
 @strawberry.type()
-class Person:
+class Person(Node):
     name: str = fake.name()
     age: int = fake.pyint()
 
 
 @strawberry.type()
-class UserManager:
+class UserManager(Node):
     name: str = fake.name()
 
     @strawberry.field

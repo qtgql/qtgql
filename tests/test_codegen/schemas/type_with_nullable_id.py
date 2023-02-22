@@ -4,16 +4,12 @@ from typing import Optional
 
 import strawberry
 
-from tests.test_codegen.schemas.node_interface import Node
+from tests.conftest import fake
 
 
 @strawberry.type
-class User(Node):
-    person: Optional[Person]
-
-
-@strawberry.type()
-class Person(Node):
+class User:
+    id: Optional[strawberry.ID]
     name: str
     age: int
 
@@ -21,8 +17,8 @@ class Person(Node):
 @strawberry.type
 class Query:
     @strawberry.field
-    def user(self) -> User:
-        return User(person=None)
+    def users(self) -> list[User]:
+        return [User(name=fake.name(), age=fake.pyint()) for _ in range(4)]
 
 
 schema = strawberry.Schema(query=Query)

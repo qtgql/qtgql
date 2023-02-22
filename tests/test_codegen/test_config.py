@@ -34,18 +34,21 @@ def fake_module(tmp_path) -> ModuleType:
         yield m
 
 
-def test_generate_from_schema(tmp_path):
-    config = QtGqlConfig(graphql_dir=tmp_path)
-    config.schema_path.write_text(str(ScalarsTestCase.schema))
-    config.operations_dir.write_text(ScalarsTestCase.query)
-    config.generate()
-    assert config.generated_types_dir.read_text()
-    assert config.generated_handlers_dir.read_text()
+@pytest.fixture()
+def pseudo_config(tmp_path) -> QtGqlConfig:
+    return QtGqlConfig(graphql_dir=tmp_path)
 
 
-def test_invalid_operation_raises(tmp_path):
-    config = QtGqlConfig(graphql_dir=tmp_path)
-    config.schema_path.write_text(str(ScalarsTestCase.schema))
-    config.operations_dir.write_text("query OpName{NoSuchField}")
+def test_generate_from_schema(pseudo_config):
+    pseudo_config.schema_path.write_text(str(ScalarsTestCase.schema))
+    pseudo_config.operations_dir.write_text(ScalarsTestCase.query)
+    pseudo_config.generate()
+    assert pseudo_config.generated_types_dir.read_text()
+    assert pseudo_config.generated_handlers_dir.read_text()
+
+
+def test_invalid_operation_raises(pseudo_config):
+    pseudo_config.schema_path.write_text(str(ScalarsTestCase.schema))
+    pseudo_config.operations_dir.write_text("query OpName{NoSuchField}")
     with pytest.raises(QtGqlException):
-        config.generate()
+        pseudo_config.generate()

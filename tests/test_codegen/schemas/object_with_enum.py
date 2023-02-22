@@ -2,6 +2,8 @@ from enum import Enum, auto
 
 import strawberry
 
+from tests.test_codegen.schemas.node_interface import Node
+
 
 @strawberry.enum
 class Status(Enum):
@@ -11,7 +13,7 @@ class Status(Enum):
 
 
 @strawberry.type
-class User:
+class User(Node):
     name: str
     age: int
     status: Status = Status.Connected

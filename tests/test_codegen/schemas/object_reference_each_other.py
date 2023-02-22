@@ -5,16 +5,17 @@ from typing import Optional
 import strawberry
 
 from tests.conftest import fake
+from tests.test_codegen.schemas.node_interface import Node
 
 
 @strawberry.type
-class User:
+class User(Node):
     password: str
     person: Optional[Person]
 
 
 @strawberry.type()
-class Person:
+class Person(Node):
     name: str = fake.name()
     age: int = fake.pyint()
     user: User

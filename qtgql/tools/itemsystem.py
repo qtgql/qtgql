@@ -136,7 +136,7 @@ class RoleMapper:
     """A container that maps the roles of a defined class each map has a
     certain usage in the future."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         # this is the real name of the field
         # how the class would be created
         self.by_name: dict[str, Role] = {}
