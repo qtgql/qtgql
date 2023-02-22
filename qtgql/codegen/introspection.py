@@ -1,10 +1,22 @@
 from __future__ import annotations
 
 from functools import cached_property
-from typing import TYPE_CHECKING, Callable, NewType, Optional, Type, TypedDict, TypeVar, Union
+from typing import (
+    TYPE_CHECKING,
+    Callable,
+    List,
+    Optional,
+    Tuple,
+    Type,
+    TypedDict,
+    TypeVar,
+    Union,
+)
 
 import graphql
 from graphql import OperationType
+from graphql import language as gql_lang
+from graphql.language import visitor
 from graphql.type import definition as gql_def
 
 from qtgql.codegen.py.compiler.builtin_scalars import BuiltinScalars
@@ -31,12 +43,60 @@ if TYPE_CHECKING:  # pragma: no cover
 introspection_query = graphql.get_introspection_query(descriptions=True)
 
 
-OperationName = NewType("OperationName", str)
-
-
 class GeneratedNamespace(TypedDict):
     handlers: str
     objecttypes: str
+
+
+def has_id_field(selection_set: Tuple[gql_lang.SelectionNode]) -> bool:
+    for field in selection_set:
+        assert isinstance(field, gql_lang.FieldNode)
+        if field.name.value == "id":
+            return True
+    return False
+
+
+class IDInjectionVisitor(visitor.Visitor):
+    ID_SELECTION_NODE = gql_lang.FieldNode(
+        name=gql_lang.NameNode(value="id"), arguments=(), directives=()
+    )
+
+    def __init__(self):
+        super().__init__()
+        self.modified_source: str = ""
+
+    def enter_selection_set(self, node, key, parent, path, ancestors):
+        if is_operation_def_node(parent):
+            return
+        if selection_set := is_selection_set(node):
+            if not has_id_field(selection_set.selections):
+                selection_set.selections = (self.ID_SELECTION_NODE, *selection_set.selections)
+
+
+class OperationMinerVisitor(visitor.Visitor):
+    """Creates handlers for root operations."""
+
+    def __init__(self, evaluator: SchemaEvaluator):
+        super().__init__()
+        self.query_handlers: dict[str, QueryHandlerDefinition] = {}
+        self.evaluator = evaluator
+
+    def enter_operation_definition(self, node, key, parent, path, ancestors):
+        if operation := is_operation_def_node(node):
+            if operation.operation is OperationType.QUERY:  # type: ignore
+                fname = operation.selection_set.selections[0].name.value
+                assert self.evaluator._query_type
+                for field_impl in self.evaluator._query_type.fields:
+                    if field_impl.name == fname:
+                        field = field_impl
+                assert field
+                op_name = operation.name.value
+                self.query_handlers[op_name] = QueryHandlerDefinition(
+                    query=graphql.print_ast(node),
+                    name=op_name,
+                    field=field,
+                    directives=node.directives,
+                )
 
 
 class SchemaEvaluator:
@@ -45,18 +105,21 @@ class SchemaEvaluator:
         self._generated_types: dict[str, GqlTypeDefinition] = {}
         self._generated_enums: EnumMap = {}
         self._fragments_store: dict[int, str] = {}
-        self._query_handlers: dict[OperationName, QueryHandlerDefinition] = {}
+        self._query_handlers: dict[str, QueryHandlerDefinition] = {}
+        self._query_type: Optional[GqlTypeDefinition] = None
 
     @cached_property
     def schema_definition(self) -> graphql.GraphQLSchema:
         with open(self.config.graphql_dir / "schema.graphql", "r") as f:
             return graphql.build_schema(f.read())
 
-    @property
-    def query_type(self) -> GqlTypeDefinition:
-        query_type = self.schema_definition.query_type
-        assert query_type
-        return self._generated_types[query_type.name]
+    @cached_property
+    def root_types(self) -> List[Optional[gql_def.GraphQLObjectType], ...]:
+        return [
+            self.schema_definition.get_root_type(OperationType.QUERY),
+            self.schema_definition.get_root_type(OperationType.MUTATION),
+            self.schema_definition.get_root_type(OperationType.SUBSCRIPTION),
+        ]
 
     def _evaluate_field_type(self, t: gql_def.GraphQLType) -> GqlTypeHinter:
         if non_null := is_non_null_definition(t):
@@ -112,12 +175,7 @@ class SchemaEvaluator:
             return None
         if evaluated := self._generated_types.get(t_name, None):
             return evaluated
-        root_types = (
-            self.schema_definition.get_root_type(OperationType.QUERY),
-            self.schema_definition.get_root_type(OperationType.MUTATION),
-            self.schema_definition.get_root_type(OperationType.SUBSCRIPTION),
-        )
-        if type_ not in root_types:
+        if type_ not in self.root_types:
             try:
                 id_field = type_.fields["id"]
                 if nonull := is_non_null_definition(id_field.type):
@@ -159,41 +217,35 @@ class SchemaEvaluator:
         for name, type_ in self.schema_definition.type_map.items():
             if name.startswith("__"):
                 continue
-
             if object_definition := is_object_definition(type_):
                 if object_type := self._evaluate_object_type(object_definition):
+                    if object_definition is self.schema_definition.query_type:
+                        self._query_type = object_type
+                    assert object_type not in self.root_types
+
                     self._generated_types[object_type.name] = object_type
             elif enum_def := is_enum_definition(type_):
                 if enum := self._evaluate_enum(enum_def):
                     self._generated_enums[enum.name] = enum
 
-    def parse_queries(self) -> None:
+    def parse_operations(self) -> None:
         with open(self.config.graphql_dir / "operations.graphql", "r") as f:
-            queries = graphql.parse(f.read())
+            operations = graphql.parse(f.read())
 
-        if errors := graphql.validate(self.schema_definition, queries):
+        operations = visitor.visit(operations, IDInjectionVisitor())
+        # validate the operation against the static schema
+        if errors := graphql.validate(self.schema_definition, operations):
             raise QtGqlException([error.formatted for error in errors])
 
-        for definition in queries.definitions:
-            field_name = definition.selection_set.selections[0].name.value  # type: ignore
-            field = None
-            if definition.operation is OperationType.QUERY:  # type: ignore
-                for field_impl in self.query_type.fields:
-                    if field_impl.name == field_name:
-                        field = field_impl
-                assert field
-                op_name = OperationName(definition.name.value)  # type: ignore
-                self._query_handlers[op_name] = QueryHandlerDefinition(
-                    query=graphql.print_ast(definition),
-                    name=op_name,
-                    field=field,
-                    directives=definition.directives,  # type: ignore
-                )
+        # get QtGql fields from the query AST.
+        operation_miner = OperationMinerVisitor(self)
+        visitor.visit(operations, operation_miner)
+        self._query_handlers.update(operation_miner.query_handlers)
 
     def dumps(self) -> GeneratedNamespace:
         """:return: The generated schema module as a string."""
         self.parse_schema_concretes()
-        self.parse_queries()
+        self.parse_operations()
         context = TemplateContext(
             enums=list(self._generated_enums.values()),
             types=[
@@ -232,3 +284,20 @@ is_list_definition = definition_identifier_factory(gql_def.GraphQLList)
 is_scalar_definition = definition_identifier_factory(gql_def.GraphQLScalarType)
 is_union_definition = definition_identifier_factory(gql_def.GraphQLUnionType)
 is_non_null_definition = definition_identifier_factory(gql_def.GraphQLNonNull)
+
+# Node checks
+T_AST_Node = TypeVar("T_AST_Node", bound=gql_lang.Node)
+
+
+def ast_identifier_factory(
+    expected: Type[T_AST_Node],
+) -> Callable[[gql_lang.Node], Optional[T_AST_Node]]:
+    def type_guarder(node: gql_lang.ast.Node) -> Optional[T_AST_Node]:
+        if isinstance(node, expected):
+            return node
+
+    return type_guarder
+
+
+is_selection_set = ast_identifier_factory(gql_lang.ast.SelectionSetNode)
+is_operation_def_node = ast_identifier_factory(gql_def.OperationDefinitionNode)

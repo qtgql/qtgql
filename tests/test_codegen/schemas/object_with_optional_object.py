@@ -4,14 +4,16 @@ from typing import Optional
 
 import strawberry
 
+from tests.test_codegen.schemas.node_interface import Node
+
 
 @strawberry.type
-class User:
+class User(Node):
     person: Optional[Person]
 
 
 @strawberry.type()
-class Person:
+class Person(Node):
     name: str
     age: int
 
