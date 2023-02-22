@@ -30,7 +30,7 @@ class GqlFieldDefinition:
     name: str
     type: GqlTypeHinter
     type_map: dict[str, GqlTypeDefinition]
-    enums: "EnumMap"
+    enums: EnumMap
     scalars: CustomScalarMap
     description: Optional[str] = ""
 
@@ -86,7 +86,8 @@ class GqlFieldDefinition:
         if gql_type := self.type.is_object_type:
             return f"{gql_type.name}.from_dict(parent, {self.name})"
         if enum_def := self.type.is_enum:
-            return f"{enum_def.name}[data.get('{self.name}', {self.default_value})]"  # graphql enums evaluates to string of the name.
+            # graphql enums evaluates to string of the name.
+            return f"{enum_def.name}[data.get('{self.name}', {self.default_value})]"
         raise NotImplementedError  # pragma: no cover
 
     @cached_property
@@ -120,7 +121,8 @@ class GqlFieldDefinition:
             return self.fget_annotation
         except (TypeError, NameError):
             if self.type.is_union():
-                return "QObject"  # graphql doesn't support scalars in Unions ATM. (what about Enums in unions)?
+                # graphql doesn't support scalars in Unions ATM. (what about Enums in unions)?
+                return "QObject"
             if self.type.is_enum:
                 # QEnum value must be int
                 return "int"
@@ -176,11 +178,11 @@ EnumMap = dict[str, "GqlEnumDefinition"]
 class GqlTypeHinter(TypeHinter):
     def __init__(
         self,
-        type: Any,  # noqa: A003
-        of_type: tuple["GqlTypeHinter", ...] = (),
+        type: Any,
+        of_type: tuple[GqlTypeHinter, ...] = (),
     ):
         self.type = type
-        self.of_type: tuple["GqlTypeHinter", ...] = of_type
+        self.of_type: tuple[GqlTypeHinter, ...] = of_type
 
     @property
     def is_object_type(self) -> Optional[GqlTypeDefinition]:
@@ -189,28 +191,35 @@ class GqlTypeHinter(TypeHinter):
                 ret = self.type.resolve()
                 if isinstance(ret, GqlTypeDefinition):
                     return ret
+                return None
+            return None
 
     @property
     def is_model(self) -> Optional[GqlTypeDefinition]:
         if self.is_list():
             # enums are not supported in lists yet (valid graphql spec though)
             return self.of_type[0].is_object_type
+        return None
 
     @property
-    def is_enum(self) -> Optional["GqlEnumDefinition"]:
+    def is_enum(self) -> Optional[GqlEnumDefinition]:
         with contextlib.suppress(TypeError):
             if issubclass(self.type, AntiForwardRef):
                 if isinstance(self.type.resolve(), GqlEnumDefinition):
                     return self.type.resolve()
+                return None
+            return None
 
     @property
     def is_builtin_scalar(self) -> Optional[BuiltinScalar]:
         if isinstance(self.type, BuiltinScalar):
             return self.type
+        return None
 
     def is_custom_scalar(self, scalars: CustomScalarMap) -> Optional[Type[BaseCustomScalar]]:
         if self.type in scalars.values():
             return self.type
+        return None
 
     def annotation(self, scalars: CustomScalarMap) -> str:
         """
@@ -233,7 +242,7 @@ class GqlTypeHinter(TypeHinter):
         if object_def := self.is_object_type:
             return f"Optional[{object_def.name}]"
         if self.is_union():
-            return "Union[" + ",".join((th.annotation(scalars) for th in self.of_type)) + "]"
+            return "Union[" + ",".join(th.annotation(scalars) for th in self.of_type) + "]"
         raise NotImplementedError  # pragma no cover
 
     def as_annotation(self, object_map=None):  # pragma: no cover

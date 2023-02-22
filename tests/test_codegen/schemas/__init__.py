@@ -20,7 +20,7 @@ from . import (
     wrogn_id_type,
 )
 
-__all__ = [
+__all__ = [  # noqa: PLE0604
     object_with_optional_object,
     object_with_optional_scalar,
     object_with_object,

@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from typing import NamedTuple
+from typing import TYPE_CHECKING, NamedTuple
 
-from qtgql.codegen.py.objecttype import GqlFieldDefinition
+if TYPE_CHECKING:
+    from qtgql.codegen.py.objecttype import GqlFieldDefinition
 
 
 class QueryHandlerDefinition(NamedTuple):

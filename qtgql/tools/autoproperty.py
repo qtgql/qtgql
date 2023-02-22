@@ -3,7 +3,7 @@ from typing import Any, Type, TypeVar, Union, cast, get_args
 
 import attr
 from attr import Attribute, define
-from PySide6 import QtCore as qtc
+from PySide6 import QtCore
 from typing_extensions import dataclass_transform
 
 __all__ = ["define_properties"]
@@ -13,19 +13,19 @@ def signal_name(name: str) -> str:
     return name + "Changed"
 
 
-class PropertyMeta(type(qtc.QObject)):  # type: ignore
+class PropertyMeta(type(QtCore.QObject)):  # type: ignore
     def __new__(cls, name, bases, attrs):
         return super().__new__(cls, name, bases, attrs)
 
 
-class BaseInner(qtc.QObject):
+class BaseInner(QtCore.QObject):
     def __init__(self, attrs_instance, parent=None):
         super().__init__(parent)
         self.attrs_instance = attrs_instance
 
 
-class PropertyImpl(qtc.Property):
-    def __init__(self, type_: type, name: str, notify: qtc.Signal):
+class PropertyImpl(QtCore.Property):
+    def __init__(self, type_: type, name: str, notify: QtCore.Signal):
         self.name = name
         super().__init__(type_, fget=self.getter, fset=self.setter, notify=notify)  # type: ignore
 
@@ -44,16 +44,16 @@ class MakeProperties:
 
     def __init_subclass__(cls, **kwargs) -> None:
         annotations: dict[str, type] = cls.__annotations__
-        properties: dict[str, Union[PropertyImpl, qtc.Signal]] = {}
-        signals: dict[str, qtc.Signal] = {}
-        for key in cls.__dict__.keys():
+        properties: dict[str, Union[PropertyImpl, QtCore.Signal]] = {}
+        signals: dict[str, QtCore.Signal] = {}
+        for key in cls.__dict__:
             if key in annotations:
                 type_ = annotations[key]
                 if args := get_args(type_):
                     type_ = args[0]
                 if type_ is Any:
                     type_ = "QVariant"  # type: ignore
-                signals[signal_name(key)] = signal = qtc.Signal()
+                signals[signal_name(key)] = signal = QtCore.Signal()
                 properties[key] = PropertyImpl(type_=type_, name=key, notify=signal)
 
         inner = types.new_class(

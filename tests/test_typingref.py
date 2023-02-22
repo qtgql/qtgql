@@ -49,7 +49,7 @@ class TestToAnnotation:
         assert th.as_annotation() == tp
 
     @pytest.mark.parametrize(
-        "container, inner", [(list, float), (Optional, str), (List, int), (tuple, bool)]
+        ("container", "inner"), [(list, float), (Optional, str), (List, int), (tuple, bool)]
     )
     def test_containers(self, container, inner):
         th = TypeHinter(type=container, of_type=(TypeHinter(type=inner),))
@@ -93,7 +93,7 @@ class TestFromString:
         assert TypeHinter.from_string(tp.__name__, ns={}).type == tp
 
     @pytest.mark.parametrize(
-        "container, inner", [(list, float), (Optional, str), (List, int), (tuple, bool)]
+        ("container", "inner"), [(list, float), (Optional, str), (List, int), (tuple, bool)]
     )
     def test_containers(self, container, inner):
         def as_str():

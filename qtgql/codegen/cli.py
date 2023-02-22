@@ -1,12 +1,15 @@
+from __future__ import annotations
+
 import importlib
 from pathlib import Path
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 import rich
 import toml
 import typer
 
-from qtgql.codegen.py.compiler.config import QtGqlConfig
+if TYPE_CHECKING:
+    from qtgql.codegen.py.compiler.config import QtGqlConfig
 
 console = rich.console.Console()
 
@@ -24,6 +27,7 @@ def _find_pyproject(p: Path) -> Optional[Path]:
         return pp
     for parent in p.parents:  # pragma: no cover
         return _find_pyproject(parent)
+    return None
 
 
 def _get_app_import_path(root: Path = Path.cwd()) -> str:
@@ -60,7 +64,9 @@ def gen():
         s.update("[bold blue]Configuration file loaded")
         config.generate()
     console.print(
-        f"[bold green]Types were generated to [link={config.generated_types_dir.resolve()}]file://{config.generated_types_dir.resolve()}[/link] successfully!"
+        "[bold green]Types were generated to"
+        f"[link={config.generated_types_dir.resolve()}]"
+        f"file://{config.generated_types_dir.resolve()}[/link] successfully!"
     )
 
 

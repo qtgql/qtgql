@@ -1,7 +1,7 @@
 import itertools
 from typing import Any
 
-from PySide6 import QtCore as qtc
+from PySide6 import QtCore
 
 from qtgql.utils.typingref import TypeHinter
 
@@ -28,9 +28,9 @@ def slot(func):
         if stripped_optionals:
             combos = get_combos(stripped_optionals, concretes)
             for combo in combos:
-                func = qtc.Slot(*combo, result=return_)(func)
+                func = QtCore.Slot(*combo, result=return_)(func)
             return func
 
-        return qtc.Slot(*[th.type for th in concretes], result=return_)(func)
+        return QtCore.Slot(*[th.type for th in concretes], result=return_)(func)
 
     return wrapper(func)

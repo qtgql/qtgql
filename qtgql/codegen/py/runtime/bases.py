@@ -1,9 +1,11 @@
 from __future__ import annotations
 
-from typing import Generic, Optional, TypeVar
+from typing import TYPE_CHECKING, ClassVar, Generic, Optional, TypeVar
 
 from PySide6.QtCore import QAbstractListModel, QByteArray, QObject, Qt, Signal
-from typing_extensions import ClassVar, Self
+
+if TYPE_CHECKING:
+    from typing_extensions import Self
 
 from qtgql.tools import qproperty, slot
 
@@ -99,6 +101,7 @@ class QGraphQListModel(QAbstractListModel, Generic[T_BaseQGraphQLObject]):
             raise NotImplementedError(
                 f"role {role} is not a valid role for {self.__class__.__name__}"
             )
+        return None
 
     def append(self, node: T_BaseQGraphQLObject) -> None:
         count = self.rowCount()
@@ -121,7 +124,9 @@ def get_base_graphql_object(name: str) -> type[_BaseQGraphQLObject]:
     :returns: A type to be extended by all generated types.
     """
     type_map: dict[str, type[_BaseQGraphQLObject]] = {}
-    return type(name, (_BaseQGraphQLObject,), {"type_map": type_map, "__store__": QGraphQLObjectStore()})  # type: ignore
+    return type(
+        name, (_BaseQGraphQLObject,), {"type_map": type_map, "__store__": QGraphQLObjectStore()}
+    )  # type: ignore
 
 
 BaseGraphQLObject = get_base_graphql_object("BaseGraphQLObject")

@@ -1,9 +1,13 @@
+from __future__ import annotations
+
 import uuid
 from types import ModuleType
-from typing import Any, Callable
+from typing import TYPE_CHECKING, Any, Callable
 
 import pytest
-from qtgql.codegen.py.objecttype import GqlFieldDefinition, GqlTypeDefinition
+
+if TYPE_CHECKING:
+    from qtgql.codegen.py.objecttype import GqlFieldDefinition, GqlTypeDefinition
 
 
 @pytest.fixture()

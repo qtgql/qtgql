@@ -59,10 +59,7 @@ def qproperty(
             try:
                 annotation = get_type_hints(func)["return"]
                 ret = TypeHinter.from_annotations(annotation)
-                if ret.is_optional():
-                    type_ = ret.of_type[0].type
-                else:
-                    type_ = ret.type
+                type_ = ret.of_type[0].type if ret.is_optional() else ret.type
             except NameError:
                 type_ = "QVariant"
         return Property(type=type_, fset=fset, notify=notify, constant=constant)(func)  # type: ignore

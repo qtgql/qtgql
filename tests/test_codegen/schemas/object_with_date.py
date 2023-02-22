@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime, timezone
 
 import strawberry
 
@@ -16,7 +16,7 @@ class User(Node):
 class Query:
     @strawberry.field
     def user(self) -> User:
-        return User(name="Patrick", age=100, birth=date.today())
+        return User(name="Patrick", age=100, birth=datetime.now(tz=timezone.utc).date())
 
 
 schema = strawberry.Schema(query=Query)

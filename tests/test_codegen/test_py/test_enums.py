@@ -41,6 +41,6 @@ def test_accessible_from_qml(qmlbot, status):
         % status.name
     )
 
-    testcase = EnumTestCase.compile()  # noqa: this would be gc'eed...
+    testcase = EnumTestCase.compile()
     item = qmlbot.loads(qml)
     assert item.property("enumValue") == status.value

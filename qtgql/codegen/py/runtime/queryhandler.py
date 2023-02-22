@@ -1,13 +1,15 @@
 from __future__ import annotations
 
-from typing import Any, ClassVar, Generic, Optional, TypeVar
+from typing import TYPE_CHECKING, Any, ClassVar, Generic, Optional, TypeVar
 
 from PySide6.QtCore import QObject, Signal
 from PySide6.QtQuick import QQuickItem
 
 from qtgql.codegen.py.runtime.environment import get_gql_env
-from qtgql.gqltransport.client import GqlClientMessage
 from qtgql.tools import qproperty, slot
+
+if TYPE_CHECKING:
+    from qtgql.gqltransport.client import GqlClientMessage
 
 T_QObject = TypeVar("T_QObject", bound=QObject)
 
@@ -26,7 +28,7 @@ class QSingletonMeta(type(QObject)):  # type: ignore
 class BaseQueryHandler(Generic[T_QObject], QObject, metaclass=QSingletonMeta):
     """Each handler will be exposed to QML and."""
 
-    instance: "ClassVar[Optional[BaseQueryHandler]]" = None
+    instance: ClassVar[Optional[BaseQueryHandler]] = None
     ENV_NAME: ClassVar[str]
     operationName: ClassVar[str]
     _message_template: ClassVar[GqlClientMessage]

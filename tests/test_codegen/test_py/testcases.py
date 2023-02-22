@@ -5,7 +5,7 @@ from functools import cached_property
 from pathlib import Path
 from textwrap import dedent
 from types import ModuleType
-from typing import Optional, Type
+from typing import TYPE_CHECKING, Optional, Type
 
 import attrs
 import strawberry.utils
@@ -13,7 +13,6 @@ from attr import define
 from qtgql.codegen.introspection import SchemaEvaluator
 from qtgql.codegen.py.compiler.config import QtGqlConfig
 from qtgql.codegen.py.objecttype import GqlTypeDefinition
-from qtgql.codegen.py.runtime.bases import _BaseQGraphQLObject
 from qtgql.codegen.py.runtime.custom_scalars import (
     BaseCustomScalar,
     DateScalar,
@@ -22,12 +21,15 @@ from qtgql.codegen.py.runtime.custom_scalars import (
     TimeScalar,
 )
 from qtgql.codegen.py.runtime.environment import QtGqlEnvironment, set_gql_env
-from qtgql.codegen.py.runtime.queryhandler import BaseQueryHandler
 from qtgql.gqltransport.client import GqlWsTransportClient
 from strawberry import Schema
 
 from tests.conftest import QmlBot, hash_schema
 from tests.test_codegen import schemas
+
+if TYPE_CHECKING:
+    from qtgql.codegen.py.runtime.bases import _BaseQGraphQLObject
+    from qtgql.codegen.py.runtime.queryhandler import BaseQueryHandler
 
 
 @define(slots=False, kw_only=True)
@@ -76,9 +78,9 @@ class QGQLObjectTestCase:
         with tempfile.TemporaryDirectory() as tmp_dir:
             tmp_dir = Path(tmp_dir)
             self.config.graphql_dir = tmp_dir
-            with open(tmp_dir / "operations.graphql", "w") as f:
+            with (tmp_dir / "operations.graphql").open("w") as f:
                 f.write(self.query)
-            with open(tmp_dir / "schema.graphql", "w") as f:
+            with (tmp_dir / "schema.graphql").open("w") as f:
                 f.write(str(self.schema))
 
             generated = self.evaluator.dumps()
@@ -116,18 +118,19 @@ class CompiledTestCase(QGQLObjectTestCase):
         return self.objecttypes_mod
 
     @property
-    def gql_type(self) -> Type[_BaseQGraphQLObject]:
+    def gql_type(self) -> Type["_BaseQGraphQLObject"]:
         assert self.tested_type
         return getattr(self.objecttypes_mod, self.tested_type.name)
 
     @property
-    def query_handler(self) -> BaseQueryHandler:
+    def query_handler(self) -> "BaseQueryHandler":
         return getattr(self.handlers_mod, self.query_operationName)()
 
     def get_field_by_type(self, t):
         for field in self.tested_type.fields:
             if field.type.type == t:
                 return field
+        return None
 
     def get_field_by_name(self, name: str):
         for field in self.tested_type.fields:
@@ -144,6 +147,7 @@ class CompiledTestCase(QGQLObjectTestCase):
         for sf in stawberry_definition.fields:
             if field_name == strawberry.utils.str_converters.to_camel_case(sf.name):
                 return sf
+        return None
 
     def load_qml(self, qmlbot: QmlBot):
         qmlbot.loads(self.qml_file)

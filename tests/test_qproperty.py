@@ -11,7 +11,7 @@ class PropertyTestCase(QObject):
 
 
 @pytest.mark.parametrize(
-    "tp, val", ((int, 2), (str, "hello"), (float, 1.2), (list, [1, 2, 3]), (dict, {1: 2}))
+    ("tp", "val"), ((int, 2), (str, "hello"), (float, 1.2), (list, [1, 2, 3]), (dict, {1: 2}))
 )
 def test_builtins(tp, val):
     class A(PropertyTestCase):
@@ -66,7 +66,7 @@ def test_custom_type():
 
 
 @pytest.mark.parametrize(
-    "tp, val", ((int, 2), (str, "hello"), (float, 1.2), (list, [1, 2, 3]), (dict, {1: 2}))
+    ("tp", "val"), ((int, 2), (str, "hello"), (float, 1.2), (list, [1, 2, 3]), (dict, {1: 2}))
 )
 def test_future_annotations(tp, val):
     class A(PropertyTestCase):

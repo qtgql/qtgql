@@ -51,7 +51,7 @@ class EntryPoint(QObject):
             self.app.set_root_query(Query.from_dict(None, message))
 
         def on_error(self, message: dict) -> None:
-            print(message)
+            raise Exception(message)
 
         def on_completed(self) -> None:
             ...
@@ -123,7 +123,7 @@ qtgqlconfig = QtGqlConfig(graphql_dir=graphql_dir)
 
 def main():  # pragma: no cover
     app = QtGui.QGuiApplication(sys.argv)
-    ep = EntryPoint()  # noqa: F841, this collected by the gc otherwise.
+    ep = EntryPoint()
     ret = app.exec()
     sys.exit(ret)
 

@@ -1,16 +1,20 @@
+from __future__ import annotations
+
 import asyncio
 import random
-from typing import AsyncGenerator, Optional
+from typing import TYPE_CHECKING, AsyncGenerator, Optional
 
 import strawberry
 from aiohttp import web
 from faker import Faker
 from strawberry.aiohttp.views import GraphQLView
-from strawberry.types import Info
 
 from tests.conftest import hash_schema
 from tests.test_codegen.schemas import __all__ as all_schemas
 from tests.test_codegen.schemas.node_interface import Node
+
+if TYPE_CHECKING:
+    from strawberry.types import Info
 
 fake = Faker()
 

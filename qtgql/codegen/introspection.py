@@ -114,7 +114,7 @@ class SchemaEvaluator:
 
     @cached_property
     def schema_definition(self) -> graphql.GraphQLSchema:
-        with open(self.config.graphql_dir / "schema.graphql", "r") as f:
+        with (self.config.graphql_dir / "schema.graphql").open() as f:
             return graphql.build_schema(f.read())
 
     @cached_property
@@ -233,7 +233,7 @@ class SchemaEvaluator:
                     self._generated_enums[enum.name] = enum
 
     def parse_operations(self) -> None:
-        with open(self.config.graphql_dir / "operations.graphql", "r") as f:
+        with (self.config.graphql_dir / "operations.graphql").open() as f:
             operations = graphql.parse(f.read())
 
         operations = visitor.visit(operations, IDInjectionVisitor())
@@ -265,7 +265,7 @@ class SchemaEvaluator:
     def dump(self):
         """:param file: Path to the directory the codegen would dump to."""
         for fname, content in self.dumps().items():
-            with open(self.config.graphql_dir / (fname + ".py"), "w") as fh:
+            with (self.config.graphql_dir / (fname + ".py")).open("w") as fh:
                 fh.write(content)
 
 
@@ -278,6 +278,7 @@ def definition_identifier_factory(
     def type_guarder(definition: gql_def.GraphQLType) -> Optional[T_Definition]:
         if isinstance(definition, expected):
             return definition
+        return None
 
     return type_guarder
 
@@ -299,6 +300,7 @@ def ast_identifier_factory(
     def type_guarder(node: gql_lang.ast.Node) -> Optional[T_AST_Node]:
         if isinstance(node, expected):
             return node
+        return None
 
     return type_guarder
 

@@ -21,13 +21,13 @@ def monkey_pyproject(monkeypatch, tmp_path) -> Path:
     monkey_toml = tmp_path / "pyproject.toml"
     pp_toml = _find_pyproject(Path.cwd())
     cop = toml.load(pp_toml).copy()
-    with open(monkey_toml, "w") as tf:
+    with monkey_toml.open("w") as tf:
         toml.dump(cop, tf)
 
     from qtgql.codegen import cli
 
     monkeypatch.setattr(cli, _get_app_import_path.__name__, partial(_get_app_import_path, tmp_path))
-    yield monkey_toml
+    return monkey_toml
 
 
 runner = CliRunner()
@@ -36,7 +36,7 @@ runner = CliRunner()
 def test_cant_find_pyproject(monkeypatch, monkey_pyproject, tmp_path):
     clone = toml.load(monkey_pyproject).copy()
     clone["tool"][TOOL_NAME].pop(QTGQL_CONFIG_KEY)
-    with open(monkey_pyproject, "w") as fh:
+    with monkey_pyproject.open("w") as fh:
         toml.dump(clone, fh)
     res = runner.invoke(app, ["gen"])
     assert isinstance(res.exception, KeyError)
