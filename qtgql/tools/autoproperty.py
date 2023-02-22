@@ -42,7 +42,7 @@ class MakeProperties:
     PropertiesClass_: Type[BaseInner]
     properties: BaseInner
 
-    def __init_subclass__(cls, **kwargs):
+    def __init_subclass__(cls, **kwargs) -> None:
         annotations: dict[str, type] = cls.__annotations__
         properties: dict[str, Union[PropertyImpl, qtc.Signal]] = {}
         signals: dict[str, qtc.Signal] = {}
@@ -52,7 +52,7 @@ class MakeProperties:
                 if args := get_args(type_):
                     type_ = args[0]
                 if type_ is Any:
-                    type_ = "QVariant"
+                    type_ = "QVariant"  # type: ignore
                 signals[signal_name(key)] = signal = qtc.Signal()
                 properties[key] = PropertyImpl(type_=type_, name=key, notify=signal)
 

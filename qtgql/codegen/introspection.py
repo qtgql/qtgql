@@ -62,7 +62,7 @@ class IDInjectionVisitor(visitor.Visitor):
         name=gql_lang.NameNode(value="id"), arguments=(), directives=()
     )
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.modified_source: str = ""
 
@@ -118,7 +118,7 @@ class SchemaEvaluator:
             return graphql.build_schema(f.read())
 
     @cached_property
-    def root_types(self) -> List[Optional[gql_def.GraphQLObjectType], ...]:
+    def root_types(self) -> List[Optional[gql_def.GraphQLObjectType]]:
         return [
             self.schema_definition.get_root_type(OperationType.QUERY),
             self.schema_definition.get_root_type(OperationType.MUTATION),

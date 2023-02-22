@@ -14,7 +14,7 @@ class _BaseQGraphQLObject(QObject):
     type_map: dict[str, type[_BaseQGraphQLObject]]
 
     id: str
-    __singleton__: _BaseQGraphQLObject
+    __singleton__: Self
     __store__: ClassVar[QGraphQLObjectStore[Self]]
 
     def __init_subclass__(cls, **kwargs):
@@ -25,9 +25,9 @@ class _BaseQGraphQLObject(QObject):
         super().__init__(parent)
 
     @classmethod
-    def default_instance(cls) -> Self:  # type: ignore
+    def default_instance(cls) -> Self:
         try:
-            return cls.__singleton__
+            return cls.__singleton__  # type: ignore
         except AttributeError:
             cls.__singleton__ = cls()
             return cls.__singleton__
