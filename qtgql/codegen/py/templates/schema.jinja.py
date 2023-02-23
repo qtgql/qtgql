@@ -6,6 +6,7 @@ from typing import Optional, Union
 from enum import Enum, auto
 from PySide6.QtQml import QmlElement, QmlSingleton
 
+from qtgql.codegen.py.runtime.queryhandler import SelectionConfig
 from qtgql.tools import qproperty
 from qtgql.codegen.py.runtime.bases import QGraphQListModel
 
@@ -48,35 +49,32 @@ class SCALARS:
 class {{ type.name }}({{context.base_object_name}}):
     """{{  type.docstring  }}"""
 
-    DEFAULT_INIT_DICT = dict({% for f in type.fields %}
-        {{f.name}}=None,{% endfor %}
-    )
-    def __init__(self, parent: QObject = None, {% for f in type.fields %} {{f.name}}: {{f.annotation}} = None, {% endfor %}):
+
+    def __init__(self, parent: QObject = None, {% for f in type.fields %} {{f.name}}: Optional[{{f.annotation}}] = None, {% endfor %}):
         super().__init__(parent){% for f in type.fields %}
         self.{{  f.private_name  }} = {{f.name}} if {{f.name}} else {{f.default_value}}{% endfor %}
 
-    def update(self, data: dict):
+    def update(self, data: dict, config: SelectionConfig):
         parent = self.parent()
         {% for f in type.fields %}
-        if {{f.name}} := data.get('{{f.name}}', None):
+        if '{{f.name}}' in config.selections.keys():
+            {{f.name}} = data.get('{{f.name}}', None)
             deserialized = {{f.deserializer}}
             if self.{{f.name}} != deserialized:
-                self.{{f.setter_name}}(deserialized)
-        return self{% endfor %}
+                self.{{f.setter_name}}(deserialized){% endfor %}
+        return self
 
     @classmethod
-    def from_dict(cls, parent,  data: dict) -> {{type.name}}:
+    def from_dict(cls, parent, data: dict, config: SelectionConfig) -> {{type.name}}:
         if instance := cls.__store__.get_node(data['id']):
             return instance.update(data)
         else:
-            init_dict = cls.DEFAULT_INIT_DICT.copy()
+            inst = cls(parent=parent)
             {% for f in type.fields %}
-            if {{f.name}} := data.get('{{f.name}}', None):
-                init_dict['{{f.name}}'] = {{f.deserializer}}{% endfor %}
-            return cls(
-                parent=parent,
-                **init_dict
-            )
+            if '{{f.name}}' in config.selections.keys():
+                {{f.name}} = data.get('{{f.name}}', None)
+                inst.{{f.private_name}} = {{f.deserializer}}{% endfor %}
+            return inst
 
     {% for f in type.fields %}
     {{ f.signal_name }} = Signal()

@@ -77,14 +77,16 @@ class GqlFieldDefinition:
             return (
                 f"{QGraphQListModel.__name__}("
                 f"parent=parent, "
-                f"data=[{model_of.name}.from_dict(parent, data) for data in {self.name}], "
+                f"data=[{model_of.name}.from_dict(parent, data, config.selections['{self.name}']) for data in {self.name}], "
                 f"default_object={model_of.name}.{_BaseQGraphQLObject.default_instance.__name__}()"
                 f")"
             )
         if self.type.is_union():
-            return f"cls.type_map[{self.name}['__typename']].from_dict(parent, {self.name})"
+            return f"cls.type_map[{self.name}['__typename']].from_dict(parent, {self.name}, config.selections['{self.name}'])"
         if gql_type := self.type.is_object_type:
-            return f"{gql_type.name}.from_dict(parent, {self.name})"
+            return (
+                f"{gql_type.name}.from_dict(parent, {self.name}, config.selections['{self.name}'])"
+            )
         if enum_def := self.type.is_enum:
             # graphql enums evaluates to string of the name.
             return f"{enum_def.name}[data.get('{self.name}', {self.default_value})]"
@@ -154,8 +156,12 @@ class GqlFieldDefinition:
 @define(slots=False)
 class GqlTypeDefinition:
     name: str
-    fields: list[GqlFieldDefinition]
+    fields_dict: dict[str, GqlFieldDefinition]
     docstring: Optional[str] = ""
+
+    @property
+    def fields(self) -> list[GqlTypeDefinition]:
+        return list(self.fields_dict.values())
 
 
 @define
@@ -195,7 +201,7 @@ class GqlTypeHinter(TypeHinter):
     @property
     def is_model(self) -> Optional[GqlTypeDefinition]:
         if self.is_list():
-            # enums are not supported in lists yet (valid graphql spec though)
+            # enums and scalars are not supported in lists yet (valid graphql spec though)
             return self.of_type[0].is_object_type
 
     @property

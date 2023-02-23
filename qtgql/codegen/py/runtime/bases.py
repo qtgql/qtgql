@@ -7,6 +7,8 @@ from PySide6.QtCore import QAbstractListModel, QByteArray, QObject, Qt, Signal
 if TYPE_CHECKING:
     from typing_extensions import Self
 
+    from qtgql.codegen.py.runtime.queryhandler import SelectionConfig
+
 from qtgql.tools import qproperty, slot
 
 __all__ = ["QGraphQListModel", "get_base_graphql_object"]
@@ -27,21 +29,17 @@ class _BaseQGraphQLObject(QObject):
         super().__init__(parent)
 
     @classmethod
+    def from_dict(cls, parent: QObject, data: dict, config: SelectionConfig):
+        raise NotImplementedError
+
+    @classmethod
     def default_instance(cls) -> Self:
+        # used for default values.
         try:
             return cls.__singleton__  # type: ignore
         except AttributeError:
             cls.__singleton__ = cls()
             return cls.__singleton__
-
-    @classmethod
-    def from_dict(
-        cls, parent: T_BaseQGraphQLObject, data: dict
-    ) -> T_BaseQGraphQLObject:  # pragma: no cover
-        raise NotImplementedError
-
-    def update(self, data: dict) -> Self:  # pragma: no cover
-        raise NotImplementedError
 
 
 T_BaseQGraphQLObject = TypeVar("T_BaseQGraphQLObject", bound=_BaseQGraphQLObject)

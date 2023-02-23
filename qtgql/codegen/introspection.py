@@ -19,7 +19,7 @@ from graphql.language import visitor
 from graphql.type import definition as gql_def
 
 from qtgql.codegen.py.compiler.builtin_scalars import BuiltinScalars
-from qtgql.codegen.py.compiler.query import QueryHandlerDefinition
+from qtgql.codegen.py.compiler.query import QtGqlQueriedField, QtGqlQueryHandlerDefinition
 from qtgql.codegen.py.compiler.template import (
     TemplateContext,
     handlers_template,
@@ -82,23 +82,55 @@ class OperationMinerVisitor(visitor.Visitor):
 
     def __init__(self, evaluator: SchemaEvaluator):
         super().__init__()
-        self.query_handlers: dict[str, QueryHandlerDefinition] = {}
+        self.query_handlers: dict[str, QtGqlQueryHandlerDefinition] = {}
         self.evaluator = evaluator
 
     def enter_operation_definition(self, node, key, parent, path, ancestors):
+        def inject_selections(
+            parent_gql_field: gql_lang.FieldNode, parent_qtgql_field: QtGqlQueriedField
+        ) -> None:
+            parent_type = parent_qtgql_field.type
+            if (
+                parent_type.is_builtin_scalar
+                or parent_type.is_enum
+                or parent_type.is_custom_scalar(self.evaluator.config.custom_scalars)
+            ):
+                return  # scalar and enums has no selection sets
+            #  otherwise it must have selections
+            assert (
+                parent_gql_field.selection_set
+            ), f"field {parent_qtgql_field} must have selections"
+
+            for selection in parent_gql_field.selection_set.selections:
+                inner_gql = is_field_node(selection)
+                if object_type := parent_qtgql_field.type.is_object_type:
+                    inner_qtgql = QtGqlQueriedField.from_field(
+                        object_type.fields_dict[inner_gql.name.value]
+                    )
+                    inject_selections(inner_gql, inner_qtgql)
+                    parent_qtgql_field.selection_set.append(inner_qtgql)
+
+                if object_type := parent_qtgql_field.type.is_model:
+                    inner_qtgql = QtGqlQueriedField.from_field(
+                        object_type.fields_dict[inner_gql.name.value]
+                    )
+                    inject_selections(inner_gql, inner_qtgql)
+                    parent_qtgql_field.selection_set.append(inner_qtgql)
+
         if operation := is_operation_def_node(node):
-            if operation.operation is OperationType.QUERY:  # type: ignore
-                fname = operation.selection_set.selections[0].name.value
+            if operation.operation is OperationType.QUERY:
+                root_field: gql_lang.FieldNode = operation.selection_set.selections[0]  # type: ignore
+                fname = root_field.name.value
                 assert self.evaluator._query_type
-                for field_impl in self.evaluator._query_type.fields:
-                    if field_impl.name == fname:
-                        field = field_impl
-                assert field
+                root_qtgql_field = QtGqlQueriedField.from_field(
+                    self.evaluator._query_type.fields_dict[fname]
+                )
+                inject_selections(root_field, root_qtgql_field)
                 op_name = operation.name.value
-                self.query_handlers[op_name] = QueryHandlerDefinition(
+                self.query_handlers[op_name] = QtGqlQueryHandlerDefinition(
                     query=graphql.print_ast(node),
                     name=op_name,
-                    field=field,
+                    field=root_qtgql_field,
                     directives=node.directives,
                 )
 
@@ -109,7 +141,7 @@ class SchemaEvaluator:
         self._generated_types: dict[str, GqlTypeDefinition] = {}
         self._generated_enums: EnumMap = {}
         self._fragments_store: dict[int, str] = {}
-        self._query_handlers: dict[str, QueryHandlerDefinition] = {}
+        self._query_handlers: dict[str, QtGqlQueryHandlerDefinition] = {}
         self._query_type: Optional[GqlTypeDefinition] = None
 
     @cached_property
@@ -200,7 +232,9 @@ class SchemaEvaluator:
         return GqlTypeDefinition(
             name=t_name,
             docstring=type_.description,
-            fields=[self._evaluate_field(name, field) for name, field in type_.fields.items()],
+            fields_dict={
+                name: self._evaluate_field(name, field) for name, field in type_.fields.items()
+            },
         )
 
     def _evaluate_enum(self, enum: gql_def.GraphQLEnumType) -> Optional[GqlEnumDefinition]:
@@ -305,3 +339,4 @@ def ast_identifier_factory(
 
 is_selection_set = ast_identifier_factory(gql_lang.ast.SelectionSetNode)
 is_operation_def_node = ast_identifier_factory(gql_def.OperationDefinitionNode)
+is_field_node = ast_identifier_factory(gql_def.FieldNode)

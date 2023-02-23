@@ -8,7 +8,7 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 
 if TYPE_CHECKING:  # pragma: no cover
     from qtgql.codegen.py.compiler.config import QtGqlConfig
-    from qtgql.codegen.py.compiler.query import QueryHandlerDefinition
+    from qtgql.codegen.py.compiler.query import QtGqlQueryHandlerDefinition
     from qtgql.codegen.py.objecttype import GqlEnumDefinition, GqlTypeDefinition
 
 env = Environment(loader=PackageLoader("qtgql.codegen.py"), autoescape=select_autoescape())
@@ -21,7 +21,7 @@ HANDLERS_TEMPLATE = env.get_template("handlers.jinja.py")
 class TemplateContext:
     enums: list[GqlEnumDefinition]
     types: list[GqlTypeDefinition]
-    queries: list[QueryHandlerDefinition]
+    queries: list[QtGqlQueryHandlerDefinition]
     config: QtGqlConfig
 
     @property

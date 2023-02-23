@@ -8,6 +8,7 @@ from qtgql.codegen.py.runtime.custom_scalars import (
     BaseCustomScalar,
     DateTimeScalar,
 )
+from qtgql.codegen.py.runtime.queryhandler import SelectionConfig
 from qtgql.utils.typingref import TypeHinter
 
 from tests.mini_gql_server import schema
@@ -136,9 +137,12 @@ class TestPropertyGetter:
 
 class TestDeserializers:
     @pytest.mark.parametrize("testcase", all_test_cases, ids=lambda x: x.test_name)
-    def test_blank_dict(self, testcase: QGQLObjectTestCase, qtbot):
+    def test_blank_dict_no_selections(self, testcase: QGQLObjectTestCase, qtbot):
         testcase = testcase.compile()
-        assert isinstance(testcase.gql_type.from_dict(None, {"id": ""}), testcase.gql_type)
+        assert isinstance(
+            testcase.gql_type.from_dict(None, {"id": ""}, SelectionConfig(selections={"id": None})),
+            testcase.gql_type,
+        )
 
     def test_scalars(self, qtbot):
         testcase = ScalarsTestCase.compile()
