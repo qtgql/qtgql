@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timezone
 from decimal import Decimal
 from typing import Type
 
@@ -48,20 +48,20 @@ class TestDateScalar(AbstractScalarTestCase):
     scalar_klass = DateScalar
 
     def test_deserialize(self):
-        expected = date.fromisoformat(date.today().isoformat())
+        expected = date.fromisoformat(datetime.now(tz=timezone.utc).date().isoformat())
         scalar = DateScalar.from_graphql(expected.isoformat())
         assert scalar._value == expected
 
     def test_to_qt(self):
-        scalar = DateScalar(date.today())
-        assert scalar.to_qt() == date.today().isoformat()
+        scalar = DateScalar(datetime.now(tz=timezone.utc).date())
+        assert scalar.to_qt() == datetime.now(tz=timezone.utc).date().isoformat()
 
 
 class TestTimeScalar(AbstractScalarTestCase):
     scalar_klass = TimeScalar
 
     def test_deserialize(self):
-        expected: time = datetime.now().time()
+        expected: time = datetime.now(tz=timezone.utc).time()
         scalar = TimeScalar.from_graphql(expected.isoformat())
         assert scalar._value == expected
 

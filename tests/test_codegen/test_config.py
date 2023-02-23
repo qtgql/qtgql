@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 import contextlib
 import importlib
 import sys
 import tempfile
 import uuid
 from pathlib import Path
-from types import ModuleType
+from typing import TYPE_CHECKING
 
 import pytest
 from qtgql.codegen.py.compiler.config import QtGqlConfig
@@ -12,13 +14,16 @@ from qtgql.exceptions import QtGqlException
 
 from tests.test_codegen.test_py.testcases import ScalarsTestCase
 
+if TYPE_CHECKING:
+    from types import ModuleType
+
 
 @contextlib.contextmanager
 def get_fake_module() -> ModuleType:
     with tempfile.TemporaryDirectory() as tmp_path:
         id_ = uuid.uuid4().hex
         file = Path(tmp_path) / f"{id_}.py"
-        with open(file, "w") as f:
+        with file.open("w") as f:
             f.write("")
 
         spec = importlib.util.spec_from_file_location(id_, file)

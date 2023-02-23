@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import hashlib
 import os
 import socket
@@ -5,7 +7,7 @@ import subprocess
 import tempfile
 import time
 from pathlib import Path
-from typing import TypeVar
+from typing import TYPE_CHECKING, TypeVar
 
 import pytest
 from attr import field
@@ -13,8 +15,10 @@ from attrs import define
 from faker import Faker
 from PySide6.QtCore import QUrl
 from PySide6.QtQuick import QQuickItem, QQuickView
-from pytestqt.qtbot import QtBot
-from strawberry import Schema
+
+if TYPE_CHECKING:
+    from pytestqt.qtbot import QtBot
+    from strawberry import Schema
 
 fake = Faker()
 
@@ -96,7 +100,7 @@ class QmlBot:
 @pytest.fixture()
 def qmlbot(qtbot):
     bot = QmlBot(qtbot)
-    yield bot
+    return bot
 
 
 def hash_schema(schema: Schema) -> int:

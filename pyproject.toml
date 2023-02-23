@@ -83,16 +83,137 @@ exclude = '''
 
 [tool.ruff]
 line-length = 100
-select = ["E", "F", "ERA", "I"]
+select = ["ALL"]
+target-version = "py38"
 ignore = [
     "TID252",
-    "E501",  # line too long, handled by black
+    # we use asserts in tests and to hint mypy
+    "E501", # line too long, handled by black.
+    "S101",
+    "S102",
+    "S104",
+    "S324",
+    "EXE002",
+    # maybe we can enable this in future
+    # we'd want to have consistent docstrings in future
+    "D",
+    "ANN101", # missing annotation for self?
+    # definitely enable these, maybe not in tests
+    "ANN001",
+    "ANN002",
+    "ANN003",
+    "ANN102",
+    "ANN201",
+    "ANN202",
+    "ANN204",
+    "ANN205",
+    "ANN206",
+    "ANN401",
+    "PGH003",
+    "PGH004",
+    "RET504",
+    "RET505",
+    "RET506",
+    "RET507",
+    "BLE001",
+    "RET503",
+    "B008",
+    "N811",
+    "N804",
+    "N818",
+    # Variable `T` in function should be lowercase
+    # this seems a potential bug or opportunity for improvement in ruff
+    "N806",
+
+    # first argument should named self (found in tests)
+    "N805",
+
+    "N815",
+
+    # shadowing builtins
+    "A001",
+    "A002",
+    "A003",
+
+    "ARG001",
+    "ARG002",
+    "ARG003",
+    "ARG004",
+    "ARG005",
+    "FBT001",
+    "FBT002",
+    "FBT003",
+
+    "PT001",
+    "PT023",
+
+    # enable these, we have some in tests
+    "B006",
+    "PT004",
+    "PT007",
+    "PT011",
+    "PT012",
+    "PT015",
+    "PT017",
+    "C414",
+    "N802",
+
+    "SIM117",
+    "SIM102",
+
+    "F841",
+    "B027",
+    "B905",
+    "ISC001",
+
+    # same?
+    "S105",
+    "S106",
+
+    "DTZ003",
+    "DTZ005",
+
+    "RSE102",
+    "SLF001",
+
+    # in tests
+    "DTZ001",
+
+    "EM101",
+    "EM102",
+    "EM103",
+
+    "B904",
+    "B019",
+
+    "N801",
+    "N807",
+
+    # pandas
+    "PD",
+
+    # code complexity
+    "C",
+    "C901",
+
+    # trailing commas
+    "COM812",
+
+    "PLR",
+    "INP",
+    "TRY",
+    "SIM300",
+    "SIM114",
+    "DJ008",
 ]
 fix = true
 src = ["qtgql", "tests"]
+[tool.ruff.flake8-annotations]
+suppress-none-returning = true
 
 [tool.ruff.pyupgrade]
 keep-runtime-typing = true
+
 
 [tool.pytest.ini_options]
 addopts = "--cov-config=pyproject.toml --ignore=qtgql/codegen/py/templates/"
@@ -105,6 +226,16 @@ relative_files = true
 
 [tool.coverage.report]
 show_missing = true
+exclude_lines = [
+  "pragma: no cover",
+  "def __repr__",
+  "def __str__",
+  "raise AssertionError",
+  "raise NotImplementedError",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+  "if typing.TYPE_CHECKING:"
+]
 
 [tool.qtgql]
 config = "tests.test_sample_ui.main:qtgqlconfig"

@@ -2,10 +2,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Protocol
 
-from qtgql.gqltransport.client import HandlerProto
-
 if TYPE_CHECKING:  # pragma: no cover
     from qtgql.codegen.py.runtime.queryhandler import BaseQueryHandler
+    from qtgql.gqltransport.client import HandlerProto
 
 
 class NetworkLayerProto(Protocol):
@@ -36,8 +35,8 @@ class QtGqlEnvironment:
     def add_query_handler(self, handler: BaseQueryHandler) -> None:
         self._query_handlers[handler.objectName()] = handler
 
-    def get_handler(self, operationName: str) -> BaseQueryHandler:
-        return self._query_handlers[operationName]
+    def get_handler(self, operation_name: str) -> BaseQueryHandler:
+        return self._query_handlers[operation_name]
 
 
 _ENV_MAP: dict[str, QtGqlEnvironment] = {}

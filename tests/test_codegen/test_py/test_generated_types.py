@@ -59,7 +59,7 @@ class TestAnnotations:
             ).as_annotation()
         )
 
-    @pytest.mark.parametrize("testcase, scalar, fname", custom_scalar_testcases)
+    @pytest.mark.parametrize(("testcase", "scalar", "fname"), custom_scalar_testcases)
     def test_custom_scalars(
         self, testcase: QGQLObjectTestCase, scalar: typing.Type[BaseCustomScalar], fname
     ):
@@ -175,7 +175,7 @@ class TestDeserializers:
         handler.on_data(testcase.initialize_dict)
         assert handler._data.name
 
-    @pytest.mark.parametrize("testcase, scalar, fname", custom_scalar_testcases)
+    @pytest.mark.parametrize(("testcase", "scalar", "fname"), custom_scalar_testcases)
     def test_custom_scalars(
         self, testcase: QGQLObjectTestCase, scalar: BaseCustomScalar, fname: str
     ):
@@ -229,7 +229,7 @@ class TestDefaultConstructor:
         # by default there is no need for initializing delegates.
         assert len(inst.persons._data) == 0
 
-    @pytest.mark.parametrize("testcase, scalar, fname", custom_scalar_testcases)
+    @pytest.mark.parametrize(("testcase", "scalar", "fname"), custom_scalar_testcases)
     def test_custom_scalars(
         self, testcase: QGQLObjectTestCase, scalar: BaseCustomScalar, fname: str
     ):

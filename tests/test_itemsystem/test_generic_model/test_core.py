@@ -3,7 +3,7 @@ from __future__ import annotations
 from unittest.mock import patch
 
 import pytest
-from PySide6 import QtCore as qtc
+from PySide6 import QtCore
 from qtgql.tools.itemsystem import GenericModel, RoleDoesNotExist, RoleMapper, role
 
 from tests.test_itemsystem.conftest import (
@@ -83,12 +83,12 @@ def test_set_data(full_model):
 
 def test_flags_return_editable(full_model):
     flag = full_model.flags(full_model.index(0))
-    assert flag == qtc.Qt.ItemFlag.ItemIsEditable
+    assert flag == QtCore.Qt.ItemFlag.ItemIsEditable
 
 
 def test_invalid_index_returns_no_item_flag(full_model):
     flag = full_model.flags(full_model.index(25))
-    assert flag == qtc.Qt.ItemFlag.NoItemFlags
+    assert flag == QtCore.Qt.ItemFlag.NoItemFlags
 
 
 def test_append(qtbot, full_model):

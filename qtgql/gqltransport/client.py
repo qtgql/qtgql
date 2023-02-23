@@ -7,9 +7,7 @@ from collections import deque
 from typing import Any, Optional
 
 from attrs import define, field
-from PySide6 import QtCore as qtc
-from PySide6 import QtNetwork as qtn
-from PySide6 import QtWebSockets as qtws
+from PySide6 import QtCore, QtNetwork, QtWebSockets
 
 from qtgql.gqltransport.core import EncodeAble, GqlEncoder, QueryPayload, T
 from qtgql.tools import slot
@@ -81,12 +79,12 @@ class MESSAGES:
     PONG = BaseGqlWsTransportMessage(type=PROTOCOL.PONG)
 
 
-class GqlWsTransportClient(qtws.QWebSocket):
+class GqlWsTransportClient(QtWebSockets.QWebSocket):
     SUB_PROTOCOL = "graphql-transport-ws"
-    textMessageReceived: qtc.Signal
-    connected: qtc.Signal
-    disconnected: qtc.Signal
-    error: qtc.Signal  # type: ignore
+    textMessageReceived: QtCore.Signal
+    connected: QtCore.Signal
+    disconnected: QtCore.Signal
+    error: QtCore.Signal  # type: ignore
 
     def __init__(
         self,
@@ -102,21 +100,21 @@ class GqlWsTransportClient(qtws.QWebSocket):
         super().__init__(parent=parent)
         self._ping_is_valid = True
         self._connection_ack = False
-        self.reconnect_timer = qtc.QTimer(self)
+        self.reconnect_timer = QtCore.QTimer(self)
         if auto_reconnect:
             self.reconnect_timer.setInterval(reconnect_timeout)
             self.reconnect_timer.timeout.connect(self.on_reconnect_timeout)  # type: ignore
 
-        self.url: qtc.QUrl = qtc.QUrl(url)
+        self.url: QtCore.QUrl = QtCore.QUrl(url)
         self.handlers: dict[str, HandlerProto] = {}
         self.pending_messages: deque[GqlClientMessage] = deque()
-        self.ping_timer = qtc.QTimer(self)
+        self.ping_timer = QtCore.QTimer(self)
         self.ping_timer.setInterval(ping_interval)
         self.ping_timer.timeout.connect(self._on_ping_timeout)  # type: ignore
-        self.ping_tester_timer = qtc.QTimer(self)
+        self.ping_tester_timer = QtCore.QTimer(self)
         self.ping_tester_timer.setInterval(ping_timeout)
         self.ping_tester_timer.timeout.connect(self._on_ping_tester_timeout)  # type: ignore
-        self.ws_options = qtws.QWebSocketHandshakeOptions()
+        self.ws_options = QtWebSockets.QWebSocketHandshakeOptions()
         self.ws_options.setSubprotocols(
             [
                 self.SUB_PROTOCOL,
@@ -126,14 +124,14 @@ class GqlWsTransportClient(qtws.QWebSocket):
         self.connected.connect(self._on_connected)
         self.disconnected.connect(self.on_disconnected)
         self.error.connect(self.on_error)
-        req = qtn.QNetworkRequest(self.url)
+        req = QtNetwork.QNetworkRequest(self.url)
         req.setUrl(self.url)
         if headers:
             for name, value in headers.items():
                 req.setRawHeader(name, value)
         self._init_connection(req)
 
-    def _init_connection(self, request: qtn.QNetworkRequest) -> None:
+    def _init_connection(self, request: QtNetwork.QNetworkRequest) -> None:
         """Instantiate the connection with server."""
         self.open(request, self.ws_options)
 
@@ -159,7 +157,11 @@ class GqlWsTransportClient(qtws.QWebSocket):
 
     def _on_connected(self):
         logger.info(
-            f"{self.__class__.__name__}: connection established with server {self.url.toString()}!"
+            "{classname}: connection established with server {url}!",
+            extra={
+                "classname": self.__class__.__name__,
+                "url": self.url.toString(),
+            },
         )
         self.sendTextMessage(self.dumps(MESSAGES.CONNECTION_INIT))
         if self.reconnect_timer.isActive():
@@ -167,15 +169,23 @@ class GqlWsTransportClient(qtws.QWebSocket):
 
     def on_disconnected(self):
         logger.warning(
-            f"disconnected from {self.url.toString()} because: {self.closeReason()}; "
-            f"close code: {self.closeCode().value}: {self.closeCode().name}"
+            "disconnected from {url} because: {}; " "close code: {closeCodeName}: {closeCodeV}",
+            extra={
+                "url": self.url.toString(),
+                "closeReason": self.closeReason(),
+                "closeCodeV": self.closeCode().value,
+                "closeCodeName": self.closeCode().name,
+            },
         )
         self.ping_timer.stop()
         self.ping_tester_timer.stop()
         self.reconnect_timer.start()
 
-    def on_error(self, error: qtn.QAbstractSocket.SocketError):  # pragma: no cover
-        logger.warning(f"error occurred in {self.__class__.__name__}: {error}")
+    def on_error(self, error: QtNetwork.QAbstractSocket.SocketError):  # pragma: no cover
+        logger.warning(
+            "error occurred in {className}: {error}",
+            extra={"className": self.__class__.__name__, "error": error},
+        )
         if not self.isValid():
             self.reconnect_timer.start()
 
@@ -211,8 +221,10 @@ class GqlWsTransportClient(qtws.QWebSocket):
         self.ping_tester_timer.start()
 
     def _on_ping_tester_timeout(self):
-        logger.warning(f"pong timeout reached on {self.requestUrl().url()}")
-        self.close(qtws.QWebSocketProtocol.CloseCode.CloseCodeReserved1004, "Pong timeout reached")
+        logger.warning("pong timeout reached on {url}", extra={"url": self.requestUrl().url()})
+        self.close(
+            QtWebSockets.QWebSocketProtocol.CloseCode.CloseCodeReserved1004, "Pong timeout reached"
+        )
         self.ping_tester_timer.stop()
 
     def _on_gql_ack(self) -> None:

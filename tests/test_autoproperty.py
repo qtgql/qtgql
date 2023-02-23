@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING, Any, Optional
 
-from PySide6 import QtCore as qtc
+from PySide6 import QtCore
 from qtgql.tools import define_properties
 
 if TYPE_CHECKING:
@@ -27,13 +27,13 @@ class PropertyTestMixin:
             a: int
             b: str
 
-        assert issubclass(Sample.PropertiesClass_, qtc.QObject)
+        assert issubclass(Sample.PropertiesClass_, QtCore.QObject)
 
     def test_property_class_initialized_on_init(self):
         klass = self.generate_class()
 
         instance = klass(1, 2)
-        assert isinstance(instance.properties, qtc.QObject)
+        assert isinstance(instance.properties, QtCore.QObject)
 
     def test_property_getter(self):
         klass = self.generate_class()

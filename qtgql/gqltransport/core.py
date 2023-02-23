@@ -41,8 +41,7 @@ class GqlResult:
 
 class GqlEncoder(json.JSONEncoder):
     def default(self, obj):
-        if isinstance(obj, uuid.UUID):  # noqa: R505
+        if isinstance(obj, uuid.UUID):
             return str(obj)
         elif isinstance(obj, (EncodeAble, QueryPayload)):
             return obj.asdict()
-        return None

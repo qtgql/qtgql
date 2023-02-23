@@ -27,7 +27,7 @@ UNSET: Any = UnsetType()
 class TypeHinter:
     def __init__(
         self,
-        type: Any,  # noqa: A003
+        type: Any,
         of_type: tuple["TypeHinter", ...] = (),
     ):
         self.type = type
@@ -40,11 +40,7 @@ class TypeHinter:
         if not self.type == other.type:
             return False
 
-        for count, child in enumerate(self.of_type):
-            if not child == other.of_type[count]:
-                return False
-
-        return True
+        return all(child == other.of_type[count] for count, child in enumerate(self.of_type))
 
     @classmethod
     def from_string(cls, tp: str, ns: dict) -> "TypeHinter":

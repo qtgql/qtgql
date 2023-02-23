@@ -242,8 +242,6 @@ class GenericModel(Generic[_TBaseType], QAbstractListModel):
                     f"options are: {self.__roles__.qt_roles}"
                 ) from exc
 
-        return None
-
     def setData(self, index, value, role=...):
         if index.row() < len(self._data) and index.isValid():
             setattr(self._data[index.row()], self.__roles__.by_num[role].name, value)
