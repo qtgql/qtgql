@@ -33,7 +33,7 @@ def get_field_from_field_node(
 @attrs.define
 class QtGqlQueriedField(GqlFieldDefinition):
     # TODO: rename this to selections
-    selection_set: List[QtGqlQueriedField] = attrs.Factory(list)
+    selections: List[QtGqlQueriedField] = attrs.Factory(list)
     choices: dict[str, List[QtGqlQueriedField]] = attrs.Factory(lambda: defaultdict(list))
 
     @classmethod
@@ -60,7 +60,7 @@ class QtGqlQueriedField(GqlFieldDefinition):
                 if not f_type:
                     f_type = f.type.is_model
                 assert f_type
-                ret.selection_set.append(get_field_from_field_node(selection, f_type))
+                ret.selections.append(get_field_from_field_node(selection, f_type))
         return ret
 
     def as_conf_string(self) -> str:

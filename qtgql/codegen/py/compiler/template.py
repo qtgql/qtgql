@@ -71,10 +71,9 @@ class ConfigContext:
 
     @property
     def selections(self) -> dict[str, str]:
-        if self.p_field.selection_set:
+        if self.p_field.selections:
             return {
-                selection.name: selection.as_conf_string()
-                for selection in self.p_field.selection_set
+                selection.name: selection.as_conf_string() for selection in self.p_field.selections
             }
         else:
             return {}
