@@ -57,6 +57,10 @@ class GqlFieldDefinition:
 
         return "None"  # Unions are not supported yet.
 
+    @property
+    def is_custom_scalar(self) -> Optional[BaseCustomScalar]:
+        return self.type.is_custom_scalar(self.scalars)
+
     @cached_property
     def deserializer(self) -> str:
         """This gets the dict from graphql and passes the data to init, goes to
@@ -77,12 +81,15 @@ class GqlFieldDefinition:
             return (
                 f"{QGraphQListModel.__name__}("
                 f"parent=parent, "
-                f"data=[{model_of.name}.from_dict(parent, data, config.selections['{self.name}']) for data in {self.name}], "
+                f"data=[{model_of.name}.from_dict(parent, data, config.selections['{self.name}']) for data in {self.name}],"
                 f"default_object={model_of.name}.{_BaseQGraphQLObject.default_instance.__name__}()"
                 f")"
             )
         if self.type.is_union():
-            return f"cls.type_map[{self.name}['__typename']].from_dict(parent, {self.name}, config.selections['{self.name}'])"
+            return (
+                f"type_name = {self.name}['__typename']\n"
+                f"cls.type_map[type_name].from_dict(parent, {self.name}, config.choices[type_name]['{self.name}'])"
+            )
         if gql_type := self.type.is_object_type:
             return (
                 f"{gql_type.name}.from_dict(parent, {self.name}, config.selections['{self.name}'])"
@@ -160,7 +167,7 @@ class GqlTypeDefinition:
     docstring: Optional[str] = ""
 
     @property
-    def fields(self) -> list[GqlTypeDefinition]:
+    def fields(self) -> list[GqlFieldDefinition]:
         return list(self.fields_dict.values())
 
 

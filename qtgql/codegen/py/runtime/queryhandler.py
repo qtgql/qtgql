@@ -15,7 +15,8 @@ T_QObject = TypeVar("T_QObject", bound=QObject)
 
 
 class SelectionConfig(NamedTuple):
-    selections: Dict[str, Optional[SelectionConfig]]
+    selections: Dict[str, Optional[SelectionConfig]] = {}
+    choices: Dict[str, SelectionConfig] = {}
 
 
 class QSingletonMeta(type(QObject)):  # type: ignore

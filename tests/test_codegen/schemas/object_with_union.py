@@ -5,13 +5,12 @@ from typing import Union
 
 import strawberry
 
-from tests.conftest import fake
 from tests.test_codegen.schemas.node_interface import Node
 
 
 @strawberry.type()
 class Frog(Node):
-    name: str = fake.name()
+    name: str = "Kermit"
     color: str = "green"
 
 
@@ -22,8 +21,8 @@ class User(Node):
 
 @strawberry.type()
 class Person(Node):
-    name: str = fake.name()
-    age: int = fake.pyint()
+    name: str = "Nir"
+    age: int = 24
 
 
 @strawberry.type

@@ -125,7 +125,12 @@ class TestPropertyGetter:
         self.default_test(ObjectWithListOfObjectTestCase, "persons")
 
     def test_union(self, qtbot):
-        self.default_test(UnionTestCase, "whoAmI")
+        testcase = UnionTestCase.compile()
+        initialize_dict = testcase.initialize_dict
+        handler = testcase.query_handler
+        handler.on_data(initialize_dict)
+        field = testcase.get_field_by_name("whoAmI")
+        assert handler._data.property(field.name)
 
     def test_enum(self, qtbot):
         testcase = EnumTestCase.compile()

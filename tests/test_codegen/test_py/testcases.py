@@ -84,7 +84,7 @@ class QGQLObjectTestCase:
                 f.write(str(self.schema))
 
             generated = self.evaluator.dumps()
-        types_module = ModuleType(uuid.uuid4().hex)
+            types_module = ModuleType(uuid.uuid4().hex)
         handlers_mod = ModuleType(uuid.uuid4().hex)
         exec(compile(generated["objecttypes"], "gen_shcema", "exec"), types_module.__dict__)
         sys.modules["objecttypes"] = types_module
