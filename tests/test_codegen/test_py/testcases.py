@@ -28,6 +28,7 @@ from tests.conftest import QmlBot, hash_schema
 from tests.test_codegen import schemas
 
 if TYPE_CHECKING:
+    from PySide6 import QtCore
     from qtgql.codegen.py.runtime.bases import _BaseQGraphQLObject
     from qtgql.codegen.py.runtime.queryhandler import BaseQueryHandler
 
@@ -129,6 +130,12 @@ class CompiledTestCase(QGQLObjectTestCase):
     @property
     def query_handler(self) -> "BaseQueryHandler":
         return getattr(self.handlers_mod, self.query_operationName)()
+
+    def get_signals(self) -> dict[str, "QtCore.Signal"]:
+        return {
+            field.signal_name: getattr(self.query_handler.data, field.signal_name)
+            for field in self.tested_type.fields
+        }
 
     def get_field_by_type(self, t):
         for field in self.tested_type.fields:

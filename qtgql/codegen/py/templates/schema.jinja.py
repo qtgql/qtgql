@@ -60,11 +60,14 @@ class {{ type.name }}({{context.base_object_name}}):
         if '{{f.name}}' in config.selections.keys():
             field_data = data.get('{{f.name}}', {{f.default_value}})
             {% if f.type.is_object_type %}
-            self.{{f.setter_name}}({{f.type.is_object_type.name}}.from_dict(
-                parent,
-                field_data,
-                config.selections['{{f.name}}']
-            ))
+            if not field_data:
+                self.{{f.setter_name}}(None)
+            else:
+                self.{{f.setter_name}}({{f.type.is_object_type.name}}.from_dict(
+                    parent,
+                    field_data,
+                    config.selections['{{f.name}}']
+                ))
             {% elif f.type.is_model %}
             self.{{f.setter_name}}(QGraphQListModel(parent,
                                                   data=[
@@ -89,22 +92,24 @@ class {{ type.name }}({{context.base_object_name}}):
             self.{{f.setter_name}}(cls.type_map[type_name].from_dict(parent, field_data, choice))
             {% endif %}
             {% endfor %}
-            return self
+
     @classmethod
     def from_dict(cls, parent, data: dict, config: SelectionConfig) -> {{type.name}}:
         if instance := cls.__store__.get_node(data['id']):
-            return instance.update(data, config)
+            instance.update(data, config)
+            return instance
         else:
             inst = cls(parent=parent)
             {% for f in type.fields %}
             if '{{f.name}}' in config.selections.keys():
                 field_data = data.get('{{f.name}}', {{f.default_value}})
                 {% if f.type.is_object_type %}
-                inst.{{f.private_name}} = {{f.type.is_object_type.name}}.from_dict(
-                    parent,
-                    field_data,
-                    config.selections['{{f.name}}']
-                )
+                if field_data:
+                    inst.{{f.private_name}} = {{f.type.is_object_type.name}}.from_dict(
+                        parent,
+                        field_data,
+                        config.selections['{{f.name}}']
+                    )
                 {% elif f.type.is_model %}
                 inst.{{f.private_name}} = QGraphQListModel(parent,
                                                       data=[

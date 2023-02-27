@@ -1,3 +1,4 @@
+import copy
 from typing import Optional, Type
 
 import pytest
@@ -228,11 +229,9 @@ class TestUpdates:
         ]
         assert initialize_dict1 != initialize_dict2
         previous = handler.data
-        signals = [
-            getattr(previous, field.signal_name)
-            for field in testcase.tested_type.fields
-            if field.name != "id"
-        ]
+        signals = testcase.get_signals()
+        signals.pop("idChanged")
+        signals = list(signals.values())
         with qtbot.wait_signals(signals):
             handler.on_data(initialize_dict2)
         after = handler.data
@@ -246,12 +245,10 @@ class TestUpdates:
         handler = testcase.query_handler
         handler.on_data(initialize_dict1)
         with pytest.raises(pytestqt.exceptions.TimeoutError):
+            signals = testcase.get_signals()
+            signals = list(signals.values())
             with qtbot.wait_signals(
-                [
-                    getattr(handler._data, field.signal_name)
-                    for field in testcase.tested_type.fields
-                    if field.name != "id"
-                ],
+                signals,
                 timeout=1000,
             ):
                 handler.on_data(initialize_dict1)
@@ -291,6 +288,64 @@ class TestUpdates:
         assert after is previous
         raw_new_val = initialize_dict2[testcase.first_field][fname]
         assert handler.data.property(fname) == scalar.from_graphql(raw_new_val).to_qt()
+
+    def test_object_in_object_no_update(self, qtbot):
+        testcase = NestedObjectTestCase.compile()
+        initialized_dict = testcase.initialize_dict
+        handler = testcase.query_handler
+        handler.on_data(initialized_dict)
+        person_type = testcase.tested_type.fields_dict["person"].type.is_object_type
+        person_signals = [
+            getattr(handler.data.person, field.signal_name) for field in person_type.fields
+        ]
+        with pytest.raises(pytestqt.exceptions.TimeoutError):
+            with qtbot.wait_signals(person_signals, timeout=1000):
+                handler.on_data(initialized_dict)
+
+    def test_nested_object_same_id_update(self, qtbot):
+        testcase = NestedObjectTestCase.compile()
+        initialized_dict1 = testcase.initialize_dict
+        handler = testcase.query_handler
+        handler.on_data(initialized_dict1)
+        person_type = testcase.tested_type.fields_dict["person"].type.is_object_type
+        person_signals = [
+            getattr(handler.data.person, field.signal_name)
+            for field in person_type.fields
+            if field.name != "id"
+        ]
+        initialized_dict2 = copy.deepcopy(initialized_dict1)
+        initialized_dict2[testcase.first_field]["person"]["name"] = "this is not a name"
+        initialized_dict2[testcase.first_field]["person"]["age"] = handler.data.person.age + 1
+        assert (
+            initialized_dict1[testcase.first_field]["person"]
+            != initialized_dict2[testcase.first_field]["person"]
+        )
+        with qtbot.wait_signals(person_signals):
+            handler.on_data(initialized_dict2)
+
+    def test_nested_optional_object_null_update_with_object(self, qtbot):
+        testcase = OptionalNestedObjectTestCase.compile()
+        initialized_dict = testcase.initialize_dict
+        handler = testcase.query_handler
+        handler.on_data(initialized_dict)
+        assert not handler.data.person
+        prev = handler.data
+        dict_with_person = NestedObjectTestCase.compile().initialize_dict
+        dict_with_person[testcase.first_field]["id"] = handler.data._id
+        with qtbot.wait_signal(handler.data.personChanged):
+            handler.on_data(dict_with_person)
+        assert prev is not handler.data.person
+
+    def test_nested_optional_object_update_with_null(self, qtbot):
+        testcase = NestedObjectTestCase.compile()
+        initialized_dict = testcase.initialize_dict
+        handler = testcase.query_handler
+        handler.on_data(initialized_dict)
+        assert handler.data.person
+        dict_without_person = OptionalNestedObjectTestCase.compile().initialize_dict
+        with qtbot.wait_signal(handler.data.personChanged):
+            handler.on_data(dict_without_person)
+        assert not handler.data.person
 
 
 class TestDefaultConstructor:
