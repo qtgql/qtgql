@@ -56,6 +56,9 @@ class QGraphQLObjectStore(Generic[T_BaseQGraphQLObject]):
     def get_node(self, id_: str) -> Optional[T_BaseQGraphQLObject]:
         return self._data.get(id_, None)
 
+    def set_node(self, node: _BaseQGraphQLObject):
+        self._data[node.id] = node
+
 
 class QGraphQListModel(QAbstractListModel, Generic[T_BaseQGraphQLObject]):
     OBJECT_ROLE = Qt.ItemDataRole.UserRole + 1

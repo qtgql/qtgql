@@ -3,6 +3,7 @@ from uuid import UUID
 
 import strawberry
 
+from tests.conftest import fake
 from tests.test_codegen.schemas.node_interface import Node
 
 
@@ -21,11 +22,11 @@ class Query:
     @strawberry.field
     def user(self) -> User:
         return User(
-            name="Patrick",
-            age=100,
-            age_point=100.0,
-            male=True,
-            id=strawberry.ID("unique"),
+            name=fake.name(),
+            age=fake.pyint(),
+            age_point=fake.pyfloat(),
+            male=fake.pybool(),
+            id=strawberry.ID(fake.pystr()),
             uuid=uuid.uuid4(),
         )
 

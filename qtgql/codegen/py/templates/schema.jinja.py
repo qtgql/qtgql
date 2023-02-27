@@ -54,42 +54,47 @@ class {{ type.name }}({{context.base_object_name}}):
         super().__init__(parent){% for f in type.fields %}
         self.{{  f.private_name  }} = {{f.name}} if {{f.name}} else {{f.default_value}}{% endfor %}
 
-
+    def update(self, data, config: SelectionConfig) -> None:
+        parent = self.parent()
+        {%for f in type.fields %}
+        if '{{f.name}}' in config.selections.keys():
+            field_data = data.get('{{f.name}}', {{f.default_value}})
+            {% if f.type.is_object_type %}
+            self.{{f.setter_name}}({{f.type.is_object_type.name}}.from_dict(
+                parent,
+                field_data,
+                config.selections['{{f.name}}']
+            ))
+            {% elif f.type.is_model %}
+            self.{{f.setter_name}}(QGraphQListModel(parent,
+                                                  data=[
+                                                      {{f.type.is_model.name}}.from_dict(parent, data,
+                                                                                         config.selections[{{f.name}}])
+                                                      for data in {{f.name}}
+                                                  ],
+                                                  default_object={{f.type.is_model}}.default_instance()
+                                                  ))
+            {% elif f.type.is_builtin_scalar %}
+            self.{{f.setter_name}}(field_data)
+            {% elif f.is_custom_scalar %}
+            self.{{f.setter_name}}(SCALARS.{{f.is_custom_scalar.name}}.from_graphql(field_data))
+            {% elif f.type.is_enum %}
+            self.{{f.setter_name}}(f.type.is_enum.name}}[field_data])
+            {% elif f.type.is_union() %}
+            type_name = field_data['__typename']
+            choice = config.selections['{{f.name}}'].choices[type_name]
+            self.{{f.setter_name}}(cls.type_map[type_name].from_dict(parent, field_data, choice))
+            {% endif %}
+            {% endfor %}
+            return self
     @classmethod
     def from_dict(cls, parent, data: dict, config: SelectionConfig) -> {{type.name}}:
         if instance := cls.__store__.get_node(data['id']):
-            return instance.update(data)
+            return instance.update(data, config)
         else:
             inst = cls(parent=parent)
-            {% for f in type.fields %}
-            if '{{f.name}}' in config.selections.keys():
-                field_data = data.get('{{f.name}}', {{f.default_value}})
-                {% if f.type.is_object_type%}
-                inst.{{f.private_name}} = {{f.type.is_object_type.name}}.from_dict(
-                    parent,
-                    field_data,
-                    config.selections['{{f.name}}']
-                    )
-                {% elif f.type.is_model %}
-                inst.{{f.private_name}} = QGraphQListModel(parent,
-                                 data=[
-                                     {{f.type.is_model.name}}.from_dict(parent, data, config.selections[{{f.name}}])
-                                     for data in {{f.name}}
-                                 ],
-                                 default_object={{f.type.is_model}}.default_instance()
-                                 )
-                {% elif f.type.is_builtin_scalar %}
-                inst.{{f.private_name}} = field_data
-                {% elif f.is_custom_scalar %}
-                inst.{{f.private_name}} = SCALARS.{f.is_custom_scalar.name}.from_graphql(field_data)
-                {% elif f.type.is_enum %}
-                inst.{{f.private_name}} = {{f.type.is_enum.name}}[field_data]
-                {% elif f.type.is_union() %}
-                type_name = field_data['__typename']
-                choice = config.selections['{{f.name}}'].choices[type_name]
-                inst.{{f.private_name}} = cls.type_map[type_name].from_dict(parent, field_data, choice)
-                {% endif %}
-            {% endfor %}
+            inst.update(data, config)
+            cls.__store__.set_node(inst)
             return inst
 
     {% for f in type.fields %}

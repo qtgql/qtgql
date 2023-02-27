@@ -217,8 +217,20 @@ class TestDeserializers:
 
 
 class TestUpdates:
-    def test(self):
-        raise NotImplementedError
+    def test_scalars(self):
+        testcase = ScalarsTestCase.compile()
+        initialize_dict1 = testcase.initialize_dict
+        handler = testcase.query_handler
+        handler.on_data(initialize_dict1)
+        initialize_dict2 = testcase.initialize_dict
+        initialize_dict2["user"]["id"] = handler.data.id
+        assert initialize_dict1 != initialize_dict2
+        previous = handler.data
+        handler.on_data(initialize_dict2)
+        after = handler.data
+        assert after is previous
+        for k, v in initialize_dict2["user"].items():
+            assert handler.data.property(k) == v
 
 
 class TestDefaultConstructor:

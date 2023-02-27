@@ -67,9 +67,13 @@ class QGQLObjectTestCase:
 
     @property
     def initialize_dict(self) -> dict:
-        return self.schema.execute_sync(
+        res = self.schema.execute_sync(
             self.evaluator._query_handlers[self.query_operationName].query
-        ).data
+        )
+        if res.errors:
+            raise Exception("graphql operations failed", res.errors)
+        else:
+            return res.data
 
     def compile(self, url: Optional[str] = "") -> "CompiledTestCase":
         url = url.replace("graphql", f"{hash_schema(self.schema)}")
