@@ -62,44 +62,6 @@ class GqlFieldDefinition:
         return self.type.is_custom_scalar(self.scalars)
 
     @cached_property
-    def deserializer(self) -> str:
-        """This gets the dict from graphql and passes the data to init, goes to
-        `from_graphql` on the J2 template
-        The J2 template in this context provides the data for the field (if was existed
-        in the dict) using walrus operator (attribute name is the field name).
-        ."""
-        # every thing is possibly optional since you can query for only so or so fields.
-
-        if self.type.is_builtin_scalar:
-            return self.name
-
-        if scalar := self.type.is_custom_scalar(self.scalars):
-            return (
-                f"SCALARS.{scalar.__name__}.{BaseCustomScalar.from_graphql.__name__}({self.name})"
-            )
-        if model_of := self.type.is_model:
-            return (
-                f"{QGraphQListModel.__name__}("
-                f"parent=parent, "
-                f"data=[{model_of.name}.from_dict(parent, data, config.selections['{self.name}']) for data in {self.name}],"
-                f"default_object={model_of.name}.{_BaseQGraphQLObject.default_instance.__name__}()"
-                f")"
-            )
-        if self.type.is_union():
-            return (
-                f"type_name = {self.name}['__typename']\n"
-                f"cls.type_map[type_name].from_dict(parent, {self.name}, config.choices[type_name]['{self.name}'])"
-            )
-        if gql_type := self.type.is_object_type:
-            return (
-                f"{gql_type.name}.from_dict(parent, {self.name}, config.selections['{self.name}'])"
-            )
-        if enum_def := self.type.is_enum:
-            # graphql enums evaluates to string of the name.
-            return f"{enum_def.name}[data.get('{self.name}', {self.default_value})]"
-        raise NotImplementedError  # pragma: no cover
-
-    @cached_property
     def annotation(self) -> str:
         """
         :returns: Annotation of the field based on the real type,

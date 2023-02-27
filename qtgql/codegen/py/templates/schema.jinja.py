@@ -77,7 +77,7 @@ class {{ type.name }}({{context.base_object_name}}):
             {% elif f.type.is_builtin_scalar %}
             self.{{f.setter_name}}(field_data)
             {% elif f.is_custom_scalar %}
-            self.{{f.setter_name}}(SCALARS.{{f.is_custom_scalar.name}}.from_graphql(field_data))
+            self.{{f.setter_name}}(SCALARS.{{f.is_custom_scalar.__name__}}.from_graphql(field_data))
             {% elif f.type.is_enum %}
             self.{{f.setter_name}}(f.type.is_enum.name}}[field_data])
             {% elif f.type.is_union() %}
@@ -93,7 +93,38 @@ class {{ type.name }}({{context.base_object_name}}):
             return instance.update(data, config)
         else:
             inst = cls(parent=parent)
-            inst.update(data, config)
+            {% for f in type.fields %}
+            if '{{f.name}}' in config.selections.keys():
+                field_data = data.get('{{f.name}}', {{f.default_value}})
+                {% if f.type.is_object_type %}
+                inst.{{f.private_name}} = {{f.type.is_object_type.name}}.from_dict(
+                    parent,
+                    field_data,
+                    config.selections['{{f.name}}']
+                )
+                {% elif f.type.is_model %}
+                inst.{{f.private_name}} = QGraphQListModel(parent,
+                                                      data=[
+                                                          {{f.type.is_model.name}}.from_dict(parent, data,
+                                                                                             config.selections[
+                                                                                                 {{f.name}}])
+                                                          for data in {{f.name}}
+                                                      ],
+                                                      default_object={{f.type.is_model}}.default_instance()
+                                                      )
+                {% elif f.type.is_builtin_scalar %}
+                inst.{{f.private_name}} = field_data
+                {% elif f.is_custom_scalar %}
+                inst.{{f.private_name}} = SCALARS.
+                {f.is_custom_scalar.name}.from_graphql(field_data)
+                {% elif f.type.is_enum %}
+                inst.{{f.private_name}} = {{f.type.is_enum.name}}[field_data]
+                {% elif f.type.is_union() %}
+                type_name = field_data['__typename']
+                choice = config.selections['{{f.name}}'].choices[type_name]
+                inst.{{f.private_name}} = cls.type_map[type_name].from_dict(parent, field_data, choice)
+                {% endif %}
+                {% endfor %}
             cls.__store__.set_node(inst)
             return inst
 
