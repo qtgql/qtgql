@@ -131,6 +131,7 @@ class TestPropertyGetter:
         handler.on_data(initialize_dict)
         field = testcase.get_field_by_name("whoAmI")
         assert handler._data.property(field.name)
+        # TODO: have a better test here.
 
     def test_enum(self, qtbot):
         testcase = EnumTestCase.compile()
