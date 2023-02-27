@@ -28,6 +28,10 @@ class _BaseQGraphQLObject(QObject):
     def __init__(self, parent: Optional[QObject] = None):
         super().__init__(parent)
 
+    @qproperty(str, constant=True)
+    def typename(self) -> str:
+        return self.__class__.__name__
+
     @classmethod
     def from_dict(cls, parent: QObject, data: dict, config: SelectionConfig):
         raise NotImplementedError

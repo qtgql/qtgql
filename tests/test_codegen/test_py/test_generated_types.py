@@ -131,7 +131,12 @@ class TestPropertyGetter:
         handler.on_data(initialize_dict)
         field = testcase.get_field_by_name("whoAmI")
         assert handler._data.property(field.name)
-        # TODO: have a better test here.
+        data: _BaseQGraphQLObject = handler._data.property(field.name)
+        if data.typename == "Person":
+            assert data.name == "Nir"
+        else:
+            assert data.typename == "Frog"
+            assert data.name == "Kermit"
 
     def test_enum(self, qtbot):
         testcase = EnumTestCase.compile()
@@ -212,7 +217,8 @@ class TestDeserializers:
 
 
 class TestUpdates:
-    ...
+    def test(self):
+        raise NotImplementedError
 
 
 class TestDefaultConstructor:
