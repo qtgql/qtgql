@@ -382,13 +382,13 @@ ObjectsThatReferenceEachOtherTestCase = QGQLObjectTestCase(
 )
 
 
-class CountryScalar(BaseCustomScalar[Optional[str]]):
+class CountryScalar(BaseCustomScalar[Optional[str], str]):
     countrymap = schemas.object_with_user_defined_scalar.countrymap
     GRAPHQL_NAME = "Country"
     DEFAULT_VALUE = "isr"
 
     @classmethod
-    def from_graphql(cls, v: Optional[str] = None) -> "BaseCustomScalar":
+    def from_graphql(cls, v=None) -> "BaseCustomScalar":
         if v:
             return cls(cls.countrymap[v])
         return cls()

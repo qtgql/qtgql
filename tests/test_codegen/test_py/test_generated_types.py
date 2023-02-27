@@ -1,6 +1,7 @@
-import typing
+from typing import Optional, Type
 
 import pytest
+import pytestqt.exceptions
 from qtgql.codegen.introspection import introspection_query
 from qtgql.codegen.py.compiler.builtin_scalars import BuiltinScalar, BuiltinScalars
 from qtgql.codegen.py.runtime.bases import QGraphQListModel, _BaseQGraphQLObject
@@ -62,7 +63,7 @@ class TestAnnotations:
 
     @pytest.mark.parametrize(("testcase", "scalar", "fname"), custom_scalar_testcases)
     def test_custom_scalars(
-        self, testcase: QGQLObjectTestCase, scalar: typing.Type[BaseCustomScalar], fname
+        self, testcase: QGQLObjectTestCase, scalar: Type[BaseCustomScalar], fname
     ):
         testcase = testcase.compile()
         field = testcase.get_field_by_type(scalar)
@@ -72,9 +73,7 @@ class TestAnnotations:
         assert getattr(klass, field.setter_name).__annotations__["v"] == field.annotation
         assert getattr(klass, field.name).fget.__annotations__["return"] == field.fget_annotation
         assert (
-            TypeHinter.from_string(
-                field.fget_annotation, ns={"Optional": typing.Optional}
-            ).as_annotation()
+            TypeHinter.from_string(field.fget_annotation, ns={"Optional": Optional}).as_annotation()
             == scalar.to_qt.__annotations__["return"]
         )
 
@@ -217,30 +216,81 @@ class TestDeserializers:
 
 
 class TestUpdates:
-    def default_test(self, testcase: QGQLObjectTestCase):
+    def test_scalars_update(self, qtbot):
+        testcase = ScalarsTestCase.compile()
         initialize_dict1 = testcase.initialize_dict
         handler = testcase.query_handler
         handler.on_data(initialize_dict1)
         initialize_dict2 = testcase.initialize_dict
         initialize_dict2[testcase.first_field]["id"] = handler.data.id
+        initialize_dict2[testcase.first_field]["male"] = not initialize_dict1[testcase.first_field][
+            "male"
+        ]
         assert initialize_dict1 != initialize_dict2
         previous = handler.data
-        handler.on_data(initialize_dict2)
+        signals = [
+            getattr(previous, field.signal_name)
+            for field in testcase.tested_type.fields
+            if field.name != "id"
+        ]
+        with qtbot.wait_signals(signals):
+            handler.on_data(initialize_dict2)
         after = handler.data
         assert after is previous
         for k, v in initialize_dict2[testcase.first_field].items():
             assert handler.data.property(k) == v
 
-    def test_scalars(self):
+    def tests_scalars_no_update(self, qtbot):
         testcase = ScalarsTestCase.compile()
-        self.default_test(testcase)
+        initialize_dict1 = testcase.initialize_dict
+        handler = testcase.query_handler
+        handler.on_data(initialize_dict1)
+        with pytest.raises(pytestqt.exceptions.TimeoutError):
+            with qtbot.wait_signals(
+                [
+                    getattr(handler._data, field.signal_name)
+                    for field in testcase.tested_type.fields
+                    if field.name != "id"
+                ],
+                timeout=1000,
+            ):
+                handler.on_data(initialize_dict1)
 
     @pytest.mark.parametrize(("testcase", "scalar", "fname"), custom_scalar_testcases)
-    def test_custom_scalars(
-        self, testcase: QGQLObjectTestCase, scalar: BaseCustomScalar, fname: str
+    def test_custom_scalars_no_update(
+        self, testcase: QGQLObjectTestCase, scalar: BaseCustomScalar, fname: str, qtbot
     ):
         testcase = testcase.compile()
-        self.default_test(testcase)
+        initialized_dict = testcase.initialize_dict
+        handler = testcase.query_handler
+        handler.on_data(initialized_dict)
+        signal = getattr(handler.data, testcase.get_field_by_name(fname).signal_name)
+        with pytest.raises(pytestqt.exceptions.TimeoutError):
+            with qtbot.wait_signal(signal, timeout=1000):
+                handler.on_data(initialized_dict)
+
+    @pytest.mark.parametrize(("testcase", "scalar", "fname"), custom_scalar_testcases)
+    def test_custom_scalars_update(
+        self, testcase: QGQLObjectTestCase, scalar: BaseCustomScalar, fname: str, qtbot
+    ):
+        testcase = testcase.compile()
+        initialize_dict1 = testcase.initialize_dict
+        handler = testcase.query_handler
+        handler.on_data(initialize_dict1)
+        initialize_dict2 = testcase.initialize_dict
+        initialize_dict2[testcase.first_field]["id"] = handler.data.id
+        assert (
+            initialize_dict2[testcase.first_field][fname]
+            != initialize_dict1[testcase.first_field][fname]
+        )
+        previous = handler.data
+        signal = getattr(handler.data, testcase.get_field_by_name(fname).signal_name)
+        with qtbot.wait_signal(signal):
+            handler.on_data(initialize_dict2)
+        after = handler.data
+        assert after is previous
+        raw_new_val = initialize_dict2[testcase.first_field][fname]
+        assert handler.data.property(fname) == scalar.from_graphql(raw_new_val).to_qt()
 
 
 class TestDefaultConstructor:

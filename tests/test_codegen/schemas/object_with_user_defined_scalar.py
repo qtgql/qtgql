@@ -22,11 +22,18 @@ class User(Node):
     country: Country
 
 
+# ugly hack for `test_custom_scalar_update` to pass.
+
+RET_CODE = ["isr", "uk"]
+
+
 @strawberry.type
 class Query:
-    @strawberry.field
+    _prev = ""
+
+    @strawberry.field()
     def user(self) -> User:
-        return User(name="Patrick", age=100, country="isr")
+        return User(name="Patrick", age=100, country=RET_CODE.pop())
 
 
 schema = strawberry.Schema(query=Query)

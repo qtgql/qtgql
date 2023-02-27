@@ -75,11 +75,14 @@ class {{ type.name }}({{context.base_object_name}}):
                                                   default_object={{f.type.is_model}}.default_instance()
                                                   ))
             {% elif f.type.is_builtin_scalar %}
-            self.{{f.setter_name}}(field_data)
+            if self.{{f.private_name}} != field_data:
+                self.{{f.setter_name}}(field_data)
             {% elif f.is_custom_scalar %}
-            self.{{f.setter_name}}(SCALARS.{{f.is_custom_scalar.__name__}}.from_graphql(field_data))
+            new = SCALARS.{{f.is_custom_scalar.__name__}}.from_graphql(field_data)
+            if new != self.{{f.private_name}}:
+                self.{{f.setter_name}}(new)
             {% elif f.type.is_enum %}
-            self.{{f.setter_name}}(f.type.is_enum.name}}[field_data])
+            self.{{f.setter_name}}({{f.type.is_enum.name}}[field_data])
             {% elif f.type.is_union() %}
             type_name = field_data['__typename']
             choice = config.selections['{{f.name}}'].choices[type_name]
@@ -115,8 +118,7 @@ class {{ type.name }}({{context.base_object_name}}):
                 {% elif f.type.is_builtin_scalar %}
                 inst.{{f.private_name}} = field_data
                 {% elif f.is_custom_scalar %}
-                inst.{{f.private_name}} = SCALARS.
-                {f.is_custom_scalar.name}.from_graphql(field_data)
+                inst.{{f.private_name}} = SCALARS.{{f.is_custom_scalar.__name__}}.from_graphql(field_data)
                 {% elif f.type.is_enum %}
                 inst.{{f.private_name}} = {{f.type.is_enum.name}}[field_data]
                 {% elif f.type.is_union() %}

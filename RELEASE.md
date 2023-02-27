@@ -6,7 +6,7 @@ an object that represents the selections for this query.
 Then if the data is being compared against local data as follows
 
 1. __builtin scalars__ - compared against the current value.
-2. __custom scalars__ - user must overload the `__eq__` dunder.
+2. __custom scalars__ - By default compared against the inner value of the custom scalar.
 3. __object_type__ - will compare against each field (generated).
 4. __unions__ - if `__typename` is different will cause a whole update, else fallback to (3)
 5. __enums__ - compare against the enum value / name (which the same string).
