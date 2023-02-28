@@ -63,11 +63,14 @@ class {{ type.name }}({{context.base_object_name}}):
             if not field_data:
                 self.{{f.setter_name}}(None)
             else:
-                self.{{f.setter_name}}({{f.type.is_object_type.name}}.from_dict(
-                    parent,
-                    field_data,
-                    config.selections['{{f.name}}']
-                ))
+                if self.{{f.private_name}}._id == field_data['id']:
+                    self.{{f.private_name}}.update(field_data, config.selections['{{f.name}}'])
+                else:
+                    self.{{f.setter_name}}({{f.type.is_object_type.name}}.from_dict(
+                        parent,
+                        field_data,
+                        config.selections['{{f.name}}']
+                    ))
             {% elif f.type.is_model %}
             self.{{f.setter_name}}(QGraphQListModel(parent,
                                                   data=[

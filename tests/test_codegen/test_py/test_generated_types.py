@@ -302,6 +302,17 @@ class TestUpdates:
             with qtbot.wait_signals(person_signals, timeout=1000):
                 handler.on_data(initialized_dict)
 
+    @staticmethod
+    def _get_nested_obj_dict_same_id_diff_val(initialized_dict1: dict) -> dict:
+        initialized_dict2 = copy.deepcopy(initialized_dict1)
+        person_dict1 = initialized_dict1["user"]["person"]
+        person_dict2 = initialized_dict2["user"]["person"]
+        person_dict2["name"] = "this is not a name"
+        person_dict2["age"] = person_dict1["age"] + 1
+        assert person_dict1 != person_dict2
+        assert person_dict1["id"] == person_dict2["id"]
+        return initialized_dict2
+
     def test_nested_object_same_id_update(self, qtbot):
         testcase = NestedObjectTestCase.compile()
         initialized_dict1 = testcase.initialize_dict
@@ -313,15 +324,19 @@ class TestUpdates:
             for field in person_type.fields
             if field.name != "id"
         ]
-        initialized_dict2 = copy.deepcopy(initialized_dict1)
-        initialized_dict2[testcase.first_field]["person"]["name"] = "this is not a name"
-        initialized_dict2[testcase.first_field]["person"]["age"] = handler.data.person.age + 1
-        assert (
-            initialized_dict1[testcase.first_field]["person"]
-            != initialized_dict2[testcase.first_field]["person"]
-        )
-        with qtbot.wait_signals(person_signals):
+        initialized_dict2 = self._get_nested_obj_dict_same_id_diff_val(initialized_dict1)
+        with qtbot.wait_signals(person_signals, timeout=500):
             handler.on_data(initialized_dict2)
+
+    def test_nested_object_wont_emit_signal_if_id_is_the_same(self, qtbot):
+        testcase = NestedObjectTestCase.compile()
+        initialized_dict1 = testcase.initialize_dict
+        handler = testcase.query_handler
+        handler.on_data(initialized_dict1)
+        initialized_dict2 = self._get_nested_obj_dict_same_id_diff_val(initialized_dict1)
+        with pytest.raises(pytestqt.exceptions.TimeoutError):
+            with qtbot.wait_signal(handler.data.personChanged, timeout=500):
+                handler.on_data(initialized_dict2)
 
     def test_nested_optional_object_null_update_with_object(self, qtbot):
         testcase = OptionalNestedObjectTestCase.compile()
