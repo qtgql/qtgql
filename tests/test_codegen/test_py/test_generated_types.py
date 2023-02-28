@@ -412,6 +412,19 @@ class TestUpdates:
             with qtbot.wait_signal(handler.data.statusChanged, timeout=500):
                 handler.on_data(d)
 
+    def test_enum_update(self, qtbot):
+        testcase = EnumTestCase.compile()
+        handler = testcase.query_handler
+        d = testcase.initialize_dict
+        handler.on_data(d)
+        from tests.test_codegen.schemas.object_with_enum import Status
+
+        assert handler.data.status != Status.Disconnected.name
+        d[testcase.first_field]["status"] = Status.Disconnected.name
+        with qtbot.wait_signal(handler.data.statusChanged, timeout=500):
+            handler.on_data(d)
+        assert handler.data.status == Status.Disconnected.value
+
 
 class TestDefaultConstructor:
     @pytest.mark.parametrize("scalar", BuiltinScalars, ids=lambda v: v.graphql_name)

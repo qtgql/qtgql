@@ -88,7 +88,8 @@ class {{ type.name }}({{context.base_object_name}}):
             if new != self.{{f.private_name}}:
                 self.{{f.setter_name}}(new)
             {% elif f.type.is_enum %}
-            self.{{f.setter_name}}({{f.type.is_enum.name}}[field_data])
+            if self.{{f.private_name}}.name != field_data:
+                self.{{f.setter_name}}({{f.type.is_enum.name}}[field_data])
             {% elif f.type.is_union() %}
             type_name = field_data['__typename']
             choice = config.selections['{{f.name}}'].choices[type_name]
