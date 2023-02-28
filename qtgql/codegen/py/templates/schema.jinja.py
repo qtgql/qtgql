@@ -78,7 +78,7 @@ class {{ type.name }}({{context.base_object_name}}):
                                                                                          config.selections[{{f.name}}])
                                                       for data in {{f.name}}
                                                   ],
-                                                  default_object={{f.type.is_model}}.default_instance()
+                                                  default_object={{f.type.is_model.name}}.default_instance()
                                                   ))
             {% elif f.type.is_builtin_scalar %}
             if self.{{f.private_name}} != field_data:
@@ -118,14 +118,10 @@ class {{ type.name }}({{context.base_object_name}}):
                         config.selections['{{f.name}}']
                     )
                 {% elif f.type.is_model %}
-                inst.{{f.private_name}} = QGraphQListModel(parent,
-                                                      data=[
-                                                          {{f.type.is_model.name}}.from_dict(parent, data,
-                                                                                             config.selections[
-                                                                                                 {{f.name}}])
-                                                          for data in {{f.name}}
-                                                      ],
-                                                      default_object={{f.type.is_model}}.default_instance()
+                inst.{{f.private_name}} = QGraphQListModel.from_dict(parent,
+                                                                     default_type={{f.type.is_model.name}},
+                                                                     data=field_data,
+                                                                     config=config.selections['{{f.name}}']
                                                       )
                 {% elif f.type.is_builtin_scalar %}
                 inst.{{f.private_name}} = field_data

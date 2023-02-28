@@ -8,7 +8,7 @@ from typing import Any, Optional, Type
 from attrs import define
 
 from qtgql.codegen.py.compiler.builtin_scalars import BuiltinScalar
-from qtgql.codegen.py.runtime.bases import QGraphQListModel, _BaseQGraphQLObject
+from qtgql.codegen.py.runtime.bases import QGraphQListModel
 from qtgql.codegen.py.runtime.custom_scalars import BaseCustomScalar, CustomScalarMap
 from qtgql.codegen.utils import AntiForwardRef
 from qtgql.utils.typingref import TypeHinter
@@ -45,8 +45,8 @@ class GqlFieldDefinition:
 
         if model_of := self.type.is_model:
             return (
-                f"{QGraphQListModel.__name__}(parent=self, data=[], "
-                f"default_object={model_of.name}.{_BaseQGraphQLObject.default_instance.__name__}())"
+                f"{QGraphQListModel.__name__}(parent=None, data=[], "
+                f"default_type={model_of.name})"
             )
 
         if custom_scalar := self.type.is_custom_scalar(self.scalars):

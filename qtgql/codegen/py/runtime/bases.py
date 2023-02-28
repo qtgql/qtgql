@@ -68,13 +68,13 @@ class QGraphQListModel(QAbstractListModel, Generic[T_BaseQGraphQLObject]):
     def __init__(
         self,
         parent: Optional[QObject],
-        default_object: T_BaseQGraphQLObject,
+        default_type: T_BaseQGraphQLObject,
         data: list[T_BaseQGraphQLObject],
     ):
         super().__init__(parent)
 
         self._data = data
-        self._default_object = default_object
+        self._default_object = default_type.default_instance()
         self._current_index: int = 0
 
     @slot
@@ -120,6 +120,23 @@ class QGraphQListModel(QAbstractListModel, Generic[T_BaseQGraphQLObject]):
         self.beginRemoveRows(self.index(index - 1).parent(), real_index, real_index)
         self._data.pop(index)
         self.endRemoveRows()
+
+    @classmethod
+    def from_dict(
+        cls,
+        parent: _BaseQGraphQLObject,
+        data: dict,
+        config: SelectionConfig,
+        default_type: T_BaseQGraphQLObject,
+    ) -> Self:
+        return cls(
+            parent=parent,
+            data=[default_type.from_dict(parent, data=node, config=config) for node in data],
+            default_type=default_type,
+        )
+
+    def update(self, data: dict, selections: SelectionConfig) -> None:
+        ...
 
 
 def get_base_graphql_object(name: str) -> type[_BaseQGraphQLObject]:
