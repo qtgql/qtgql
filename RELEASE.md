@@ -7,7 +7,9 @@ Then if the data is being compared against local data as follows
 
 1. __builtin scalars__ - compared against the current value.
 2. __custom scalars__ - By default compared against the inner value of the custom scalar.
-3. __object_type__ - will compare against each field (generated on `update()`)
+3. __object_type__ - will compare against each field (generated on `update()`),
+ - Note: if the object had the same ID! then the fields setter should not be called since the updates only
+  occur at the child level, thus avoiding unnecessary updates.
 edge cased:
  - new id reached: resolution -> create a new object and replace the pointer with the field setter.
  - field was null before (ATM objecttypes are the only real fields that can be null): resolution -> use setter on this field

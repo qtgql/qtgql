@@ -343,6 +343,7 @@ class TestUpdates:
         handler.on_data(initialized_dict)
         assert handler.data.person
         dict_without_person = OptionalNestedObjectTestCase.compile().initialize_dict
+        dict_without_person["user"]["id"] = initialized_dict["user"]["id"]
         with qtbot.wait_signal(handler.data.personChanged):
             handler.on_data(dict_without_person)
         assert not handler.data.person

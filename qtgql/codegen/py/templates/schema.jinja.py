@@ -140,7 +140,7 @@ class {{ type.name }}({{context.base_object_name}}):
 
     def {{ f.setter_name }}(self, v: {{  f.annotation  }}) -> None:
         self.{{  f.private_name  }} = v
-        self.{{  f.name  }}Changed.emit()
+        self.{{  f.signal_name  }}.emit()
 
     @qproperty(type={{f.property_type}}, fset={{ f.setter_name }}, notify={{f.signal_name}})
     def {{ f.name }}(self) -> {{ f.fget_annotation }}:
