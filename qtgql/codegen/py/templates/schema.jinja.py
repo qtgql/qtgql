@@ -92,7 +92,10 @@ class {{ type.name }}({{context.base_object_name}}):
             {% elif f.type.is_union() %}
             type_name = field_data['__typename']
             choice = config.selections['{{f.name}}'].choices[type_name]
-            self.{{f.setter_name}}(self.type_map[type_name].from_dict(parent, field_data, choice))
+            if self.{{f.private_name}} and self.{{f.private_name}}._id == field_data['id']:
+                self.{{f.private_name}}.update(field_data, choice)
+            else:
+                self.{{f.setter_name}}(self.type_map[type_name].from_dict(parent, field_data, choice))
             {% endif %}
             {% endfor %}
 

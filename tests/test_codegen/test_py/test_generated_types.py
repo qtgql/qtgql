@@ -365,12 +365,43 @@ class TestUpdates:
 
     def test_union_no_update(self, qtbot):
         testcase = UnionTestCase.compile()
+        handler = testcase.query_handler
         query = testcase.evaluator._query_handlers[testcase.query_operationName].query
         frog_dict = testcase.schema.execute_sync(query).data
         testcase.query_handler.on_data(frog_dict)
+        same_frog_new_name = copy.deepcopy(frog_dict)
+        new_name = "Same same, new name!"
+        same_frog_new_name["user"]["whoAmI"]["name"] = new_name
         with pytest.raises(pytestqt.exceptions.TimeoutError):
-            with qtbot.wait_signal(testcase.query_handler.data.whoAmIChanged):
-                testcase.query_handler.on_data(frog_dict)
+            with qtbot.wait_signal(handler.data.whoAmIChanged, timeout=500):
+                handler.on_data(same_frog_new_name)
+        assert handler.data.whoAmI.name == new_name
+
+    def test_union_update_same_type(self, qtbot):
+        testcase = UnionTestCase.compile()
+        handler = testcase.query_handler
+        query = testcase.evaluator._query_handlers[testcase.query_operationName].query
+        frog_dict = testcase.schema.execute_sync(query).data
+        testcase.query_handler.on_data(frog_dict)
+        frog_dict2 = testcase.schema.execute_sync(query).data
+        frog_dict2[testcase.first_field]["id"] = handler.data.id
+        with qtbot.wait_signal(handler.data.whoAmIChanged, timeout=500):
+            handler.on_data(frog_dict2)
+        assert handler.data.whoAmI.name == frog_dict2[testcase.first_field]["whoAmI"]["name"]
+
+    def test_union_update_different_type(self, qtbot):
+        testcase = UnionTestCase.compile()
+        handler = testcase.query_handler
+        query = testcase.evaluator._query_handlers[testcase.query_operationName].query
+        frog_dict = testcase.schema.execute_sync(query).data
+        testcase.query_handler.on_data(frog_dict)
+        person_dict = testcase.schema.execute_sync(
+            query.replace("choice: FROG", "choice: PERSON")
+        ).data
+        person_dict[testcase.first_field]["id"] = handler.data.id
+        with qtbot.wait_signal(handler.data.whoAmIChanged, timeout=500):
+            handler.on_data(person_dict)
+        assert handler.data.whoAmI.age
 
 
 class TestDefaultConstructor:
