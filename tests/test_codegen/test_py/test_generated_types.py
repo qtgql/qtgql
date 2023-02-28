@@ -403,6 +403,15 @@ class TestUpdates:
             handler.on_data(person_dict)
         assert handler.data.whoAmI.age
 
+    def test_enum_no_update(self, qtbot):
+        testcase = EnumTestCase.compile()
+        handler = testcase.query_handler
+        d = testcase.initialize_dict
+        handler.on_data(d)
+        with pytest.raises(pytestqt.exceptions.TimeoutError):
+            with qtbot.wait_signal(handler.data.statusChanged, timeout=500):
+                handler.on_data(d)
+
 
 class TestDefaultConstructor:
     @pytest.mark.parametrize("scalar", BuiltinScalars, ids=lambda v: v.graphql_name)
