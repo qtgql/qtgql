@@ -264,7 +264,7 @@ UnionTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_union.schema,
     query="""
         query MainQuery {
-          user {
+          user (choice: FROG){
             whoAmI {
               ... on Frog {
                 __typename

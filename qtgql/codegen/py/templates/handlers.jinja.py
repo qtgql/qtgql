@@ -24,7 +24,7 @@ class {{query.name}}(BaseQueryHandler[{{query.field.annotation}}]):
     OPERATION_CONFIG = {{query.operation_config}}
     def on_data(self, message: dict) -> None:
         config = self.OPERATION_CONFIG
-        # TODO: What about updates here?
+        # TODO: this should be a copy of the `from_dict()` template.
         if {{query.field.name}} := message.get('{{query.field.name}}', None):
             self._data = {{query.field.type.type.name}}.from_dict(self, {{query.field.name}}, config)
         self.dataChanged.emit()

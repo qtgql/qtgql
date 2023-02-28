@@ -14,7 +14,7 @@ edge cased:
  - new id reached: resolution -> create a new object and replace the pointer with the field setter.
  - field was null before (ATM objecttypes are the only real fields that can be null): resolution -> use setter on this field
  -
-4. __unions__ - if `__typename` is different will cause a whole update, else fallback to (3)
+4. __unions__ - if `__typename` is different will cause a whole update, else similar to (3)
 5. __enums__ - compare against the enum value / name (which the same string).
 6. __lists a.k.a models__ -- since lists just store a pointer (or a key in the store) to a node and the node itself
 already compared when `.from_dict` called on the raw-node,

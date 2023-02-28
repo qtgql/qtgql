@@ -363,6 +363,15 @@ class TestUpdates:
             handler.on_data(dict_without_person)
         assert not handler.data.person
 
+    def test_union_no_update(self, qtbot):
+        testcase = UnionTestCase.compile()
+        query = testcase.evaluator._query_handlers[testcase.query_operationName].query
+        frog_dict = testcase.schema.execute_sync(query).data
+        testcase.query_handler.on_data(frog_dict)
+        with pytest.raises(pytestqt.exceptions.TimeoutError):
+            with qtbot.wait_signal(testcase.query_handler.data.whoAmIChanged):
+                testcase.query_handler.on_data(frog_dict)
+
 
 class TestDefaultConstructor:
     @pytest.mark.parametrize("scalar", BuiltinScalars, ids=lambda v: v.graphql_name)
