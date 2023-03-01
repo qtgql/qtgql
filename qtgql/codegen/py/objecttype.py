@@ -3,7 +3,7 @@ from __future__ import annotations
 import contextlib
 import enum
 from functools import cached_property
-from typing import Any, Optional, Type
+from typing import TYPE_CHECKING, Any, Optional, Type
 
 from attrs import define
 
@@ -12,6 +12,9 @@ from qtgql.codegen.py.runtime.bases import QGraphQListModel
 from qtgql.codegen.py.runtime.custom_scalars import BaseCustomScalar, CustomScalarMap
 from qtgql.codegen.utils import AntiForwardRef
 from qtgql.utils.typingref import TypeHinter
+
+if TYPE_CHECKING:
+    from typing_extensions import Self
 
 
 class Kinds(enum.Enum):
@@ -119,12 +122,22 @@ class GqlFieldDefinition:
             return f"return self.{self.private_name}.value"
         return f"return self.{self.private_name}"
 
+    @cached_property
+    def can_select_id(self) -> Optional[Self]:
+        object_type = self.type.is_object_type or self.type.is_model
+        if object_type:
+            return object_type.has_id_field
+
 
 @define(slots=False)
 class GqlTypeDefinition:
     name: str
     fields_dict: dict[str, GqlFieldDefinition]
     docstring: Optional[str] = ""
+
+    @cached_property
+    def has_id_field(self) -> Optional[GqlFieldDefinition]:
+        return self.fields_dict.get("id", None)
 
     @property
     def fields(self) -> list[GqlFieldDefinition]:
