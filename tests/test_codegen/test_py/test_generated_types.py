@@ -167,9 +167,11 @@ class TestDeserializers:
     def test_nested_object_from_dict(self, qtbot):
         testcase = NestedObjectTestCase.compile()
         handler = testcase.query_handler
-        handler.on_data(testcase.initialize_dict)
-        assert handler._data.person.name == "Patrick"
-        assert handler._data.person.age == 100
+        init_dict = testcase.initialize_dict
+        person = init_dict[testcase.first_field]["person"]
+        handler.on_data(init_dict)
+        assert handler._data.person.name == person["name"]
+        assert handler._data.person.age == person["age"]
 
     def test_nested_optional_object_is_null(self):
         testcase = OptionalNestedObjectTestCase.compile()
@@ -487,9 +489,7 @@ class TestDefaultConstructor:
     def test_object_with_list_of_object(self):
         testcase = ObjectWithListOfObjectTestCase.compile()
         inst = testcase.gql_type()
-        assert isinstance(inst.persons, QGraphQListModel)
-        # by default there is no need for initializing delegates.
-        assert len(inst.persons._data) == 0
+        assert inst.persons == []  # default of model is empty list atm.
 
     @pytest.mark.parametrize(("testcase", "scalar", "fname"), custom_scalar_testcases)
     def test_custom_scalars(

@@ -72,23 +72,7 @@ class {{ type.name }}({{context.base_object_name}}):
                         config.selections['{{f.name}}']
                     ))
             {% elif f.type.is_model %}
-            new_len = len(field_data)
-            node_selection = config.selections['{{f.name}}']
-            prev_len = self.{{f.private_name}}.rowCount()
-            if new_len < prev_len:
-                # crop the list to the arrived data length.
-                self.{{f.private_name}}.removeRows(new_len, prev_len - new_len)
-            for index, node in enumerate(field_data):
-                if self.{{f.private_name}}._data[index].id != node['id']:
-                    # get or create node if wasn't on the correct index.
-                    # Note: it is safe to call [].insert(50, 50) (although index 50 doesn't exist).
-                    self.{{f.private_name}}.insert(index,
-                                                   {{f.type.is_model.name}}.from_dict(parent, field_data[index],
-                                                                                      node_selection)
-                                                   )
-                else:
-                    # same node on that index just call update there is no need call model signals.
-                    self.{{f.private_name}}._data[index].update(field_data[index], node_selection)
+            self.{{f.private_name}}.update(field_data, config.selections['{{f.name}}'])
             {% elif f.type.is_builtin_scalar %}
             if self.{{f.private_name}} != field_data:
                 self.{{f.setter_name}}(field_data)
