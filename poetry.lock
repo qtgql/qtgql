@@ -1877,14 +1877,14 @@ files = [
 
 [[package]]
 name = "strawberry-graphql"
-version = "0.158.2"
+version = "0.159.0"
 description = "A library for creating GraphQL APIs"
 category = "dev"
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "strawberry_graphql-0.158.2-py3-none-any.whl", hash = "sha256:5a71243e2035b72f95e28731029cda9cc5f1a6d0594be81c055700d4355aafc0"},
-    {file = "strawberry_graphql-0.158.2.tar.gz", hash = "sha256:5b655ab1c4c2af770c72d4169d07f966639e9124b42194ae486c42c73bd2c44a"},
+    {file = "strawberry_graphql-0.159.0-py3-none-any.whl", hash = "sha256:459890ef2f4afb89fc6b13fc24e2453db1904ac37bc85a08990814c19ef06ee2"},
+    {file = "strawberry_graphql-0.159.0.tar.gz", hash = "sha256:0650b2a398457981f4a3ae139336f26c1c1bdda3a18118bc84ecb68edc45b663"},
 ]
 
 [package.dependencies]
@@ -2183,4 +2183,4 @@ codegen = ["graphql-core", "jinja2", "typer", "toml"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.12"
-content-hash = "c0240ef4fa43ddca53a006df815a8272b6ae0d14df870b9b7f6aa512248e7065"
+content-hash = "5d39e91703a55e2e6866b43c8fef3399f77611347a5ee3627976192554a21975"
