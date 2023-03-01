@@ -1,4 +1,5 @@
 import copy
+import time
 from typing import Optional, Type
 
 import pytest
@@ -276,6 +277,7 @@ class TestUpdates:
         initialize_dict1 = testcase.initialize_dict
         handler = testcase.query_handler
         handler.on_data(initialize_dict1)
+        time.sleep(0.01)  # windows doesn't give very accurate time...
         initialize_dict2 = testcase.initialize_dict
         initialize_dict2[testcase.first_field]["id"] = handler.data.id
         assert (
