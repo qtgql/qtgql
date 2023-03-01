@@ -17,8 +17,8 @@ country_map = {
     'isr': 'israel'
 }
 
-
-class CountryCode(BaseCustomScalar[str]):
+# BaseCustomScalar[<typeof default_value>, <typeof graphql_value>]
+class CountryCode(BaseCustomScalar[str, str]):
     GRAPHQL_NAME = "CountryCode"
     DEFAULT_VALUE = "israel"  # this would be the default value.
 

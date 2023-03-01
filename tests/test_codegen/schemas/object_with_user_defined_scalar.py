@@ -25,6 +25,8 @@ class User(Node):
 # ugly hack for `test_custom_scalar_update` to pass.
 
 RET_CODE = ["isr", "uk"]
+for _ in range(20):
+    RET_CODE.extend(RET_CODE)
 
 
 @strawberry.type
