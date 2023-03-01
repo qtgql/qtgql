@@ -9,13 +9,14 @@ This library is an attempt to provide a high-level graphql client to the QT worl
 
 ## Features
 !!! success "[Codegen (introspection compiler)](./codegen/tutorial.md)"
-    - [x] object types, for each field there is a corresponding `Property`
-    - [x] enums
-    - [x] custom scalars
-    - [x] query generation
-!!! success "Runtime"
+    - [x] Object types, for each field there is a corresponding `Property`
+    - [x] Enums
+    - [x] Custom scalars
+    - [x] Unions
+    - [x] Query handlers: queries your server when a component uses this query (or imperatively fetched).
+    - [x] Query updates: fetch the same query multiple times would not instantiate everything from scratch
+!!! success "Network layer"
     - [x] "Qt-native" graphql-transport-ws network manager (supports subscriptions).
-    - [x] Query handler, (generated for each query in QML).
 
 !!! success "Helpers"
     - [x] [generic models](helpers/itemsystem.md) that get created from dictionaries (with update, pop, insert implemented by default)

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, ClassVar, Generic, Optional, TypeVar
+from typing import TYPE_CHECKING, Any, ClassVar, Dict, Generic, NamedTuple, Optional, TypeVar
 
 from PySide6.QtCore import QObject, Signal
 from PySide6.QtQuick import QQuickItem
@@ -12,6 +12,11 @@ if TYPE_CHECKING:
     from qtgql.gqltransport.client import GqlClientMessage
 
 T_QObject = TypeVar("T_QObject", bound=QObject)
+
+
+class SelectionConfig(NamedTuple):
+    selections: Dict[str, Optional[SelectionConfig]] = {}
+    choices: Dict[str, SelectionConfig] = {}
 
 
 class QSingletonMeta(type(QObject)):  # type: ignore
@@ -32,19 +37,17 @@ class BaseQueryHandler(Generic[T_QObject], QObject, metaclass=QSingletonMeta):
     ENV_NAME: ClassVar[str]
     operationName: ClassVar[str]
     _message_template: ClassVar[GqlClientMessage]
+    OPERATION_CONFIG: ClassVar[SelectionConfig]
 
     graphqlChanged = Signal()
     dataChanged = Signal()
     completedChanged = Signal()
     errorChanged = Signal()
 
-    signalNames = ("graphqlChanged", "dataChanged", "completedChanged", "errorChanged")
-
     def __init__(self, parent: Optional[QObject] = None):
         super().__init__(parent)
         name = self.__class__.__name__
         self.setObjectName(name)
-        self._query: str = ""
         self._completed: bool = False
         self._data: Optional[T_QObject] = None
         self.environment = get_gql_env(self.ENV_NAME)

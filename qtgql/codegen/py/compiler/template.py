@@ -8,20 +8,21 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 
 if TYPE_CHECKING:  # pragma: no cover
     from qtgql.codegen.py.compiler.config import QtGqlConfig
-    from qtgql.codegen.py.compiler.query import QueryHandlerDefinition
+    from qtgql.codegen.py.compiler.query import QtGqlQueriedField, QtGqlQueryHandlerDefinition
     from qtgql.codegen.py.objecttype import GqlEnumDefinition, GqlTypeDefinition
 
-env = Environment(loader=PackageLoader("qtgql.codegen.py"), autoescape=select_autoescape())
+template_env = Environment(loader=PackageLoader("qtgql.codegen.py"), autoescape=select_autoescape())
 
-SCHEMA_TEMPLATE = env.get_template("schema.jinja.py")
-HANDLERS_TEMPLATE = env.get_template("handlers.jinja.py")
+SCHEMA_TEMPLATE = template_env.get_template("schema.jinja.py")
+HANDLERS_TEMPLATE = template_env.get_template("handlers.jinja.py")
+CONFIG_TEMPLATE = template_env.get_template("config.jinja.py")
 
 
 @define
 class TemplateContext:
     enums: list[GqlEnumDefinition]
     types: list[GqlTypeDefinition]
-    queries: list[QueryHandlerDefinition]
+    queries: list[QtGqlQueryHandlerDefinition]
     config: QtGqlConfig
 
     @property
@@ -50,3 +51,33 @@ def schema_types_template(context: TemplateContext) -> str:
 
 def handlers_template(context: TemplateContext) -> str:
     return HANDLERS_TEMPLATE.render(context=context)
+
+
+@define
+class ConfigContext:
+    p_field: QtGqlQueriedField
+
+    @property
+    def choices(self):
+        if self.p_field.choices:
+            return {
+                type_name: {
+                    selection.name: selection.as_conf_string() or "None" for selection in selections
+                }
+                for type_name, selections in self.p_field.choices.items()
+            }
+        else:
+            return {}
+
+    @property
+    def selections(self) -> dict[str, str]:
+        if self.p_field.selections:
+            return {
+                selection.name: selection.as_conf_string() for selection in self.p_field.selections
+            }
+        else:
+            return {}
+
+
+def config_template(context: ConfigContext):
+    return CONFIG_TEMPLATE.render(context=context)

@@ -8,7 +8,7 @@ from typing import Any, Optional, Type
 from attrs import define
 
 from qtgql.codegen.py.compiler.builtin_scalars import BuiltinScalar
-from qtgql.codegen.py.runtime.bases import QGraphQListModel, _BaseQGraphQLObject
+from qtgql.codegen.py.runtime.bases import QGraphQListModel
 from qtgql.codegen.py.runtime.custom_scalars import BaseCustomScalar, CustomScalarMap
 from qtgql.codegen.utils import AntiForwardRef
 from qtgql.utils.typingref import TypeHinter
@@ -43,11 +43,9 @@ class GqlFieldDefinition:
         if self.type.is_object_type:
             return "None"
 
-        if model_of := self.type.is_model:
-            return (
-                f"{QGraphQListModel.__name__}(parent=self, data=[], "
-                f"default_object={model_of.name}.{_BaseQGraphQLObject.default_instance.__name__}())"
-            )
+        if self.type.is_model:
+            # this would just generate the model without data.
+            return "list()"
 
         if custom_scalar := self.type.is_custom_scalar(self.scalars):
             return f"SCALARS.{custom_scalar.__name__}()"
@@ -57,38 +55,9 @@ class GqlFieldDefinition:
 
         return "None"  # Unions are not supported yet.
 
-    @cached_property
-    def deserializer(self) -> str:
-        """This gets the dict from graphql and passes the data to init, goes to
-        `from_graphql` on the J2 template
-        The J2 template in this context provides the data for the field (if was existed
-        in the dict) using walrus operator (attribute name is the field name).
-        ."""
-        # every thing is possibly optional since you can query for only so or so fields.
-
-        if self.type.is_builtin_scalar:
-            return self.name
-
-        if scalar := self.type.is_custom_scalar(self.scalars):
-            return (
-                f"SCALARS.{scalar.__name__}.{BaseCustomScalar.from_graphql.__name__}({self.name})"
-            )
-        if model_of := self.type.is_model:
-            return (
-                f"{QGraphQListModel.__name__}("
-                f"parent=parent, "
-                f"data=[{model_of.name}.from_dict(parent, data) for data in {self.name}], "
-                f"default_object={model_of.name}.{_BaseQGraphQLObject.default_instance.__name__}()"
-                f")"
-            )
-        if self.type.is_union():
-            return f"cls.type_map[{self.name}['__typename']].from_dict(parent, {self.name})"
-        if gql_type := self.type.is_object_type:
-            return f"{gql_type.name}.from_dict(parent, {self.name})"
-        if enum_def := self.type.is_enum:
-            # graphql enums evaluates to string of the name.
-            return f"{enum_def.name}[data.get('{self.name}', {self.default_value})]"
-        raise NotImplementedError  # pragma: no cover
+    @property
+    def is_custom_scalar(self) -> Optional[Type[BaseCustomScalar]]:
+        return self.type.is_custom_scalar(self.scalars)
 
     @cached_property
     def annotation(self) -> str:
@@ -154,8 +123,12 @@ class GqlFieldDefinition:
 @define(slots=False)
 class GqlTypeDefinition:
     name: str
-    fields: list[GqlFieldDefinition]
+    fields_dict: dict[str, GqlFieldDefinition]
     docstring: Optional[str] = ""
+
+    @property
+    def fields(self) -> list[GqlFieldDefinition]:
+        return list(self.fields_dict.values())
 
 
 @define
@@ -195,7 +168,7 @@ class GqlTypeHinter(TypeHinter):
     @property
     def is_model(self) -> Optional[GqlTypeDefinition]:
         if self.is_list():
-            # enums are not supported in lists yet (valid graphql spec though)
+            # enums and scalars are not supported in lists yet (valid graphql spec though)
             return self.of_type[0].is_object_type
 
     @property

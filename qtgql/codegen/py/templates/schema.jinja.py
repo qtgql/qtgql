@@ -6,6 +6,7 @@ from typing import Optional, Union
 from enum import Enum, auto
 from PySide6.QtQml import QmlElement, QmlSingleton
 
+from qtgql.codegen.py.runtime.queryhandler import SelectionConfig
 from qtgql.tools import qproperty
 from qtgql.codegen.py.runtime.bases import QGraphQListModel
 
@@ -48,42 +49,95 @@ class SCALARS:
 class {{ type.name }}({{context.base_object_name}}):
     """{{  type.docstring  }}"""
 
-    DEFAULT_INIT_DICT = dict({% for f in type.fields %}
-        {{f.name}}=None,{% endfor %}
-    )
-    def __init__(self, parent: QObject = None, {% for f in type.fields %} {{f.name}}: {{f.annotation}} = None, {% endfor %}):
+
+    def __init__(self, parent: QObject = None, {% for f in type.fields %} {{f.name}}: Optional[{{f.annotation}}] = None, {% endfor %}):
         super().__init__(parent){% for f in type.fields %}
         self.{{  f.private_name  }} = {{f.name}} if {{f.name}} else {{f.default_value}}{% endfor %}
 
-    def update(self, data: dict):
+    def update(self, data, config: SelectionConfig) -> None:
         parent = self.parent()
-        {% for f in type.fields %}
-        if {{f.name}} := data.get('{{f.name}}', None):
-            deserialized = {{f.deserializer}}
-            if self.{{f.name}} != deserialized:
-                self.{{f.setter_name}}(deserialized)
-        return self{% endfor %}
+        {%for f in type.fields %}
+        if '{{f.name}}' in config.selections.keys():
+            field_data = data.get('{{f.name}}', {{f.default_value}})
+            {% if f.type.is_object_type %}
+            if not field_data:
+                self.{{f.setter_name}}(None)
+            else:
+                if self.{{f.private_name}} and self.{{f.private_name}}._id == field_data['id']:
+                    self.{{f.private_name}}.update(field_data, config.selections['{{f.name}}'])
+                else:
+                    self.{{f.setter_name}}({{f.type.is_object_type.name}}.from_dict(
+                        parent,
+                        field_data,
+                        config.selections['{{f.name}}']
+                    ))
+            {% elif f.type.is_model %}
+            self.{{f.private_name}}.update(field_data, config.selections['{{f.name}}'])
+            {% elif f.type.is_builtin_scalar %}
+            if self.{{f.private_name}} != field_data:
+                self.{{f.setter_name}}(field_data)
+            {% elif f.is_custom_scalar %}
+            new = SCALARS.{{f.is_custom_scalar.__name__}}.from_graphql(field_data)
+            if new != self.{{f.private_name}}:
+                self.{{f.setter_name}}(new)
+            {% elif f.type.is_enum %}
+            if self.{{f.private_name}}.name != field_data:
+                self.{{f.setter_name}}({{f.type.is_enum.name}}[field_data])
+            {% elif f.type.is_union() %}
+            type_name = field_data['__typename']
+            choice = config.selections['{{f.name}}'].choices[type_name]
+            if self.{{f.private_name}} and self.{{f.private_name}}._id == field_data['id']:
+                self.{{f.private_name}}.update(field_data, choice)
+            else:
+                self.{{f.setter_name}}(self.type_map[type_name].from_dict(parent, field_data, choice))
+            {% endif %}
+            {% endfor %}
 
     @classmethod
-    def from_dict(cls, parent,  data: dict) -> {{type.name}}:
+    def from_dict(cls, parent, data: dict, config: SelectionConfig) -> {{type.name}}:
         if instance := cls.__store__.get_node(data['id']):
-            return instance.update(data)
+            instance.update(data, config)
+            return instance
         else:
-            init_dict = cls.DEFAULT_INIT_DICT.copy()
+            inst = cls(parent=parent)
             {% for f in type.fields %}
-            if {{f.name}} := data.get('{{f.name}}', None):
-                init_dict['{{f.name}}'] = {{f.deserializer}}{% endfor %}
-            return cls(
-                parent=parent,
-                **init_dict
-            )
+            if '{{f.name}}' in config.selections.keys():
+                field_data = data.get('{{f.name}}', {{f.default_value}})
+                {% if f.type.is_object_type %}
+                if field_data:
+                    inst.{{f.private_name}} = {{f.type.is_object_type.name}}.from_dict(
+                        parent,
+                        field_data,
+                        config.selections['{{f.name}}']
+                    )
+                {% elif f.type.is_model %}
+                node_config = config.selections['{{f.name}}']
+                inst.{{f.private_name}} = QGraphQListModel(
+                    parent=parent,
+                    data=[{{f.type.is_model.name}}.from_dict(parent, data=node, config=node_config) for node in field_data],
+                    default_type={{f.type.is_model.name}},
+                )
+                {% elif f.type.is_builtin_scalar %}
+                inst.{{f.private_name}} = field_data
+                {% elif f.is_custom_scalar %}
+                inst.{{f.private_name}} = SCALARS.{{f.is_custom_scalar.__name__}}.from_graphql(field_data)
+                {% elif f.type.is_enum %}
+                inst.{{f.private_name}} = {{f.type.is_enum.name}}[field_data]
+                {% elif f.type.is_union() %}
+                type_name = field_data['__typename']
+                choice = config.selections['{{f.name}}'].choices[type_name]
+                inst.{{f.private_name}} = cls.type_map[type_name].from_dict(parent, field_data, choice)
+                {% endif %}
+                {% endfor %}
+            cls.__store__.set_node(inst)
+            return inst
 
     {% for f in type.fields %}
     {{ f.signal_name }} = Signal()
 
     def {{ f.setter_name }}(self, v: {{  f.annotation  }}) -> None:
         self.{{  f.private_name  }} = v
-        self.{{  f.name  }}Changed.emit()
+        self.{{  f.signal_name  }}.emit()
 
     @qproperty(type={{f.property_type}}, fset={{ f.setter_name }}, notify={{f.signal_name}})
     def {{ f.name }}(self) -> {{ f.fget_annotation }}:

@@ -1,6 +1,7 @@
 import pytest
 from PySide6.QtCore import QByteArray, QObject, Qt
 from qtgql.codegen.py.runtime.bases import QGraphQListModel
+from qtgql.codegen.py.runtime.queryhandler import SelectionConfig
 
 from tests.test_codegen.test_py.testcases import ObjectWithListOfObjectTestCase
 
@@ -46,7 +47,34 @@ def test_pop(qtbot, sample_model_initialized):
 def test_append(qtbot, sample_model_initialized):
     with qtbot.wait_signal(sample_model_initialized.rowsAboutToBeInserted):
         sample_model_initialized.append("foo")
-    assert "foo" in sample_model_initialized._data
+    assert sample_model_initialized._data[-1] == "foo"
+
+
+def test_insert(qtbot, sample_model_initialized):
+    with qtbot.wait_signal(sample_model_initialized.rowsAboutToBeInserted):
+        sample_model_initialized.insert(2, "foo")
+    assert sample_model_initialized.data(sample_model_initialized.index(1), 257) == "foo"
+
+
+def test_remove_rows(qtbot, sample_model_initialized):
+    sample_model_initialized.append(2)
+    sample_model_initialized.append(3)
+    prev_data = sample_model_initialized._data
+    sample_model_initialized.removeRows(2, 0)
+    assert sample_model_initialized._data == prev_data
+    sample_model_initialized.removeRows(0, sample_model_initialized.rowCount())
+    assert not sample_model_initialized._data
+
+
+def test_remove_rows_inside(qtbot, sample_model_initialized):
+    sample_model_initialized.pop()
+    assert not sample_model_initialized._data
+    sample_model_initialized.append(2)
+    sample_model_initialized.append(3)
+    sample_model_initialized.append(4)
+    assert 3 in sample_model_initialized._data
+    sample_model_initialized.removeRows(1, 2)
+    assert 3 not in sample_model_initialized._data
 
 
 class TestCurrentIndexProp:
@@ -83,6 +111,10 @@ class TestCurrentObject:
     def test_is_default_when_initialized_with_no_data(self, sample_model_initialized):
         testcase = ObjectWithListOfObjectTestCase.compile()
         user = testcase.gql_type
-        user = user()
+        user = user.from_dict(
+            None,
+            {"id": "", "persons": []},
+            SelectionConfig({"persons": SelectionConfig(selections={"name": None})}),
+        )
         model = user.persons
         assert model.property("currentObject") is testcase.module.Person.default_instance()

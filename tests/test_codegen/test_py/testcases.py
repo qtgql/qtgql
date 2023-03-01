@@ -28,6 +28,7 @@ from tests.conftest import QmlBot, hash_schema
 from tests.test_codegen import schemas
 
 if TYPE_CHECKING:
+    from PySide6 import QtCore
     from qtgql.codegen.py.runtime.bases import _BaseQGraphQLObject
     from qtgql.codegen.py.runtime.queryhandler import BaseQueryHandler
 
@@ -67,9 +68,13 @@ class QGQLObjectTestCase:
 
     @property
     def initialize_dict(self) -> dict:
-        return self.schema.execute_sync(
+        res = self.schema.execute_sync(
             self.evaluator._query_handlers[self.query_operationName].query
-        ).data
+        )
+        if res.errors:
+            raise Exception("graphql operations failed", res.errors)
+        else:
+            return res.data
 
     def compile(self, url: Optional[str] = "") -> "CompiledTestCase":
         url = url.replace("graphql", f"{hash_schema(self.schema)}")
@@ -84,7 +89,7 @@ class QGQLObjectTestCase:
                 f.write(str(self.schema))
 
             generated = self.evaluator.dumps()
-        types_module = ModuleType(uuid.uuid4().hex)
+            types_module = ModuleType(uuid.uuid4().hex)
         handlers_mod = ModuleType(uuid.uuid4().hex)
         exec(compile(generated["objecttypes"], "gen_shcema", "exec"), types_module.__dict__)
         sys.modules["objecttypes"] = types_module
@@ -125,6 +130,12 @@ class CompiledTestCase(QGQLObjectTestCase):
     @property
     def query_handler(self) -> "BaseQueryHandler":
         return getattr(self.handlers_mod, self.query_operationName)()
+
+    def get_signals(self) -> dict[str, "QtCore.Signal"]:
+        return {
+            field.signal_name: getattr(self.query_handler.data, field.signal_name)
+            for field in self.tested_type.fields
+        }
 
     def get_field_by_type(self, t):
         for field in self.tested_type.fields:
@@ -253,7 +264,7 @@ UnionTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_union.schema,
     query="""
         query MainQuery {
-          user {
+          user (choice: FROG){
             whoAmI {
               ... on Frog {
                 __typename
@@ -378,13 +389,13 @@ ObjectsThatReferenceEachOtherTestCase = QGQLObjectTestCase(
 )
 
 
-class CountryScalar(BaseCustomScalar[Optional[str]]):
+class CountryScalar(BaseCustomScalar[Optional[str], str]):
     countrymap = schemas.object_with_user_defined_scalar.countrymap
     GRAPHQL_NAME = "Country"
     DEFAULT_VALUE = "isr"
 
     @classmethod
-    def from_graphql(cls, v: Optional[str] = None) -> "BaseCustomScalar":
+    def from_graphql(cls, v=None) -> "BaseCustomScalar":
         if v:
             return cls(cls.countrymap[v])
         return cls()

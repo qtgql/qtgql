@@ -5,11 +5,11 @@ from typing import Any, Generic, Optional, Type, TypeVar
 from _decimal import Decimal
 
 T = TypeVar("T")
-
+T_RAW = TypeVar("T_RAW")
 __all__ = ["BaseCustomScalar"]
 
 
-class BaseCustomScalar(Generic[T], ABC):
+class BaseCustomScalar(Generic[T, T_RAW], ABC):
     """Class to extend by user defined scalars."""
 
     __slots__ = "_value"
@@ -29,7 +29,7 @@ class BaseCustomScalar(Generic[T], ABC):
             self._value = v
 
     @abstractmethod
-    def from_graphql(cls, v: Optional[Any] = None) -> "BaseCustomScalar":
+    def from_graphql(cls, v: Optional[T_RAW] = None) -> "BaseCustomScalar":
         """Deserializes data fetched from graphql, This is useful when you want
         to set a first-of value that will later be used by `to_qt()`.
 
@@ -46,31 +46,36 @@ class BaseCustomScalar(Generic[T], ABC):
         """
         raise NotImplementedError  # pragma: no cover
 
+    def __ne__(self, other) -> bool:
+        assert isinstance(other, BaseCustomScalar), "can only compare scalar with other scalar."
+        return self._value != other._value
 
-class DateTimeScalar(BaseCustomScalar[datetime]):
+
+class DateTimeScalar(BaseCustomScalar[datetime, str]):
     """An ISO-8601 encoded datetime."""
 
     GRAPHQL_NAME: str = "DateTime"
     DEFAULT_VALUE = datetime.now()
+    FORMAT_STRING = "%H:%M (%m/%d/%Y)"
 
     @classmethod
-    def from_graphql(cls, v: Optional[str] = None) -> "DateTimeScalar":
+    def from_graphql(cls, v=None) -> "DateTimeScalar":
         if v:
             return cls(datetime.fromisoformat(v))
         return cls()
 
     def to_qt(self) -> str:
-        return self._value.strftime("%H:%M (%m/%d/%Y)")
+        return self._value.strftime(self.FORMAT_STRING)
 
 
-class DateScalar(BaseCustomScalar[date]):
+class DateScalar(BaseCustomScalar[date, str]):
     """An ISO-8601 encoded date."""
 
     GRAPHQL_NAME = "Date"
     DEFAULT_VALUE = date(year=1998, month=8, day=23)
 
     @classmethod
-    def from_graphql(cls, v: Optional[str] = None) -> "DateScalar":
+    def from_graphql(cls, v=None) -> "DateScalar":
         if v:
             return cls(date.fromisoformat(v))
         return cls()
@@ -79,7 +84,7 @@ class DateScalar(BaseCustomScalar[date]):
         return self._value.isoformat()
 
 
-class TimeScalar(BaseCustomScalar[time]):
+class TimeScalar(BaseCustomScalar[time, str]):
     """an ISO-8601 encoded time."""
 
     GRAPHQL_NAME = "Time"
@@ -95,7 +100,7 @@ class TimeScalar(BaseCustomScalar[time]):
         return self._value.isoformat()
 
 
-class DecimalScalar(BaseCustomScalar[Decimal]):
+class DecimalScalar(BaseCustomScalar[Decimal, str]):
     """A Decimal value serialized as a string."""
 
     GRAPHQL_NAME = "Decimal"

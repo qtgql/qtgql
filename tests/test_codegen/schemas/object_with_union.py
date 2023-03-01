@@ -1,17 +1,16 @@
 from __future__ import annotations
 
-import random
+import enum
 from typing import Union
 
 import strawberry
 
-from tests.conftest import fake
 from tests.test_codegen.schemas.node_interface import Node
 
 
 @strawberry.type()
 class Frog(Node):
-    name: str = fake.name()
+    name: str = "Kermit"
     color: str = "green"
 
 
@@ -20,17 +19,24 @@ class User(Node):
     who_am_i: Union[Frog, Person]
 
 
+@strawberry.enum()
+class UnionChoice(enum.Enum):
+    PERSON, FROG = range(2)
+
+
 @strawberry.type()
 class Person(Node):
-    name: str = fake.name()
-    age: int = fake.pyint()
+    name: str = "Nir"
+    age: int = 24
 
 
 @strawberry.type
 class Query:
     @strawberry.field
-    def user(self) -> User:
-        return random.choice([User(who_am_i=Person()), User(who_am_i=Frog())])
+    def user(self, choice: UnionChoice = UnionChoice.PERSON) -> User:
+        if choice is UnionChoice.PERSON:
+            return User(who_am_i=Person())
+        return User(who_am_i=Frog())
 
 
 schema = strawberry.Schema(query=Query)
