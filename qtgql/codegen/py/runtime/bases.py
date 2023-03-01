@@ -36,6 +36,9 @@ class _BaseQGraphQLObject(QObject):
     def from_dict(cls, parent: QObject, data: dict, config: SelectionConfig):
         raise NotImplementedError
 
+    def update(self, data, config: SelectionConfig) -> None:
+        raise NotImplementedError
+
     @classmethod
     def default_instance(cls) -> Self:
         # used for default values.
@@ -56,7 +59,7 @@ class QGraphQLObjectStore(Generic[T_BaseQGraphQLObject]):
     def get_node(self, id_: str) -> Optional[T_BaseQGraphQLObject]:
         return self._data.get(id_, None)
 
-    def set_node(self, node: _BaseQGraphQLObject):
+    def set_node(self, node: T_BaseQGraphQLObject):
         self._data[node.id] = node
 
 
@@ -152,6 +155,8 @@ class QGraphQListModel(QAbstractListModel, Generic[T_BaseQGraphQLObject]):
             start = self._data[:row]
             self._data = start + end
             self.endRemoveRows()
+            return True
+        return False
 
 
 def get_base_graphql_object(name: str) -> type[_BaseQGraphQLObject]:

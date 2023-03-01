@@ -56,7 +56,7 @@ class GqlFieldDefinition:
         return "None"  # Unions are not supported yet.
 
     @property
-    def is_custom_scalar(self) -> Optional[BaseCustomScalar]:
+    def is_custom_scalar(self) -> Optional[Type[BaseCustomScalar]]:
         return self.type.is_custom_scalar(self.scalars)
 
     @cached_property

@@ -1,11 +1,8 @@
 from abc import ABC, abstractmethod
 from datetime import date, datetime, time
-from typing import TYPE_CHECKING, Any, Generic, Optional, Type, TypeVar
+from typing import Any, Generic, Optional, Type, TypeVar
 
 from _decimal import Decimal
-
-if TYPE_CHECKING:
-    from typing_extensions import Self
 
 T = TypeVar("T")
 T_RAW = TypeVar("T_RAW")
@@ -49,7 +46,8 @@ class BaseCustomScalar(Generic[T, T_RAW], ABC):
         """
         raise NotImplementedError  # pragma: no cover
 
-    def __ne__(self, other: "Self") -> bool:
+    def __ne__(self, other) -> bool:
+        assert isinstance(other, BaseCustomScalar), "can only compare scalar with other scalar."
         return self._value != other._value
 
 

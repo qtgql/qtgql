@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from textwrap import dedent
-from typing import TYPE_CHECKING, List, NamedTuple
+from typing import TYPE_CHECKING, List, NamedTuple, Optional
 
 import attrs
 
@@ -11,20 +11,18 @@ from qtgql.codegen.py.compiler.template import (
     ConfigContext,
     config_template,
 )
-from qtgql.codegen.py.objecttype import GqlFieldDefinition
+from qtgql.codegen.py.objecttype import GqlFieldDefinition, GqlTypeDefinition
 from qtgql.codegen.utils import AntiForwardRef
 
 if TYPE_CHECKING:
     from graphql import language as gql_lang
-
-    from qtgql.codegen.py.objecttype import GqlTypeDefinition
 
 
 def get_field_from_field_node(
     selection: gql_lang.FieldNode, field_type: GqlTypeDefinition
 ) -> QtGqlQueriedField:
     field_node = is_field_node(selection)
-    assert is_field_node
+    assert field_node
     return QtGqlQueriedField.from_field(
         field_type.fields_dict[field_node.name.value], selection_set=field_node.selection_set
     )
@@ -38,7 +36,7 @@ class QtGqlQueriedField(GqlFieldDefinition):
 
     @classmethod
     def from_field(
-        cls, f: GqlFieldDefinition, selection_set: gql_lang.SelectionSetNode
+        cls, f: GqlFieldDefinition, selection_set: Optional[gql_lang.SelectionSetNode]
     ) -> QtGqlQueriedField:
         ret = cls(**attrs.asdict(f, recurse=False))
         if not hasattr(selection_set, "selections"):
@@ -50,8 +48,10 @@ class QtGqlQueriedField(GqlFieldDefinition):
                 concrete = next(t for t in f.type.of_type if t.type.name == type_name)
                 assert issubclass(concrete.type, AntiForwardRef)
                 concrete = concrete.type.resolve()
-                for field_node in inline_frag.selection_set.selections:
-                    field_node = is_field_node(field_node)
+                assert isinstance(concrete, GqlTypeDefinition)
+                for selection_node in inline_frag.selection_set.selections:
+                    field_node = is_field_node(selection_node)
+                    assert field_node
                     if field_node.name.value == "__typename":
                         continue
                     ret.choices[type_name].append(get_field_from_field_node(field_node, concrete))
@@ -60,7 +60,9 @@ class QtGqlQueriedField(GqlFieldDefinition):
                 if not f_type:
                     f_type = f.type.is_model
                 assert f_type
-                ret.selections.append(get_field_from_field_node(selection, f_type))
+                field_node = is_field_node(selection)
+                assert field_node
+                ret.selections.append(get_field_from_field_node(field_node, f_type))
         return ret
 
     def as_conf_string(self) -> str:
