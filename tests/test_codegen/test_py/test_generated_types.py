@@ -425,6 +425,47 @@ class TestUpdates:
             handler.on_data(d)
         assert handler.data.status == Status.Disconnected.value
 
+    def test_list_no_update(self, qtbot):
+        testcase = ObjectWithListOfObjectTestCase.compile()
+        init_dict = testcase.initialize_dict
+        handler = testcase.query_handler
+        handler.on_data(init_dict)
+        model: QGraphQListModel = handler.data.persons
+        with pytest.raises(
+            pytestqt.exceptions.TimeoutError, match="Received 0 of the 2 expected signals."
+        ):
+            with qtbot.wait_signals(
+                [model.rowsAboutToBeRemoved, model.rowsAboutToBeInserted], timeout=500
+            ):
+                handler.on_data(init_dict)
+
+    def test_list_update_insert(self, qtbot):
+        testcase = ObjectWithListOfObjectTestCase.compile()
+        init_dict = testcase.initialize_dict
+        init_dict2 = testcase.initialize_dict
+        handler = testcase.query_handler
+        handler.on_data(init_dict)
+        model: QGraphQListModel = handler.data.persons
+        init_dict2[testcase.first_field]["id"] = handler.data.id
+        with qtbot.wait_signal(model.rowsAboutToBeInserted, timeout=500):
+            handler.on_data(init_dict2)
+
+    def test_list_update_crop(self, qtbot):
+        testcase = ObjectWithListOfObjectTestCase.compile()
+        init_dict = testcase.initialize_dict
+        init_dict2 = testcase.initialize_dict
+        init_dict[testcase.first_field]["persons"].extend(
+            testcase.initialize_dict[testcase.first_field]["persons"]
+        )
+        handler = testcase.query_handler
+        handler.on_data(init_dict)
+        model: QGraphQListModel = handler.data.persons
+        init_dict2[testcase.first_field]["id"] = handler.data.id
+        with qtbot.wait_signals(
+            [model.rowsAboutToBeRemoved, model.rowsAboutToBeInserted], timeout=500
+        ):
+            handler.on_data(init_dict2)
+
 
 class TestDefaultConstructor:
     @pytest.mark.parametrize("scalar", BuiltinScalars, ids=lambda v: v.graphql_name)

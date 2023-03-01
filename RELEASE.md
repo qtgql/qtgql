@@ -19,7 +19,8 @@ edge cased:
 6. __lists a.k.a models__ -- since lists just store a pointer (or a key in the store) to a node and the node itself
 already compared when `.from_dict` called on the raw-node,
 we should just compare if the pointers points the right index so first crop the length of the list
-to the length of the arrived data, then for each index compare the `ID!` and replace correspondingly.
+to the length of the arrived data, then for each index compare the `ID!` and replace correspondingly if ID matched
+call `update()` on that node.
 
 
 

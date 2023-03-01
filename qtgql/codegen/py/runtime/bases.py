@@ -121,22 +121,21 @@ class QGraphQListModel(QAbstractListModel, Generic[T_BaseQGraphQLObject]):
         self._data.pop(index)
         self.endRemoveRows()
 
-    @classmethod
-    def from_dict(
-        cls,
-        parent: _BaseQGraphQLObject,
-        data: dict,
-        config: SelectionConfig,
-        default_type: T_BaseQGraphQLObject,
-    ) -> Self:
-        return cls(
-            parent=parent,
-            data=[default_type.from_dict(parent, data=node, config=config) for node in data],
-            default_type=default_type,
-        )
+    @slot
+    def insert(self, index: int, v: T_BaseQGraphQLObject):
+        model_index = self.index(index)
+        if index <= self.rowCount() + 1:
+            self.beginInsertRows(model_index, index, index)
+            self._data.insert(index, v)
+            self.endInsertRows()
 
-    def update(self, data: dict, selections: SelectionConfig) -> None:
-        ...
+    def removeRows(self, row: int, count: int, parent=None) -> bool:
+        if row + count <= self.rowCount():
+            self.beginRemoveRows(self.index(0).parent(), row, count)
+            end = self._data[row + count :]
+            start = self._data[:row]
+            self._data = start + end
+            self.endRemoveRows()
 
 
 def get_base_graphql_object(name: str) -> type[_BaseQGraphQLObject]:

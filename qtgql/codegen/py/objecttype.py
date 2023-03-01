@@ -43,11 +43,9 @@ class GqlFieldDefinition:
         if self.type.is_object_type:
             return "None"
 
-        if model_of := self.type.is_model:
-            return (
-                f"{QGraphQListModel.__name__}(parent=None, data=[], "
-                f"default_type={model_of.name})"
-            )
+        if self.type.is_model:
+            # this would just generate the model without data.
+            return "list()"
 
         if custom_scalar := self.type.is_custom_scalar(self.scalars):
             return f"SCALARS.{custom_scalar.__name__}()"

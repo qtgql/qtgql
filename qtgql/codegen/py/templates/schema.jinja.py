@@ -72,14 +72,23 @@ class {{ type.name }}({{context.base_object_name}}):
                         config.selections['{{f.name}}']
                     ))
             {% elif f.type.is_model %}
-            self.{{f.setter_name}}(QGraphQListModel(parent,
-                                                  data=[
-                                                      {{f.type.is_model.name}}.from_dict(parent, data,
-                                                                                         config.selections[{{f.name}}])
-                                                      for data in {{f.name}}
-                                                  ],
-                                                  default_object={{f.type.is_model.name}}.default_instance()
-                                                  ))
+            new_len = len(field_data)
+            node_selection = config.selections['{{f.name}}']
+            prev_len = self.{{f.private_name}}.rowCount()
+            if new_len < prev_len:
+                # crop the list to the arrived data length.
+                self.{{f.private_name}}.removeRows(new_len, prev_len - new_len)
+            for index, node in enumerate(field_data):
+                if self.{{f.private_name}}._data[index].id != node['id']:
+                    # get or create node if wasn't on the correct index.
+                    # Note: it is safe to call [].insert(50, 50) (although index 50 doesn't exist).
+                    self.{{f.private_name}}.insert(index,
+                                                   {{f.type.is_model.name}}.from_dict(parent, field_data[index],
+                                                                                      node_selection)
+                                                   )
+                else:
+                    # same node on that index just call update there is no need call model signals.
+                    self.{{f.private_name}}._data[index].update(field_data[index], node_selection)
             {% elif f.type.is_builtin_scalar %}
             if self.{{f.private_name}} != field_data:
                 self.{{f.setter_name}}(field_data)
@@ -118,11 +127,12 @@ class {{ type.name }}({{context.base_object_name}}):
                         config.selections['{{f.name}}']
                     )
                 {% elif f.type.is_model %}
-                inst.{{f.private_name}} = QGraphQListModel.from_dict(parent,
-                                                                     default_type={{f.type.is_model.name}},
-                                                                     data=field_data,
-                                                                     config=config.selections['{{f.name}}']
-                                                      )
+                node_config = config.selections['{{f.name}}']
+                inst.{{f.private_name}} = QGraphQListModel(
+                    parent=parent,
+                    data=[{{f.type.is_model.name}}.from_dict(parent, data=node, config=node_config) for node in field_data],
+                    default_type={{f.type.is_model.name}},
+                )
                 {% elif f.type.is_builtin_scalar %}
                 inst.{{f.private_name}} = field_data
                 {% elif f.is_custom_scalar %}
