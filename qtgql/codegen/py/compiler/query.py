@@ -41,6 +41,7 @@ class QtGqlQueriedField(GqlFieldDefinition):
         ret = cls(**attrs.asdict(f, recurse=False))
         if not hasattr(selection_set, "selections"):
             return ret
+        assert selection_set
         for selection in selection_set.selections:
             if inline_frag := is_inline_fragment(selection):
                 assert ret.type.is_union()  # ATM supported fragments are unions only.
