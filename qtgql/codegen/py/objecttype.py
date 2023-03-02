@@ -3,7 +3,7 @@ from __future__ import annotations
 import contextlib
 import enum
 from functools import cached_property
-from typing import TYPE_CHECKING, Any, Optional, Type
+from typing import Any, Optional, Type
 
 from attrs import define
 
@@ -12,9 +12,6 @@ from qtgql.codegen.py.runtime.bases import QGraphQListModel
 from qtgql.codegen.py.runtime.custom_scalars import BaseCustomScalar, CustomScalarMap
 from qtgql.codegen.utils import AntiForwardRef
 from qtgql.utils.typingref import TypeHinter
-
-if TYPE_CHECKING:
-    from typing_extensions import Self
 
 
 class Kinds(enum.Enum):
@@ -89,7 +86,7 @@ class GqlFieldDefinition:
             # this should raise if it is an inner type.
             ret = GqlTypeHinter.from_string(self.fget_annotation, self.type_map)
             if ret.type in self.type_map.values():
-                raise TypeError  # in py3.11 the get_type_hints won't raise so raise brutally
+                raise TypeError  # in py3.11 the get_type_hints won't explicitly raise.
             return self.fget_annotation
         except (TypeError, NameError):
             if self.type.is_union():
@@ -123,7 +120,7 @@ class GqlFieldDefinition:
         return f"return self.{self.private_name}"
 
     @cached_property
-    def can_select_id(self) -> Optional[Self]:
+    def can_select_id(self) -> Optional[GqlFieldDefinition]:
         object_type = self.type.is_object_type or self.type.is_model
         if object_type:
             return object_type.has_id_field
@@ -138,6 +135,12 @@ class GqlTypeDefinition:
     @cached_property
     def has_id_field(self) -> Optional[GqlFieldDefinition]:
         return self.fields_dict.get("id", None)
+
+    @cached_property
+    def id_is_optional(self) -> Optional[GqlFieldDefinition]:
+        if id_f := self.has_id_field:
+            if id_f.type.is_optional():
+                return id_f
 
     @property
     def fields(self) -> list[GqlFieldDefinition]:
@@ -161,6 +164,10 @@ class GqlEnumDefinition:
 EnumMap = dict[str, "GqlEnumDefinition"]
 
 
+def optional_maybe(th: GqlTypeHinter) -> GqlTypeHinter:
+    return th if not th.is_optional() else th.of_type[0]
+
+
 class GqlTypeHinter(TypeHinter):
     def __init__(
         self,
@@ -172,56 +179,64 @@ class GqlTypeHinter(TypeHinter):
 
     @property
     def is_object_type(self) -> Optional[GqlTypeDefinition]:
+        t_self = optional_maybe(self).type
         with contextlib.suppress(TypeError):
-            if issubclass(self.type, AntiForwardRef):
-                ret = self.type.resolve()
+            if issubclass(t_self, AntiForwardRef):
+                ret = t_self.resolve()
                 if isinstance(ret, GqlTypeDefinition):
                     return ret
 
     @property
     def is_model(self) -> Optional[GqlTypeDefinition]:
-        if self.is_list():
-            # enums and scalars are not supported in lists yet (valid graphql spec though)
-            return self.of_type[0].is_object_type
+        t_self = optional_maybe(self)
+        if t_self.is_list():
+            # enums and scalars or unions are not supported in lists yet (valid graphql spec though)
+            return t_self.of_type[0].is_object_type
 
     @property
     def is_enum(self) -> Optional[GqlEnumDefinition]:
+        t_self = optional_maybe(self).type
         with contextlib.suppress(TypeError):
-            if issubclass(self.type, AntiForwardRef):
-                if isinstance(self.type.resolve(), GqlEnumDefinition):
-                    return self.type.resolve()
+            if issubclass(t_self, AntiForwardRef):
+                if isinstance(t_self.resolve(), GqlEnumDefinition):
+                    return t_self.resolve()
 
     @property
     def is_builtin_scalar(self) -> Optional[BuiltinScalar]:
-        if isinstance(self.type, BuiltinScalar):
-            return self.type
+        t_self = optional_maybe(self).type
+        if isinstance(t_self, BuiltinScalar):
+            return t_self
 
     def is_custom_scalar(self, scalars: CustomScalarMap) -> Optional[Type[BaseCustomScalar]]:
-        if self.type in scalars.values():
-            return self.type
+        t_self = optional_maybe(self).type
+        if t_self in scalars.values():
+            return t_self
 
     def annotation(self, scalars: CustomScalarMap) -> str:
         """
         :returns: Annotation of the field based on the real type,
         meaning that the private attribute would be of that type.
-        this goes for init and the property setter.
+        this goes for init and the property setter. They are optional by default,
+        (at the template) so unwrap optional first
         """
+        t_self = optional_maybe(self)
+
         # int, str, float etc...
-        if builtin_scalar := self.is_builtin_scalar:
+        if builtin_scalar := t_self.is_builtin_scalar:
             return builtin_scalar.tp.__name__
 
-        if scalar := self.is_custom_scalar(scalars):
+        if scalar := t_self.is_custom_scalar(scalars):
             return f"SCALARS.{scalar.__name__}"
-        if gql_enum := self.is_enum:
+        if gql_enum := t_self.is_enum:
             return gql_enum.name
         # handle Optional, Union, List etc...
         # removing redundant prefixes.
-        if model_of := self.is_model:
+        if model_of := t_self.is_model:
             return f"{QGraphQListModel.__name__}[{model_of.name}]"
-        if object_def := self.is_object_type:
+        if object_def := t_self.is_object_type:
             return f"Optional[{object_def.name}]"
-        if self.is_union():
-            return "Union[" + ",".join(th.annotation(scalars) for th in self.of_type) + "]"
+        if t_self.is_union():
+            return "Union[" + ",".join(th.annotation(scalars) for th in t_self.of_type) + "]"
         raise NotImplementedError  # pragma no cover
 
     def as_annotation(self, object_map=None):  # pragma: no cover

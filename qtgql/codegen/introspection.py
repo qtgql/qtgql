@@ -108,29 +108,32 @@ class SchemaEvaluator:
         ]
 
     def _evaluate_field_type(self, t: gql_def.GraphQLType) -> GqlTypeHinter:
+        # even though every type in qtgql has a default constructor,
+        # hence there is no "real" non-null values
+        # we store it as optional for generating nullable checks only for what's required.
+        ret = None
+        is_optional = True
         if non_null := is_non_null_definition(t):
-            # There are no optionals in qtgql, we use default values.
-            # By default, everything in graphql is optional,
-            # so NON_NULL doesn't really make a difference,
-            return self._evaluate_field_type(non_null.of_type)
+            t = non_null.of_type
+            is_optional = False
 
         if list_def := is_list_definition(t):
-            return GqlTypeHinter(type=list, of_type=(self._evaluate_field_type(list_def.of_type),))
+            ret = GqlTypeHinter(type=list, of_type=(self._evaluate_field_type(list_def.of_type),))
         elif scalar_def := is_scalar_definition(t):
             if builtin_scalar := BuiltinScalars.by_graphql_name(scalar_def.name):
-                return GqlTypeHinter(type=builtin_scalar)
+                ret = GqlTypeHinter(type=builtin_scalar)
             else:
-                return GqlTypeHinter(type=self.config.custom_scalars[scalar_def.name])
+                ret = GqlTypeHinter(type=self.config.custom_scalars[scalar_def.name])
         elif enum_def := is_enum_definition(t):
-            return GqlTypeHinter(
+            ret = GqlTypeHinter(
                 type=anti_forward_ref(name=enum_def.name, type_map=self._generated_enums)
             )
         elif obj_def := is_object_definition(t):
-            return GqlTypeHinter(
+            ret = GqlTypeHinter(
                 type=anti_forward_ref(name=obj_def.name, type_map=self._generated_types)
             )
         elif union_def := is_union_definition(t):
-            return GqlTypeHinter(
+            ret = GqlTypeHinter(
                 type=Union,
                 of_type=tuple(
                     GqlTypeHinter(
@@ -139,8 +142,12 @@ class SchemaEvaluator:
                     for possible in self.schema_definition.get_possible_types(union_def)
                 ),
             )
+        if not ret:  # pragma: no cover
+            raise NotImplementedError(f"type {t} not supported yet")
 
-        raise NotImplementedError(f"type {t} not supported yet")  # pragma: no cover
+        if is_optional:
+            return GqlTypeHinter(type=Optional, of_type=(ret,))
+        return ret
 
     def _evaluate_field(self, name: str, field: gql_def.GraphQLField) -> GqlFieldDefinition:
         """we don't really know what is the field type just it's name."""

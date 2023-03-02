@@ -8,7 +8,6 @@ if TYPE_CHECKING:
     from typing_extensions import Self
 
     from qtgql.codegen.py.runtime.queryhandler import SelectionConfig
-
 from qtgql.tools import qproperty, slot
 
 __all__ = ["QGraphQListModel", "get_base_graphql_object"]
@@ -57,6 +56,7 @@ class QGraphQLObjectStore(Generic[T_BaseQGraphQLObject]):
         self._data: dict[str, T_BaseQGraphQLObject] = {}
 
     def get_node(self, id_: str) -> Optional[T_BaseQGraphQLObject]:
+        assert id_
         return self._data.get(id_, None)
 
     def set_node(self, node: T_BaseQGraphQLObject):
@@ -141,13 +141,14 @@ class QGraphQListModel(QAbstractListModel, Generic[T_BaseQGraphQLObject]):
             # crop the list to the arrived data length.
             self.removeRows(new_len, prev_len - new_len)
         for index, node in enumerate(data):
-            if self._data[index].id != node["id"]:
+            id_ = node.get("id", None)
+            if id_ and self._data[index].id == id_:
+                # same node on that index just call update there is no need call model signals.
+                self._data[index].update(data[index], node_selection)
+            else:
                 # get or create node if wasn't on the correct index.
                 # Note: it is safe to call [].insert(50, 50) (although index 50 doesn't exist).
                 self.insert(index, self.default_type.from_dict(self, data[index], node_selection))
-            else:
-                # same node on that index just call update there is no need call model signals.
-                self._data[index].update(data[index], node_selection)
 
     def removeRows(self, row: int, count: int, parent=None) -> bool:
         if row + count <= self.rowCount():

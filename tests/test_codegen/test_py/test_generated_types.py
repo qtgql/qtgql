@@ -1,4 +1,5 @@
 import copy
+import uuid
 from typing import Optional, Type
 
 import pytest
@@ -25,6 +26,7 @@ from tests.test_codegen.test_py.testcases import (
     QGQLObjectTestCase,
     RootListOfTestCase,
     ScalarsTestCase,
+    TypeWithNoIDTestCase,
     TypeWithNullAbleIDTestCase,
     UnionTestCase,
     all_test_cases,
@@ -152,7 +154,9 @@ class TestDeserializers:
     def test_blank_dict_no_selections(self, testcase: QGQLObjectTestCase, qtbot):
         testcase = testcase.compile()
         assert isinstance(
-            testcase.gql_type.from_dict(None, {"id": ""}, SelectionConfig(selections={"id": None})),
+            testcase.gql_type.from_dict(
+                None, {"id": uuid.uuid4().hex}, SelectionConfig(selections={"id": None})
+            ),
             testcase.gql_type,
         )
 
@@ -220,6 +224,12 @@ class TestDeserializers:
 
     def test_type_with_optional_id_and_id_not_arrived(self):
         testcase = TypeWithNullAbleIDTestCase.compile()
+        testcase.query_handler.on_data(testcase.initialize_dict)
+        testcase.query_handler.on_data(testcase.initialize_dict)
+
+    def test_type_with_no_id(self):
+        testcase = TypeWithNoIDTestCase.compile()
+        testcase.query_handler.on_data(testcase.initialize_dict)
         testcase.query_handler.on_data(testcase.initialize_dict)
 
 
