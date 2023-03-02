@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+0.110.1 - 2023-03-02
+--------------------
+
+This release adds support for types without `ID!` field.
+fixes [#115](https://github.com/nrbnlulu/qtgql/issues/115)
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #116](https://github.com/nrbnlulu/qtgql/pull/116/)
+
+
 0.110.0 - 2023-03-01
 --------------------
 
