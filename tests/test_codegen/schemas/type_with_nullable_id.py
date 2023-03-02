@@ -9,9 +9,9 @@ from tests.conftest import fake
 
 @strawberry.type
 class User:
-    id: Optional[strawberry.ID]
     name: str
     age: int
+    id: Optional[strawberry.ID] = None
 
 
 @strawberry.type

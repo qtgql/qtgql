@@ -25,6 +25,7 @@ from tests.test_codegen.test_py.testcases import (
     QGQLObjectTestCase,
     RootListOfTestCase,
     ScalarsTestCase,
+    TypeWithNullAbleIDTestCase,
     UnionTestCase,
     all_test_cases,
     custom_scalar_testcases,
@@ -216,6 +217,10 @@ class TestDeserializers:
         testcase = RootListOfTestCase.compile()
         handler = testcase.query_handler
         handler.on_data(testcase.initialize_dict)
+
+    def test_type_with_optional_id_and_id_not_arrived(self):
+        testcase = TypeWithNullAbleIDTestCase.compile()
+        testcase.query_handler.on_data(testcase.initialize_dict)
 
 
 class TestUpdates:

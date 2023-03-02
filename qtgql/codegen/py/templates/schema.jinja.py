@@ -129,7 +129,9 @@ class {{ type.name }}({{context.base_object_name}}):
                 inst.{{f.private_name}} = cls.type_map[type_name].from_dict(parent, field_data, choice)
                 {% endif %}
                 {% endfor %}
+            {% if type.has_id_field %}
             cls.__store__.set_node(inst)
+            {% endif %}
             return inst
 
     {% for f in type.fields %}

@@ -60,6 +60,7 @@ class QGraphQLObjectStore(Generic[T_BaseQGraphQLObject]):
         return self._data.get(id_, None)
 
     def set_node(self, node: T_BaseQGraphQLObject):
+        assert node.id
         self._data[node.id] = node
 
 

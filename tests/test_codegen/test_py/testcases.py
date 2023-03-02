@@ -421,6 +421,17 @@ CustomUserScalarTestCase = QGQLObjectTestCase(
     """,
 )
 
+TypeWithNoIDTestCase = QGQLObjectTestCase(
+    schema=schemas.type_with_no_id.schema,
+    query="""query MainQuery {users{name}}""",
+    test_name="TypeWithNoIDTestCase",
+)
+TypeWithNullAbleIDTestCase = QGQLObjectTestCase(
+    schema=schemas.type_with_nullable_id.schema,
+    query="""query MainQuery {users{name}}""",
+    test_name="TypeWithNullAbleIDTestCase",
+)
+
 
 all_test_cases = [
     ScalarsTestCase,
@@ -439,6 +450,8 @@ all_test_cases = [
     CustomUserScalarTestCase,
     ObjectsThatReferenceEachOtherTestCase,
     RootListOfTestCase,
+    TypeWithNoIDTestCase,
+    TypeWithNullAbleIDTestCase,
 ]
 custom_scalar_testcases = [
     (DateTimeTestCase, DateTimeScalar, "birth"),
