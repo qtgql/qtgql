@@ -95,10 +95,19 @@ class {{ type.name }}({{context.base_object_name}}):
 
     @classmethod
     def from_dict(cls, parent, data: dict, config: SelectionConfig) -> {{type.name}}:
+        {% if type.id_is_optional %}
+        if id_ := data.get('id', None):
+            if instance := cls.__store__.get_node(id_):
+                instance.update(data, config)
+                return instance
+        {% elif type.has_is_field %}
         if instance := cls.__store__.get_node(data['id']):
             instance.update(data, config)
             return instance
+        {% endif %}
+        {% if type.has_is_field%}
         else:
+        {% endif %}
             inst = cls(parent=parent)
             {% for f in type.fields %}
             if '{{f.name}}' in config.selections.keys():
@@ -129,7 +138,12 @@ class {{ type.name }}({{context.base_object_name}}):
                 inst.{{f.private_name}} = cls.type_map[type_name].from_dict(parent, field_data, choice)
                 {% endif %}
                 {% endfor %}
+            {% if type.id_is_optional %}
+            if inst.id:
+                cls.__store__.set_node(inst)
+            {% elif type.has_id_field and not type.id_is_optional %}
             cls.__store__.set_node(inst)
+            {% endif %}
             return inst
 
     {% for f in type.fields %}

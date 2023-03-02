@@ -2,18 +2,10 @@ import pytest
 from qtgql.exceptions import QtGqlException
 
 from tests.test_codegen import schemas
-from tests.test_codegen.test_py.testcases import QGQLObjectTestCase
-
-TypeWithNoIDTestCase = QGQLObjectTestCase(
-    schema=schemas.type_with_no_id.schema,
-    query="""query MainQuery {users{name}}""",
-    test_name="TypeWithNoIDTestCase",
-)
-
-TypeWithNullAbleIDTestCase = QGQLObjectTestCase(
-    schema=schemas.type_with_nullable_id.schema,
-    query="""query MainQuery {users{name}}""",
-    test_name="TypeWithNullAbleIDTestCase",
+from tests.test_codegen.test_py.testcases import (
+    QGQLObjectTestCase,
+    TypeWithNoIDTestCase,
+    TypeWithNullAbleIDTestCase,
 )
 
 TypeWithWrongIDTypeTestCase = QGQLObjectTestCase(
@@ -37,13 +29,13 @@ NoIdOnQueryTestCase = QGQLObjectTestCase(
 )
 
 
-def test_raises_if_no_id_on_type():
-    with pytest.raises(QtGqlException):
+def test_warns_if_no_id_on_type():
+    with pytest.warns(match="QtGql enforces types to have ID field"):
         TypeWithNoIDTestCase.compile()
 
 
 def test_raises_on_nullable_id():
-    with pytest.raises(QtGqlException):
+    with pytest.warns(match="id field of type ID!"):
         TypeWithNullAbleIDTestCase.compile()
 
 

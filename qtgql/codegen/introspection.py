@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from functools import cached_property
 from typing import (
     TYPE_CHECKING,
@@ -21,7 +22,6 @@ from qtgql.codegen.graphql_ref import (
     is_object_definition,
     is_operation_def_node,
     is_scalar_definition,
-    is_selection_set,
     is_union_definition,
 )
 from qtgql.codegen.py.compiler.builtin_scalars import BuiltinScalars
@@ -55,38 +55,12 @@ class GeneratedNamespace(TypedDict):
     objecttypes: str
 
 
-def has_id_field(selection_set: gql_lang.SelectionSetNode) -> bool:
-    if hasattr(selection_set, "__has_id__"):
-        return True
-    for field in selection_set.selections:
-        assert isinstance(field, gql_lang.FieldNode)
-        if field.name.value == "id":
-            return True
-    return False
+class QtGqlVisitor(visitor.Visitor):
+    """Creates handlers for root operations.
 
-
-class IDInjectionVisitor(visitor.Visitor):
-    ID_SELECTION_NODE = gql_lang.FieldNode(
-        name=gql_lang.NameNode(value="id"), arguments=(), directives=()
-    )
-
-    def __init__(self) -> None:
-        super().__init__()
-        self.modified_source: str = ""
-
-    def enter_field(self, node: gql_def.FieldNode, key, parent, path, ancestors):
-        # root field grand parent is an operation.
-        if is_operation_def_node(ancestors[-2]):
-            return
-        selection_set: gql_lang.SelectionSetNode = ancestors[-1]
-        assert is_selection_set(selection_set)
-        if not has_id_field(selection_set):
-            selection_set.selections = (self.ID_SELECTION_NODE, *selection_set.selections)
-            selection_set.__has_id__ = True
-
-
-class OperationMinerVisitor(visitor.Visitor):
-    """Creates handlers for root operations."""
+    Also injects id field to types that have id field but not explicitly
+    queried it.
+    """
 
     def __init__(self, evaluator: SchemaEvaluator):
         super().__init__()
@@ -134,29 +108,32 @@ class SchemaEvaluator:
         ]
 
     def _evaluate_field_type(self, t: gql_def.GraphQLType) -> GqlTypeHinter:
+        # even though every type in qtgql has a default constructor,
+        # hence there is no "real" non-null values
+        # we store it as optional for generating nullable checks only for what's required.
+        ret = None
+        is_optional = True
         if non_null := is_non_null_definition(t):
-            # There are no optionals in qtgql, we use default values.
-            # By default, everything in graphql is optional,
-            # so NON_NULL doesn't really make a difference,
-            return self._evaluate_field_type(non_null.of_type)
+            t = non_null.of_type
+            is_optional = False
 
         if list_def := is_list_definition(t):
-            return GqlTypeHinter(type=list, of_type=(self._evaluate_field_type(list_def.of_type),))
+            ret = GqlTypeHinter(type=list, of_type=(self._evaluate_field_type(list_def.of_type),))
         elif scalar_def := is_scalar_definition(t):
             if builtin_scalar := BuiltinScalars.by_graphql_name(scalar_def.name):
-                return GqlTypeHinter(type=builtin_scalar)
+                ret = GqlTypeHinter(type=builtin_scalar)
             else:
-                return GqlTypeHinter(type=self.config.custom_scalars[scalar_def.name])
+                ret = GqlTypeHinter(type=self.config.custom_scalars[scalar_def.name])
         elif enum_def := is_enum_definition(t):
-            return GqlTypeHinter(
+            ret = GqlTypeHinter(
                 type=anti_forward_ref(name=enum_def.name, type_map=self._generated_enums)
             )
         elif obj_def := is_object_definition(t):
-            return GqlTypeHinter(
+            ret = GqlTypeHinter(
                 type=anti_forward_ref(name=obj_def.name, type_map=self._generated_types)
             )
         elif union_def := is_union_definition(t):
-            return GqlTypeHinter(
+            ret = GqlTypeHinter(
                 type=Union,
                 of_type=tuple(
                     GqlTypeHinter(
@@ -165,8 +142,12 @@ class SchemaEvaluator:
                     for possible in self.schema_definition.get_possible_types(union_def)
                 ),
             )
+        if not ret:  # pragma: no cover
+            raise NotImplementedError(f"type {t} not supported yet")
 
-        raise NotImplementedError(f"type {t} not supported yet")  # pragma: no cover
+        if is_optional:
+            return GqlTypeHinter(type=Optional, of_type=(ret,))
+        return ret
 
     def _evaluate_field(self, name: str, field: gql_def.GraphQLField) -> GqlFieldDefinition:
         """we don't really know what is the field type just it's name."""
@@ -183,8 +164,6 @@ class SchemaEvaluator:
         self, type_: gql_def.GraphQLObjectType
     ) -> Optional[GqlTypeDefinition]:
         t_name: str = type_.name
-        if t_name.startswith("__"):
-            return None
         if evaluated := self._generated_types.get(t_name, None):
             return evaluated
         if type_ not in self.root_types:
@@ -198,9 +177,12 @@ class SchemaEvaluator:
                             f"\n Got: {nonull.of_type}"
                         )
                 else:
-                    raise QtGqlException("id field should not be nullable!" f"\n Got: {id_field}")
+                    warnings.warn(
+                        "It is best practice to have id field of type ID!"
+                        f"\ntype {type_} has: {id_field}"
+                    )
             except KeyError:
-                raise QtGqlException(
+                warnings.warn(
                     "QtGql enforces types to have ID field"
                     f"type {type_} does not not define an id field.\n"
                     f"fields: {type_.fields}"
@@ -246,14 +228,13 @@ class SchemaEvaluator:
         with (self.config.graphql_dir / "operations.graphql").open() as f:
             operations = graphql.parse(f.read())
 
-        operations = visitor.visit(operations, IDInjectionVisitor())
         # validate the operation against the static schema
         if errors := graphql.validate(self.schema_definition, operations):
             raise QtGqlException([error.formatted for error in errors])
 
-        # get QtGql fields from the query AST.
-        operation_miner = OperationMinerVisitor(self)
-        visitor.visit(operations, operation_miner)
+        # get QtGql fields from the query AST and inject ID field.
+        operation_miner = QtGqlVisitor(self)
+        operations = visitor.visit(operations, operation_miner)
         self._query_handlers.update(operation_miner.query_handlers)
 
     def dumps(self) -> GeneratedNamespace:

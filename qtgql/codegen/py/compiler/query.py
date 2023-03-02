@@ -2,9 +2,10 @@ from __future__ import annotations
 
 from collections import defaultdict
 from textwrap import dedent
-from typing import TYPE_CHECKING, List, NamedTuple, Optional
+from typing import List, NamedTuple, Optional
 
 import attrs
+from graphql import language as gql_lang
 
 from qtgql.codegen.graphql_ref import is_field_node, is_inline_fragment
 from qtgql.codegen.py.compiler.template import (
@@ -13,9 +14,6 @@ from qtgql.codegen.py.compiler.template import (
 )
 from qtgql.codegen.py.objecttype import GqlFieldDefinition, GqlTypeDefinition
 from qtgql.codegen.utils import AntiForwardRef
-
-if TYPE_CHECKING:
-    from graphql import language as gql_lang
 
 
 def get_field_from_field_node(
@@ -28,9 +26,25 @@ def get_field_from_field_node(
     )
 
 
+ID_SELECTION_NODE = (
+    gql_lang.FieldNode(name=gql_lang.NameNode(value="id"), arguments=(), directives=()),
+)
+
+
+def inject_id_selection(selection_set: gql_lang.SelectionSetNode) -> None:
+    selection_set.selections += ID_SELECTION_NODE
+
+
+def has_id_field(selection_set: gql_lang.SelectionSetNode) -> bool:
+    for field in selection_set.selections:
+        assert isinstance(field, gql_lang.FieldNode)
+        if field.name.value == "id":
+            return True
+    return False
+
+
 @attrs.define
 class QtGqlQueriedField(GqlFieldDefinition):
-    # TODO: rename this to selections
     selections: List[QtGqlQueriedField] = attrs.Factory(list)
     choices: dict[str, List[QtGqlQueriedField]] = attrs.Factory(lambda: defaultdict(list))
 
@@ -42,6 +56,10 @@ class QtGqlQueriedField(GqlFieldDefinition):
         if not hasattr(selection_set, "selections"):
             return ret
         assert selection_set
+        # inject ID field for types that supports it. unions area handled below.
+        if f.can_select_id and not has_id_field(selection_set):
+            inject_id_selection(selection_set)
+
         for selection in selection_set.selections:
             if inline_frag := is_inline_fragment(selection):
                 assert ret.type.is_union()  # ATM supported fragments are unions only.
@@ -50,6 +68,9 @@ class QtGqlQueriedField(GqlFieldDefinition):
                 assert issubclass(concrete.type, AntiForwardRef)
                 concrete = concrete.type.resolve()
                 assert isinstance(concrete, GqlTypeDefinition)
+                if not has_id_field(inline_frag.selection_set) and concrete.has_id_field:
+                    inject_id_selection(inline_frag.selection_set)
+
                 for selection_node in inline_frag.selection_set.selections:
                     field_node = is_field_node(selection_node)
                     assert field_node
