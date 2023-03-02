@@ -36,8 +36,6 @@ def inject_id_selection(selection_set: gql_lang.SelectionSetNode) -> None:
 
 
 def has_id_field(selection_set: gql_lang.SelectionSetNode) -> bool:
-    if hasattr(selection_set, "__has_id__"):
-        return True
     for field in selection_set.selections:
         assert isinstance(field, gql_lang.FieldNode)
         if field.name.value == "id":

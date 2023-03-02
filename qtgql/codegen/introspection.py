@@ -164,8 +164,6 @@ class SchemaEvaluator:
         self, type_: gql_def.GraphQLObjectType
     ) -> Optional[GqlTypeDefinition]:
         t_name: str = type_.name
-        if t_name.startswith("__"):
-            return None
         if evaluated := self._generated_types.get(t_name, None):
             return evaluated
         if type_ not in self.root_types:
