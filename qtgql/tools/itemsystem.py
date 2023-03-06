@@ -76,7 +76,7 @@ class BaseTypeMeta(type):
                     roles.by_name[role_.name] = role_
                     roles.qt_roles[role_.num] = role_.qt_name
 
-            cls.Model = GenericModel.from_role_defined(cls)
+            cls.Model = GenericModel.from_role_defined(cls, parent=getattr(cls, "Model", None))
             cls.Model.__roles__ = roles
 
         return cls
