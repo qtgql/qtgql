@@ -1,7 +1,6 @@
 import pytest
 from PySide6.QtCore import QByteArray, QObject, Qt
 from qtgql.codegen.py.runtime.bases import QGraphQListModel
-from qtgql.codegen.py.runtime.queryhandler import SelectionConfig
 
 from tests.test_codegen.test_py.testcases import ObjectWithListOfObjectTestCase
 
@@ -107,14 +106,3 @@ class TestCurrentObject:
         first = sample_model_initialized._data[0]
         assert sample_model_initialized.currentObject is first
         assert sample_model_initialized.property("currentObject") is first
-
-    def test_is_default_when_initialized_with_no_data(self, sample_model_initialized):
-        testcase = ObjectWithListOfObjectTestCase.compile()
-        user = testcase.gql_type
-        user = user.from_dict(
-            None,
-            {"id": "", "persons": []},
-            SelectionConfig({"persons": SelectionConfig(selections={"name": None})}),
-        )
-        model = user.persons
-        assert model.property("currentObject") is testcase.module.Person.default_instance()

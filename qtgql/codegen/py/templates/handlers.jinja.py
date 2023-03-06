@@ -1,3 +1,5 @@
+{% import "macros.jinja.py" as macros %}
+
 from typing import Optional, Union
 from PySide6.QtCore import Signal, QObject
 from PySide6.QtQml import QmlElement, QmlSingleton
@@ -24,40 +26,29 @@ class {{query.name}}(BaseQueryHandler[{{query.field.annotation}}]):
 
     OPERATION_CONFIG = {{query.operation_config}}
 
+    def set_data(self, d: {{query.field.annotation}}) -> None:
+        self._data = d
+        self.dataChanged.emit()
+    def update(self, data, config: SelectionConfig) -> None:
+        parent = self
+        {{ macros.update_field(query.field,  fset_name='self.dataChanged', private_name='self._data', include_selection_check=False) | indent(4, True) }}
+
+    def deserialize(self, data: dict, config: SelectionConfig) -> None:
+        parent = self
+        {% set assign_to %}self._data{% endset %}
+        {{ macros.deserialize_field(query.field,  assign_to, include_selection_check=False) | indent(4) }}
+        self.dataChanged.emit()
     def on_data(self, message: dict) -> None:
-        config = self.OPERATION_CONFIG
-        # TODO: this should be a copy of the `from_dict()` template.
-        field_data = message.get('{{query.field.name}}', None)
-        {% if query.field.type.is_object_type %}
-        if not field_data:
-            emit = False
-            if self._data:
-                emit = True
+        if not self._data:
+            self.deserialize(message, self.OPERATION_CONFIG)
+
+        # data existed and arrived data was null, empty data.
+        elif not message.get('{{query.field.name}}', None):
             self._data = None
-            if emit:
-                self.dataChanged.emit()
+            self.dataChanged.emit()
+        # data existed already, update the data
         else:
-            if self._data and self._data._id == field_data['id']:
-                self._data.update(field_data, config)
-            else:
-                self._data = {{query.field.type.is_object_type.name}}.from_dict(
-                    self,
-                    field_data,
-                    config
-                )
-                self.dataChanged.emit()
-        {% elif query.field.type.is_model %}
-        if field_data:
-            if self._data:
-                self._data.update(field_data, config)
-            else:
-                self._data = QGraphQListModel(
-                    parent=self,
-                    data=[{{ query.field.type.is_model.name }}.from_dict(self, data=node, config=config) for node in field_data],
-                    default_type={{ query.field.type.is_model.name }},
-                )
-                self.dataChanged.emit()
-        {% endif %}
+            self.update(message, self.OPERATION_CONFIG)
 
 {% endfor %}
 

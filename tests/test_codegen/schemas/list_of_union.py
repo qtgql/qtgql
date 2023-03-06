@@ -1,4 +1,8 @@
+from __future__ import annotations
+
+import random
 import uuid
+from typing import Union
 from uuid import UUID
 
 import strawberry
@@ -17,11 +21,17 @@ class User(Node):
     uuid: UUID = strawberry.field(default_factory=uuid.uuid4)
 
 
+@strawberry.type()
+class Frog(Node):
+    name: str = "Kermit"
+    color: str = "green"
+
+
 @strawberry.type
 class Query:
     @strawberry.field
-    def user(self) -> User:
-        return User()
+    def usersAndFrogs(self) -> list[Union[Frog, User]]:
+        return [random.choice((User(), Frog())) for _ in range(7)]
 
 
 schema = strawberry.Schema(query=Query)

@@ -121,7 +121,10 @@ class GqlFieldDefinition:
 
     @cached_property
     def can_select_id(self) -> Optional[GqlFieldDefinition]:
-        object_type = self.type.is_object_type or self.type.is_model
+        object_type = self.type.is_object_type
+        if not object_type:
+            if self.type.is_model:
+                object_type = self.type.is_model.is_object_type
         if object_type:
             return object_type.has_id_field
 
@@ -187,11 +190,11 @@ class GqlTypeHinter(TypeHinter):
                     return ret
 
     @property
-    def is_model(self) -> Optional[GqlTypeDefinition]:
+    def is_model(self) -> Optional[GqlTypeHinter]:
         t_self = optional_maybe(self)
         if t_self.is_list():
-            # enums and scalars or unions are not supported in lists yet (valid graphql spec though)
-            return t_self.of_type[0].is_object_type
+            # scalars or unions are not supported in lists yet (valid graphql spec though)
+            return t_self.of_type[0]
 
     @property
     def is_enum(self) -> Optional[GqlEnumDefinition]:
@@ -232,11 +235,11 @@ class GqlTypeHinter(TypeHinter):
         # handle Optional, Union, List etc...
         # removing redundant prefixes.
         if model_of := t_self.is_model:
-            return f"{QGraphQListModel.__name__}[{model_of.name}]"
+            return f"{QGraphQListModel.__name__}[{model_of.annotation(scalars)}]"
         if object_def := t_self.is_object_type:
             return f"Optional[{object_def.name}]"
         if t_self.is_union():
-            return "Union[" + ",".join(th.annotation(scalars) for th in t_self.of_type) + "]"
+            return "Union[" + ", ".join(th.annotation(scalars) for th in t_self.of_type) + "]"
         raise NotImplementedError  # pragma no cover
 
     def as_annotation(self, object_map=None):  # pragma: no cover

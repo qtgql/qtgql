@@ -84,8 +84,14 @@ class TestAnnotations:
     def test_list_of(self):
         testcase = ObjectWithListOfObjectTestCase.compile()
         field = testcase.get_field_by_name("persons")
-        assert field.annotation == f"{QGraphQListModel.__name__}[{field.type.is_model.name}]"
-        assert field.fget_annotation == f"{QGraphQListModel.__name__}[{field.type.is_model.name}]"
+        assert (
+            field.annotation
+            == f"{QGraphQListModel.__name__}[Optional[{field.type.is_model.is_object_type.name}]]"
+        )
+        assert (
+            field.fget_annotation
+            == f"{QGraphQListModel.__name__}[{field.type.is_model.is_object_type.name}]"
+        )
 
     def test_custom_scalar_property_type_is_to_qt_return_annotation(self):
         testcase = DateTimeTestCase.compile()
@@ -130,6 +136,7 @@ class TestPropertyGetter:
     def test_union(self, qtbot):
         testcase = UnionTestCase.compile()
         initialize_dict = testcase.initialize_dict
+
         handler = testcase.query_handler
         handler.on_data(initialize_dict)
         field = testcase.get_field_by_name("whoAmI")
@@ -237,6 +244,7 @@ class TestUpdates:
     def test_scalars_update(self, qtbot):
         testcase = ScalarsTestCase.compile()
         initialize_dict1 = testcase.initialize_dict
+
         handler = testcase.query_handler
         handler.on_data(initialize_dict1)
         initialize_dict2 = testcase.initialize_dict
