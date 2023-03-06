@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+0.111.0 - 2023-03-06
+--------------------
+
+This release adds support for list of unions.
+
+**This release also deprecates default object on QGraphQListModel**
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #125](https://github.com/nrbnlulu/qtgql/pull/125/)
+
+
 0.110.1 - 2023-03-02
 --------------------
 
