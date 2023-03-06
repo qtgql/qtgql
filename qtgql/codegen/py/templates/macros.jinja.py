@@ -76,12 +76,12 @@ if '{{f.name}}' in config.selections.keys():
             ))
     {% elif f.type.is_model %}
     node_config = inner_config
-    new_len = len(data)
-    prev_len = self.rowCount()
+    new_len = len(field_data)
+    prev_len = {{private_name}}.rowCount()
     if new_len < prev_len:
         # crop the list to the arrived data length.
-        self.removeRows(new_len, prev_len - new_len)
-    for index, node in enumerate(data):
+        {{private_name}}.removeRows(new_len, prev_len - new_len)
+    for index, node in enumerate(field_data):
         id_ = node.get("id", None)
         if id_ and {{private_name}}._data[index].id == id_:
             # same node on that index just call update there is no need call model signals.
@@ -91,12 +91,12 @@ if '{{f.name}}' in config.selections.keys():
             # Note: it is safe to call [].insert(50, 50) (although index 50 doesn't exist).
             {% if f.type.is_model.is_object_type %}
             {{private_name}}.insert(index,
-                                      {{f.type.is_model.is_object_type.name}}.from_dict(self, data[index], node_config))
+                                      {{f.type.is_model.is_object_type.name}}.from_dict(self, field_data[index], node_config))
             {% elif f.type.is_model.is_union %}
             type_name = node['__typename']
             choice = node_config.choices[type_name]
             {{private_name}}.insert(index,
-                                      __TYPE_MAP__[type_name].from_dict(self, data[index],
+                                      __TYPE_MAP__[type_name].from_dict(self, field_data[index],
                                                                         choice))
             {% endif %}
     {% elif f.type.is_builtin_scalar %}

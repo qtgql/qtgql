@@ -90,7 +90,7 @@ class TestAnnotations:
         )
         assert (
             field.fget_annotation
-            == f"{QGraphQListModel.__name__}[{field.type.is_model.is_object_type.name}]"
+            == f"{QGraphQListModel.__name__}[Optional[{field.type.is_model.is_object_type.name}]]"
         )
 
     def test_custom_scalar_property_type_is_to_qt_return_annotation(self):
@@ -483,9 +483,13 @@ class TestUpdates:
             testcase.initialize_dict[testcase.first_field]["persons"]
         )
         handler = testcase.query_handler
+        from tests.test_sample_ui.__temp import MainQuery
+
+        MainQuery().on_data(init_dict)
         handler.on_data(init_dict)
         model: QGraphQListModel = handler.data.persons
         init_dict2[testcase.first_field]["id"] = handler.data.id
+        MainQuery().on_data(init_dict2)
         with qtbot.wait_signals(
             [model.rowsAboutToBeRemoved, model.rowsAboutToBeInserted], timeout=500
         ):

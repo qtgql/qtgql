@@ -119,9 +119,13 @@ class QGraphQListModel(QAbstractListModel, Generic[T_BaseQGraphQLObject]):
     @slot
     def insert(self, index: int, v: T_BaseQGraphQLObject):
         model_index = self.index(index)
-        if index <= self.rowCount() + 1:
+        if index <= self.rowCount() - 1:
             self.beginInsertRows(model_index, index, index)
-            self._data.insert(index, v)
+            self._data[index] = v
+            self.endInsertRows()
+        else:
+            self.beginInsertRows(model_index, index, index)
+            self._data.append(v)
             self.endInsertRows()
 
     def update(self, data: list[dict], node_selection: SelectionConfig) -> None:

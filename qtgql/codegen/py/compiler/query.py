@@ -82,7 +82,9 @@ class QtGqlQueriedField(GqlFieldDefinition):
                     ret.choices[type_name].append(get_field_from_field_node(field_node, concrete))
             else:
                 # unions have inline fragments so this should be either
-                f_type = f.type.is_object_type or f.type.is_model.is_object_type
+                f_type = f.type.is_object_type
+                if not f_type and f.type.is_model:
+                    f_type = f.type.is_model.is_object_type
                 assert f_type
                 field_node = is_field_node(selection)
                 assert field_node
