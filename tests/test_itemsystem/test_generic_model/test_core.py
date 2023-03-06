@@ -124,3 +124,19 @@ def test_clear_clears_children_as_well(model_with_child):
     assert len(child._data)
     model.clear()
     assert not len(child._data)
+
+
+def test_custom_model(base_type):
+    reached = False
+
+    class SomeModel(base_type):
+        class Model(GenericModel):
+            def __init__(self, *args, **kwargs):
+                nonlocal reached
+                reached = True
+                super().__init__(*args, **kwargs)
+
+        a: int
+
+    SomeModel.Model()
+    assert reached
