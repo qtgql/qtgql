@@ -1,6 +1,21 @@
 CHANGELOG
 =========
 
+0.111.1 - 2023-03-06
+--------------------
+
+This release fixes a bug that inner model class would get overridden
+by ItemBase metaclass.
+```python
+class StatusIndicator(ItemBaseType):
+    class Model(GenericModel):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+```
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #128](https://github.com/nrbnlulu/qtgql/pull/128/)
+
+
 0.111.0 - 2023-03-06
 --------------------
 
