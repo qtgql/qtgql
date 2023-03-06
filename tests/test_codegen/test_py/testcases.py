@@ -91,9 +91,13 @@ class QGQLObjectTestCase:
             generated = self.evaluator.dumps()
             types_module = ModuleType(uuid.uuid4().hex)
         handlers_mod = ModuleType(uuid.uuid4().hex)
-        exec(compile(generated["objecttypes"], "gen_shcema", "exec"), types_module.__dict__)
+        try:
+            exec(compile(generated["objecttypes"], "gen_schema", "exec"), types_module.__dict__)
+        except BaseException as e:
+            raise RuntimeError(generated["objecttypes"]) from e
+
         sys.modules["objecttypes"] = types_module
-        exec(compile(generated["handlers"], "gen_imports", "exec"), handlers_mod.__dict__)
+        exec(compile(generated["handlers"], "gen_handlers", "exec"), handlers_mod.__dict__)
         handlers_mod.init()
         return CompiledTestCase(
             evaluator=self.evaluator,
@@ -282,7 +286,7 @@ UnionTestCase = QGQLObjectTestCase(
     """,
     test_name="UnionTestCase",
 )
-ListOfUnionTestCase = QGQLObjectTestCase(
+ListOfObjectWithUnionTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_list_of_type_with_union.schema,
     query="""
         query MainQuery {
@@ -432,6 +436,23 @@ TypeWithNullAbleIDTestCase = QGQLObjectTestCase(
     test_name="TypeWithNullAbleIDTestCase",
 )
 
+ListOfUnionTestCase = QGQLObjectTestCase(
+    schema=schemas.list_of_union.schema,
+    query="""
+       query MainQuery {
+          usersAndFrogs {
+            ... on User {
+              name
+              age
+            }
+            ... on Frog {
+              name
+              color
+            }
+          }
+        }""",
+    test_name="ListOfUnionTestCase",
+)
 
 all_test_cases = [
     ScalarsTestCase,
@@ -444,7 +465,7 @@ all_test_cases = [
     ObjectWithListOfObjectTestCase,
     InterfaceTestCase,
     UnionTestCase,
-    ListOfUnionTestCase,
+    ListOfObjectWithUnionTestCase,
     TimeTestCase,
     EnumTestCase,
     CustomUserScalarTestCase,
@@ -452,6 +473,7 @@ all_test_cases = [
     RootListOfTestCase,
     TypeWithNoIDTestCase,
     TypeWithNullAbleIDTestCase,
+    ListOfUnionTestCase,
 ]
 custom_scalar_testcases = [
     (DateTimeTestCase, DateTimeScalar, "birth"),

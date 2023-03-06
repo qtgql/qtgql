@@ -14,14 +14,11 @@ __all__ = ["QGraphQListModel", "get_base_graphql_object"]
 
 
 class _BaseQGraphQLObject(QObject):
-    type_map: dict[str, type[_BaseQGraphQLObject]]
-
     id: str
     __singleton__: Self
     __store__: ClassVar[QGraphQLObjectStore[Self]]
 
     def __init_subclass__(cls, **kwargs):
-        cls.type_map[cls.__name__] = cls  # required to instantiate unions.
         cls.__store__ = QGraphQLObjectStore()
 
     def __init__(self, parent: Optional[QObject] = None):
@@ -72,14 +69,10 @@ class QGraphQListModel(QAbstractListModel, Generic[T_BaseQGraphQLObject]):
     def __init__(
         self,
         parent: Optional[QObject],
-        default_type: T_BaseQGraphQLObject,
         data: list[T_BaseQGraphQLObject],
     ):
         super().__init__(parent)
-
         self._data = data
-        self.default_type = default_type
-        self._default_object = default_type.default_instance()
         self._current_index: int = 0
 
     @slot
@@ -93,10 +86,7 @@ class QGraphQListModel(QAbstractListModel, Generic[T_BaseQGraphQLObject]):
 
     @qproperty(QObject, notify=currentIndexChanged)  # type: ignore
     def currentObject(self) -> Optional[T_BaseQGraphQLObject]:
-        try:
-            return self._data[self._current_index]
-        except IndexError:
-            return self._default_object
+        return self._data[self._current_index]
 
     def rowCount(self, *args, **kwargs) -> int:
         return len(self._data)
@@ -129,26 +119,17 @@ class QGraphQListModel(QAbstractListModel, Generic[T_BaseQGraphQLObject]):
     @slot
     def insert(self, index: int, v: T_BaseQGraphQLObject):
         model_index = self.index(index)
-        if index <= self.rowCount() + 1:
+        if index <= self.rowCount() - 1:
             self.beginInsertRows(model_index, index, index)
-            self._data.insert(index, v)
+            self._data[index] = v
+            self.endInsertRows()
+        else:
+            self.beginInsertRows(model_index, index, index)
+            self._data.append(v)
             self.endInsertRows()
 
     def update(self, data: list[dict], node_selection: SelectionConfig) -> None:
-        new_len = len(data)
-        prev_len = self.rowCount()
-        if new_len < prev_len:
-            # crop the list to the arrived data length.
-            self.removeRows(new_len, prev_len - new_len)
-        for index, node in enumerate(data):
-            id_ = node.get("id", None)
-            if id_ and self._data[index].id == id_:
-                # same node on that index just call update there is no need call model signals.
-                self._data[index].update(data[index], node_selection)
-            else:
-                # get or create node if wasn't on the correct index.
-                # Note: it is safe to call [].insert(50, 50) (although index 50 doesn't exist).
-                self.insert(index, self.default_type.from_dict(self, data[index], node_selection))
+        raise NotImplementedError
 
     def removeRows(self, row: int, count: int, parent=None) -> bool:
         if row + count <= self.rowCount():
@@ -166,10 +147,7 @@ def get_base_graphql_object(name: str) -> type[_BaseQGraphQLObject]:
     :param name: valid attribute name (used by codegen to import it).
     :returns: A type to be extended by all generated types.
     """
-    type_map: dict[str, type[_BaseQGraphQLObject]] = {}
-    return type(
-        name, (_BaseQGraphQLObject,), {"type_map": type_map, "__store__": QGraphQLObjectStore()}
-    )  # type: ignore
+    return type(name, (_BaseQGraphQLObject,), {"__store__": QGraphQLObjectStore()})  # type: ignore
 
 
 BaseGraphQLObject = get_base_graphql_object("BaseGraphQLObject")

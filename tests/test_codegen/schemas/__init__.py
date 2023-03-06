@@ -1,4 +1,5 @@
 from . import (
+    list_of_union,
     object_reference_each_other,
     object_with_date,
     object_with_datetime,
@@ -40,4 +41,5 @@ __all__ = [  # noqa: PLE0604
     type_with_no_id,
     type_with_nullable_id,
     wrogn_id_type,
+    list_of_union,
 ]
