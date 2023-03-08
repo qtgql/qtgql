@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+0.111.3 - 2023-03-08
+--------------------
+
+This release adds support for `QGraphQListModel.clear()`.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #133](https://github.com/nrbnlulu/qtgql/pull/133/)
+
+
 0.111.2 - 2023-03-08
 --------------------
 
