@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 import pytest
 from PySide6.QtCore import QByteArray, QObject, Qt
 from qtgql.codegen.py.runtime.bases import QGraphQListModel
@@ -41,6 +43,16 @@ def test_pop(qtbot, sample_model_initialized):
     assert original_data != sample_model_initialized._data
     original_data.pop(0)
     assert original_data == sample_model_initialized._data
+
+
+@patch("PySide6.QtCore.QAbstractListModel.endRemoveRows")
+def test_clear(mock, qtbot, sample_model_initialized):
+    assert sample_model_initialized.rowCount() > 0
+    with qtbot.wait_signal(sample_model_initialized.rowsAboutToBeRemoved):
+        sample_model_initialized.clear()
+
+    assert sample_model_initialized.rowCount() == 0
+    assert mock.called
 
 
 def test_append(qtbot, sample_model_initialized):

@@ -116,6 +116,13 @@ class QGraphQListModel(QAbstractListModel, Generic[T_BaseQGraphQLObject]):
         self._data.pop(index)
         self.endRemoveRows()
 
+    @slot
+    def clear(self) -> None:
+        if self._data:
+            self.beginRemoveRows(self.index(0).parent(), 0, self.rowCount())
+            self._data = []
+            self.endRemoveRows()
+
     @Slot(int, QObject)
     def insert(self, index: int, v: T_BaseQGraphQLObject):
         model_index = self.index(index)
