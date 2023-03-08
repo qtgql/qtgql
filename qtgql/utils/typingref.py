@@ -1,4 +1,5 @@
 import inspect
+import typing
 from typing import Any, List, Optional, Type, TypeVar, Union, get_args, get_origin
 
 
@@ -58,6 +59,14 @@ class TypeHinter:
 
     @classmethod
     def from_annotations(cls, tp: Any) -> "TypeHinter":
+        # future annotation
+        if isinstance(tp, str):
+
+            def foo() -> tp:
+                ...
+
+            tp = typing.get_type_hints(foo)["return"]
+
         if args := get_args(tp):
             # handle optional
             if type(None) in args:
@@ -111,7 +120,7 @@ class TypeHinter:
         return self.type is Union
 
     def is_optional(self) -> bool:
-        return self.type is Optional
+        return self.type in (Optional, type(Optional))
 
     def is_list(self) -> bool:
         return self.type in (list, List)
@@ -123,6 +132,11 @@ class TypeHinter:
             th = inst.of_type[0]
 
         return cls(type=th.type, of_type=tuple(cls.strip_optionals(tp) for tp in th.of_type))
+
+    def __repr__(self):  # pragma: no cover
+        if self.of_type:
+            return f"{self.type}[{', '.join([repr(t) for t in self.of_type])}]]"
+        return f"{self.type}"
 
 
 T = TypeVar("T")

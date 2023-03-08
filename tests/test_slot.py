@@ -245,3 +245,16 @@ def test_Qvariant(ret):
             return ret
 
     T().default_test()
+
+
+def test_future_annotations():
+    class T(QObjectHelper):
+        @Slot()
+        def qt(self):
+            return
+
+        @slot
+        def hack(self) -> "None":
+            return
+
+    T().default_test()

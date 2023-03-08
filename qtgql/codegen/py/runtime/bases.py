@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, ClassVar, Generic, Optional, TypeVar
 
-from PySide6.QtCore import QAbstractListModel, QByteArray, QObject, Qt, Signal
+from PySide6.QtCore import QAbstractListModel, QByteArray, QObject, Qt, Signal, Slot
 
 if TYPE_CHECKING:
     from typing_extensions import Self
@@ -116,7 +116,7 @@ class QGraphQListModel(QAbstractListModel, Generic[T_BaseQGraphQLObject]):
         self._data.pop(index)
         self.endRemoveRows()
 
-    @slot
+    @Slot(int, QObject)
     def insert(self, index: int, v: T_BaseQGraphQLObject):
         model_index = self.index(index)
         if index <= self.rowCount() - 1:
