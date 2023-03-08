@@ -10,6 +10,11 @@ class TestFromAnnotation:
         th = TypeHinter.from_annotations(tp)
         assert th.type is tp
 
+    @pytest.mark.parametrize("tp", [int, float, str, bool, object])
+    def test_future_annotations(self, tp):
+        th = TypeHinter.from_annotations(tp.__name__)
+        assert th.type is tp
+
     @pytest.mark.parametrize("tp", [list[float], Optional[str]])
     def test_containers(self, tp):
         th = TypeHinter.from_annotations(tp)
