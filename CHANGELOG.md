@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+0.111.2 - 2023-03-08
+--------------------
+
+This release adds minimal support for future annotations in slots or other parts
+of the lib that uses TypeHinter.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #132](https://github.com/nrbnlulu/qtgql/pull/132/)
+
+
 0.111.1 - 2023-03-06
 --------------------
 
