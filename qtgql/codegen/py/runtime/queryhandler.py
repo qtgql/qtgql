@@ -68,6 +68,7 @@ class BaseQueryHandler(Generic[T_QObject], QObject, metaclass=QSingletonMeta):
         self._consumers_count -= 1
         if not self._consumers_count:
             self.loose()
+            self._data = None
 
     def consume(self) -> None:
         # if it is the first consumer fetch the data here.

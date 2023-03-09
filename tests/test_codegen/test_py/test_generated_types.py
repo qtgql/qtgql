@@ -552,3 +552,4 @@ class TestGarbageCollection:
         assert node is testcase.gql_type.__store__.get_node(node_id)
         testcase.query_handler.unconsume()
         assert not testcase.gql_type.__store__.get_node(node_id)
+        assert not testcase.query_handler.data
