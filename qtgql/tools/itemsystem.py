@@ -46,7 +46,7 @@ T_V = TypeVar("T_V")
 
 
 @dataclass_transform(
-    field_descriptors=(role,),
+    field_specifiers=(role,),
     kw_only_default=True,
 )
 class BaseTypeMeta(type):
@@ -93,18 +93,12 @@ class _BaseType(metaclass=BaseTypeMeta):
 
 _TBaseType = TypeVar("_TBaseType", bound=_BaseType)
 
-count = 1
 
-
-def get_base_type() -> type[_BaseType]:
+def get_base_type(name: str = "Default") -> type[_BaseType]:
     """:return: BaseType to use for generating `GenericModel`'s"""
-    global count
-    cls: type[_BaseType] = types.new_class(
-        name=f"BaseType{count}", kwds={"metaclass": BaseTypeMeta}
-    )
+    cls: type[_BaseType] = types.new_class(name=f"{name}BaseType", kwds={"metaclass": BaseTypeMeta})
     # we need to inject this here in order for `get_type_hints()` to work.
     cls.__types_map__ = {GenericModel.__name__: GenericModel}  # type: ignore
-    count += 1
     return cls
 
 
@@ -210,8 +204,8 @@ class GenericModel(Generic[_TBaseType], QAbstractListModel):
 
         # initialize list of attrs classes
         for node in data:
-            node = self.type_(**node)  # type: ignore
-            self._data.append(node)
+            inst = self.type_(**node)  # type: ignore
+            self._data.append(inst)
 
         self.layoutChanged.emit()
 
