@@ -540,3 +540,15 @@ class TestDefaultConstructor:
     def test_wont_recursive(self):
         testcase = ObjectsThatReferenceEachOtherTestCase.compile()
         testcase.gql_type()
+
+
+class TestGarbageCollection:
+    def test_root_object(self, qtbot, schemas_server):
+        testcase = ScalarsTestCase.compile(url=schemas_server.address)
+        testcase.query_handler.consume()
+        qtbot.wait_until(lambda: testcase.query_handler.completed)
+        node = testcase.query_handler.data
+        node_id = node.id
+        assert node is testcase.gql_type.__store__.get_node(node_id)
+        testcase.query_handler.unconsume()
+        assert not testcase.gql_type.__store__.get_node(node_id)
