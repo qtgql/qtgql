@@ -33,6 +33,8 @@ class QtGqlEnvironment:
         self.name = name
 
     def add_query_handler(self, handler: BaseQueryHandler) -> None:
+        """Adds an query handler to the environment, this would further be used
+        by `UseQuery` Components."""
         self._query_handlers[handler.objectName()] = handler
 
     def get_handler(self, operation_name: str) -> BaseQueryHandler:

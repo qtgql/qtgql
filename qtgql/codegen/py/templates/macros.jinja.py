@@ -15,13 +15,14 @@ if '{{f.name}}' in config.selections.keys():
         {{ assign_to }} = {{f.type.is_object_type.name}}.from_dict(
         parent,
         field_data,
-        inner_config
+        inner_config,
+        metadata,
     )
     {% elif f.type.is_model -%}
     {% if f.type.is_model.is_object_type -%}
     {{ assign_to }} = QGraphQListModel(
         parent=parent,
-        data=[{{f.type.is_model.is_object_type.name}}.from_dict(parent, data=node, config=inner_config) for
+        data=[{{f.type.is_model.is_object_type.name}}.from_dict(parent, data=node, config=inner_config, metadata=metadata) for
               node in field_data],
     )
     {% elif f.type.is_model.is_union -%}
@@ -31,7 +32,7 @@ if '{{f.name}}' in config.selections.keys():
         choice = inner_config.choices[type_name]
         model_data.append(
             __TYPE_MAP__[type_name].from_dict(self, node,
-                                              choice)
+                                              choice, metadata)
         )
     {{ assign_to }} = QGraphQListModel(parent, data=model_data)
     {% endif %}
@@ -44,7 +45,7 @@ if '{{f.name}}' in config.selections.keys():
     {% elif f.type.is_union() -%}
     type_name = field_data['__typename']
     choice = inner_config.choices[type_name]
-    {{ assign_to }} = __TYPE_MAP__[type_name].from_dict(parent, field_data, choice)
+    {{ assign_to }} = __TYPE_MAP__[type_name].from_dict(parent, field_data, choice, metadata)
     {% endif %}
 {%- endmacro %}
 
@@ -72,7 +73,8 @@ if '{{f.name}}' in config.selections.keys():
             {{fset_name}}({{f.type.is_object_type.name}}.from_dict(
                 parent,
                 field_data,
-                inner_config
+                inner_config,
+                metadata
             ))
     {% elif f.type.is_model %}
     node_config = inner_config
@@ -91,13 +93,13 @@ if '{{f.name}}' in config.selections.keys():
             # Note: it is safe to call [].insert(50, 50) (although index 50 doesn't exist).
             {% if f.type.is_model.is_object_type %}
             {{private_name}}.insert(index,
-                                      {{f.type.is_model.is_object_type.name}}.from_dict(self, field_data[index], node_config))
+                                      {{f.type.is_model.is_object_type.name}}.from_dict(self, field_data[index], node_config, metadata))
             {% elif f.type.is_model.is_union %}
             type_name = node['__typename']
             choice = node_config.choices[type_name]
             {{private_name}}.insert(index,
                                       __TYPE_MAP__[type_name].from_dict(self, field_data[index],
-                                                                        choice))
+                                                                        choice, metadata))
             {% endif %}
     {% elif f.type.is_builtin_scalar %}
     if {{private_name}} != field_data:
@@ -115,7 +117,13 @@ if '{{f.name}}' in config.selections.keys():
     if {{private_name}} and {{private_name}}._id == field_data['id']:
         {{private_name}}.update(field_data, choice)
     else:
-        {{fset_name}}(__TYPE_MAP__[type_name].from_dict(parent, field_data, choice))
+        {{fset_name}}(__TYPE_MAP__[type_name].from_dict(parent, field_data, choice, metadata))
     {% endif %}
 {%- endmacro %}
 
+
+{% macro loose_field(f, private_name) -%}
+        {% if f.type.is_object_type %}
+        {{private_name}}.loose(metadata)
+        {% endif %}
+{%- endmacro %}
