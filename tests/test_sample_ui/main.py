@@ -99,8 +99,8 @@ class EntryPoint(QObject):
         @slot
         def on_qml_file_changed(self) -> None:
             self.qml_engine.clearComponentCache()
+            window: QtQuick.QQuickWindow
             for window in self.qml_engine.rootObjects():  # type: ignore
-                window: QtQuick.QQuickWindow
                 loader: QtQuick.QQuickItem = window.findChild(QtQuick.QQuickItem, "debug_loader")  # type: ignore
                 QtCore.QEventLoop().processEvents(
                     QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 1000

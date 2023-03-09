@@ -80,8 +80,8 @@ class QGQLObjectTestCase:
         url = url.replace("graphql", f"{hash_schema(self.schema)}")
         env = QtGqlEnvironment(client=GqlWsTransportClient(url=url), name=self.config.env_name)
         set_gql_env(env)
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            tmp_dir = Path(tmp_dir)
+        with tempfile.TemporaryDirectory() as raw_tmp_dir:
+            tmp_dir = Path(raw_tmp_dir)
             self.config.graphql_dir = tmp_dir
             with (tmp_dir / "operations.graphql").open("w") as f:
                 f.write(self.query)

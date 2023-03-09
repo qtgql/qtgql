@@ -76,7 +76,7 @@ BasePropertyClass = TypeVar("BasePropertyClass", bound=MakeProperties)
 
 
 @dataclass_transform(
-    field_descriptors=(attr.attrib, attr.field),
+    field_specifiers=(attr.attrib, attr.field),
 )
 def define_properties(cls: Union[Type[T], Type[MakeProperties]]) -> Type[BasePropertyClass]:
     """
