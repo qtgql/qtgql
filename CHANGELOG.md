@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+0.111.4 - 2023-03-09
+--------------------
+
+This release updates dependencies.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #136](https://github.com/nrbnlulu/qtgql/pull/136/)
+
+
 0.111.3 - 2023-03-08
 --------------------
 
