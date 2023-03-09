@@ -1743,14 +1743,14 @@ files = [
 
 [[package]]
 name = "strawberry-graphql"
-version = "0.161.0"
+version = "0.161.1"
 description = "A library for creating GraphQL APIs"
 category = "dev"
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "strawberry_graphql-0.161.0-py3-none-any.whl", hash = "sha256:593ece8c40e593132995f886e244c8263828a385fc1df6eb1138a3dd8b9cc169"},
-    {file = "strawberry_graphql-0.161.0.tar.gz", hash = "sha256:e01e5f52aade245aeb3c66a7b179ab49be7f6f6e6ce5974d68a83497d8cf569d"},
+    {file = "strawberry_graphql-0.161.1-py3-none-any.whl", hash = "sha256:7cb994355fec90640f05c154817d8fe424e16fcb3364809d11855493e036ee69"},
+    {file = "strawberry_graphql-0.161.1.tar.gz", hash = "sha256:4e865fb6ca32806bb9c60bc3ffabb3239d2e21d3efafe2938c22812b88d9aad6"},
 ]
 
 [package.dependencies]
