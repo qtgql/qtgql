@@ -36,9 +36,10 @@ class {{query.name}}(BaseQueryHandler[{{query.field.annotation}}]):
         self._data = d
         self.dataChanged.emit()
 
-    def update(self, data, config: SelectionConfig) -> None:
+    def update(self, data: dict) -> None:
         parent = self
         metadata = self.OPERATION_METADATA
+        config = self.OPERATION_METADATA.selections
 
         {{ macros.update_field(query.field,  fset_name='self.dataChanged', private_name='self._data', include_selection_check=False) | indent(4, True) }}
 
@@ -63,7 +64,7 @@ class {{query.name}}(BaseQueryHandler[{{query.field.annotation}}]):
             self.dataChanged.emit()
         # data existed already, update the data
         else:
-            self.update(message, self.OPERATION_CONFIG)
+            self.update(message)
 
 {% endfor %}
 

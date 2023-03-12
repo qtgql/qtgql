@@ -64,7 +64,7 @@ def test_append(qtbot, sample_model_initialized):
 def test_insert(qtbot, sample_model_initialized):
     with qtbot.wait_signal(sample_model_initialized.rowsAboutToBeInserted):
         sample_model_initialized.insert(2, "foo")
-    assert sample_model_initialized.data(sample_model_initialized.index(1), 257) == "foo"
+    assert sample_model_initialized.data(sample_model_initialized.index(2), 257) == "foo"
 
 
 def test_remove_rows(qtbot, sample_model_initialized):
@@ -78,7 +78,7 @@ def test_remove_rows(qtbot, sample_model_initialized):
 
 
 def test_remove_rows_inside(qtbot, sample_model_initialized):
-    sample_model_initialized.pop()
+    sample_model_initialized.clear()
     assert not sample_model_initialized._data
     sample_model_initialized.append(2)
     sample_model_initialized.append(3)

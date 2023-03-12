@@ -163,7 +163,10 @@ class TestDeserializers:
         testcase = testcase.compile()
         assert isinstance(
             testcase.gql_type.from_dict(
-                None, {"id": uuid.uuid4().hex}, SelectionConfig(selections={"id": None})
+                None,
+                {"id": uuid.uuid4().hex},
+                SelectionConfig(selections={"id": None}),
+                testcase.query_handler.OPERATION_METADATA,
             ),
             testcase.gql_type,
         )
@@ -592,8 +595,7 @@ class TestGarbageCollection:
         user = weakref.ref(testcase.query_handler.data._data[0])
         assert user()._name
         testcase.query_handler.loose()
-        qtbot.wait(100)
-        assert not user()
+        qtbot.wait_until(lambda: not user())
         assert not testcase.query_handler.data
 
     def test_union(self, qtbot):

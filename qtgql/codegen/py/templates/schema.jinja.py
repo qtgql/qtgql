@@ -75,6 +75,8 @@ class {{ type.name }}({{context.base_object_name}}):
             self.__store__.loose(self, metadata.operation_name)
         {% elif type.has_id_field and not type.id_is_optional %}
         self.__store__.loose(self, metadata.operation_name)
+        {% else %} {# type with no ID wouldn't clear up itself at the store. delete it here. #}
+        self.deleteLater()
         {% endif %}
 
 
@@ -83,32 +85,29 @@ class {{ type.name }}({{context.base_object_name}}):
         {% if type.id_is_optional %}
         if id_ := data.get('id', None):
             if instance := cls.__store__.get_node(id_):
-                instance.update(data, config)
+                instance.update(data, config, metadata)
                 return instance
         {% elif type.has_id_field %}
         if instance := cls.__store__.get_node(data['id']):
-            instance.update(data, config)
+            instance.update(data, config, metadata)
             return instance
         {% endif %}
-        {% if type.has_id_field%}
-        else:
-        {% endif %}
-            inst = cls(parent=parent)
-            {% for f in type.fields -%}
-            {% set assign_to %}inst.{{f.private_name}}{% endset %}
-            {{ macros.deserialize_field(f,  assign_to) | indent(12)}}
-            {%- endfor %}
-            {% if type.id_is_optional %}
-            if inst.id:
-                record = NodeRecord(node=inst, retainers=set()).retain(metadata.operation_name)
-                cls.__store__.add_record(record)
-            {% elif type.has_id_field and not type.id_is_optional %}
+        inst = cls(parent=parent)
+        {% for f in type.fields -%}
+        {% set assign_to %}inst.{{f.private_name}}{% endset %}
+        {{ macros.deserialize_field(f,  assign_to) | indent(8)}}
+        {%- endfor %}
+        {% if type.id_is_optional %}
+        if inst.id:
             record = NodeRecord(node=inst, retainers=set()).retain(metadata.operation_name)
             cls.__store__.add_record(record)
-            {% endif %}
-            return inst
+        {% elif type.has_id_field and not type.id_is_optional %}
+        record = NodeRecord(node=inst, retainers=set()).retain(metadata.operation_name)
+        cls.__store__.add_record(record)
+        {% endif %}
+        return inst
 
-    def update(self, data, config: SelectionConfig) -> None:
+    def update(self, data, config: SelectionConfig, metadata: OperationMetaData) -> None:
         parent = self.parent()
         {%for f in type.fields %}{% set fset %}self.{{f.setter_name}}{% endset %}{% set private_name %}self.{{f.private_name}}{% endset %}
         {{ macros.update_field(f, fset_name=fset, private_name=private_name) | indent(8, True) }}{% endfor %}

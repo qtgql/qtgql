@@ -68,7 +68,7 @@ if '{{f.name}}' in config.selections.keys():
         {{fset_name}}(None)
     else:
         if {{private_name}} and {{private_name}}._id == field_data['id']:
-            {{private_name}}.update(field_data, inner_config)
+            {{private_name}}.update(field_data, inner_config, metadata)
         else:
             {{fset_name}}({{f.type.is_object_type.name}}.from_dict(
                 parent,
@@ -87,7 +87,7 @@ if '{{f.name}}' in config.selections.keys():
         id_ = node.get("id", None)
         if id_ and {{private_name}}._data[index].id == id_:
             # same node on that index just call update there is no need call model signals.
-            {{private_name}}._data[index].update(field_data[index], node_config)
+            {{private_name}}._data[index].update(field_data[index], node_config, metadata)
         else:
             # get or create node if wasn't on the correct index.
             # Note: it is safe to call [].insert(50, 50) (although index 50 doesn't exist).
@@ -115,7 +115,7 @@ if '{{f.name}}' in config.selections.keys():
     type_name = field_data['__typename']
     choice = inner_config.choices[type_name]
     if {{private_name}} and {{private_name}}._id == field_data['id']:
-        {{private_name}}.update(field_data, choice)
+        {{private_name}}.update(field_data, choice, metadata)
     else:
         {{fset_name}}(__TYPE_MAP__[type_name].from_dict(parent, field_data, choice, metadata))
     {% endif %}
@@ -124,12 +124,14 @@ if '{{f.name}}' in config.selections.keys():
 
 {% macro loose_field(f, private_name) -%}
         {% if f.type.is_object_type or f.type.is_union() %}
-        {{private_name}}.loose(metadata)
-        {{private_name}} = None
+        if {{private_name}}:
+            {{private_name}}.loose(metadata)
+            {{private_name}} = None
         {% elif f.type.is_model.is_object_type or f.type.is_model.is_union %}
-        for node in {{private_name}}._data:
-            node.loose(metadata)
-        {{private_name}}.deleteLater()
-        {{private_name}} = None
+        if {{private_name}}:
+            for node in {{private_name}}._data:
+                node.loose(metadata)
+            {{private_name}}.deleteLater()
+            {{private_name}} = None
         {% endif %}
 {%- endmacro %}
