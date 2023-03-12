@@ -71,10 +71,12 @@ class BaseQueryHandler(Generic[T_QObject], QObject, metaclass=QSingletonMeta):
             self._data = None
 
     def consume(self) -> None:
-        # if it is the first consumer fetch the data here.
-        if not self._operation_on_the_fly and not self._completed:
-            self.fetch()
-
+        # if it is the first consumer (or first after all previous consumers disposed) fetch the data here.
+        if self._consumers_count <= 0 and not self._operation_on_the_fly:
+            if self._completed:
+                self.refetch()
+            else:
+                self.fetch()
         self._consumers_count += 1
 
     @property
@@ -92,6 +94,12 @@ class BaseQueryHandler(Generic[T_QObject], QObject, metaclass=QSingletonMeta):
     def fetch(self) -> None:
         self._operation_on_the_fly = True
         self.environment.client.execute(self)  # type: ignore
+
+    @slot
+    def refetch(self) -> None:
+        if not self._operation_on_the_fly:
+            self._completed = False
+            self.fetch()
 
     def on_data(self, message: dict) -> None:  # pragma: no cover
         # real is on derived class.

@@ -55,6 +55,8 @@ class {{query.name}}(BaseQueryHandler[{{query.field.annotation}}]):
         {{ macros.deserialize_field(query.field,  assign_to, include_selection_check=False) | indent(4) }}
         self.dataChanged.emit()
     def on_data(self, message: dict) -> None:
+        self._operation_on_the_fly = False
+
         if not self._data:
             self.deserialize(message)
 
