@@ -19,6 +19,11 @@ class SelectionConfig(NamedTuple):
     choices: Dict[str, SelectionConfig] = {}
 
 
+class OperationMetaData(NamedTuple):
+    operation_name: str
+    selections: SelectionConfig
+
+
 class QSingletonMeta(type(QObject)):  # type: ignore
     def __init__(cls, name, bases, dict):
         super().__init__(name, bases, dict)
@@ -35,9 +40,8 @@ class BaseQueryHandler(Generic[T_QObject], QObject, metaclass=QSingletonMeta):
 
     instance: ClassVar[Optional[BaseQueryHandler]] = None
     ENV_NAME: ClassVar[str]
-    operationName: ClassVar[str]
+    OPERATION_METADATA: ClassVar[OperationMetaData]
     _message_template: ClassVar[GqlClientMessage]
-    OPERATION_CONFIG: ClassVar[SelectionConfig]
 
     graphqlChanged = Signal()
     dataChanged = Signal()
@@ -55,8 +59,16 @@ class BaseQueryHandler(Generic[T_QObject], QObject, metaclass=QSingletonMeta):
         self._consumers_count: int = 0
         self._operation_on_the_fly: bool = False
 
+    def loose(self) -> None:
+        """Releases retention from all children, real implementation is
+        generated."""
+        raise NotImplementedError
+
     def unconsume(self) -> None:
         self._consumers_count -= 1
+        if self._consumers_count <= 0:
+            self.loose()
+            self._data = None
 
     def consume(self) -> None:
         # if it is the first consumer fetch the data here.

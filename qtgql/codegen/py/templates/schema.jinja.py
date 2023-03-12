@@ -7,14 +7,9 @@ from typing import Optional, Union
 from enum import Enum, auto
 from PySide6.QtQml import QmlElement, QmlSingleton
 
-from qtgql.codegen.py.runtime.queryhandler import SelectionConfig
+from qtgql.codegen.py.runtime.queryhandler import SelectionConfig, OperationMetaData
 from qtgql.tools import qproperty
-from qtgql.codegen.py.runtime.bases import QGraphQListModel
-
-
-
-
-
+from qtgql.codegen.py.runtime.bases import QGraphQListModel, NodeRecord
 
 {% for dep in context.dependencies %}
 {{dep}}{% endfor %}
@@ -67,35 +62,52 @@ class {{ type.name }}({{context.base_object_name}}):
         {{f.fget}}
     {% endfor %}
     
+    def loose(self, metadata: OperationMetaData) -> None:
+        metadata=metadata  {# no-op for types without children #}
+        {# loose children #}
+        {% for f in type.fields -%}
+        {% set private_name %}self.{{f.private_name}}{% endset %}
+        {{ macros.loose_field(f, private_name) }}
+        {% endfor %}
+        {# loose self #}
+        {% if type.id_is_optional %}
+        if self._id:
+            self.__store__.loose(self, metadata.operation_name)
+        {% elif type.has_id_field and not type.id_is_optional %}
+        self.__store__.loose(self, metadata.operation_name)
+        {% else %} {# type with no ID wouldn't clear up itself at the store. delete it here. #}
+        self.deleteLater()
+        {% endif %}
+
 
     @classmethod
-    def from_dict(cls, parent, data: dict, config: SelectionConfig) -> {{type.name}}:
+    def from_dict(cls, parent, data: dict, config: SelectionConfig, metadata: OperationMetaData) -> {{type.name}}:
         {% if type.id_is_optional %}
         if id_ := data.get('id', None):
             if instance := cls.__store__.get_node(id_):
-                instance.update(data, config)
+                instance.update(data, config, metadata)
                 return instance
-        {% elif type.has_is_field %}
+        {% elif type.has_id_field %}
         if instance := cls.__store__.get_node(data['id']):
-            instance.update(data, config)
+            instance.update(data, config, metadata)
             return instance
         {% endif %}
-        {% if type.has_is_field%}
-        else:
+        inst = cls(parent=parent)
+        {% for f in type.fields -%}
+        {% set assign_to %}inst.{{f.private_name}}{% endset %}
+        {{ macros.deserialize_field(f,  assign_to) | indent(8)}}
+        {%- endfor %}
+        {% if type.id_is_optional %}
+        if inst.id:
+            record = NodeRecord(node=inst, retainers=set()).retain(metadata.operation_name)
+            cls.__store__.add_record(record)
+        {% elif type.has_id_field and not type.id_is_optional %}
+        record = NodeRecord(node=inst, retainers=set()).retain(metadata.operation_name)
+        cls.__store__.add_record(record)
         {% endif %}
-            inst = cls(parent=parent)
-            {% for f in type.fields -%}
-            {% set assign_to %}inst.{{f.private_name}}{% endset %}
-            {{ macros.deserialize_field(f,  assign_to) | indent(12)}}
-            {%- endfor %}
-            {% if type.id_is_optional %}
-            if inst.id:
-                cls.__store__.set_node(inst)
-            {% elif type.has_id_field and not type.id_is_optional %}
-            cls.__store__.set_node(inst)
-            {% endif %}
-            return inst
-    def update(self, data, config: SelectionConfig) -> None:
+        return inst
+
+    def update(self, data, config: SelectionConfig, metadata: OperationMetaData) -> None:
         parent = self.parent()
         {%for f in type.fields %}{% set fset %}self.{{f.setter_name}}{% endset %}{% set private_name %}self.{{f.private_name}}{% endset %}
         {{ macros.update_field(f, fset_name=fset, private_name=private_name) | indent(8, True) }}{% endfor %}

@@ -1,5 +1,6 @@
 import copy
 import uuid
+import weakref
 from typing import Optional, Type
 
 import pytest
@@ -162,7 +163,10 @@ class TestDeserializers:
         testcase = testcase.compile()
         assert isinstance(
             testcase.gql_type.from_dict(
-                None, {"id": uuid.uuid4().hex}, SelectionConfig(selections={"id": None})
+                None,
+                {"id": uuid.uuid4().hex},
+                SelectionConfig(selections={"id": None}),
+                testcase.query_handler.OPERATION_METADATA,
             ),
             testcase.gql_type,
         )
@@ -501,7 +505,7 @@ class TestDefaultConstructor:
         f = testcase.get_field_by_type(scalar)
         assert getattr(inst, f.private_name) == scalar.default_value
 
-    def test_nested_object_from_dict(self, qtbot):
+    def test_nested_object(self, qtbot):
         # types that refer each-other can cause recursion error
         # This is why we set object types to null.
         testcase = NestedObjectTestCase.compile()
@@ -540,3 +544,82 @@ class TestDefaultConstructor:
     def test_wont_recursive(self):
         testcase = ObjectsThatReferenceEachOtherTestCase.compile()
         testcase.gql_type()
+
+
+class TestGarbageCollection:
+    def test_root_object_with_scalars(self, qtbot, schemas_server):
+        testcase = ScalarsTestCase.compile(url=schemas_server.address)
+        testcase.query_handler.consume()
+        qtbot.wait_until(lambda: testcase.query_handler.completed)
+        node = testcase.query_handler.data
+        node_id = node.id
+        assert node is testcase.gql_type.__store__.get_node(node_id)
+        testcase.query_handler.unconsume()
+        assert not testcase.gql_type.__store__.get_node(node_id)
+        assert not testcase.query_handler.data
+
+    def test_nested_object(self, qtbot, schemas_server):
+        testcase = NestedObjectTestCase.compile(url=schemas_server.address)
+        testcase.query_handler.consume()
+        qtbot.wait_until(lambda: testcase.query_handler.completed)
+        node = testcase.query_handler.data.person
+        node_id = node.id
+        assert node is node.__store__.get_node(node_id)
+        testcase.query_handler.unconsume()
+        assert not testcase.gql_type.__store__.get_node(node_id)
+        assert not testcase.query_handler.data
+
+    def test_object_with_list_of_object(self, qtbot, schemas_server):
+        testcase = ObjectWithListOfObjectTestCase.compile(url=schemas_server.address)
+        testcase.query_handler.consume()
+        qtbot.wait_until(lambda: testcase.query_handler.completed)
+        persons = testcase.query_handler.data.persons._data
+        testcase.query_handler.unconsume()
+        for person in persons:
+            assert not person.__store__.get_node(person.id)
+        assert not testcase.query_handler.data
+
+    def test_root_field_list_of_object(self, qtbot, schemas_server):
+        testcase = RootListOfTestCase.compile(url=schemas_server.address)
+        testcase.query_handler.consume()
+        qtbot.wait_until(lambda: testcase.query_handler.completed)
+        users = testcase.query_handler.data._data
+        testcase.query_handler.unconsume()
+        for user in users:
+            assert not user.__store__.get_node(user.id)
+        assert not testcase.query_handler.data
+
+    def test_type_with_no_id(self, qtbot):
+        testcase = TypeWithNoIDTestCase.compile()
+        testcase.query_handler.on_data(testcase.initialize_dict)
+        user = weakref.ref(testcase.query_handler.data._data[0])
+        assert user()._name
+        testcase.query_handler.loose()
+        qtbot.wait_until(lambda: not user())
+        assert not testcase.query_handler.data
+
+    def test_union(self, qtbot):
+        testcase = UnionTestCase.compile()
+        handler = testcase.query_handler
+
+        handler.on_data(testcase.initialize_dict)
+        union_node = weakref.ref(handler.data.whoAmI)
+        assert union_node()
+        handler.loose()
+        qtbot.wait_until(lambda: not union_node())
+
+    def test_duplicate_object_on_same_handler(self, qtbot, monkeypatch):
+        monkeypatch.setattr(
+            ObjectWithListOfObjectTestCase,
+            "query",
+            ObjectWithListOfObjectTestCase.query.replace("user", "userWithSamePerson"),
+        )
+        testcase = ObjectWithListOfObjectTestCase.compile()
+        handler = testcase.query_handler
+        handler.on_data(testcase.initialize_dict)
+        p1 = weakref.ref(handler._data.persons._data[0])
+        for person in handler.data.persons._data:
+            assert person.id == p1().id
+        del person
+        handler.loose()
+        qtbot.wait_until(lambda: not p1())

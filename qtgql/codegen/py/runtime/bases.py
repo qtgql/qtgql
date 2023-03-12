@@ -1,19 +1,21 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, ClassVar, Generic, Optional, TypeVar
+import contextlib
+from typing import TYPE_CHECKING, ClassVar, Generic, NamedTuple, Optional, TypeVar
 
 from PySide6.QtCore import QAbstractListModel, QByteArray, QObject, Qt, Signal, Slot
 
 if TYPE_CHECKING:
     from typing_extensions import Self
 
-    from qtgql.codegen.py.runtime.queryhandler import SelectionConfig
+    from qtgql.codegen.py.runtime.queryhandler import OperationMetaData, SelectionConfig
 from qtgql.tools import qproperty, slot
 
 __all__ = ["QGraphQListModel", "get_base_graphql_object"]
 
 
 class _BaseQGraphQLObject(QObject):
+    _id: str
     id: str
     __singleton__: Self
     __store__: ClassVar[QGraphQLObjectStore[Self]]
@@ -30,9 +32,21 @@ class _BaseQGraphQLObject(QObject):
 
     @classmethod
     def from_dict(cls, parent: QObject, data: dict, config: SelectionConfig):
+        """Creates a new instance from GraphQL raw data."""
         raise NotImplementedError
 
     def update(self, data, config: SelectionConfig) -> None:
+        """updates a node based on new GraphQL data."""
+        raise NotImplementedError
+
+    def loose(self, metadata: OperationMetaData) -> None:
+        """releases all child objects if exists.
+
+        note that this method would be useful only if the object (or one
+        of its children) has an id and a reference in the store,
+        otherwise the pointer to this object is release and this object
+        would be deleted.
+        """
         raise NotImplementedError
 
     @classmethod
@@ -48,17 +62,38 @@ class _BaseQGraphQLObject(QObject):
 T_BaseQGraphQLObject = TypeVar("T_BaseQGraphQLObject", bound=_BaseQGraphQLObject)
 
 
+class NodeRecord(NamedTuple):
+    node: _BaseQGraphQLObject
+    retainers: set[str]  # set of operation names.
+
+    def retain(self, operation_name: str) -> Self:
+        self.retainers.add(operation_name)
+        return self
+
+
 class QGraphQLObjectStore(Generic[T_BaseQGraphQLObject]):
     def __init__(self) -> None:
-        self._data: dict[str, T_BaseQGraphQLObject] = {}
+        self._data: dict[str, NodeRecord] = {}
 
-    def get_node(self, id_: str) -> Optional[T_BaseQGraphQLObject]:
+    def get_node(self, id_: str) -> Optional[_BaseQGraphQLObject]:
         assert id_
-        return self._data.get(id_, None)
+        if found := self._data.get(id_, None):
+            return found.node
 
-    def set_node(self, node: T_BaseQGraphQLObject):
+    def add_record(self, record: NodeRecord):
+        assert record.node.id
+        self._data[record.node.id] = record
+
+    def loose(self, node: T_BaseQGraphQLObject, operation_name: str) -> None:
         assert node.id
-        self._data[node.id] = node
+        with contextlib.suppress(
+            KeyError
+        ):  # This node was already deleted, we can safely ignore it
+            record = self._data[node.id]
+            record.retainers.remove(operation_name)
+            if not record.retainers:
+                self._data.pop(node.id)
+                node.deleteLater()  # we can delete it now since it has no retainers.
 
 
 class QGraphQListModel(QAbstractListModel, Generic[T_BaseQGraphQLObject]):
@@ -131,6 +166,8 @@ class QGraphQListModel(QAbstractListModel, Generic[T_BaseQGraphQLObject]):
             self._data[index] = v
             self.endInsertRows()
         else:
+            model_index = self.index(self.rowCount() - 1)
+            index = self.rowCount()
             self.beginInsertRows(model_index, index, index)
             self._data.append(v)
             self.endInsertRows()
@@ -139,6 +176,7 @@ class QGraphQListModel(QAbstractListModel, Generic[T_BaseQGraphQLObject]):
         raise NotImplementedError
 
     def removeRows(self, row: int, count: int, parent=None) -> bool:
+        # check that this is a valid removal.
         if row + count <= self.rowCount():
             self.beginRemoveRows(self.index(0).parent(), row, count)
             end = self._data[row + count :]
@@ -146,7 +184,7 @@ class QGraphQListModel(QAbstractListModel, Generic[T_BaseQGraphQLObject]):
             self._data = start + end
             self.endRemoveRows()
             return True
-        return False
+        return False  # pragma: no cover
 
 
 def get_base_graphql_object(name: str) -> type[_BaseQGraphQLObject]:
