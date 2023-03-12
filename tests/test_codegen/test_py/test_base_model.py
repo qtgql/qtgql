@@ -67,6 +67,17 @@ def test_insert(qtbot, sample_model_initialized):
     assert sample_model_initialized.data(sample_model_initialized.index(2), 257) == "foo"
 
 
+def test_insert_after_max_index(qtbot, sample_model_initialized):
+    with qtbot.wait_signal(sample_model_initialized.rowsAboutToBeInserted):
+        sample_model_initialized.insert(sample_model_initialized.rowCount() + 200, "foo")
+    assert (
+        sample_model_initialized.data(
+            sample_model_initialized.index(sample_model_initialized.rowCount() - 1), 257
+        )
+        == "foo"
+    )
+
+
 def test_remove_rows(qtbot, sample_model_initialized):
     sample_model_initialized.append(2)
     sample_model_initialized.append(3)

@@ -166,6 +166,8 @@ class QGraphQListModel(QAbstractListModel, Generic[T_BaseQGraphQLObject]):
             self._data[index] = v
             self.endInsertRows()
         else:
+            model_index = self.index(self.rowCount() - 1)
+            index = self.rowCount()
             self.beginInsertRows(model_index, index, index)
             self._data.append(v)
             self.endInsertRows()
@@ -181,7 +183,7 @@ class QGraphQListModel(QAbstractListModel, Generic[T_BaseQGraphQLObject]):
             self._data = start + end
             self.endRemoveRows()
             return True
-        return False
+        return False  # pragma: no cover
 
 
 def get_base_graphql_object(name: str) -> type[_BaseQGraphQLObject]:
