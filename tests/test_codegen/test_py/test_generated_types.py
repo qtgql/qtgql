@@ -547,7 +547,7 @@ class TestDefaultConstructor:
 
 
 class TestGarbageCollection:
-    def test_root_object_with_scalars(self, qtbot, schemas_server):
+    def test_root_object_with_scalars_cleanup_when_no_subscribers(self, qtbot, schemas_server):
         testcase = ScalarsTestCase.compile(url=schemas_server.address)
         testcase.query_handler.consume()
         qtbot.wait_until(lambda: testcase.query_handler.completed)
@@ -557,6 +557,19 @@ class TestGarbageCollection:
         testcase.query_handler.unconsume()
         assert not testcase.gql_type.__store__.get_node(node_id)
         assert not testcase.query_handler.data
+
+    def test_refetch(self, qtbot, schemas_server):
+        testcase = ScalarsTestCase.compile(url=schemas_server.address)
+        testcase.query_handler.consume()
+        qtbot.wait_until(lambda: testcase.query_handler.completed)
+        node = testcase.query_handler.data
+        node_id = node.id
+        assert node is testcase.gql_type.__store__.get_node(node_id)
+        testcase.query_handler.unconsume()
+        assert not testcase.gql_type.__store__.get_node(node_id)
+        assert not testcase.query_handler.data
+        testcase.query_handler.consume()
+        qtbot.wait_until(lambda: bool(testcase.query_handler._data))
 
     def test_nested_object(self, qtbot, schemas_server):
         testcase = NestedObjectTestCase.compile(url=schemas_server.address)
