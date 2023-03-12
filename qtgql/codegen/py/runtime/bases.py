@@ -63,7 +63,7 @@ T_BaseQGraphQLObject = TypeVar("T_BaseQGraphQLObject", bound=_BaseQGraphQLObject
 
 
 class NodeRecord(NamedTuple):
-    node: T_BaseQGraphQLObject
+    node: _BaseQGraphQLObject
     retainers: set[str]  # set of operation names.
 
     def retain(self, operation_name: str) -> Self:
@@ -75,7 +75,7 @@ class QGraphQLObjectStore(Generic[T_BaseQGraphQLObject]):
     def __init__(self) -> None:
         self._data: dict[str, NodeRecord] = {}
 
-    def get_node(self, id_: str) -> Optional[T_BaseQGraphQLObject]:
+    def get_node(self, id_: str) -> Optional[_BaseQGraphQLObject]:
         assert id_
         if found := self._data.get(id_, None):
             return found.node
