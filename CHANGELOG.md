@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+0.112.0 - 2023-03-12
+--------------------
+
+This release adds initial support for garbage collection in order to avoid
+caching too many objects.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #137](https://github.com/nrbnlulu/qtgql/pull/137/)
+
+
 0.111.4 - 2023-03-09
 --------------------
 
