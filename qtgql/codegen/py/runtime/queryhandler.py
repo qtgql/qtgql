@@ -66,7 +66,7 @@ class BaseQueryHandler(Generic[T_QObject], QObject, metaclass=QSingletonMeta):
 
     def unconsume(self) -> None:
         self._consumers_count -= 1
-        if not self._consumers_count:
+        if self._consumers_count <= 0:
             self.loose()
             self._data = None
 

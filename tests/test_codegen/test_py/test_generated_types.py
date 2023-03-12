@@ -586,13 +586,25 @@ class TestGarbageCollection:
             assert not user.__store__.get_node(user.id)
         assert not testcase.query_handler.data
 
-    def test_type_with_no_id(self, qtbot, schemas_server):
-        testcase = TypeWithNoIDTestCase.compile(url=schemas_server.address)
-        testcase.query_handler.consume()
-        qtbot.wait_until(lambda: testcase.query_handler.completed)
+    def test_type_with_no_id(self, qtbot):
+        testcase = TypeWithNoIDTestCase.compile()
+        testcase.query_handler.on_data(testcase.initialize_dict)
         user = weakref.ref(testcase.query_handler.data._data[0])
         assert user()._name
-        testcase.query_handler.unconsume()
+        testcase.query_handler.loose()
         qtbot.wait(100)
         assert not user()
         assert not testcase.query_handler.data
+
+    def test_union(self, qtbot):
+        testcase = UnionTestCase.compile()
+        handler = testcase.query_handler
+
+        handler.on_data(testcase.initialize_dict)
+        union_node = weakref.ref(handler.data.whoAmI)
+        assert union_node()
+        handler.loose()
+        qtbot.wait_until(lambda: not union_node())
+
+    def test_duplicate_object_on_same_handler(self):
+        raise NotImplementedError
