@@ -501,7 +501,7 @@ class TestDefaultConstructor:
         f = testcase.get_field_by_type(scalar)
         assert getattr(inst, f.private_name) == scalar.default_value
 
-    def test_nested_object_from_dict(self, qtbot):
+    def test_nested_object(self, qtbot):
         # types that refer each-other can cause recursion error
         # This is why we set object types to null.
         testcase = NestedObjectTestCase.compile()
@@ -543,7 +543,7 @@ class TestDefaultConstructor:
 
 
 class TestGarbageCollection:
-    def test_root_object(self, qtbot, schemas_server):
+    def test_root_object_with_scalars(self, qtbot, schemas_server):
         testcase = ScalarsTestCase.compile(url=schemas_server.address)
         testcase.query_handler.consume()
         qtbot.wait_until(lambda: testcase.query_handler.completed)
@@ -552,4 +552,25 @@ class TestGarbageCollection:
         assert node is testcase.gql_type.__store__.get_node(node_id)
         testcase.query_handler.unconsume()
         assert not testcase.gql_type.__store__.get_node(node_id)
+        assert not testcase.query_handler.data
+
+    def test_nested_object(self, qtbot, schemas_server):
+        testcase = NestedObjectTestCase.compile(url=schemas_server.address)
+        testcase.query_handler.consume()
+        qtbot.wait_until(lambda: testcase.query_handler.completed)
+        node = testcase.query_handler.data.person
+        node_id = node.id
+        assert node is node.__store__.get_node(node_id)
+        testcase.query_handler.unconsume()
+        assert not testcase.gql_type.__store__.get_node(node_id)
+        assert not testcase.query_handler.data
+
+    def test_object_with_list_of_object(self, qtbot, schemas_server):
+        testcase = ObjectWithListOfObjectTestCase.compile(url=schemas_server.address)
+        testcase.query_handler.consume()
+        qtbot.wait_until(lambda: testcase.query_handler.completed)
+        persons = testcase.query_handler.data.persons._data
+        testcase.query_handler.unconsume()
+        for person in persons:
+            assert not person.__store__.get_node(person.id)
         assert not testcase.query_handler.data

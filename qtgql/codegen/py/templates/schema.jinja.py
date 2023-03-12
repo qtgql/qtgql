@@ -86,12 +86,12 @@ class {{ type.name }}({{context.base_object_name}}):
             if instance := cls.__store__.get_node(id_):
                 instance.update(data, config)
                 return instance
-        {% elif type.has_is_field %}
+        {% elif type.has_id_field %}
         if instance := cls.__store__.get_node(data['id']):
             instance.update(data, config)
             return instance
         {% endif %}
-        {% if type.has_is_field%}
+        {% if type.has_id_field%}
         else:
         {% endif %}
             inst = cls(parent=parent)
@@ -101,10 +101,10 @@ class {{ type.name }}({{context.base_object_name}}):
             {%- endfor %}
             {% if type.id_is_optional %}
             if inst.id:
-                record = NodeRecord(node=inst).retain(metadata.operation_name)
+                record = NodeRecord(node=inst, retainers=set()).retain(metadata.operation_name)
                 cls.__store__.add_record(record)
             {% elif type.has_id_field and not type.id_is_optional %}
-            record = NodeRecord(node=inst).retain(metadata.operation_name)
+            record = NodeRecord(node=inst, retainers=set()).retain(metadata.operation_name)
             cls.__store__.add_record(record)
             {% endif %}
             return inst

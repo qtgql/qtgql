@@ -63,7 +63,7 @@ T_BaseQGraphQLObject = TypeVar("T_BaseQGraphQLObject", bound=_BaseQGraphQLObject
 
 class NodeRecord(NamedTuple):
     node: T_BaseQGraphQLObject
-    retainers: set[str] = set()  # set of operation names.
+    retainers: set[str]  # set of operation names.
 
     def retain(self, operation_name: str) -> Self:
         self.retainers.add(operation_name)
