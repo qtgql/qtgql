@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+0.112.1 - 2023-03-12
+--------------------
+
+This release adds support for queries refetching.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #143](https://github.com/nrbnlulu/qtgql/pull/143/)
+
+
 0.112.0 - 2023-03-12
 --------------------
 
