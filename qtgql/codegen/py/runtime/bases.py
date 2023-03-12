@@ -176,6 +176,7 @@ class QGraphQListModel(QAbstractListModel, Generic[T_BaseQGraphQLObject]):
         raise NotImplementedError
 
     def removeRows(self, row: int, count: int, parent=None) -> bool:
+        # check that this is a valid removal.
         if row + count <= self.rowCount():
             self.beginRemoveRows(self.index(0).parent(), row, count)
             end = self._data[row + count :]
