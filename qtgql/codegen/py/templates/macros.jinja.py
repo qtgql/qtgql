@@ -122,27 +122,13 @@ if '{{f.name}}' in config.selections.keys():
 {%- endmacro %}
 
 
-{% macro loose_obj_store(type, attr_name) %}
-        {# loose self #}
-        {% if type.id_is_optional or type.is_union() %}
-        if {{attr_name}}._id:
-            {{attr_name}}.__store__.loose({{attr_name}}, metadata.operation_name)
-        {% elif type.has_id_field and not type.id_is_optional %}
-        {{attr_name}}.__store__.loose({{attr_name}}, metadata.operation_name)
-        {% endif %}
-        {{attr_name}}.deleteLater()
-
-{% endmacro %}
-
 {% macro loose_field(f, private_name) -%}
         {% if f.type.is_object_type or f.type.is_union() %}
         {{private_name}}.loose(metadata)
-        {{loose_obj_store(f.type, private_name)}}
         {{private_name}} = None
-        {% elif f.type.is_model.is_object_type %}
+        {% elif f.type.is_model.is_object_type or f.type.is_model.is_union %}
         for node in {{private_name}}._data:
             node.loose(metadata)
-            {{loose_obj_store(f.type, "node") | indent(4)}}
         {{private_name}}.deleteLater()
         {{private_name}} = None
         {% endif %}

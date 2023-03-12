@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 from typing import TYPE_CHECKING, ClassVar, Generic, NamedTuple, Optional, TypeVar
 
 from PySide6.QtCore import QAbstractListModel, QByteArray, QObject, Qt, Signal, Slot
@@ -85,10 +86,14 @@ class QGraphQLObjectStore(Generic[T_BaseQGraphQLObject]):
 
     def loose(self, node: T_BaseQGraphQLObject, operation_name: str) -> None:
         assert node.id
-        record = self._data[node.id]
-        record.retainers.remove(operation_name)
-        if not record.retainers:
-            self._data.pop(node.id)
+        with contextlib.suppress(
+            KeyError
+        ):  # This node was already deleted, we can safely ignore it
+            record = self._data[node.id]
+            record.retainers.remove(operation_name)
+            if not record.retainers:
+                self._data.pop(node.id)
+                node.deleteLater()  # we can delete it now since it has no retainers.
 
 
 class QGraphQListModel(QAbstractListModel, Generic[T_BaseQGraphQLObject]):

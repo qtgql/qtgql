@@ -606,5 +606,18 @@ class TestGarbageCollection:
         handler.loose()
         qtbot.wait_until(lambda: not union_node())
 
-    def test_duplicate_object_on_same_handler(self):
-        raise NotImplementedError
+    def test_duplicate_object_on_same_handler(self, qtbot, monkeypatch):
+        monkeypatch.setattr(
+            ObjectWithListOfObjectTestCase,
+            "query",
+            ObjectWithListOfObjectTestCase.query.replace("user", "userWithSamePerson"),
+        )
+        testcase = ObjectWithListOfObjectTestCase.compile()
+        handler = testcase.query_handler
+        handler.on_data(testcase.initialize_dict)
+        p1 = weakref.ref(handler._data.persons._data[0])
+        for person in handler.data.persons._data:
+            assert person.id == p1().id
+        del person
+        handler.loose()
+        qtbot.wait_until(lambda: not p1())
