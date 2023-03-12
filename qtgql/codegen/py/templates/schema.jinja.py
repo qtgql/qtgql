@@ -63,20 +63,13 @@ class {{ type.name }}({{context.base_object_name}}):
     {% endfor %}
     
     def loose(self, metadata: OperationMetaData) -> None:
+        metadata=metadata  {# no-op for types without children #}
         {# loose children #}
         {% for f in type.fields -%}
         {% set private_name %}self.{{f.private_name}}{% endset %}
         {{ macros.loose_field(f, private_name) }}
         {% endfor %}
-        {# loose self #}
-        {% if type.id_is_optional %}
-        if self._id:
-            self.__store__.loose(self, metadata.operation_name)
-        {% elif type.has_id_field and not type.id_is_optional %}
-        self.__store__.loose(self, metadata.operation_name)
-        {% else %}
-        self.deleteLater()
-        {% endif %}
+
 
 
     @classmethod

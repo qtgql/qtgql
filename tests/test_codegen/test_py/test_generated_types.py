@@ -1,5 +1,6 @@
 import copy
 import uuid
+import weakref
 from typing import Optional, Type
 
 import pytest
@@ -573,4 +574,25 @@ class TestGarbageCollection:
         testcase.query_handler.unconsume()
         for person in persons:
             assert not person.__store__.get_node(person.id)
+        assert not testcase.query_handler.data
+
+    def test_root_field_list_of_object(self, qtbot, schemas_server):
+        testcase = RootListOfTestCase.compile(url=schemas_server.address)
+        testcase.query_handler.consume()
+        qtbot.wait_until(lambda: testcase.query_handler.completed)
+        users = testcase.query_handler.data._data
+        testcase.query_handler.unconsume()
+        for user in users:
+            assert not user.__store__.get_node(user.id)
+        assert not testcase.query_handler.data
+
+    def test_type_with_no_id(self, qtbot, schemas_server):
+        testcase = TypeWithNoIDTestCase.compile(url=schemas_server.address)
+        testcase.query_handler.consume()
+        qtbot.wait_until(lambda: testcase.query_handler.completed)
+        user = weakref.ref(testcase.query_handler.data._data[0])
+        assert user()._name
+        testcase.query_handler.unconsume()
+        qtbot.wait(100)
+        assert not user()
         assert not testcase.query_handler.data
