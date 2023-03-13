@@ -24,25 +24,13 @@ class OperationMetaData(NamedTuple):
     selections: SelectionConfig
 
 
-class QSingletonMeta(type(QObject)):  # type: ignore
-    def __init__(cls, name, bases, dict):
-        super().__init__(name, bases, dict)
-        cls.instance = None
-
-    def __call__(cls, *args, **kw):
-        if cls.instance is None:
-            cls.instance = super().__call__(*args, **kw)
-        return cls.instance
-
-
-class BaseQueryHandler(Generic[T_QObject], QObject, metaclass=QSingletonMeta):
-    """Each handler will be exposed to QML and."""
-
-    instance: ClassVar[Optional[BaseQueryHandler]] = None
+class BaseOperationHandler(QObject):
+    # class-vars
     ENV_NAME: ClassVar[str]
     OPERATION_METADATA: ClassVar[OperationMetaData]
     _message_template: ClassVar[GqlClientMessage]
 
+    # signals
     graphqlChanged = Signal()
     dataChanged = Signal()
     completedChanged = Signal()
@@ -112,6 +100,23 @@ class BaseQueryHandler(Generic[T_QObject], QObject, metaclass=QSingletonMeta):
     def on_error(self, message: list[dict[str, Any]]) -> None:  # pragma: no cover
         # This (unlike `on_data` is not implemented for real)
         raise NotImplementedError(message)
+
+
+class QSingletonMeta(type(QObject)):  # type: ignore
+    def __init__(cls, name, bases, dict):
+        super().__init__(name, bases, dict)
+        cls.instance = None
+
+    def __call__(cls, *args, **kw):
+        if cls.instance is None:
+            cls.instance = super().__call__(*args, **kw)
+        return cls.instance
+
+
+class BaseQueryHandler(Generic[T_QObject], BaseOperationHandler, metaclass=QSingletonMeta):
+    """Each handler will be exposed to QML and."""
+
+    instance: ClassVar[Optional[BaseQueryHandler]] = None
 
 
 class UseQueryABC(QQuickItem):
