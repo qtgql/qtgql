@@ -273,6 +273,7 @@ class SchemaEvaluator:
                 t for name, t in self._generated_types.items() if name not in BuiltinScalars.keys()
             ],
             queries=list(self._query_handlers.values()),
+            mutations=list(self._mutation_handlers.values()),
             config=self.config,
         )
         return GeneratedNamespace(

@@ -1,6 +1,16 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, ClassVar, Dict, Generic, NamedTuple, Optional, TypeVar
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    ClassVar,
+    Dict,
+    Generic,
+    NamedTuple,
+    Optional,
+    TypeVar,
+)
 
 from PySide6.QtCore import QObject, Signal
 from PySide6.QtQuick import QQuickItem
@@ -117,6 +127,10 @@ class BaseQueryHandler(Generic[T_QObject], BaseOperationHandler, metaclass=QSing
     """Each handler will be exposed to QML and."""
 
     instance: ClassVar[Optional[BaseQueryHandler]] = None
+
+
+class BaseMutationHandler(BaseOperationHandler):
+    commit: Callable
 
 
 class UseQueryABC(QQuickItem):

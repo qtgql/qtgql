@@ -23,6 +23,7 @@ class TemplateContext:
     enums: list[GqlEnumDefinition]
     types: list[GqlTypeDefinition]
     queries: list[QtGqlOperationDefinition]
+    mutations: list[QtGqlOperationDefinition]
     config: QtGqlConfig
 
     @property
