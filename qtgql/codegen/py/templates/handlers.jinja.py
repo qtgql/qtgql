@@ -67,19 +67,19 @@ QML_IMPORT_MAJOR_VERSION = 1
 
 
 {% for query in context.queries %}
-@QmlElement
-@QmlSingleton
+
 class {{query.name}}(BaseQueryHandler[{{query.field.annotation}}]):
 
     {{operation_classvars(query)}}
     {{operation_common(query)}}
+
+@QmlElement
+class Require{{query.name}}(UseQueryABC):
+    ENV_NAME = "{{context.config.env_name}}"
+
+    def _get_handler(self) -> BaseQueryHandler[{{query.field.annotation}}]:
+        return {{query.name}}(self)
 {% endfor %}
-def init() -> None:
-    {% for query in context.queries %}
-    {{query.name}}()
-    {% endfor %}
-
-
 
 {% for mutation in context.mutations %}
 class {{query.name}}(BaseMutationHandler[{{query.field.annotation}}]):
@@ -89,6 +89,3 @@ class {{query.name}}(BaseMutationHandler[{{query.field.annotation}}]):
 
 {% endfor %}
 
-@QmlElement
-class UseQuery(UseQueryABC):
-    ENV_NAME = "{{context.config.env_name}}"
