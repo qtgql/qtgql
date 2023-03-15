@@ -18,6 +18,7 @@ from . import (
     root_list_of_object,
     type_with_no_id,
     type_with_nullable_id,
+    variables_schema,
     wrogn_id_type,
 )
 
@@ -42,4 +43,5 @@ __all__ = [  # noqa: PLE0604
     type_with_nullable_id,
     wrogn_id_type,
     list_of_union,
+    variables_schema,
 ]

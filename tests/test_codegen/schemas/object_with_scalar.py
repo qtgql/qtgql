@@ -4,7 +4,7 @@ from uuid import UUID
 import strawberry
 
 from tests.conftest import fake
-from tests.test_codegen.schemas.node_interface import NODE_DB, Node
+from tests.test_codegen.schemas.node_interface import Node
 
 
 @strawberry.type
@@ -15,9 +15,6 @@ class User(Node):
     male: bool = strawberry.field(default_factory=fake.pybool)
     id: strawberry.ID = strawberry.field(default_factory=lambda: strawberry.ID(fake.pystr()))
     uuid: UUID = strawberry.field(default_factory=uuid.uuid4)
-
-    def __post_init__(self):
-        NODE_DB.insert(self)
 
 
 @strawberry.type
@@ -33,17 +30,4 @@ class ChangeNameInput:
     name: str
 
 
-@strawberry.type
-class Mutation:
-    @strawberry.mutation
-    def createUserNoArgs(self) -> User:
-        return User()
-
-    @strawberry.mutation
-    def updateName(self, id: strawberry.ID, newName: str) -> User:  # noqa: N803
-        user: User = NODE_DB.get(id)
-        user.name = newName
-        return user
-
-
-schema = strawberry.Schema(query=Query, mutation=Mutation)
+schema = strawberry.Schema(query=Query)

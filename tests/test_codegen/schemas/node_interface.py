@@ -10,6 +10,9 @@ import strawberry
 class Node:
     id: strawberry.ID = strawberry.field(default_factory=lambda: uuid.uuid4().hex)
 
+    def __post_init__(self):
+        NODE_DB.insert(self)
+
 
 T_Node = TypeVar("T_Node", bound=Node)
 

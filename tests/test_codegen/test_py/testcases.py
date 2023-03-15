@@ -136,11 +136,8 @@ class CompiledTestCase(QGQLObjectTestCase):
     def query_handler(self) -> "BaseQueryHandler":
         return getattr(self.handlers_mod, self.query_operationName)(None)
 
-    @cached_property
-    def mutation_handler(self) -> BaseMutationHandler:
-        return getattr(
-            self.handlers_mod, list(self.evaluator._mutation_handlers.values())[0].name, None
-        )
+    def get_mutation_handler(self, opertaion_name: str) -> BaseMutationHandler:
+        return getattr(self.handlers_mod, opertaion_name, None)
 
     def get_signals(self) -> dict[str, "QtCore.Signal"]:
         return {
@@ -472,6 +469,29 @@ ListOfUnionTestCase = QGQLObjectTestCase(
           }
         }""",
     test_name="ListOfUnionTestCase",
+)
+
+
+OperationVariableTestCase = QGQLObjectTestCase(
+    schema=schemas.variables_schema.schema,
+    query="""
+    query MainQuery{
+        post{
+        header
+        comments{
+            content
+            commenter
+        }
+        createdAt
+        }
+    }
+
+    mutation changePostHeaderMutation ($postID: ID!, $newHeader: String!){
+        changePostHeader(newHeader: $newHeader, postId: $postID) {header}
+    }
+    """,
+    test_name="OperationVariableTestCase",
+    type_name="Post",
 )
 
 all_test_cases = [
