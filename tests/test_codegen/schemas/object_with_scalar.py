@@ -4,7 +4,7 @@ from uuid import UUID
 import strawberry
 
 from tests.conftest import fake
-from tests.test_codegen.schemas.node_interface import NODE_DB, Node, NodeDb
+from tests.test_codegen.schemas.node_interface import NODE_DB, Node
 
 
 @strawberry.type
@@ -41,7 +41,7 @@ class Mutation:
 
     @strawberry.mutation
     def updateName(self, id: strawberry.ID, newName: str) -> User:  # noqa: N803
-        user: User = NodeDb.get(id)
+        user: User = NODE_DB.get(id)
         user.name = newName
         return user
 

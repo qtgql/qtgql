@@ -49,6 +49,8 @@ class BaseOperationHandler(QObject, Generic[T]):
     operationOnFlightChanged = Signal()
     errorChanged = Signal()
 
+    setVariables: Callable  # implementation by jinja.
+
     def __init__(self, parent: Optional[QObject]):
         super().__init__(parent)
         name = self.__class__.__name__
@@ -57,6 +59,7 @@ class BaseOperationHandler(QObject, Generic[T]):
         self._operation_on_the_fly: bool = False
         self._data: Optional[T] = None
         self.environment = get_gql_env(self.ENV_NAME)
+        self._variables: dict = {}
 
     def loose(self) -> None:
         """Releases retention from all children, real implementation is
@@ -76,6 +79,7 @@ class BaseOperationHandler(QObject, Generic[T]):
 
     @property
     def message(self) -> GqlClientMessage:
+        self._message_template.payload.variables = self._variables
         return self._message_template
 
     @qproperty(QObject, notify=dataChanged)
@@ -126,7 +130,7 @@ class BaseQueryHandler(BaseOperationHandler[T]):
     ...
 
 
-class BaseMutationHandler(BaseOperationHandler):
+class BaseMutationHandler(BaseOperationHandler[T]):
     commit: Callable
 
 

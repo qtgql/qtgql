@@ -21,7 +21,7 @@ from qtgql.codegen.py.runtime.custom_scalars import (
     TimeScalar,
 )
 from qtgql.codegen.py.runtime.environment import QtGqlEnvironment, set_gql_env
-from qtgql.codegen.py.runtime.queryhandler import BaseQueryHandler
+from qtgql.codegen.py.runtime.queryhandler import BaseMutationHandler, BaseQueryHandler
 from qtgql.gqltransport.client import GqlWsTransportClient
 from strawberry import Schema
 
@@ -136,6 +136,12 @@ class CompiledTestCase(QGQLObjectTestCase):
     def query_handler(self) -> "BaseQueryHandler":
         return getattr(self.handlers_mod, self.query_operationName)(None)
 
+    @cached_property
+    def mutation_handler(self) -> BaseMutationHandler:
+        return getattr(
+            self.handlers_mod, list(self.evaluator._mutation_handlers.values())[0].name, None
+        )
+
     def get_signals(self) -> dict[str, "QtCore.Signal"]:
         return {
             field.signal_name: getattr(self.query_handler.data, field.signal_name)
@@ -186,13 +192,15 @@ ScalarsTestCase = QGQLObjectTestCase(
           }
         }
 
-       mutation updateNameMutation($id: ID!, $name: String!){updateName(id: $id, newName: $name){
-        name
-        age
-        agePoint
-        uuid
-        male
-        }}
+        mutation updateNameMutation($id: ID!, $name: String!) {
+          updateName(id: $id, newName: $name) {
+            name
+            age
+            agePoint
+            uuid
+            male
+          }
+        }
         """,
     test_name="ScalarsTestCase",
 )

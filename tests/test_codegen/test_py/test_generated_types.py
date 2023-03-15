@@ -636,3 +636,19 @@ class TestGarbageCollection:
         del person
         handler.loose()
         qtbot.wait_until(lambda: not p1())
+
+
+class TestOperationVariables:
+    def test_scalars(self, qtbot, schemas_server):
+        testcase = ScalarsTestCase.compile(schemas_server.address)
+        query_handler = testcase.query_handler
+        query_handler.fetch()
+        qtbot.wait_until(lambda: query_handler.completed)
+        user_id = query_handler.data.id
+        prev_name = query_handler.data.name
+        mutation_handler = testcase.mutation_handler(None)
+        mutation_handler.setVariables(user_id, "Nir")
+        mutation_handler.fetch()
+        qtbot.wait_until(lambda: mutation_handler.completed)
+        assert query_handler.data.name == "Nir"
+        assert "Nir" != prev_name

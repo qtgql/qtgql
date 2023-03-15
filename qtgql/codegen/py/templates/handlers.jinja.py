@@ -63,11 +63,22 @@ QML_IMPORT_MAJOR_VERSION = 1
         # data existed already, update the data
         else:
             self.update(message)
+    {% if operation_def.variables %}
+    @slot
+    def setVariables(self,
+                     {% for var in operation_def.variables %}{{var.name}}: {{var.annotation}}, {% endfor %}
+                     ) -> None:
+
+        self._variables = {
+            {% for var in operation_def.variables %}'{{var.name}}':  {{var.name}},{% endfor %}
+        }
+
+    {% endif %}
+
 {% endmacro %}
 
 
 {% for query in context.queries %}
-
 class {{query.name}}(BaseQueryHandler[{{query.field.annotation}}]):
 
     {{operation_classvars(query)}}
@@ -81,8 +92,15 @@ class Require{{query.name}}(UseQueryABC):
         return {{query.name}}(self)
 {% endfor %}
 
+
 {% for mutation in context.mutations %}
 class {{mutation.name}}(BaseMutationHandler[{{mutation.field.annotation}}]):
+
+    {{operation_classvars(mutation)}}
+    {{operation_common(mutation)}}
+
+
+class Require{{mutation.name}}(BaseMutationHandler[{{mutation.field.annotation}}]):
     @slot
     def commit(self) -> None:
         self.refetch()
