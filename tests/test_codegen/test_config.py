@@ -72,3 +72,18 @@ def test_get_mutation_operations(pseudo_config):
     )
     pseudo_config.generate()
     assert pseudo_config._evaluator._mutation_handlers != {}
+
+
+def test_get_operation_input_variables(pseudo_config):
+    pseudo_config.schema_path.write_text(str(ScalarsTestCase.schema))
+    pseudo_config.operations_dir.write_text(
+        """mutation updateNameMutation($id: ID!, $name: String!){updateName(id: $id, newName: $name){
+            name
+            age
+            agePoint
+            uuid
+            male
+            }}"""
+    )
+    pseudo_config.generate()
+    assert pseudo_config._evaluator._mutation_handlers["updateNameMutation"].variables

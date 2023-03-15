@@ -18,7 +18,9 @@ from graphql.language import visitor
 from qtgql.codegen.graphql_ref import (
     is_enum_definition,
     is_list_definition,
+    is_named_type_node,
     is_non_null_definition,
+    is_nonnull_node,
     is_object_definition,
     is_operation_def_node,
     is_scalar_definition,
@@ -38,6 +40,7 @@ from qtgql.codegen.py.objecttype import (
     GqlFieldDefinition,
     GqlTypeDefinition,
     GqlTypeHinter,
+    QtGqlVariableDefinition,
 )
 from qtgql.codegen.utils import anti_forward_ref
 from qtgql.exceptions import QtGqlException
@@ -75,11 +78,27 @@ class QtGqlVisitor(visitor.Visitor):
             root_type.fields_dict[gql_field.name.value], gql_field.selection_set
         )
 
+    def _parse_variable_definition(
+        self, var: gql_lang.VariableDefinitionNode
+    ) -> QtGqlVariableDefinition:
+        return QtGqlVariableDefinition(
+            name=var.variable.name.value,
+            type=self.evaluator.get_type(var.type),
+            type_map=self.evaluator._generated_types,
+            scalars=self.evaluator.config.custom_scalars,
+            enums=self.evaluator._generated_enums,
+            default_value=var.default_value,
+        )
+
     def enter_operation_definition(self, node, key, parent, path, ancestors):
         if operation := is_operation_def_node(node):
             if operation.operation in (OperationType.QUERY, OperationType.MUTATION):
                 root_field: gql_lang.FieldNode = operation.selection_set.selections[0]  # type: ignore
                 op_name = operation.name.value
+                operation_vars: list[QtGqlVariableDefinition] = []
+                if variables_def := operation.variable_definitions:
+                    for var in variables_def:
+                        operation_vars.append(self._parse_variable_definition(var))
                 if operation.operation is OperationType.QUERY:
                     assert self.evaluator._query_type
                     root_qtgql_field = self._get_root_type_field(
@@ -90,6 +109,7 @@ class QtGqlVisitor(visitor.Visitor):
                         name=op_name,
                         field=root_qtgql_field,
                         directives=node.directives,
+                        variables=operation_vars,
                     )
                     self.query_handlers[op_name] = operation_definition
                 elif operation.operation is OperationType.MUTATION:
@@ -101,6 +121,7 @@ class QtGqlVisitor(visitor.Visitor):
                         name=op_name,
                         field=root_qtgql_field,
                         directives=node.directives,
+                        variables=operation_vars,
                     )
                     self.mutation_handlers[op_name] = operation_definition
 
@@ -110,11 +131,22 @@ class SchemaEvaluator:
         self.config = config
         self._generated_types: dict[str, GqlTypeDefinition] = {}
         self._generated_enums: EnumMap = {}
-        self._fragments_store: dict[int, str] = {}
         self._query_handlers: dict[str, QtGqlOperationDefinition] = {}
         self._mutation_handlers: dict[str, QtGqlOperationDefinition] = {}
         self._query_type: Optional[GqlTypeDefinition] = None
         self._mutation_type: Optional[GqlTypeDefinition] = None
+
+    def get_type(self, node: gql_lang.TypeNode) -> GqlTypeHinter:
+        if nonnull := is_nonnull_node(node):
+            return self._evaluate_field_type(
+                graphql.type.GraphQLNonNull(
+                    self.schema_definition.get_type(nonnull.type.name.value)
+                )
+            )
+
+        if named_type := is_named_type_node(node):
+            return self._evaluate_field_type(self.schema_definition.get_type(named_type.name.value))
+        raise NotImplementedError(node, "Type is not supported as a variable ATM")
 
     @cached_property
     def schema_definition(self) -> graphql.GraphQLSchema:
@@ -178,8 +210,8 @@ class SchemaEvaluator:
             name=name,
             type_map=self._generated_types,
             scalars=self.config.custom_scalars,
-            description=field.description,
             enums=self._generated_enums,
+            description=field.description,
         )
 
     def _evaluate_object_type(

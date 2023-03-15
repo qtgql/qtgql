@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from textwrap import dedent
-from typing import List, NamedTuple, Optional
+from typing import TYPE_CHECKING, List, NamedTuple, Optional
 
 import attrs
 from graphql import language as gql_lang
@@ -14,6 +14,9 @@ from qtgql.codegen.py.compiler.template import (
 )
 from qtgql.codegen.py.objecttype import GqlFieldDefinition, GqlTypeDefinition
 from qtgql.codegen.utils import AntiForwardRef
+
+if TYPE_CHECKING:
+    from qtgql.codegen.py.objecttype import QtGqlVariableDefinition
 
 
 def get_field_from_field_node(
@@ -105,6 +108,7 @@ class QtGqlOperationDefinition(NamedTuple):
     field: QtGqlQueriedField
     directives: list[str] = []
     fragments: list[str] = []
+    variables: list[QtGqlVariableDefinition] = []
 
     @property
     def operation_config(self) -> str:

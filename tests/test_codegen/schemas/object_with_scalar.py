@@ -4,7 +4,7 @@ from uuid import UUID
 import strawberry
 
 from tests.conftest import fake
-from tests.test_codegen.schemas.node_interface import Node
+from tests.test_codegen.schemas.node_interface import NODE_DB, Node, NodeDb
 
 
 @strawberry.type
@@ -16,6 +16,9 @@ class User(Node):
     id: strawberry.ID = strawberry.field(default_factory=lambda: strawberry.ID(fake.pystr()))
     uuid: UUID = strawberry.field(default_factory=uuid.uuid4)
 
+    def __post_init__(self):
+        NODE_DB.insert(self)
+
 
 @strawberry.type
 class Query:
@@ -24,11 +27,23 @@ class Query:
         return User()
 
 
+@strawberry.input
+class ChangeNameInput:
+    id: strawberry.ID
+    name: str
+
+
 @strawberry.type
 class Mutation:
     @strawberry.mutation
     def createUserNoArgs(self) -> User:
         return User()
+
+    @strawberry.mutation
+    def updateName(self, id: strawberry.ID, newName: str) -> User:  # noqa: N803
+        user: User = NodeDb.get(id)
+        user.name = newName
+        return user
 
 
 schema = strawberry.Schema(query=Query, mutation=Mutation)

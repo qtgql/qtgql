@@ -82,7 +82,7 @@ class Require{{query.name}}(UseQueryABC):
 {% endfor %}
 
 {% for mutation in context.mutations %}
-class {{query.name}}(BaseMutationHandler[{{query.field.annotation}}]):
+class {{mutation.name}}(BaseMutationHandler[{{mutation.field.annotation}}]):
     @slot
     def commit(self) -> None:
         self.refetch()

@@ -3,7 +3,7 @@ from __future__ import annotations
 import contextlib
 import enum
 from functools import cached_property
-from typing import Any, Optional, Type
+from typing import TYPE_CHECKING, Any, Generic, Optional, Type, TypeVar
 
 from attrs import define
 
@@ -12,6 +12,9 @@ from qtgql.codegen.py.runtime.bases import QGraphQListModel
 from qtgql.codegen.py.runtime.custom_scalars import BaseCustomScalar, CustomScalarMap
 from qtgql.codegen.utils import AntiForwardRef
 from qtgql.utils.typingref import TypeHinter
+
+if TYPE_CHECKING:
+    from graphql.language.ast import NamedTypeNode
 
 
 class Kinds(enum.Enum):
@@ -26,12 +29,37 @@ class Kinds(enum.Enum):
 
 
 @define(slots=False)
-class GqlFieldDefinition:
+class QtGqlBaseTypedNode:
     name: str
     type: GqlTypeHinter
     type_map: dict[str, GqlTypeDefinition]
     enums: EnumMap
     scalars: CustomScalarMap
+
+    @property
+    def is_custom_scalar(self) -> Optional[Type[BaseCustomScalar]]:
+        return self.type.is_custom_scalar(self.scalars)
+
+    @cached_property
+    def annotation(self) -> str:
+        """
+        :returns: Annotation of the field based on the real type,
+        meaning that the private attribute would be of that type.
+        this goes for init and the property setter.
+        """
+        return self.type.annotation(self.scalars)
+
+
+T = TypeVar("T")
+
+
+@define(slots=False)
+class QtGqlVariableDefinition(Generic[T], QtGqlBaseTypedNode):
+    default_value: Optional[T]
+
+
+@define(slots=False)
+class GqlFieldDefinition(QtGqlBaseTypedNode):
     description: Optional[str] = ""
 
     @cached_property
@@ -54,19 +82,6 @@ class GqlFieldDefinition:
             return f"{enum_def.name}(1)"  # 1 is where auto() starts.
 
         return "None"  # Unions are not supported yet.
-
-    @property
-    def is_custom_scalar(self) -> Optional[Type[BaseCustomScalar]]:
-        return self.type.is_custom_scalar(self.scalars)
-
-    @cached_property
-    def annotation(self) -> str:
-        """
-        :returns: Annotation of the field based on the real type,
-        meaning that the private attribute would be of that type.
-        this goes for init and the property setter.
-        """
-        return self.type.annotation(self.scalars)
 
     @cached_property
     def fget_annotation(self) -> str:
@@ -244,3 +259,8 @@ class GqlTypeHinter(TypeHinter):
 
     def as_annotation(self, object_map=None):  # pragma: no cover
         raise NotImplementedError("not safe to call on this type")
+
+    @classmethod
+    def from_named_type_node(cls, node: NamedTypeNode) -> GqlTypeHinter:
+        type_name = node
+        return cls(type=node.name.value)
