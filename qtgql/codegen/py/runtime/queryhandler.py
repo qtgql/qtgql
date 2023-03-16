@@ -31,7 +31,7 @@ class SelectionConfig(NamedTuple):
 
 class OperationMetaData(NamedTuple):
     operation_name: str
-    selections: SelectionConfig
+    selections: Optional[SelectionConfig] = None
 
 
 T = TypeVar("T")

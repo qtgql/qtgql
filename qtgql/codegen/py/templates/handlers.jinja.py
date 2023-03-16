@@ -19,7 +19,7 @@ QML_IMPORT_MAJOR_VERSION = 1
     ENV_NAME = "{{context.config.env_name}}"
     OPERATION_METADATA = OperationMetaData(
         operation_name="{{operation_def.name}}",
-        selections={{operation_def.operation_config}}
+        {% if operation_def.operation_config %}selections={{operation_def.operation_config}}{% endif %}
     )
     _message_template = GqlClientMessage(payload=QueryPayload(query="""{{operation_def.query}}""", operationName="{{operation_def.name}}"))
 {% endmacro %}
@@ -70,7 +70,7 @@ QML_IMPORT_MAJOR_VERSION = 1
                      ) -> None:
         {% for var in operation_def.variables %}
         if {{var.name}}:
-            self._variables['{{var.name}}'] =  {{macros.input_field_ast_dict(var, var.name)}}
+            self._variables['{{var.name}}'] =  {{var.json_repr()}}
         {% endfor %}
 
     {% endif %}

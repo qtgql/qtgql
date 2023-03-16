@@ -26,6 +26,7 @@ from tests.test_codegen.test_py.testcases import (
     OperationVariableTestCase,
     OptionalNestedObjectTestCase,
     QGQLObjectTestCase,
+    RootEnumTestCase,
     RootListOfTestCase,
     ScalarsTestCase,
     TypeWithNoIDTestCase,
@@ -243,6 +244,12 @@ class TestDeserializers:
         testcase = TypeWithNoIDTestCase.compile()
         testcase.query_handler.on_data(testcase.initialize_dict)
         testcase.query_handler.on_data(testcase.initialize_dict)
+
+    def test_root_enum(self):
+        testcase = RootEnumTestCase.compile()
+        handler = testcase.query_handler
+        handler.on_data(testcase.initialize_dict)
+        assert handler.data.name == "Connected"
 
 
 class TestUpdates:
@@ -656,10 +663,22 @@ class TestOperationVariables:
 
     def test_object_types(self, qtbot, schemas_server):
         testcase = OperationVariableTestCase.compile(schemas_server.address)
-        input_type = testcase.get_generated("CreatePostInput")
+        input_type = testcase.get_attr("CreatePostInput")
         inp_obj = input_type(content="Sample Content", header="SampleHeader")
         create_post = testcase.get_mutation_handler("CreatePost")(None)
         create_post.setVariables(inp_obj)
         create_post.commit()
         qtbot.wait_until(lambda: create_post.completed)
         assert create_post.data.header == "SampleHeader"
+
+    def test_enums(self, qtbot, schemas_server):
+        testcase = OperationVariableTestCase.compile(schemas_server.address)
+        handler = testcase.get_query_handler("EnumNameQuery")(None)
+        enum_klass = testcase.get_attr("SampleEnum")
+        handler.setVariables(enum_klass.A)
+        handler.fetch()
+        qtbot.wait_until(lambda: handler.completed)
+        assert handler.data == enum_klass.A.name
+
+    def test_optional(self, qtbot, schemas_server):
+        ...

@@ -11,7 +11,7 @@ from qtgql.codegen.py.compiler.builtin_scalars import BuiltinScalar
 from qtgql.codegen.py.runtime.bases import QGraphQListModel
 from qtgql.codegen.py.runtime.custom_scalars import BaseCustomScalar, CustomScalarMap
 from qtgql.codegen.utils import AntiForwardRef
-from qtgql.utils.typingref import TypeHinter
+from qtgql.utils.typingref import UNSET, TypeHinter
 
 if TYPE_CHECKING:
     from graphql.language.ast import NamedTypeNode
@@ -55,14 +55,17 @@ T = TypeVar("T")
 
 @define(slots=False)
 class QtGqlVariableDefinition(Generic[T], QtGqlBaseTypedNode):
-    default_value: Optional[T]
+    default_value: Optional[T] = UNSET
 
-    @property
-    def json_repr(self) -> str:
+    def json_repr(self, attr_name: Optional[str] = None) -> str:
+        if not attr_name:
+            attr_name = self.name
         if self.type.is_input_object_type:
-            return f"{self.name}.asdict()"
+            return f"{attr_name}.asdict()"
         elif self.type.is_builtin_scalar:
-            return self.name
+            return attr_name
+        elif self.type.is_enum:
+            return f"{attr_name}.name"
         raise NotImplementedError(f"{self.type} is not supported as an input type ATM")
 
 
@@ -72,12 +75,8 @@ class BaseQtGqlFieldDefinition(QtGqlBaseTypedNode):
 
 
 @define(slots=False)
-class QtGqlInputFieldDefinition(BaseQtGqlFieldDefinition):
-    p_default_value: Optional[Any] = None
-
-    @cached_property
-    def default_value(self) -> str:
-        raise NotImplementedError
+class QtGqlInputFieldDefinition(BaseQtGqlFieldDefinition, QtGqlVariableDefinition):
+    ...
 
 
 @define(slots=False)

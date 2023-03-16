@@ -99,7 +99,10 @@ class QGQLObjectTestCase:
             raise RuntimeError(generated["objecttypes"]) from e
 
         sys.modules["objecttypes"] = types_module
-        exec(compile(generated["handlers"], "gen_handlers", "exec"), handlers_mod.__dict__)
+        try:
+            exec(compile(generated["handlers"], "gen_handlers", "exec"), handlers_mod.__dict__)
+        except BaseException as e:
+            raise RuntimeError(generated["handlers"]) from e
         return CompiledTestCase(
             evaluator=self.evaluator,
             objecttypes_mod=types_module,
@@ -111,7 +114,7 @@ class QGQLObjectTestCase:
             query_operationName=self.query_operationName,
             first_field=self.first_field,
             test_name=self.test_name,
-            tested_type=self.evaluator._objecttypes_def_map[self.type_name],
+            tested_type=self.evaluator._objecttypes_def_map.get(self.type_name, None),
         )
 
 
@@ -136,14 +139,14 @@ class CompiledTestCase(QGQLObjectTestCase):
     def query_handler(self) -> "BaseQueryHandler":
         return getattr(self.handlers_mod, self.query_operationName)(None)
 
-    def get_generated(self, attr: str):
+    def get_attr(self, attr: str):
         return getattr(self.handlers_mod, attr, None)
 
     def get_query_handler(self, operation_name: str) -> BaseQueryHandler:
-        return self.get_generated(operation_name)
+        return self.get_attr(operation_name)
 
     def get_mutation_handler(self, operation_name: str) -> BaseMutationHandler:
-        return self.get_generated(operation_name)
+        return self.get_attr(operation_name)
 
     def get_signals(self) -> dict[str, "QtCore.Signal"]:
         return {
@@ -348,6 +351,16 @@ EnumTestCase = QGQLObjectTestCase(
         """,
     test_name="EnumTestCase",
 )
+RootEnumTestCase = QGQLObjectTestCase(
+    schema=schemas.root_enum_schema.schema,
+    query="""
+        query MainQuery {
+          status
+        }
+        """,
+    test_name="RootEnumTestCase",
+)
+
 DateTimeTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_datetime.schema,
     query="""
@@ -525,6 +538,9 @@ OperationVariableTestCase = QGQLObjectTestCase(
           content
         }
       }
+    }
+    query EnumNameQuery ($enumVar: SampleEnum! ){
+      getEnumName(enumInput: $enumVar)
     }
     """,
     test_name="OperationVariableTestCase",

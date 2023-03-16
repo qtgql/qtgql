@@ -1,11 +1,17 @@
 from __future__ import annotations
 
+import enum
 from datetime import datetime, timezone
 
 import strawberry
 
 from tests.conftest import fake
 from tests.test_codegen.schemas.node_interface import NODE_DB, Node
+
+
+@strawberry.enum
+class SampleEnum(enum.Enum):
+    A, B, C = range(3)
 
 
 @strawberry.type
@@ -31,6 +37,10 @@ class Query:
     @strawberry.field()
     def get_post_by_id(self, id: strawberry.ID) -> Post:
         return NODE_DB.get(id)
+
+    @strawberry.field
+    def get_enum_name(self, enum_input: SampleEnum) -> str:
+        return enum_input.name
 
 
 @strawberry.input()

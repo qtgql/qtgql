@@ -15,6 +15,7 @@ from . import (
     object_with_time_scalar,
     object_with_union,
     object_with_user_defined_scalar,
+    root_enum_schema,
     root_list_of_object,
     type_with_no_id,
     type_with_nullable_id,
@@ -44,4 +45,5 @@ __all__ = [  # noqa: PLE0604
     wrogn_id_type,
     list_of_union,
     variables_schema,
+    root_enum_schema,
 ]
