@@ -24,6 +24,7 @@ from tests.test_codegen.test_py.testcases import (
     ObjectsThatReferenceEachOtherTestCase,
     ObjectWithListOfObjectTestCase,
     OperationVariableTestCase,
+    OptionalInputTestCase,
     OptionalNestedObjectTestCase,
     QGQLObjectTestCase,
     RootEnumTestCase,
@@ -654,7 +655,7 @@ class TestOperationVariables:
         qtbot.wait_until(lambda: query_handler.completed)
         post_id = query_handler.data.id
         prev_header = query_handler.data.header
-        mutation_handler = testcase.get_mutation_handler("changePostHeaderMutation")(None)
+        mutation_handler = testcase.get_mutation_handler("changePostHeaderMutation")
         mutation_handler.setVariables(post_id, "Nir")
         mutation_handler.fetch()
         qtbot.wait_until(lambda: mutation_handler.completed)
@@ -665,7 +666,7 @@ class TestOperationVariables:
         testcase = OperationVariableTestCase.compile(schemas_server.address)
         input_type = testcase.get_attr("CreatePostInput")
         inp_obj = input_type(content="Sample Content", header="SampleHeader")
-        create_post = testcase.get_mutation_handler("CreatePost")(None)
+        create_post = testcase.get_mutation_handler("CreatePost")
         create_post.setVariables(inp_obj)
         create_post.commit()
         qtbot.wait_until(lambda: create_post.completed)
@@ -673,7 +674,7 @@ class TestOperationVariables:
 
     def test_enums(self, qtbot, schemas_server):
         testcase = OperationVariableTestCase.compile(schemas_server.address)
-        handler = testcase.get_query_handler("EnumNameQuery")(None)
+        handler = testcase.get_query_handler("EnumNameQuery")
         enum_klass = testcase.get_attr("SampleEnum")
         handler.setVariables(enum_klass.A)
         handler.fetch()
@@ -681,4 +682,12 @@ class TestOperationVariables:
         assert handler.data == enum_klass.A.name
 
     def test_optional(self, qtbot, schemas_server):
-        ...
+        testcase = OptionalInputTestCase.compile(schemas_server.address)
+        handler = testcase.get_query_handler("HelloOrEchoQuery")
+        handler.fetch()
+        qtbot.wait_until(lambda: handler.completed)
+        assert "Hello World" in handler.data
+        handler.setVariables("Repeat after me")
+        handler.refetch()
+        qtbot.wait_until(lambda: handler.completed)
+        assert "Repeat" in handler.data

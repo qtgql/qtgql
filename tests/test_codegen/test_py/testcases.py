@@ -143,10 +143,10 @@ class CompiledTestCase(QGQLObjectTestCase):
         return getattr(self.handlers_mod, attr, None)
 
     def get_query_handler(self, operation_name: str) -> BaseQueryHandler:
-        return self.get_attr(operation_name)
+        return self.get_attr(operation_name)(None)
 
     def get_mutation_handler(self, operation_name: str) -> BaseMutationHandler:
-        return self.get_attr(operation_name)
+        return self.get_attr(operation_name)(None)
 
     def get_signals(self) -> dict[str, "QtCore.Signal"]:
         return {
@@ -546,7 +546,15 @@ OperationVariableTestCase = QGQLObjectTestCase(
     test_name="OperationVariableTestCase",
     type_name="Post",
 )
-
+OptionalInputTestCase = QGQLObjectTestCase(
+    schema=schemas.optional_input_schema.schema,
+    query="""
+    query HelloOrEchoQuery($echo: String){
+      echoOrHello(echo: $echo)
+    }
+    """,
+    test_name="OptionalInputTestCase",
+)
 all_test_cases = [
     ScalarsTestCase,
     DateTimeTestCase,

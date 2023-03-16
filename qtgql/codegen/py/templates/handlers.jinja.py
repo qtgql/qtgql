@@ -34,7 +34,7 @@ QML_IMPORT_MAJOR_VERSION = 1
         metadata = self.OPERATION_METADATA
         config = self.OPERATION_METADATA.selections
 
-        {{macros.update_field(operation_def.field, fset_name='self.dataChanged', private_name='self._data',
+        {{macros.update_field(operation_def.field, fset_name='self.set_data', private_name='self._data',
                               include_selection_check=False) | indent(4, True)}}
 
     def loose(self) -> None:
