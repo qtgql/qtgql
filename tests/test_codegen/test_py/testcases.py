@@ -12,7 +12,7 @@ import strawberry.utils
 from attr import define
 from qtgql.codegen.introspection import SchemaEvaluator
 from qtgql.codegen.py.compiler.config import QtGqlConfig
-from qtgql.codegen.py.objecttype import GqlTypeDefinition
+from qtgql.codegen.py.objecttype import QtGqlObjectTypeDefinition
 from qtgql.codegen.py.runtime.custom_scalars import (
     BaseCustomScalar,
     DateScalar,
@@ -111,7 +111,7 @@ class QGQLObjectTestCase:
             query_operationName=self.query_operationName,
             first_field=self.first_field,
             test_name=self.test_name,
-            tested_type=self.evaluator._generated_types[self.type_name],
+            tested_type=self.evaluator._objecttypes_def_map[self.type_name],
         )
 
 
@@ -120,7 +120,7 @@ class CompiledTestCase(QGQLObjectTestCase):
     objecttypes_mod: ModuleType
     handlers_mod: ModuleType
     config: QtGqlConfig
-    tested_type: GqlTypeDefinition
+    tested_type: QtGqlObjectTypeDefinition
     evaluator: SchemaEvaluator
 
     @property
@@ -198,6 +198,7 @@ ScalarsTestCase = QGQLObjectTestCase(
             male
           }
         }
+
         """,
     test_name="ScalarsTestCase",
 )
@@ -475,19 +476,49 @@ ListOfUnionTestCase = QGQLObjectTestCase(
 OperationVariableTestCase = QGQLObjectTestCase(
     schema=schemas.variables_schema.schema,
     query="""
-    query MainQuery{
-        post{
+    query MainQuery {
+      post {
         header
-        comments{
-            content
-            commenter
+        comments {
+          content
+          commenter
         }
         createdAt
-        }
+      }
     }
 
-    mutation changePostHeaderMutation ($postID: ID!, $newHeader: String!){
-        changePostHeader(newHeader: $newHeader, postId: $postID) {header}
+    mutation changePostHeaderMutation($postID: ID!, $newHeader: String!) {
+      changePostHeader(newHeader: $newHeader, postId: $postID) {
+        header
+      }
+    }
+
+    mutation MyMutation($input: CreatePostInput!) {
+      createPost(input: $input) {
+        content
+        header
+        createdAt
+        id
+        comments {
+          id
+          commenter
+          content
+        }
+      }
+    }
+
+    query GetPostById($id: ID!) {
+      getPostById(id: $id) {
+        content
+        header
+        createdAt
+        id
+        comments {
+          id
+          commenter
+          content
+        }
+      }
     }
     """,
     test_name="OperationVariableTestCase",

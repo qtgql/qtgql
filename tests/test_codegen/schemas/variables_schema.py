@@ -10,9 +10,10 @@ from tests.test_codegen.schemas.node_interface import NODE_DB, Node
 
 @strawberry.type
 class Post(Node):
-    comments: list[Comment]
-    createdAt: datetime = strawberry.field(default_factory=lambda: fake.date_time(timezone.utc))
     header: str = strawberry.field(default_factory=fake.paragraph)
+    content: str = strawberry.field(default_factory=fake.paragraph)
+    createdAt: datetime = strawberry.field(default_factory=lambda: fake.date_time(timezone.utc))
+    comments: list[Comment] = strawberry.field(default_factory=list)
 
 
 @strawberry.type()
@@ -27,14 +28,28 @@ class Query:
     def post(self) -> Post:
         return Post(comments=[Comment() for _ in range(5)])
 
+    @strawberry.field()
+    def get_post_by_id(self, id: strawberry.ID) -> Post:
+        return NODE_DB.get(id)
+
+
+@strawberry.input()
+class CreatePostInput:
+    content: str
+    header: str
+
 
 @strawberry.type
 class Mutation:
-    @strawberry.field
+    @strawberry.mutation
     def changePostHeader(self, post_id: strawberry.ID, new_header: str) -> Post:
         post: Post = NODE_DB.get(post_id)
         post.header = new_header
         return post
+
+    @strawberry.mutation
+    def createPost(self, input: CreatePostInput) -> Post:
+        return Post(content=input.content, header=input.header)
 
 
 schema = strawberry.Schema(query=Query, mutation=Mutation)

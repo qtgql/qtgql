@@ -654,5 +654,8 @@ class TestOperationVariables:
         assert query_handler.data.header == "Nir"
         assert "Nir" != prev_header
 
-    def test_object_types(self, qtbot):
-        testcase = NestedObjectTestCase.compile()
+    def test_object_types(self, qtbot, schemas_server):
+        testcase = OperationVariableTestCase.compile(schemas_server.address)
+        query_handler = testcase.query_handler
+        query_handler.fetch()
+        qtbot.wait_until(lambda: query_handler.completed)

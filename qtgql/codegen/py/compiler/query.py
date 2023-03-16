@@ -12,7 +12,7 @@ from qtgql.codegen.py.compiler.template import (
     ConfigContext,
     config_template,
 )
-from qtgql.codegen.py.objecttype import GqlFieldDefinition, GqlTypeDefinition
+from qtgql.codegen.py.objecttype import QtGqlFieldDefinition, QtGqlObjectTypeDefinition
 from qtgql.codegen.utils import AntiForwardRef
 
 if TYPE_CHECKING:
@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 
 
 def get_field_from_field_node(
-    selection: gql_lang.FieldNode, field_type: GqlTypeDefinition
+    selection: gql_lang.FieldNode, field_type: QtGqlObjectTypeDefinition
 ) -> QtGqlQueriedField:
     field_node = is_field_node(selection)
     assert field_node
@@ -40,20 +40,21 @@ def inject_id_selection(selection_set: gql_lang.SelectionSetNode) -> None:
 
 def has_id_field(selection_set: gql_lang.SelectionSetNode) -> bool:
     for field in selection_set.selections:
-        assert isinstance(field, gql_lang.FieldNode)
+        if not isinstance(field, gql_lang.FieldNode):
+            raise RuntimeError(f"{field} is not a field")
         if field.name.value == "id":
             return True
     return False
 
 
 @attrs.define
-class QtGqlQueriedField(GqlFieldDefinition):
+class QtGqlQueriedField(QtGqlFieldDefinition):
     selections: List[QtGqlQueriedField] = attrs.Factory(list)
     choices: dict[str, List[QtGqlQueriedField]] = attrs.Factory(lambda: defaultdict(list))
 
     @classmethod
     def from_field(
-        cls, f: GqlFieldDefinition, selection_set: Optional[gql_lang.SelectionSetNode]
+        cls, f: QtGqlFieldDefinition, selection_set: Optional[gql_lang.SelectionSetNode]
     ) -> QtGqlQueriedField:
         ret = cls(**attrs.asdict(f, recurse=False))
         if not hasattr(selection_set, "selections"):
@@ -73,7 +74,7 @@ class QtGqlQueriedField(GqlFieldDefinition):
                 concrete = next(t for t in tp.of_type if t.type.name == type_name)
                 assert issubclass(concrete.type, AntiForwardRef)
                 concrete = concrete.type.resolve()
-                assert isinstance(concrete, GqlTypeDefinition)
+                assert isinstance(concrete, QtGqlObjectTypeDefinition)
                 if not has_id_field(inline_frag.selection_set) and concrete.has_id_field:
                     inject_id_selection(inline_frag.selection_set)
 

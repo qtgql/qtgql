@@ -14,6 +14,15 @@ from qtgql.tools import qproperty, slot
 __all__ = ["QGraphQListModel", "get_base_graphql_object"]
 
 
+class QGraphQLInputObjectABC(QObject):
+    @classmethod
+    def create(cls) -> Self:
+        raise NotImplementedError
+
+    def asdict(self) -> dict:
+        raise NotImplementedError
+
+
 class _BaseQGraphQLObject(QObject):
     _id: str
     id: str

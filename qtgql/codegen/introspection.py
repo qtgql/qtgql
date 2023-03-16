@@ -14,9 +14,11 @@ import graphql
 from graphql import OperationType
 from graphql import language as gql_lang
 from graphql.language import visitor
+from graphql.type import definition as gql_def
 
 from qtgql.codegen.graphql_ref import (
     is_enum_definition,
+    is_input_definition,
     is_list_definition,
     is_named_type_node,
     is_non_null_definition,
@@ -36,18 +38,18 @@ from qtgql.codegen.py.compiler.template import (
 from qtgql.codegen.py.objecttype import (
     EnumMap,
     EnumValue,
-    GqlEnumDefinition,
-    GqlFieldDefinition,
-    GqlTypeDefinition,
     GqlTypeHinter,
+    QtGqlEnumDefinition,
+    QtGqlFieldDefinition,
+    QtGqlInputFieldDefinition,
+    QtGqlInputObjectTypeDefinition,
+    QtGqlObjectTypeDefinition,
     QtGqlVariableDefinition,
 )
 from qtgql.codegen.utils import anti_forward_ref
 from qtgql.exceptions import QtGqlException
 
 if TYPE_CHECKING:  # pragma: no cover
-    from graphql.type import definition as gql_def
-
     from qtgql.codegen.py.compiler.config import QtGqlConfig
 
 introspection_query = graphql.get_introspection_query(descriptions=True)
@@ -72,7 +74,7 @@ class QtGqlVisitor(visitor.Visitor):
         self.evaluator = evaluator
 
     def _get_root_type_field(
-        self, root_type: GqlTypeDefinition, gql_field: gql_lang.FieldNode
+        self, root_type: QtGqlObjectTypeDefinition, gql_field: gql_lang.FieldNode
     ) -> QtGqlQueriedField:
         return QtGqlQueriedField.from_field(
             root_type.fields_dict[gql_field.name.value], gql_field.selection_set
@@ -84,9 +86,9 @@ class QtGqlVisitor(visitor.Visitor):
         return QtGqlVariableDefinition(
             name=var.variable.name.value,
             type=self.evaluator.get_type(var.type),
-            type_map=self.evaluator._generated_types,
+            type_map=self.evaluator._objecttypes_def_map,
             scalars=self.evaluator.config.custom_scalars,
-            enums=self.evaluator._generated_enums,
+            enums=self.evaluator._enums_def_map,
             default_value=var.default_value,
         )
 
@@ -129,12 +131,13 @@ class QtGqlVisitor(visitor.Visitor):
 class SchemaEvaluator:
     def __init__(self, config: QtGqlConfig):
         self.config = config
-        self._generated_types: dict[str, GqlTypeDefinition] = {}
-        self._generated_enums: EnumMap = {}
+        self._objecttypes_def_map: dict[str, QtGqlObjectTypeDefinition] = {}
+        self._enums_def_map: EnumMap = {}
+        self._input_objects_def_map: dict[str, QtGqlInputObjectTypeDefinition] = {}
         self._query_handlers: dict[str, QtGqlOperationDefinition] = {}
         self._mutation_handlers: dict[str, QtGqlOperationDefinition] = {}
-        self._query_type: Optional[GqlTypeDefinition] = None
-        self._mutation_type: Optional[GqlTypeDefinition] = None
+        self._query_type: Optional[QtGqlObjectTypeDefinition] = None
+        self._mutation_type: Optional[QtGqlObjectTypeDefinition] = None
 
     def get_type(self, node: gql_lang.TypeNode) -> GqlTypeHinter:
         if nonnull := is_nonnull_node(node):
@@ -180,22 +183,30 @@ class SchemaEvaluator:
                 ret = GqlTypeHinter(type=self.config.custom_scalars[scalar_def.name])
         elif enum_def := is_enum_definition(t):
             ret = GqlTypeHinter(
-                type=anti_forward_ref(name=enum_def.name, type_map=self._generated_enums)
+                type=anti_forward_ref(name=enum_def.name, type_map=self._enums_def_map)
             )
         elif obj_def := is_object_definition(t):
-            ret = GqlTypeHinter(
-                type=anti_forward_ref(name=obj_def.name, type_map=self._generated_types)
-            )
+            concrete = self.schema_definition.get_type(obj_def.name)
+            assert isinstance(concrete, gql_def.GraphQLObjectType)
+            ret = GqlTypeHinter(type=self._evaluate_object_type(concrete))
+
         elif union_def := is_union_definition(t):
             ret = GqlTypeHinter(
                 type=Union,
                 of_type=tuple(
                     GqlTypeHinter(
-                        type=anti_forward_ref(name=possible.name, type_map=self._generated_types)
+                        type=anti_forward_ref(
+                            name=possible.name, type_map=self._objecttypes_def_map
+                        )
                     )
                     for possible in self.schema_definition.get_possible_types(union_def)
                 ),
             )
+        elif input_def := is_input_definition(t):
+            concrete = self.schema_definition.get_type(input_def.name)
+            assert isinstance(concrete, gql_def.GraphQLInputObjectType)
+            ret = GqlTypeHinter(type=self._evaluate_input_type(input_def))
+
         if not ret:  # pragma: no cover
             raise NotImplementedError(f"type {t} not supported yet")
 
@@ -203,22 +214,33 @@ class SchemaEvaluator:
             return GqlTypeHinter(type=Optional, of_type=(ret,))
         return ret
 
-    def _evaluate_field(self, name: str, field: gql_def.GraphQLField) -> GqlFieldDefinition:
-        """we don't really know what is the field type just it's name."""
-        return GqlFieldDefinition(
+    def _evaluate_field(self, name: str, field: gql_def.GraphQLField) -> QtGqlFieldDefinition:
+        return QtGqlFieldDefinition(
             type=self._evaluate_field_type(field.type),
             name=name,
-            type_map=self._generated_types,
+            type_map=self._objecttypes_def_map,
             scalars=self.config.custom_scalars,
-            enums=self._generated_enums,
+            enums=self._enums_def_map,
+            description=field.description,
+        )
+
+    def _evaluate_input_field(
+        self, name: str, field: gql_def.GraphQLInputField
+    ) -> QtGqlInputFieldDefinition:
+        return QtGqlInputFieldDefinition(
+            type=self._evaluate_field_type(field.type),
+            name=name,
+            type_map=self._objecttypes_def_map,
+            scalars=self.config.custom_scalars,
+            enums=self._enums_def_map,
             description=field.description,
         )
 
     def _evaluate_object_type(
         self, type_: gql_def.GraphQLObjectType
-    ) -> Optional[GqlTypeDefinition]:
+    ) -> Optional[QtGqlObjectTypeDefinition]:
         t_name: str = type_.name
-        if evaluated := self._generated_types.get(t_name, None):
+        if evaluated := self._objecttypes_def_map.get(t_name, None):
             return evaluated
         if type_ not in self.root_types:
             try:
@@ -241,21 +263,38 @@ class SchemaEvaluator:
                     f"type {type_} does not not define an id field.\n"
                     f"fields: {type_.fields}"
                 )
-        return GqlTypeDefinition(
+        ret = QtGqlObjectTypeDefinition(
             name=t_name,
             docstring=type_.description,
             fields_dict={
                 name: self._evaluate_field(name, field) for name, field in type_.fields.items()
             },
         )
+        assert ret not in self.root_types
+        self._objecttypes_def_map[ret.name] = ret
+        return ret
 
-    def _evaluate_enum(self, enum: gql_def.GraphQLEnumType) -> Optional[GqlEnumDefinition]:
+    def _evaluate_input_type(self, type_: gql_def.GraphQLInputObjectType):
+        ret = self._input_objects_def_map.get(type_.name, None)
+        if not ret:
+            ret = QtGqlInputObjectTypeDefinition(
+                name=type_.name,
+                docstring=type_.description,
+                fields_dict={
+                    name: self._evaluate_input_field(name, field)
+                    for name, field in type_.fields.items()
+                },
+            )
+            self._input_objects_def_map[ret.name] = ret
+        return ret
+
+    def _evaluate_enum(self, enum: gql_def.GraphQLEnumType) -> Optional[QtGqlEnumDefinition]:
         name: str = enum.name
 
-        if self._generated_enums.get(name, None):
+        if self._enums_def_map.get(name, None):
             return None
 
-        return GqlEnumDefinition(
+        return QtGqlEnumDefinition(
             name=name,
             members=[
                 EnumValue(name=name, description=val.description or "")
@@ -274,12 +313,9 @@ class SchemaEvaluator:
                     elif object_definition is self.schema_definition.mutation_type:
                         self._mutation_type = object_type
 
-                    assert object_type not in self.root_types
-
-                    self._generated_types[object_type.name] = object_type
             elif enum_def := is_enum_definition(type_):
                 if enum := self._evaluate_enum(enum_def):
-                    self._generated_enums[enum.name] = enum
+                    self._enums_def_map[enum.name] = enum
 
     def parse_operations(self) -> None:
         with (self.config.graphql_dir / "operations.graphql").open() as f:
@@ -300,12 +336,15 @@ class SchemaEvaluator:
         self.parse_schema_concretes()
         self.parse_operations()
         context = TemplateContext(
-            enums=list(self._generated_enums.values()),
+            enums=list(self._enums_def_map.values()),
             types=[
-                t for name, t in self._generated_types.items() if name not in BuiltinScalars.keys()
+                t
+                for name, t in self._objecttypes_def_map.items()
+                if name not in BuiltinScalars.keys()
             ],
             queries=list(self._query_handlers.values()),
             mutations=list(self._mutation_handlers.values()),
+            input_objects=list(self._input_objects_def_map.values()),
             config=self.config,
         )
         return GeneratedNamespace(

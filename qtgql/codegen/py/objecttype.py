@@ -32,7 +32,7 @@ class Kinds(enum.Enum):
 class QtGqlBaseTypedNode:
     name: str
     type: GqlTypeHinter
-    type_map: dict[str, GqlTypeDefinition]
+    type_map: dict[str, QtGqlObjectTypeDefinition]
     enums: EnumMap
     scalars: CustomScalarMap
 
@@ -59,9 +59,21 @@ class QtGqlVariableDefinition(Generic[T], QtGqlBaseTypedNode):
 
 
 @define(slots=False)
-class GqlFieldDefinition(QtGqlBaseTypedNode):
+class BaseQtGqlFieldDefinition(QtGqlBaseTypedNode):
     description: Optional[str] = ""
 
+
+@define(slots=False)
+class QtGqlInputFieldDefinition(BaseQtGqlFieldDefinition):
+    p_default_value: Optional[Any] = None
+
+    @cached_property
+    def default_value(self) -> str:
+        raise NotImplementedError
+
+
+@define(slots=False)
+class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
     @cached_property
     def default_value(self):
         if builtin_scalar := self.type.is_builtin_scalar:
@@ -135,7 +147,7 @@ class GqlFieldDefinition(QtGqlBaseTypedNode):
         return f"return self.{self.private_name}"
 
     @cached_property
-    def can_select_id(self) -> Optional[GqlFieldDefinition]:
+    def can_select_id(self) -> Optional[QtGqlFieldDefinition]:
         object_type = self.type.is_object_type
         if not object_type:
             if self.type.is_model:
@@ -145,24 +157,44 @@ class GqlFieldDefinition(QtGqlBaseTypedNode):
 
 
 @define(slots=False)
-class GqlTypeDefinition:
+class BaseGqlTypeDefinition:
     name: str
-    fields_dict: dict[str, GqlFieldDefinition]
+    fields_dict: dict[str, QtGqlFieldDefinition]
     docstring: Optional[str] = ""
 
+    @property
+    def fields(self) -> list[QtGqlFieldDefinition]:
+        return list(self.fields_dict.values())
+
+
+@define(slots=False)
+class QtGqlObjectTypeDefinition(BaseGqlTypeDefinition):
     @cached_property
-    def has_id_field(self) -> Optional[GqlFieldDefinition]:
+    def has_id_field(self) -> Optional[QtGqlFieldDefinition]:
         return self.fields_dict.get("id", None)
 
     @cached_property
-    def id_is_optional(self) -> Optional[GqlFieldDefinition]:
+    def id_is_optional(self) -> Optional[QtGqlFieldDefinition]:
         if id_f := self.has_id_field:
             if id_f.type.is_optional():
                 return id_f
 
+
+@define(slots=False)
+class QtGqlInputObjectTypeDefinition(BaseGqlTypeDefinition):
+    fields_dict: dict[str, QtGqlInputFieldDefinition] = {}
+
     @property
-    def fields(self) -> list[GqlFieldDefinition]:
+    def fields(self) -> list[QtGqlInputFieldDefinition]:
         return list(self.fields_dict.values())
+
+    @property
+    def required_fields(self) -> list[QtGqlInputFieldDefinition]:
+        return [field for field in self.fields if not field.type.is_optional()]
+
+    @property
+    def optional_fields(self) -> list[QtGqlInputFieldDefinition]:
+        return [field for field in self.fields if field.type.is_optional()]
 
 
 @define
@@ -174,12 +206,12 @@ class EnumValue:
 
 
 @define
-class GqlEnumDefinition:
+class QtGqlEnumDefinition:
     name: str
     members: list[EnumValue]
 
 
-EnumMap = dict[str, "GqlEnumDefinition"]
+EnumMap = dict[str, "QtGqlEnumDefinition"]
 
 
 def optional_maybe(th: GqlTypeHinter) -> GqlTypeHinter:
@@ -196,13 +228,16 @@ class GqlTypeHinter(TypeHinter):
         self.of_type: tuple[GqlTypeHinter, ...] = of_type
 
     @property
-    def is_object_type(self) -> Optional[GqlTypeDefinition]:
+    def is_object_type(self) -> Optional[QtGqlObjectTypeDefinition]:
         t_self = optional_maybe(self).type
-        with contextlib.suppress(TypeError):
-            if issubclass(t_self, AntiForwardRef):
-                ret = t_self.resolve()
-                if isinstance(ret, GqlTypeDefinition):
-                    return ret
+        if isinstance(t_self, QtGqlObjectTypeDefinition):
+            return t_self
+
+    @property
+    def is_input_object_type(self) -> Optional[QtGqlInputObjectTypeDefinition]:
+        t_self = optional_maybe(self).type
+        if isinstance(t_self, QtGqlInputObjectTypeDefinition):
+            return t_self
 
     @property
     def is_model(self) -> Optional[GqlTypeHinter]:
@@ -212,11 +247,11 @@ class GqlTypeHinter(TypeHinter):
             return t_self.of_type[0]
 
     @property
-    def is_enum(self) -> Optional[GqlEnumDefinition]:
+    def is_enum(self) -> Optional[QtGqlEnumDefinition]:
         t_self = optional_maybe(self).type
         with contextlib.suppress(TypeError):
             if issubclass(t_self, AntiForwardRef):
-                if isinstance(t_self.resolve(), GqlEnumDefinition):
+                if isinstance(t_self.resolve(), QtGqlEnumDefinition):
                     return t_self.resolve()
 
     @property
@@ -247,14 +282,15 @@ class GqlTypeHinter(TypeHinter):
             return f"SCALARS.{scalar.__name__}"
         if gql_enum := t_self.is_enum:
             return gql_enum.name
-        # handle Optional, Union, List etc...
-        # removing redundant prefixes.
         if model_of := t_self.is_model:
             return f"{QGraphQListModel.__name__}[{model_of.annotation(scalars)}]"
         if object_def := t_self.is_object_type:
             return f"Optional[{object_def.name}]"
         if t_self.is_union():
             return "Union[" + ", ".join(th.annotation(scalars) for th in t_self.of_type) + "]"
+        if input_obj := t_self.is_input_object_type:
+            return input_obj.name
+
         raise NotImplementedError  # pragma no cover
 
     def as_annotation(self, object_map=None):  # pragma: no cover
