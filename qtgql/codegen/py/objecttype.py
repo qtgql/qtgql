@@ -57,6 +57,14 @@ T = TypeVar("T")
 class QtGqlVariableDefinition(Generic[T], QtGqlBaseTypedNode):
     default_value: Optional[T]
 
+    @property
+    def json_repr(self) -> str:
+        if self.type.is_input_object_type:
+            return f"{self.name}.asdict()"
+        elif self.type.is_builtin_scalar:
+            return self.name
+        raise NotImplementedError(f"{self.type} is not supported as an input type ATM")
+
 
 @define(slots=False)
 class BaseQtGqlFieldDefinition(QtGqlBaseTypedNode):

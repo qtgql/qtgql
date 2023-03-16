@@ -136,8 +136,14 @@ class CompiledTestCase(QGQLObjectTestCase):
     def query_handler(self) -> "BaseQueryHandler":
         return getattr(self.handlers_mod, self.query_operationName)(None)
 
-    def get_mutation_handler(self, opertaion_name: str) -> BaseMutationHandler:
-        return getattr(self.handlers_mod, opertaion_name, None)
+    def get_generated(self, attr: str):
+        return getattr(self.handlers_mod, attr, None)
+
+    def get_query_handler(self, operation_name: str) -> BaseQueryHandler:
+        return self.get_generated(operation_name)
+
+    def get_mutation_handler(self, operation_name: str) -> BaseMutationHandler:
+        return self.get_generated(operation_name)
 
     def get_signals(self) -> dict[str, "QtCore.Signal"]:
         return {
@@ -493,7 +499,7 @@ OperationVariableTestCase = QGQLObjectTestCase(
       }
     }
 
-    mutation MyMutation($input: CreatePostInput!) {
+    mutation CreatePost($input: CreatePostInput!) {
       createPost(input: $input) {
         content
         header

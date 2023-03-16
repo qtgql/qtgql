@@ -68,10 +68,10 @@ QML_IMPORT_MAJOR_VERSION = 1
     def setVariables(self,
                      {% for var in operation_def.variables %}{{var.name}}: {{var.annotation}}, {% endfor %}
                      ) -> None:
-
-        self._variables = {
-            {% for var in operation_def.variables %}'{{var.name}}':  {{var.name}},{% endfor %}
-        }
+        {% for var in operation_def.variables %}
+        if {{var.name}}:
+            self._variables['{{var.name}}'] =  {{macros.input_field_ast_dict(var, var.name)}}
+        {% endfor %}
 
     {% endif %}
 
@@ -101,9 +101,11 @@ class {{mutation.name}}(BaseMutationHandler[{{mutation.field.annotation}}]):
 
 
 class Require{{mutation.name}}(BaseMutationHandler[{{mutation.field.annotation}}]):
+    def _get_handler(self) -> BaseMutationHandler[{{mutation.field.annotation}}]:
+        return {{mutation.name}}(self)
     @slot
     def commit(self) -> None:
-        self.refetch()
+        self._handler.refetch()
 
 {% endfor %}
 

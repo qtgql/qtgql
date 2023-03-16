@@ -135,3 +135,13 @@ if '{{f.name}}' in config.selections.keys():
             {{private_name}} = None
         {% endif %}
 {%- endmacro %}
+
+
+
+{% macro input_field_ast_dict(field, attr_name) -%}
+    {% if field.type.is_input_object_type -%}
+        {{attr_name}}.asdict()
+    {% elif field.type.is_builtin_scalar -%}
+        {{attr_name}}
+    {% endif %}
+{% endmacro %}

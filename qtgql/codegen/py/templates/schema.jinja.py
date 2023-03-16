@@ -127,6 +127,13 @@ class {{type.name}}(QGraphQLInputObjectABC):
         self.{{f.name}} = {{f.name}}{% endfor %}
 
 
+    def asdict(self) -> dict:
+        ret = {}
+        {% for f in type.fields %}{% set attr_name %}self.{{f.name}}{% endset %}
+        if {{attr_name}}:
+            ret['{{f.name}}'] = {{macros.input_field_ast_dict(f, attr_name)}}
+        {% endfor %}
+        return ret
 
 
 {% endfor %}

@@ -131,7 +131,10 @@ class BaseQueryHandler(BaseOperationHandler[T]):
 
 
 class BaseMutationHandler(BaseOperationHandler[T]):
-    commit: Callable
+    @slot
+    def commit(self) -> None:
+        # ATM this is just an alias, we might add some functionality here later like optimistic updates.
+        self.refetch()
 
 
 class UseQueryABC(QQuickItem, Generic[T]):

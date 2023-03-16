@@ -656,6 +656,10 @@ class TestOperationVariables:
 
     def test_object_types(self, qtbot, schemas_server):
         testcase = OperationVariableTestCase.compile(schemas_server.address)
-        query_handler = testcase.query_handler
-        query_handler.fetch()
-        qtbot.wait_until(lambda: query_handler.completed)
+        input_type = testcase.get_generated("CreatePostInput")
+        inp_obj = input_type(content="Sample Content", header="SampleHeader")
+        create_post = testcase.get_mutation_handler("CreatePost")(None)
+        create_post.setVariables(inp_obj)
+        create_post.commit()
+        qtbot.wait_until(lambda: create_post.completed)
+        assert create_post.data.header == "SampleHeader"
