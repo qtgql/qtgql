@@ -1,6 +1,7 @@
 from . import (
     custom_scalar_input_schema,
     list_of_union,
+    mutation_schema,
     object_reference_each_other,
     object_with_date,
     object_with_datetime,
@@ -50,4 +51,5 @@ __all__ = [  # noqa: PLE0604
     root_enum_schema,
     optional_input_schema,
     custom_scalar_input_schema,
+    mutation_schema,
 ]

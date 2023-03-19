@@ -12,7 +12,7 @@ import pytest
 from qtgql.codegen.py.compiler.config import QtGqlConfig
 from qtgql.exceptions import QtGqlException
 
-from tests.test_codegen.test_py.testcases import ScalarsTestCase
+from tests.test_codegen.test_py.testcases import MutationOperationTestCase, ScalarsTestCase
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -60,9 +60,9 @@ def test_invalid_operation_raises(pseudo_config):
 
 
 def test_get_mutation_operations(pseudo_config):
-    pseudo_config.schema_path.write_text(str(ScalarsTestCase.schema))
+    pseudo_config.schema_path.write_text(str(MutationOperationTestCase.schema))
     pseudo_config.operations_dir.write_text(
-        """mutation CreateUserNoArgs{createUserNoArgs{
+        """mutation CreateUserNoArgs{createUser{
     name
     age
     agePoint
@@ -75,9 +75,9 @@ def test_get_mutation_operations(pseudo_config):
 
 
 def test_get_operation_input_variables(pseudo_config):
-    pseudo_config.schema_path.write_text(str(ScalarsTestCase.schema))
+    pseudo_config.schema_path.write_text(str(MutationOperationTestCase.schema))
     pseudo_config.operations_dir.write_text(
-        """mutation updateNameMutation($id: ID!, $name: String!){updateName(id: $id, newName: $name){
+        """mutation updateNameMutation($id: ID!, $name: String!){updateName(id: $id, name: $name){
             name
             age
             agePoint

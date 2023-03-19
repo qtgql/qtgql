@@ -573,6 +573,22 @@ CustomScalarInputTestCase = QGQLObjectTestCase(
     """,
     test_name="CustomScalarInputTestCase",
 )
+
+MutationOperationTestCase = QGQLObjectTestCase(
+    schema=schemas.mutation_schema.schema,
+    query="""        query MainQuery {
+          user {
+            id
+            name
+            age
+            agePoint
+            male
+            id
+            uuid
+          }
+        }""",
+    test_name="MutationOperationTestCase",
+)
 all_test_cases = [
     ScalarsTestCase,
     DateTimeTestCase,
