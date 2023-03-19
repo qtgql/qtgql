@@ -83,21 +83,21 @@ class QGQLObjectTestCase:
         env = QtGqlEnvironment(client=GqlWsTransportClient(url=url), name=self.config.env_name)
         set_gql_env(env)
         with tempfile.TemporaryDirectory() as raw_tmp_dir:
-            tmp_dir = Path(raw_tmp_dir)
+            tmp_dir = Path(raw_tmp_dir).resolve()
             self.config.graphql_dir = tmp_dir
-            (tmp_dir / "__init__.py").write_text("import os")
-            (tmp_dir / "operations.graphql").write_text(self.query)
-            (tmp_dir / "schema.graphql").write_text(str(self.schema))
+            (tmp_dir / "__init__.py").resolve(True).write_text("import os")
+            (tmp_dir / "operations.graphql").resolve(True).write_text(self.query)
+            (tmp_dir / "schema.graphql").resolve(True).write_text(str(self.schema))
             gen_module_name = fake.pystr()
             generated_dir = tmp_dir / gen_module_name
             generated_dir.mkdir()
             generated = self.evaluator.dumps()
-            (generated_dir / "__init__.py").write_text("import os")
-            schema_dir = generated_dir / "schema.py"
+            (generated_dir / "__init__.py").resolve(True).write_text("import os")
+            schema_dir = (generated_dir / "schema.py").resolve(True)
             schema_dir.write_text(generated["objecttypes"])
-            handlers_dir = generated_dir / "handlers.py"
+            handlers_dir = (generated_dir / "handlers.py").resolve(True)
             handlers_dir.write_text(generated["handlers"])
-            sys.path.append(tmp_dir.as_posix())
+            sys.path.append(str(tmp_dir))
             try:
                 schema_mod = importlib.import_module(f"{gen_module_name}.schema")
             except BaseException as e:
