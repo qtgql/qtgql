@@ -1,5 +1,6 @@
 import pytest
 from PySide6.QtNetwork import QAbstractSocket
+from PySide6.QtWebSockets import QWebSocketProtocol
 from qtgql.gqltransport.client import PROTOCOL, GqlWsTransportClient, SubscribeResponseMessage
 from qtgql.gqltransport.core import QueryPayload
 
@@ -15,6 +16,7 @@ def test_connection_init(qtbot, schemas_server):
     client = GqlWsTransportClient(ping_timeout=20000, url=schemas_server.address)
     assert not client._connection_ack
     qtbot.wait_until(lambda: client._connection_ack)
+    client.close(QWebSocketProtocol.CloseCode.CloseCodeNormal)
 
 
 def test_connection_pong(qtbot, schemas_server):
