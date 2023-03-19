@@ -6,6 +6,8 @@ class AntiForwardRef:
     i.e:
     Union["someString"] would return a ForwardRef, this class is a simple hack
     to just return a type contains the name.
+    Also, this is a workaround for types that reference each-other,
+    otherwise it would cause recursion error.
     """
 
     name: str

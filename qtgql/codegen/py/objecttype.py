@@ -240,8 +240,11 @@ class GqlTypeHinter(TypeHinter):
     @property
     def is_object_type(self) -> Optional[QtGqlObjectTypeDefinition]:
         t_self = optional_maybe(self).type
-        if isinstance(t_self, QtGqlObjectTypeDefinition):
-            return t_self
+        with contextlib.suppress(TypeError):
+            if issubclass(t_self, AntiForwardRef):
+                ret = t_self.resolve()
+                if isinstance(ret, QtGqlObjectTypeDefinition):
+                    return ret
 
     @property
     def is_input_object_type(self) -> Optional[QtGqlInputObjectTypeDefinition]:

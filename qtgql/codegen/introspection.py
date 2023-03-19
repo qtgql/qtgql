@@ -192,10 +192,9 @@ class SchemaEvaluator:
                 type=anti_forward_ref(name=enum_def.name, type_map=self._enums_def_map),
             )
         elif obj_def := is_object_definition(t):
-            concrete = self.schema_definition.get_type(obj_def.name)
-            assert isinstance(concrete, gql_def.GraphQLObjectType)
-            ret = GqlTypeHinter(type=self._evaluate_object_type(concrete))
-
+            ret = GqlTypeHinter(
+                type=anti_forward_ref(name=obj_def.name, type_map=self._objecttypes_def_map),
+            )
         elif union_def := is_union_definition(t):
             ret = GqlTypeHinter(
                 type=Union,

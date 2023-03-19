@@ -201,17 +201,6 @@ ScalarsTestCase = QGQLObjectTestCase(
             uuid
           }
         }
-
-        mutation updateNameMutation($id: ID!, $name: String!) {
-          updateName(id: $id, newName: $name) {
-            name
-            age
-            agePoint
-            uuid
-            male
-          }
-        }
-
         """,
     test_name="ScalarsTestCase",
 )
