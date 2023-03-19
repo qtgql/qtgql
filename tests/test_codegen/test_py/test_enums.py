@@ -38,7 +38,7 @@ def test_accessible_from_qml(qmlbot, status):
 
 
         """
-        % status.name
+        % status.name,
     )
 
     EnumTestCase.compile()

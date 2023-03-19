@@ -7,7 +7,10 @@ repos:
       - id: check-yaml
       - id: check-added-large-files
         args: [ "--maxkb=1492" ]
-
+  - repo: https://github.com/asottile/add-trailing-comma
+    rev: v2.4.0
+    hooks:
+    -   id: add-trailing-comma
   - repo: https://github.com/codespell-project/codespell
     rev: v2.2.2
     hooks:

@@ -20,12 +20,14 @@ if TYPE_CHECKING:
 
 
 def get_field_from_field_node(
-    selection: gql_lang.FieldNode, field_type: QtGqlObjectTypeDefinition
+    selection: gql_lang.FieldNode,
+    field_type: QtGqlObjectTypeDefinition,
 ) -> QtGqlQueriedField:
     field_node = is_field_node(selection)
     assert field_node
     return QtGqlQueriedField.from_field(
-        field_type.fields_dict[field_node.name.value], selection_set=field_node.selection_set
+        field_type.fields_dict[field_node.name.value],
+        selection_set=field_node.selection_set,
     )
 
 
@@ -54,7 +56,9 @@ class QtGqlQueriedField(QtGqlFieldDefinition):
 
     @classmethod
     def from_field(
-        cls, f: QtGqlFieldDefinition, selection_set: Optional[gql_lang.SelectionSetNode]
+        cls,
+        f: QtGqlFieldDefinition,
+        selection_set: Optional[gql_lang.SelectionSetNode],
     ) -> QtGqlQueriedField:
         ret = cls(**attrs.asdict(f, recurse=False))
         if not hasattr(selection_set, "selections"):
@@ -99,7 +103,7 @@ class QtGqlQueriedField(QtGqlFieldDefinition):
         return dedent(
             config_template(
                 context=ConfigContext(self),
-            )
+            ),
         )
 
 

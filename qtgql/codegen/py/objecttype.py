@@ -66,6 +66,9 @@ class QtGqlVariableDefinition(Generic[T], QtGqlBaseTypedNode):
             return attr_name
         elif self.type.is_enum:
             return f"{attr_name}.name"
+        elif self.is_custom_scalar:
+            return f"{attr_name}.{BaseCustomScalar.parse_value.__name__}()"
+
         raise NotImplementedError(f"{self.type} is not supported as an input type ATM")
 
 
@@ -107,7 +110,7 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
         """This annotates the value that is QML-compatible."""
         if custom_scalar := self.type.is_custom_scalar(self.scalars):
             return TypeHinter.from_annotations(
-                custom_scalar.to_qt.__annotations__["return"]
+                custom_scalar.to_qt.__annotations__["return"],
             ).stringify()
         if self.type.is_enum:
             return "int"

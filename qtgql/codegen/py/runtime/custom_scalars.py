@@ -28,8 +28,14 @@ class BaseCustomScalar(Generic[T, T_RAW], ABC):
         else:
             self._value = v
 
+    def parse_value(self) -> T_RAW:
+        """When this scalar is used for input types (in variables) this method
+        would be called to parse the value to JSON form."""
+        raise NotImplementedError
+
+    @classmethod
     @abstractmethod
-    def from_graphql(cls, v: Optional[T_RAW] = None) -> "BaseCustomScalar":
+    def deserialize(cls, v: Optional[T_RAW] = None) -> "BaseCustomScalar":
         """Deserializes data fetched from graphql, This is useful when you want
         to set a first-of value that will later be used by `to_qt()`.
 
@@ -58,8 +64,11 @@ class DateTimeScalar(BaseCustomScalar[datetime, str]):
     DEFAULT_VALUE = datetime.now()
     FORMAT_STRING = "%H:%M (%m/%d/%Y)"
 
+    def parse_value(self) -> str:
+        return self._value.isoformat()
+
     @classmethod
-    def from_graphql(cls, v=None) -> "DateTimeScalar":
+    def deserialize(cls, v=None) -> "DateTimeScalar":
         if v:
             return cls(datetime.fromisoformat(v))
         return cls()
@@ -74,8 +83,11 @@ class DateScalar(BaseCustomScalar[date, str]):
     GRAPHQL_NAME = "Date"
     DEFAULT_VALUE = date(year=1998, month=8, day=23)
 
+    def parse_value(self) -> str:
+        return self._value.isoformat()
+
     @classmethod
-    def from_graphql(cls, v=None) -> "DateScalar":
+    def deserialize(cls, v=None) -> "DateScalar":
         if v:
             return cls(date.fromisoformat(v))
         return cls()
@@ -90,8 +102,11 @@ class TimeScalar(BaseCustomScalar[time, str]):
     GRAPHQL_NAME = "Time"
     DEFAULT_VALUE = time()
 
+    def parse_value(self) -> str:
+        return self._value.isoformat()
+
     @classmethod
-    def from_graphql(cls, v: Optional[str] = None) -> "TimeScalar":
+    def deserialize(cls, v: Optional[str] = None) -> "TimeScalar":
         if v:
             return cls(time.fromisoformat(v))
         return cls()
@@ -106,8 +121,11 @@ class DecimalScalar(BaseCustomScalar[Decimal, str]):
     GRAPHQL_NAME = "Decimal"
     DEFAULT_VALUE = Decimal()
 
+    def parse_value(self) -> str:
+        return str(self._value)
+
     @classmethod
-    def from_graphql(cls, v: Optional[str] = None) -> "DecimalScalar":
+    def deserialize(cls, v: Optional[str] = None) -> "DecimalScalar":
         if v:
             return cls(Decimal(v))
         return cls()

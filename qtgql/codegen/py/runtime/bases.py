@@ -96,7 +96,7 @@ class QGraphQLObjectStore(Generic[T_BaseQGraphQLObject]):
     def loose(self, node: T_BaseQGraphQLObject, operation_name: str) -> None:
         assert node.id
         with contextlib.suppress(
-            KeyError
+            KeyError,
         ):  # This node was already deleted, we can safely ignore it
             record = self._data[node.id]
             record.retainers.remove(operation_name)
@@ -143,7 +143,7 @@ class QGraphQListModel(QAbstractListModel, Generic[T_BaseQGraphQLObject]):
             if role == self.OBJECT_ROLE:
                 return self._data[index.row()]
             raise NotImplementedError(
-                f"role {role} is not a valid role for {self.__class__.__name__}"
+                f"role {role} is not a valid role for {self.__class__.__name__}",
             )
 
     def append(self, node: T_BaseQGraphQLObject) -> None:

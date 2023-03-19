@@ -1,6 +1,6 @@
+import importlib
 import sys
 import tempfile
-import uuid
 from functools import cached_property
 from pathlib import Path
 from textwrap import dedent
@@ -41,7 +41,7 @@ class QGQLObjectTestCase:
     type_name: str = "User"
     qmlbot: Optional[QmlBot] = None
     config: QtGqlConfig = attrs.field(
-        factory=lambda: QtGqlConfig(graphql_dir=Path(__file__).parent, env_name="TestEnv")
+        factory=lambda: QtGqlConfig(graphql_dir=Path(__file__).parent, env_name="TestEnv"),
     )
     query_operationName: str = "MainQuery"
     first_field: str = "user"
@@ -61,7 +61,7 @@ class QGQLObjectTestCase:
 
                     }
                 """
-                % self.query_operationName
+                % self.query_operationName,
             )
 
     @cached_property
@@ -71,7 +71,7 @@ class QGQLObjectTestCase:
     @property
     def initialize_dict(self) -> dict:
         res = self.schema.execute_sync(
-            self.evaluator._query_handlers[self.query_operationName].query
+            self.evaluator._query_handlers[self.query_operationName].query,
         )
         if res.errors:
             raise Exception("graphql operations failed", res.errors)
@@ -85,28 +85,31 @@ class QGQLObjectTestCase:
         with tempfile.TemporaryDirectory() as raw_tmp_dir:
             tmp_dir = Path(raw_tmp_dir)
             self.config.graphql_dir = tmp_dir
-            with (tmp_dir / "operations.graphql").open("w") as f:
-                f.write(self.query)
-            with (tmp_dir / "schema.graphql").open("w") as f:
-                f.write(str(self.schema))
-
+            (tmp_dir / "__init__.py").write_text("import os")
+            (tmp_dir / "operations.graphql").write_text(self.query)
+            (tmp_dir / "schema.graphql").write_text(str(self.schema))
+            generated_dir = tmp_dir / "generated"
+            generated_dir.mkdir()
             generated = self.evaluator.dumps()
-            types_module = ModuleType(uuid.uuid4().hex)
-        handlers_mod = ModuleType(uuid.uuid4().hex)
-        try:
-            exec(compile(generated["objecttypes"], "gen_schema", "exec"), types_module.__dict__)
-        except BaseException as e:
-            raise RuntimeError(generated["objecttypes"]) from e
+            (generated_dir / "__init__.py").write_text("import os")
+            schema_dir = generated_dir / "schema.py"
+            schema_dir.write_text(generated["objecttypes"])
+            handlers_dir = generated_dir / "handlers.py"
+            handlers_dir.write_text(generated["handlers"])
+            sys.path.append(tmp_dir.as_posix())
+            try:
+                schema_mod = importlib.import_module("generated.schema")
+            except BaseException as e:
+                raise RuntimeError(generated["objecttypes"]) from e
 
-        sys.modules["objecttypes"] = types_module
-        try:
-            exec(compile(generated["handlers"], "gen_handlers", "exec"), handlers_mod.__dict__)
-        except BaseException as e:
-            raise RuntimeError(generated["handlers"]) from e
+            try:
+                handler_mod = importlib.import_module("generated.handlers")
+            except BaseException as e:
+                raise RuntimeError(generated["handlers"]) from e
         return CompiledTestCase(
             evaluator=self.evaluator,
-            objecttypes_mod=types_module,
-            handlers_mod=handlers_mod,
+            objecttypes_mod=schema_mod,
+            handlers_mod=handler_mod,
             config=self.config,
             query=self.query,
             schema=self.schema,
@@ -436,7 +439,7 @@ class CountryScalar(BaseCustomScalar[Optional[str], str]):
     DEFAULT_VALUE = "isr"
 
     @classmethod
-    def from_graphql(cls, v=None) -> "BaseCustomScalar":
+    def deserialize(cls, v=None) -> "BaseCustomScalar":
         if v:
             return cls(cls.countrymap[v])
         return cls()
@@ -448,7 +451,8 @@ class CountryScalar(BaseCustomScalar[Optional[str], str]):
 CustomUserScalarTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_user_defined_scalar.schema,
     config=QtGqlConfig(
-        graphql_dir=None, custom_scalars={CountryScalar.GRAPHQL_NAME: CountryScalar}
+        graphql_dir=None,
+        custom_scalars={CountryScalar.GRAPHQL_NAME: CountryScalar},
     ),
     test_name="CustomUserScalarTestCase",
     query="""
@@ -554,6 +558,30 @@ OptionalInputTestCase = QGQLObjectTestCase(
     }
     """,
     test_name="OptionalInputTestCase",
+)
+
+CustomScalarInputTestCase = QGQLObjectTestCase(
+    schema=schemas.custom_scalar_input_schema.schema,
+    query="""
+        query ArgsQuery($decimal: Decimal!, $dt: DateTime!, $time: Time!, $date: Date!) {
+          echoCustomScalar(decimal: $decimal, dt: $dt, time_: $time, date_: $date) {
+            date_
+            decimal
+            dt
+            time_
+          }
+        }
+
+        query CustomScalarsInputObj($input: SupportedCustomScalarsInput!) {
+          echoCustomScalarInputObj(input: $input) {
+            dt
+            decimal
+            date_
+            time_
+          }
+        }
+    """,
+    test_name="CustomScalarInputTestCase",
 )
 all_test_cases = [
     ScalarsTestCase,

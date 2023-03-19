@@ -23,7 +23,7 @@ class AbstractScalarTestCase(ABC):
         raise NotImplementedError
 
     def test_default_value(self):
-        scalar = self.scalar_klass.from_graphql()
+        scalar = self.scalar_klass.deserialize()
         assert scalar._value == scalar.DEFAULT_VALUE
         assert scalar.to_qt() == self.scalar_klass(scalar.DEFAULT_VALUE).to_qt()
 
@@ -31,15 +31,15 @@ class AbstractScalarTestCase(ABC):
 class TestDecimalScalar(AbstractScalarTestCase):
     def test_deserialize(self):
         expected = Decimal(1000)
-        scalar = DecimalScalar.from_graphql(str(expected))
+        scalar = DecimalScalar.deserialize(str(expected))
         assert scalar._value == expected
 
     def test_to_qt(self):
-        scalar = DecimalScalar.from_graphql("100.0")
+        scalar = DecimalScalar.deserialize("100.0")
         assert scalar.to_qt() == "100.0"
 
     def test_default_value(self):
-        scalar = DecimalScalar.from_graphql()
+        scalar = DecimalScalar.deserialize()
         assert scalar._value == Decimal()
         assert scalar.to_qt() == "0"
 
@@ -49,7 +49,7 @@ class TestDateScalar(AbstractScalarTestCase):
 
     def test_deserialize(self):
         expected = date.fromisoformat(datetime.now(tz=timezone.utc).date().isoformat())
-        scalar = DateScalar.from_graphql(expected.isoformat())
+        scalar = DateScalar.deserialize(expected.isoformat())
         assert scalar._value == expected
 
     def test_to_qt(self):
@@ -62,7 +62,7 @@ class TestTimeScalar(AbstractScalarTestCase):
 
     def test_deserialize(self):
         expected: time = datetime.now(tz=timezone.utc).time()
-        scalar = TimeScalar.from_graphql(expected.isoformat())
+        scalar = TimeScalar.deserialize(expected.isoformat())
         assert scalar._value == expected
 
     def test_to_qt(self):

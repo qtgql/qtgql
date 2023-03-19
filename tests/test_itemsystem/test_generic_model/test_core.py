@@ -64,7 +64,7 @@ def test_child_creates_model(full_model):
 
 def test_child_has_parent_model(full_model):
     parent_model: GenericModel[WithChild] = WithChild.Model(
-        data=[init_dict_withChild() for _ in range(3)]
+        data=[init_dict_withChild() for _ in range(3)],
     )
     child_model: GenericModel[FullClass] = parent_model._data[0].child
     assert child_model.parent_model is parent_model

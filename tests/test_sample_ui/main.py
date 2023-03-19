@@ -41,7 +41,7 @@ class EntryPoint(QObject):
                 }
               }
             }
-            """
+            """,
         )
 
         def __init__(self, app: "EntryPoint"):
@@ -60,7 +60,7 @@ class EntryPoint(QObject):
         super().__init__(parent)
         main_qml = Path(__file__).parent / "qml" / "main.qml"
         QtGui.QFontDatabase.addApplicationFont(
-            str(main_qml.parent / "materialdesignicons-webfont.ttf")
+            str(main_qml.parent / "materialdesignicons-webfont.ttf"),
         )
         self.qml_engine = QQmlApplicationEngine()
         self.gql_client = GqlWsTransportClient(url="ws://localhost:8080/graphql")
@@ -103,7 +103,8 @@ class EntryPoint(QObject):
             for window in self.qml_engine.rootObjects():  # type: ignore
                 loader: QtQuick.QQuickItem = window.findChild(QtQuick.QQuickItem, "debug_loader")  # type: ignore
                 QtCore.QEventLoop().processEvents(
-                    QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 1000
+                    QtCore.QEventLoop.ProcessEventsFlag.AllEvents,
+                    1000,
                 )
                 prev = loader.property("source")
                 loader.setProperty("source", "")

@@ -1,4 +1,5 @@
 from . import (
+    custom_scalar_input_schema,
     list_of_union,
     object_reference_each_other,
     object_with_date,
@@ -48,4 +49,5 @@ __all__ = [  # noqa: PLE0604
     variables_schema,
     root_enum_schema,
     optional_input_schema,
+    custom_scalar_input_schema,
 ]

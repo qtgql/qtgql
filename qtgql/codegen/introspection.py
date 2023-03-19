@@ -74,14 +74,18 @@ class QtGqlVisitor(visitor.Visitor):
         self.evaluator = evaluator
 
     def _get_root_type_field(
-        self, root_type: QtGqlObjectTypeDefinition, gql_field: gql_lang.FieldNode
+        self,
+        root_type: QtGqlObjectTypeDefinition,
+        gql_field: gql_lang.FieldNode,
     ) -> QtGqlQueriedField:
         return QtGqlQueriedField.from_field(
-            root_type.fields_dict[gql_field.name.value], gql_field.selection_set
+            root_type.fields_dict[gql_field.name.value],
+            gql_field.selection_set,
         )
 
     def _parse_variable_definition(
-        self, var: gql_lang.VariableDefinitionNode
+        self,
+        var: gql_lang.VariableDefinitionNode,
     ) -> QtGqlVariableDefinition:
         return QtGqlVariableDefinition(
             name=var.variable.name.value,
@@ -104,7 +108,8 @@ class QtGqlVisitor(visitor.Visitor):
                 if operation.operation is OperationType.QUERY:
                     assert self.evaluator._query_type
                     root_qtgql_field = self._get_root_type_field(
-                        self.evaluator._query_type, root_field
+                        self.evaluator._query_type,
+                        root_field,
                     )
                     operation_definition = QtGqlOperationDefinition(
                         query=graphql.print_ast(node),
@@ -116,7 +121,8 @@ class QtGqlVisitor(visitor.Visitor):
                     self.query_handlers[op_name] = operation_definition
                 elif operation.operation is OperationType.MUTATION:
                     root_qtgql_field = self._get_root_type_field(
-                        self.evaluator._mutation_type, root_field
+                        self.evaluator._mutation_type,
+                        root_field,
                     )
                     operation_definition = QtGqlOperationDefinition(
                         query=graphql.print_ast(node),
@@ -143,8 +149,8 @@ class SchemaEvaluator:
         if nonnull := is_nonnull_node(node):
             return self._evaluate_field_type(
                 graphql.type.GraphQLNonNull(
-                    self.schema_definition.get_type(nonnull.type.name.value)
-                )
+                    self.schema_definition.get_type(nonnull.type.name.value),
+                ),
             )
 
         if named_type := is_named_type_node(node):
@@ -183,7 +189,7 @@ class SchemaEvaluator:
                 ret = GqlTypeHinter(type=self.config.custom_scalars[scalar_def.name])
         elif enum_def := is_enum_definition(t):
             ret = GqlTypeHinter(
-                type=anti_forward_ref(name=enum_def.name, type_map=self._enums_def_map)
+                type=anti_forward_ref(name=enum_def.name, type_map=self._enums_def_map),
             )
         elif obj_def := is_object_definition(t):
             concrete = self.schema_definition.get_type(obj_def.name)
@@ -196,8 +202,9 @@ class SchemaEvaluator:
                 of_type=tuple(
                     GqlTypeHinter(
                         type=anti_forward_ref(
-                            name=possible.name, type_map=self._objecttypes_def_map
-                        )
+                            name=possible.name,
+                            type_map=self._objecttypes_def_map,
+                        ),
                     )
                     for possible in self.schema_definition.get_possible_types(union_def)
                 ),
@@ -225,7 +232,9 @@ class SchemaEvaluator:
         )
 
     def _evaluate_input_field(
-        self, name: str, field: gql_def.GraphQLInputField
+        self,
+        name: str,
+        field: gql_def.GraphQLInputField,
     ) -> QtGqlInputFieldDefinition:
         return QtGqlInputFieldDefinition(
             type=self._evaluate_field_type(field.type),
@@ -237,7 +246,8 @@ class SchemaEvaluator:
         )
 
     def _evaluate_object_type(
-        self, type_: gql_def.GraphQLObjectType
+        self,
+        type_: gql_def.GraphQLObjectType,
     ) -> Optional[QtGqlObjectTypeDefinition]:
         t_name: str = type_.name
         if evaluated := self._objecttypes_def_map.get(t_name, None):
@@ -250,18 +260,18 @@ class SchemaEvaluator:
                     if nonull.of_type is not id_scalar:
                         raise QtGqlException(
                             f"id field type must be of the {id_scalar} scalar!"
-                            f"\n Got: {nonull.of_type}"
+                            f"\n Got: {nonull.of_type}",
                         )
                 else:
                     warnings.warn(
                         "It is best practice to have id field of type ID!"
-                        f"\ntype {type_} has: {id_field}"
+                        f"\ntype {type_} has: {id_field}",
                     )
             except KeyError:
                 warnings.warn(
                     "QtGql enforces types to have ID field"
                     f"type {type_} does not not define an id field.\n"
-                    f"fields: {type_.fields}"
+                    f"fields: {type_.fields}",
                 )
         ret = QtGqlObjectTypeDefinition(
             name=t_name,
@@ -348,7 +358,8 @@ class SchemaEvaluator:
             config=self.config,
         )
         return GeneratedNamespace(
-            handlers=handlers_template(context), objecttypes=schema_types_template(context)
+            handlers=handlers_template(context),
+            objecttypes=schema_types_template(context),
         )
 
     def dump(self):

@@ -4,11 +4,11 @@ from qtgql.tools import slot
 
 from typing import Optional, Union
 from PySide6.QtCore import Signal, QObject
-from PySide6.QtQml import QmlElement, QmlSingleton
+from PySide6.QtQml import QmlElement
 from qtgql.codegen.py.runtime.queryhandler import BaseQueryHandler, UseQueryABC, SelectionConfig, OperationMetaData, BaseMutationHandler
 from qtgql.gqltransport.client import  GqlClientMessage, QueryPayload
 from qtgql.codegen.py.runtime.bases import QGraphQListModel
-from objecttypes import * # noqa
+from .schema import * # noqa
 
 
 QML_IMPORT_NAME = "generated.{{context.config.env_name}}"

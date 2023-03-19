@@ -108,7 +108,9 @@ def test_not_gql_is_valid_if_not_isValid(qtbot, default_client):
 @pytest.fixture
 def auto_reconnect_client(qtbot, schemas_server):
     client = GqlWsTransportClient(
-        url=schemas_server.address, auto_reconnect=True, reconnect_timeout=100
+        url=schemas_server.address,
+        auto_reconnect=True,
+        reconnect_timeout=100,
     )
     qtbot.wait_until(client.gql_is_valid)
     return client
@@ -116,7 +118,9 @@ def auto_reconnect_client(qtbot, schemas_server):
 
 def test_wont_reconnect_if_reconnect_is_false(qtbot, schemas_server):
     client = GqlWsTransportClient(
-        url=schemas_server.address, auto_reconnect=False, reconnect_timeout=100
+        url=schemas_server.address,
+        auto_reconnect=False,
+        reconnect_timeout=100,
     )
     qtbot.wait_until(client.gql_is_valid)
     client.close()
@@ -142,7 +146,9 @@ def test_reconnects_on_error_if_not_valid(qtbot, auto_reconnect_client):
 
 def test_stops_reconnect_timer_on_connected(qtbot, schemas_server):
     client = GqlWsTransportClient(
-        url=schemas_server.address, auto_reconnect=True, reconnect_timeout=100
+        url=schemas_server.address,
+        auto_reconnect=True,
+        reconnect_timeout=100,
     )
     qtbot.wait_until(client.gql_is_valid)
     client.close()

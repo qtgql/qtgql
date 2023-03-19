@@ -24,8 +24,8 @@ class Worm(Node):
     name: str = strawberry.field(default_factory=fake.name)
     family: str = strawberry.field(
         default_factory=lambda: random.choice(
-            ["Platyhelminthes", "Annelida", "Nemertea", "Nematoda", "Acanthocephala"]
-        )
+            ["Platyhelminthes", "Annelida", "Nemertea", "Nematoda", "Acanthocephala"],
+        ),
     )
     size: int = strawberry.field(default_factory=lambda: random.randint(10, 100))
 

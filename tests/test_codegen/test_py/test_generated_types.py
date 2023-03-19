@@ -1,6 +1,8 @@
 import copy
+import decimal
 import uuid
 import weakref
+from datetime import timezone
 from typing import Optional, Type
 
 import pytest
@@ -10,13 +12,18 @@ from qtgql.codegen.py.compiler.builtin_scalars import BuiltinScalar, BuiltinScal
 from qtgql.codegen.py.runtime.bases import QGraphQListModel, _BaseQGraphQLObject
 from qtgql.codegen.py.runtime.custom_scalars import (
     BaseCustomScalar,
+    DateScalar,
     DateTimeScalar,
+    DecimalScalar,
+    TimeScalar,
 )
 from qtgql.codegen.py.runtime.queryhandler import SelectionConfig
 from qtgql.utils.typingref import TypeHinter
 
+from tests.conftest import fake
 from tests.mini_gql_server import schema
 from tests.test_codegen.test_py.testcases import (
+    CustomScalarInputTestCase,
     DateTimeTestCase,
     EnumTestCase,
     InterfaceTestCase,
@@ -59,19 +66,24 @@ class TestAnnotations:
         assert (
             scalar.tp
             == TypeHinter.from_string(
-                getattr(klass, field.setter_name).__annotations__["v"], ns=field.type_map
+                getattr(klass, field.setter_name).__annotations__["v"],
+                ns=field.type_map,
             ).as_annotation()
         )
         assert (
             scalar.tp
             == TypeHinter.from_string(
-                getattr(klass, field.name).fget.__annotations__["return"], ns=field.type_map
+                getattr(klass, field.name).fget.__annotations__["return"],
+                ns=field.type_map,
             ).as_annotation()
         )
 
     @pytest.mark.parametrize(("testcase", "scalar", "fname"), custom_scalar_testcases)
     def test_custom_scalars(
-        self, testcase: QGQLObjectTestCase, scalar: Type[BaseCustomScalar], fname
+        self,
+        testcase: QGQLObjectTestCase,
+        scalar: Type[BaseCustomScalar],
+        fname,
     ):
         testcase = testcase.compile()
         field = testcase.get_field_by_type(scalar)
@@ -213,13 +225,16 @@ class TestDeserializers:
 
     @pytest.mark.parametrize(("testcase", "scalar", "fname"), custom_scalar_testcases)
     def test_custom_scalars(
-        self, testcase: QGQLObjectTestCase, scalar: BaseCustomScalar, fname: str
+        self,
+        testcase: QGQLObjectTestCase,
+        scalar: BaseCustomScalar,
+        fname: str,
     ):
         testcase = testcase.compile()
         initialize_dict = testcase.initialize_dict
         field = testcase.get_field_by_name(fname)
         raw_value = initialize_dict[testcase.first_field][field.name]
-        expected = scalar.from_graphql(raw_value).to_qt()
+        expected = scalar.deserialize(raw_value).to_qt()
         handler = testcase.query_handler
         handler.on_data(initialize_dict)
         assert handler._data.property(field.name) == expected
@@ -293,7 +308,11 @@ class TestUpdates:
 
     @pytest.mark.parametrize(("testcase", "scalar", "fname"), custom_scalar_testcases)
     def test_custom_scalars_no_update(
-        self, testcase: QGQLObjectTestCase, scalar: BaseCustomScalar, fname: str, qtbot
+        self,
+        testcase: QGQLObjectTestCase,
+        scalar: BaseCustomScalar,
+        fname: str,
+        qtbot,
     ):
         testcase = testcase.compile()
         initialized_dict = testcase.initialize_dict
@@ -306,7 +325,11 @@ class TestUpdates:
 
     @pytest.mark.parametrize(("testcase", "scalar", "fname"), custom_scalar_testcases)
     def test_custom_scalars_update(
-        self, testcase: QGQLObjectTestCase, scalar: BaseCustomScalar, fname: str, qtbot
+        self,
+        testcase: QGQLObjectTestCase,
+        scalar: BaseCustomScalar,
+        fname: str,
+        qtbot,
     ):
         testcase = testcase.compile()
         initialize_dict1 = testcase.initialize_dict
@@ -325,7 +348,7 @@ class TestUpdates:
         after = handler.data
         assert after is previous
         raw_new_val = initialize_dict2[testcase.first_field][fname]
-        assert handler.data.property(fname) == scalar.from_graphql(raw_new_val).to_qt()
+        assert handler.data.property(fname) == scalar.deserialize(raw_new_val).to_qt()
 
     def test_object_in_object_no_update(self, qtbot):
         testcase = NestedObjectTestCase.compile()
@@ -434,7 +457,7 @@ class TestUpdates:
         frog_dict = testcase.schema.execute_sync(query).data
         testcase.query_handler.on_data(frog_dict)
         person_dict = testcase.schema.execute_sync(
-            query.replace("choice: FROG", "choice: PERSON")
+            query.replace("choice: FROG", "choice: PERSON"),
         ).data
         person_dict[testcase.first_field]["id"] = handler.data.id
         with qtbot.wait_signal(handler.data.whoAmIChanged, timeout=500):
@@ -470,10 +493,12 @@ class TestUpdates:
         handler.on_data(init_dict)
         model: QGraphQListModel = handler.data.persons
         with pytest.raises(
-            pytestqt.exceptions.TimeoutError, match="Received 0 of the 2 expected signals."
+            pytestqt.exceptions.TimeoutError,
+            match="Received 0 of the 2 expected signals.",
         ):
             with qtbot.wait_signals(
-                [model.rowsAboutToBeRemoved, model.rowsAboutToBeInserted], timeout=500
+                [model.rowsAboutToBeRemoved, model.rowsAboutToBeInserted],
+                timeout=500,
             ):
                 handler.on_data(init_dict)
 
@@ -493,14 +518,15 @@ class TestUpdates:
         init_dict = testcase.initialize_dict
         init_dict2 = testcase.initialize_dict
         init_dict[testcase.first_field]["persons"].extend(
-            testcase.initialize_dict[testcase.first_field]["persons"]
+            testcase.initialize_dict[testcase.first_field]["persons"],
         )
         handler = testcase.query_handler
         handler.on_data(init_dict)
         model: QGraphQListModel = handler.data.persons
         init_dict2[testcase.first_field]["id"] = handler.data.id
         with qtbot.wait_signals(
-            [model.rowsAboutToBeRemoved, model.rowsAboutToBeInserted], timeout=500
+            [model.rowsAboutToBeRemoved, model.rowsAboutToBeInserted],
+            timeout=500,
         ):
             handler.on_data(init_dict2)
 
@@ -529,7 +555,10 @@ class TestDefaultConstructor:
 
     @pytest.mark.parametrize(("testcase", "scalar", "fname"), custom_scalar_testcases)
     def test_custom_scalars(
-        self, testcase: QGQLObjectTestCase, scalar: BaseCustomScalar, fname: str
+        self,
+        testcase: QGQLObjectTestCase,
+        scalar: BaseCustomScalar,
+        fname: str,
     ):
         testcase = testcase.compile()
         inst = testcase.gql_type()
@@ -691,3 +720,19 @@ class TestOperationVariables:
         handler.refetch()
         qtbot.wait_until(lambda: handler.completed)
         assert "Repeat" in handler.data
+
+    def test_custom_scalar_as_args(self, qtbot, schemas_server):
+        testcase = CustomScalarInputTestCase.compile(schemas_server.address)
+        handler = testcase.get_query_handler("ArgsQuery")
+        dec = DecimalScalar(decimal.Decimal("1234333454351345"))
+        dt = DateTimeScalar(fake.date_time(timezone.utc))
+        time = TimeScalar(dt._value.time())
+        date = DateScalar(dt._value.date())
+        handler.setVariables(dec, dt, time, date)
+        handler.fetch()
+        qtbot.wait_until(lambda: handler.completed)
+        container = handler.data
+        assert container._dt._value == dt._value
+        assert container._decimal._value == dec._value
+        assert container._time_._value == time._value
+        assert container._date_._value == date._value

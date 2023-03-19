@@ -102,7 +102,9 @@ class TypeHinter:
             self.type = object_map[self.type]
 
         if builder := getattr(
-            self.type, "__class_getitem__", getattr(self.type, "__getitem__", None)
+            self.type,
+            "__class_getitem__",
+            getattr(self.type, "__getitem__", None),
         ):
             if self.is_union():
                 return builder(tuple(arg.as_annotation(object_map) for arg in self.of_type))

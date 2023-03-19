@@ -68,7 +68,7 @@ def test_get_mutation_operations(pseudo_config):
     agePoint
     uuid
     male
-    }}"""
+    }}""",
     )
     pseudo_config.generate()
     assert pseudo_config._evaluator._mutation_handlers != {}
@@ -83,7 +83,7 @@ def test_get_operation_input_variables(pseudo_config):
             agePoint
             uuid
             male
-            }}"""
+            }}""",
     )
     pseudo_config.generate()
     assert pseudo_config._evaluator._mutation_handlers["updateNameMutation"].variables
