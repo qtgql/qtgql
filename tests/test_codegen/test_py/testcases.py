@@ -25,7 +25,7 @@ from qtgql.codegen.py.runtime.queryhandler import BaseMutationHandler, BaseQuery
 from qtgql.gqltransport.client import GqlWsTransportClient
 from strawberry import Schema
 
-from tests.conftest import QmlBot, hash_schema
+from tests.conftest import QmlBot, fake, hash_schema
 from tests.test_codegen import schemas
 
 if TYPE_CHECKING:
@@ -88,7 +88,8 @@ class QGQLObjectTestCase:
             (tmp_dir / "__init__.py").write_text("import os")
             (tmp_dir / "operations.graphql").write_text(self.query)
             (tmp_dir / "schema.graphql").write_text(str(self.schema))
-            generated_dir = tmp_dir / "generated"
+            gen_module_name = fake.pystr()
+            generated_dir = tmp_dir / gen_module_name
             generated_dir.mkdir()
             generated = self.evaluator.dumps()
             (generated_dir / "__init__.py").write_text("import os")
@@ -98,12 +99,12 @@ class QGQLObjectTestCase:
             handlers_dir.write_text(generated["handlers"])
             sys.path.append(tmp_dir.as_posix())
             try:
-                schema_mod = importlib.import_module("generated.schema")
+                schema_mod = importlib.import_module(f"{gen_module_name}.schema")
             except BaseException as e:
                 raise RuntimeError(generated["objecttypes"]) from e
 
             try:
-                handler_mod = importlib.import_module("generated.handlers")
+                handler_mod = importlib.import_module(f"{gen_module_name}.handlers")
             except BaseException as e:
                 raise RuntimeError(generated["handlers"]) from e
         return CompiledTestCase(

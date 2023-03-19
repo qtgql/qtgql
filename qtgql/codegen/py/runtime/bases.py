@@ -15,10 +15,6 @@ __all__ = ["QGraphQListModel", "get_base_graphql_object"]
 
 
 class QGraphQLInputObjectABC(QObject):
-    @classmethod
-    def create(cls) -> Self:
-        raise NotImplementedError
-
     def asdict(self) -> dict:
         raise NotImplementedError
 

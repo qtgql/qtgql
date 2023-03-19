@@ -1,8 +1,9 @@
 import copy
+import dataclasses
 import decimal
 import uuid
 import weakref
-from datetime import timezone
+from datetime import datetime, timezone
 from typing import Optional, Type
 
 import pytest
@@ -721,18 +722,54 @@ class TestOperationVariables:
         qtbot.wait_until(lambda: handler.completed)
         assert "Repeat" in handler.data
 
-    def test_custom_scalar_as_args(self, qtbot, schemas_server):
+    def test_custom_scalars_as_args(self, qtbot, schemas_server):
         testcase = CustomScalarInputTestCase.compile(schemas_server.address)
         handler = testcase.get_query_handler("ArgsQuery")
-        dec = DecimalScalar(decimal.Decimal("1234333454351345"))
-        dt = DateTimeScalar(fake.date_time(timezone.utc))
-        time = TimeScalar(dt._value.time())
-        date = DateScalar(dt._value.date())
-        handler.setVariables(dec, dt, time, date)
+        scalars = ScalarsContainer.from_datetime(
+            fake.date_time(timezone.utc),
+            DecimalScalar(decimal.Decimal("1234333454351345")),
+        )
+        handler.setVariables(scalars.decimal, scalars.dt, scalars.time_, scalars.date_)
         handler.fetch()
         qtbot.wait_until(lambda: handler.completed)
         container = handler.data
-        assert container._dt._value == dt._value
-        assert container._decimal._value == dec._value
-        assert container._time_._value == time._value
-        assert container._date_._value == date._value
+        assert container._dt._value == scalars.dt._value
+        assert container._decimal._value == scalars.decimal._value
+        assert container._time_._value == scalars.time_._value
+        assert container._date_._value == scalars.date_._value
+
+    def test_custom_scalars_in_input_obj(self, qtbot, schemas_server):
+        testcase = CustomScalarInputTestCase.compile(schemas_server.address)
+        handler = testcase.get_query_handler("CustomScalarsInputObj")
+        scalars = ScalarsContainer.from_datetime(
+            fake.date_time(timezone.utc),
+            DecimalScalar(decimal.Decimal("1234333454351345")),
+        )
+        inp_obj = testcase.get_attr("SupportedCustomScalarsInput")
+        handler.setVariables(
+            inp_obj(None, scalars.dt, scalars.date_, scalars.time_, scalars.decimal),
+        )
+        handler.fetch()
+        qtbot.wait_until(lambda: handler.completed)
+        container = handler.data
+        assert container._dt._value == scalars.dt._value
+        assert container._decimal._value == scalars.decimal._value
+        assert container._time_._value == scalars.time_._value
+        assert container._date_._value == scalars.date_._value
+
+
+@dataclasses.dataclass
+class ScalarsContainer:
+    dt: DateTimeScalar
+    date_: DateScalar
+    time_: TimeScalar
+    decimal: DecimalScalar
+
+    @classmethod
+    def from_datetime(cls, dt: datetime, dec: DecimalScalar):
+        return ScalarsContainer(
+            dt=DateTimeScalar(dt),
+            time_=TimeScalar(dt.time()),
+            date_=DateScalar(dt.date()),
+            decimal=dec,
+        )

@@ -18,8 +18,10 @@ This library is an attempt to provide a high-level graphql client to the QT worl
     - [x] Type-safe Mutation handlers
     - [x] Type Safe Query handlers: queries your server when a component uses this query (or imperatively fetched).
     - [x] Query updates: fetch the same query multiple times would not instantiate everything from scratch
-!!! success "Network layer"
-    - [x] Native-Qt client implementation of "[graphql-transport-ws](https://github.com/enisdenjo/graphql-ws/blob/master/PROTOCOL.md)" protocol (supports subscriptions) - You can provide your own network layer though.
+    - [x] Mutations.
+    - [x] Fully typed input variables.
+  !!! success "Network layer"
+      - [x] Native-Qt client implementation of "[graphql-transport-ws](https://github.com/enisdenjo/graphql-ws/blob/master/PROTOCOL.md)" protocol (supports subscriptions) - You can provide your own network layer though.
 
 !!! success "Helpers"
     - [x] [generic models](helpers/itemsystem.md) that get created from dictionaries (with update, pop, insert implemented by default)
