@@ -85,17 +85,17 @@ class QGQLObjectTestCase:
         with tempfile.TemporaryDirectory() as raw_tmp_dir:
             tmp_dir = Path(raw_tmp_dir).resolve()
             self.config.graphql_dir = tmp_dir
-            (tmp_dir / "__init__.py").resolve(True).write_text("import os")
-            (tmp_dir / "operations.graphql").resolve(True).write_text(self.query)
-            (tmp_dir / "schema.graphql").resolve(True).write_text(str(self.schema))
+            (tmp_dir / "__init__.py").resolve().write_text("import os")
+            (tmp_dir / "operations.graphql").resolve().write_text(self.query)
+            (tmp_dir / "schema.graphql").resolve().write_text(str(self.schema))
             gen_module_name = fake.pystr()
             generated_dir = tmp_dir / gen_module_name
             generated_dir.mkdir()
             generated = self.evaluator.dumps()
-            (generated_dir / "__init__.py").resolve(True).write_text("import os")
-            schema_dir = (generated_dir / "schema.py").resolve(True)
+            (generated_dir / "__init__.py").resolve().write_text("import os")
+            schema_dir = (generated_dir / "schema.py").resolve()
             schema_dir.write_text(generated["objecttypes"])
-            handlers_dir = (generated_dir / "handlers.py").resolve(True)
+            handlers_dir = (generated_dir / "handlers.py").resolve()
             handlers_dir.write_text(generated["handlers"])
             sys.path.append(str(tmp_dir))
             try:
