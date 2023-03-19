@@ -192,19 +192,7 @@ class QtGqlObjectTypeDefinition(BaseGqlTypeDefinition):
 
 @define(slots=False)
 class QtGqlInputObjectTypeDefinition(BaseGqlTypeDefinition):
-    fields_dict: dict[str, QtGqlInputFieldDefinition] = {}
-
-    @property
-    def fields(self) -> list[QtGqlInputFieldDefinition]:
-        return list(self.fields_dict.values())
-
-    @property
-    def required_fields(self) -> list[QtGqlInputFieldDefinition]:
-        return [field for field in self.fields if not field.type.is_optional()]
-
-    @property
-    def optional_fields(self) -> list[QtGqlInputFieldDefinition]:
-        return [field for field in self.fields if field.type.is_optional()]
+    fields_dict: dict[str, QtGqlInputFieldDefinition] = {}  # type: ignore
 
 
 @define

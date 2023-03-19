@@ -3,8 +3,8 @@ Release type: minor
 This release adds initial support for mutations.
 
 - [ ] Mutation handler (on par with query handler).
-- [ ] commit slot. - on par with `refetch()` / `fetch()`
-- [ ] Support variables
+- [x] commit slot. - on par with `refetch()` / `fetch()`
+- [x] Support variables
 Every operation would generate <OperationName>Variables type, this type would be the property
 The commit slot would have the types arguments on it, and for every type is not a plain JS type
 we would generate a factory slot (accessible from QML), those types would be transformed to dictionaries and further on to JSON.

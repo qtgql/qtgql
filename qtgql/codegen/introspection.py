@@ -149,12 +149,14 @@ class SchemaEvaluator:
         if nonnull := is_nonnull_node(node):
             return self._evaluate_field_type(
                 graphql.type.GraphQLNonNull(
-                    self.schema_definition.get_type(nonnull.type.name.value),
+                    self.schema_definition.get_type(nonnull.type.name.value),  # type: ignore
                 ),
             )
 
         if named_type := is_named_type_node(node):
-            return self._evaluate_field_type(self.schema_definition.get_type(named_type.name.value))
+            gql_concrete = self.schema_definition.get_type(named_type.name.value)
+            assert gql_concrete
+            return self._evaluate_field_type(gql_concrete)
         raise NotImplementedError(node, "Type is not supported as a variable ATM")
 
     @cached_property
