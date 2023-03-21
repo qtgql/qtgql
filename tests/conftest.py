@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import os
+import platform
 import socket
 import subprocess
 import tempfile
@@ -22,7 +23,7 @@ if TYPE_CHECKING:
 
 fake = Faker()
 
-IS_WINDOWS = os.name == "windows"
+IS_WINDOWS = platform.system() == "Windows"
 
 
 @define
