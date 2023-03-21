@@ -60,6 +60,11 @@ class BaseOperationHandler(QObject, Generic[T]):
         self._data: Optional[T] = None
         self.environment = get_gql_env(self.ENV_NAME)
         self._variables: dict = {}
+        self._consumer: Optional[QmlOperationConsumerABC] = None
+
+    def consume(self, consumer: QmlOperationConsumerABC) -> None:
+        self._consumer = consumer
+        self.dataChanged.connect(consumer.handlerDataChanged)
 
     def loose(self) -> None:
         """Releases retention from all children, real implementation is
@@ -137,29 +142,42 @@ class BaseMutationHandler(BaseOperationHandler[T]):
         self.refetch()
 
 
-class UseQueryABC(QQuickItem, Generic[T]):
-    """Concrete implementation in the template."""
-
-    ENV_NAME: ClassVar[str]
-
+class QmlOperationConsumerABC(QQuickItem, Generic[T]):
     # signals
     operationNameChanged = Signal()
+    autofetchChanged = Signal()
+    handlerDataChanged = Signal()
 
     def __init__(self, parent: Optional[QQuickItem] = None):
         super().__init__(parent)
-        self.env = get_gql_env(self.ENV_NAME)
-        self._handler: BaseQueryHandler[T] = self._get_handler()
+        self._autofetch: bool = False
+        self._handler: BaseOperationHandler[T] = self._get_handler()
+        self._handler.consume(self)
         self.destroyed.connect(self._handler.dispose)  # type: ignore
 
-    @qproperty()
-    def handler(self) -> BaseQueryHandler[T]:
+    @qproperty(type=BaseOperationHandler, constant=True)
+    def handler(self) -> BaseOperationHandler[T]:
         return self._handler
 
+    def handlerData(self):  # property
+        # real implementation in template.
+        raise NotImplementedError
+
+    @slot
+    def set_autofetch(self, v: bool) -> None:
+        self._autofetch = v
+        self.autofetchChanged.emit()
+
+    @qproperty(type=bool, notify=autofetchChanged, fset=set_autofetch)
+    def autofetch(self) -> bool:
+        return self._autofetch
+
     def componentComplete(self) -> None:
-        self._handler.fetch()
+        if self._autofetch:
+            self._handler.fetch()
         super().componentComplete()
 
     @classmethod
-    def _get_handler(cls) -> BaseQueryHandler[T]:
+    def _get_handler(cls) -> BaseOperationHandler[T]:
         # real implementation is generated.
         raise NotImplementedError

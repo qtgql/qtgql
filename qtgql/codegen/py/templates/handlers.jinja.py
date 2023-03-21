@@ -1,11 +1,11 @@
-from qtgql.tools import slot
+from qtgql.tools import slot, qproperty
 
 {% import "macros.jinja.py" as macros %}
 
 from typing import Optional, Union
 from PySide6.QtCore import Signal, QObject
 from PySide6.QtQml import QmlElement
-from qtgql.codegen.py.runtime.queryhandler import BaseQueryHandler, UseQueryABC, SelectionConfig, OperationMetaData, BaseMutationHandler
+from qtgql.codegen.py.runtime.queryhandler import BaseQueryHandler, QmlOperationConsumerABC, SelectionConfig, OperationMetaData, BaseMutationHandler
 from qtgql.gqltransport.client import  GqlClientMessage, QueryPayload
 from qtgql.codegen.py.runtime.bases import QGraphQListModel
 from .schema import * # noqa
@@ -78,6 +78,15 @@ QML_IMPORT_MAJOR_VERSION = 1
 {% endmacro %}
 
 
+{% macro operation_consumer_common(operation) %}
+    dataChanged = Signal()
+
+    @qproperty(type=QObject, notify=dataChanged)
+    def handlerData(self) -> {{operation.field.annotation}}:
+        return self._handler._data
+{% endmacro %}
+
+
 {% for query in context.queries %}
 class {{query.name}}(BaseQueryHandler[{{query.field.annotation}}]):
 
@@ -85,9 +94,8 @@ class {{query.name}}(BaseQueryHandler[{{query.field.annotation}}]):
     {{operation_common(query)}}
 
 @QmlElement
-class Require{{query.name}}(UseQueryABC):
-    ENV_NAME = "{{context.config.env_name}}"
-
+class Consume{{query.name}}(QmlOperationConsumerABC):
+    {{operation_consumer_common(query)}}
     def _get_handler(self) -> BaseQueryHandler[{{query.field.annotation}}]:
         return {{query.name}}(self)
 {% endfor %}
@@ -99,13 +107,13 @@ class {{mutation.name}}(BaseMutationHandler[{{mutation.field.annotation}}]):
     {{operation_classvars(mutation)}}
     {{operation_common(mutation)}}
 
+@QmlElement
+class Consume{{mutation.name}}(QmlOperationConsumerABC[{{mutation.field.annotation}}]):
+    {{operation_consumer_common(mutation)}}
 
-class Require{{mutation.name}}(BaseMutationHandler[{{mutation.field.annotation}}]):
     def _get_handler(self) -> BaseMutationHandler[{{mutation.field.annotation}}]:
         return {{mutation.name}}(self)
-    @slot
-    def commit(self) -> None:
-        self._handler.refetch()
+
 
 {% endfor %}
 

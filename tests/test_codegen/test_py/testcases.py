@@ -132,8 +132,9 @@ class CompiledTestCase(QGQLObjectTestCase):
                     import QtQuick
                     import generated.{} as Env
 
-                     Env.Require{}{{
+                     Env.Consume{}{{
                         objectName: "rootObject"
+                        autofetch: true
                         anchors.fill: parent;
 
                     }}
