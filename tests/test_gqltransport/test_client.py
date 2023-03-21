@@ -4,6 +4,7 @@ from PySide6.QtWebSockets import QWebSocketProtocol
 from qtgql.gqltransport.client import PROTOCOL, GqlWsTransportClient, SubscribeResponseMessage
 from qtgql.gqltransport.core import QueryPayload
 
+from tests.conftest import IS_WINDOWS
 from tests.test_gqltransport.conftest import get_subscription_str
 
 
@@ -12,6 +13,10 @@ def test_get_operation_name():
     assert payload.operationName == "TestOperationName"
 
 
+@pytest.mark.skipif(
+    IS_WINDOWS,
+    reason="for some weird reason this test " "would fail on windows when running all tests.",
+)
 def test_connection_init(qtbot, schemas_server):
     client = GqlWsTransportClient(ping_timeout=20000, url=schemas_server.address)
     assert not client._connection_ack

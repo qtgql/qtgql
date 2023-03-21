@@ -22,6 +22,8 @@ if TYPE_CHECKING:
 
 fake = Faker()
 
+IS_WINDOWS = os.name == "windows"
+
 
 @define
 class MiniServer:
