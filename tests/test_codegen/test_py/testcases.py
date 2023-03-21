@@ -22,7 +22,7 @@ from qtgql.codegen.py.runtime.custom_scalars import (
     DecimalScalar,
     TimeScalar,
 )
-from qtgql.codegen.py.runtime.environment import QtGqlEnvironment, set_gql_env
+from qtgql.codegen.py.runtime.environment import _ENV_MAP, QtGqlEnvironment, set_gql_env
 from qtgql.codegen.py.runtime.queryhandler import BaseMutationHandler, BaseQueryHandler
 from qtgql.gqltransport.client import GqlWsTransportClient
 from strawberry import Schema
@@ -49,23 +49,6 @@ class QGQLObjectTestCase:
     first_field: str = "user"
     qml_file: str = ""
 
-    def __attrs_post_init__(self):
-        self.query = dedent(self.query)
-        if not self.qml_file:
-            self.qml_file = dedent(
-                """
-                    import QtQuick
-                    import generated.TestEnv as Env
-
-                     Env.Require%s{
-                        objectName: "rootObject"
-                        anchors.fill: parent;
-
-                    }
-                """
-                % self.query_operationName,
-            )
-
     @cached_property
     def evaluator(self) -> SchemaEvaluator:
         return SchemaEvaluator(config=self.config)
@@ -83,8 +66,11 @@ class QGQLObjectTestCase:
     @contextlib.contextmanager
     def compile(self, url: Optional[str] = "") -> "CompiledTestCase":
         url = url.replace("graphql", f"{hash_schema(self.schema)}")
-        env = QtGqlEnvironment(client=GqlWsTransportClient(url=url), name=self.config.env_name)
+        client = GqlWsTransportClient(url=url)
+        self.config.env_name = env_name = fake.pystr()
+        env = QtGqlEnvironment(client=client, name=env_name)
         set_gql_env(env)
+
         with tempfile.TemporaryDirectory() as raw_tmp_dir:
             tmp_dir = Path(raw_tmp_dir).resolve()
             self.config.graphql_dir = tmp_dir
@@ -125,6 +111,8 @@ class QGQLObjectTestCase:
         )
         yield testcase
         testcase.cleanup()
+        client.deleteLater()
+        _ENV_MAP.pop(env_name)
 
 
 @define
@@ -135,6 +123,25 @@ class CompiledTestCase(QGQLObjectTestCase):
     tested_type: QtGqlObjectTypeDefinition
     evaluator: SchemaEvaluator
     parent_obj: QObject = attrs.field(factory=QObject)
+
+    def __attrs_post_init__(self):
+        self.query = dedent(self.query)
+        if not self.qml_file:
+            self.qml_file = dedent(
+                """
+                    import QtQuick
+                    import generated.{} as Env
+
+                     Env.Require{}{{
+                        objectName: "rootObject"
+                        anchors.fill: parent;
+
+                    }}
+                """.format(
+                    self.config.env_name,
+                    self.query_operationName,
+                ),
+            )
 
     def cleanup(self) -> None:
         self.parent_obj.deleteLater()

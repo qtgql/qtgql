@@ -26,21 +26,20 @@ def test_generates_qobject_class_with_all_the_enums():
 
 @pytest.mark.parametrize("status", iter(object_with_enum.Status))
 def test_accessible_from_qml(qmlbot, status):
-    qml = dedent(
-        """
-        import QtQuick
-        import generated.TestEnv.types as Env
+    with EnumTestCase.compile() as testcase:
+        qml = dedent(
+            """
+            import QtQuick
+            import generated.%s.types as Env
 
-        Rectangle {
-            objectName: "rootObject"
-            property int enumValue: Env.Enums.%s
-        }
+            Rectangle {
+                objectName: "rootObject"
+                property int enumValue: Env.Enums.%s
+            }
 
 
-        """
-        % status.name,
-    )
-
-    with EnumTestCase.compile():
+            """
+            % (testcase.config.env_name, status.name),
+        )
         item = qmlbot.loads(qml)
         assert item.property("enumValue") == status.value
