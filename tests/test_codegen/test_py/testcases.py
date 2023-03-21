@@ -1,3 +1,4 @@
+import contextlib
 import importlib
 import sys
 import tempfile
@@ -10,6 +11,7 @@ from typing import TYPE_CHECKING, Optional, Type
 import attrs
 import strawberry.utils
 from attr import define
+from PySide6.QtCore import QObject
 from qtgql.codegen.introspection import SchemaEvaluator
 from qtgql.codegen.py.compiler.config import QtGqlConfig
 from qtgql.codegen.py.objecttype import QtGqlObjectTypeDefinition
@@ -78,6 +80,7 @@ class QGQLObjectTestCase:
         else:
             return res.data
 
+    @contextlib.contextmanager
     def compile(self, url: Optional[str] = "") -> "CompiledTestCase":
         url = url.replace("graphql", f"{hash_schema(self.schema)}")
         env = QtGqlEnvironment(client=GqlWsTransportClient(url=url), name=self.config.env_name)
@@ -107,7 +110,7 @@ class QGQLObjectTestCase:
                 handler_mod = importlib.import_module(f"{gen_module_name}.handlers")
             except BaseException as e:
                 raise RuntimeError(generated["handlers"]) from e
-        return CompiledTestCase(
+        testcase = CompiledTestCase(
             evaluator=self.evaluator,
             objecttypes_mod=schema_mod,
             handlers_mod=handler_mod,
@@ -120,6 +123,8 @@ class QGQLObjectTestCase:
             test_name=self.test_name,
             tested_type=self.evaluator._objecttypes_def_map.get(self.type_name, None),
         )
+        yield testcase
+        testcase.cleanup()
 
 
 @define
@@ -129,6 +134,10 @@ class CompiledTestCase(QGQLObjectTestCase):
     config: QtGqlConfig
     tested_type: QtGqlObjectTypeDefinition
     evaluator: SchemaEvaluator
+    parent_obj: QObject = attrs.field(factory=QObject)
+
+    def cleanup(self) -> None:
+        self.parent_obj.deleteLater()
 
     @property
     def module(self) -> ModuleType:
@@ -141,16 +150,16 @@ class CompiledTestCase(QGQLObjectTestCase):
 
     @cached_property
     def query_handler(self) -> "BaseQueryHandler":
-        return getattr(self.handlers_mod, self.query_operationName)(None)
+        return getattr(self.handlers_mod, self.query_operationName)(self.parent_obj)
 
     def get_attr(self, attr: str):
         return getattr(self.handlers_mod, attr, None)
 
     def get_query_handler(self, operation_name: str) -> BaseQueryHandler:
-        return self.get_attr(operation_name)(None)
+        return self.get_attr(operation_name)(self.parent_obj)
 
     def get_mutation_handler(self, operation_name: str) -> BaseMutationHandler:
-        return self.get_attr(operation_name)(None)
+        return self.get_attr(operation_name)(self.parent_obj)
 
     def get_signals(self) -> dict[str, "QtCore.Signal"]:
         return {

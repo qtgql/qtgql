@@ -15,8 +15,11 @@ def test_get_operation_name():
 def test_connection_init(qtbot, schemas_server):
     client = GqlWsTransportClient(ping_timeout=20000, url=schemas_server.address)
     assert not client._connection_ack
-    qtbot.wait_until(lambda: client._connection_ack)
-    client.close(QWebSocketProtocol.CloseCode.CloseCodeNormal)
+    qtbot.wait_until(client.gql_is_valid)
+    assert client._connection_ack
+
+    client.close(QWebSocketProtocol.CloseCode.CloseCodeGoingAway)
+    qtbot.wait_until(lambda: not client.isValid())
 
 
 def test_connection_pong(qtbot, schemas_server):

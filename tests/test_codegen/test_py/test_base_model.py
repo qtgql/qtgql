@@ -9,11 +9,11 @@ from tests.test_codegen.test_py.testcases import ObjectWithListOfObjectTestCase
 
 @pytest.fixture()
 def sample_model_initialized() -> QGraphQListModel:
-    testcase = ObjectWithListOfObjectTestCase.compile()
-    handler = testcase.query_handler
-    handler.fetch()
-    handler.on_data(testcase.initialize_dict)
-    return handler._data.persons
+    with ObjectWithListOfObjectTestCase.compile() as testcase:
+        handler = testcase.query_handler
+        handler.fetch()
+        handler.on_data(testcase.initialize_dict)
+        return handler._data.persons
 
 
 def test_returns_object_role(sample_model_initialized):
