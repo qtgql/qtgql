@@ -102,7 +102,6 @@ def test_gql_is_valido_not_valid_if_no_ack(qtbot, schemas_server):
     assert client.isValid()
 
 
-@pytest.mark.skipif(IS_WINDOWS, reason="This would kill the server on windows for some reason.")
 def test_not_gql_is_valid_if_not_isValid(qtbot, default_client):
     assert default_client.isValid()
     assert default_client.gql_is_valid()
