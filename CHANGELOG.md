@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+0.113.1 - 2023-03-22
+--------------------
+
+This release fixes an edge case where root types with no id fields
+would cause errors on updates.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #160](https://github.com/nrbnlulu/qtgql/pull/160/)
+
+
 0.113.0 - 2023-03-22
 --------------------
 
