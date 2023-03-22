@@ -42,8 +42,7 @@ def inject_id_selection(selection_set: gql_lang.SelectionSetNode) -> None:
 
 def has_id_field(selection_set: gql_lang.SelectionSetNode) -> bool:
     for field in selection_set.selections:
-        if not isinstance(field, gql_lang.FieldNode):
-            raise RuntimeError(f"{field} is not a field")
+        assert isinstance(field, gql_lang.FieldNode), f"{field} is not a field"
         if field.name.value == "id":
             return True
     return False

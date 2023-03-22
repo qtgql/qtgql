@@ -15,7 +15,7 @@ we would generate a factory slot (accessible from QML), those types would be tra
 - [x] Should have a `property` for `operationOnFlight` (maybe queries as well)
 
 - [x] Test usage from QML Already covered by query tests, all operations use the same base class.
-- [ ] Update docs.
+- [ ] <s>Update docs.</s> Would update in a separate PR when updating major version.
 - [x] if there are variables for an operation than it shouldn't auto fetch itself (when used in QML)
 we should provide something like `property bool autofetch: false`
 
