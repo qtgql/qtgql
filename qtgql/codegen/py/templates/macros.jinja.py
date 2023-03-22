@@ -67,9 +67,11 @@ if '{{f.name}}' in config.selections.keys():
     if not field_data:
         {{fset_name}}(None)
     else:
-        if {{private_name}} and {{private_name}}._id == field_data['id']:
+        {% if f.can_select_id %}
+        if {{private_name}} and {{private_name}}._id == field_data.get('id', None):
             {{private_name}}.update(field_data, inner_config, metadata)
         else:
+        {% endif %}
             {{fset_name}}({{f.type.is_object_type.name}}.from_dict(
                 parent,
                 field_data,

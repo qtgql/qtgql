@@ -82,13 +82,13 @@ class QGQLObjectTestCase:
             generated_dir.mkdir()
             generated = self.evaluator.dumps()
             (generated_dir / "__init__.py").resolve().write_text("import os")
-            schema_dir = (generated_dir / "schema.py").resolve()
+            schema_dir = (generated_dir / "objecttypes.py").resolve()
             schema_dir.write_text(generated["objecttypes"])
             handlers_dir = (generated_dir / "handlers.py").resolve()
             handlers_dir.write_text(generated["handlers"])
             sys.path.append(str(tmp_dir))
             try:
-                schema_mod = importlib.import_module(f"{gen_module_name}.schema")
+                schema_mod = importlib.import_module(f"{gen_module_name}.objecttypes")
             except BaseException as e:
                 raise RuntimeError(generated["objecttypes"]) from e
 
