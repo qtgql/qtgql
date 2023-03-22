@@ -481,6 +481,19 @@ TypeWithNoIDTestCase = QGQLObjectTestCase(
     query="""query MainQuery {users{name}}""",
     test_name="TypeWithNoIDTestCase",
 )
+
+RootTypeNoIDTestCase = QGQLObjectTestCase(
+    schema=schemas.root_type_no_id.schema,
+    query="""
+    query MainQuery {
+        user{
+            name
+            age
+        }
+    }""",
+    test_name="RootTypeNoIDTestCase",
+)
+
 TypeWithNullAbleIDTestCase = QGQLObjectTestCase(
     schema=schemas.type_with_nullable_id.schema,
     query="""query MainQuery {users{name}}""",
@@ -629,6 +642,7 @@ all_test_cases = [
     TypeWithNoIDTestCase,
     TypeWithNullAbleIDTestCase,
     ListOfUnionTestCase,
+    RootTypeNoIDTestCase,
 ]
 custom_scalar_testcases = [
     (DateTimeTestCase, DateTimeScalar, "birth"),
