@@ -20,6 +20,7 @@ from . import (
     optional_input_schema,
     root_enum_schema,
     root_list_of_object,
+    root_type_no_id,
     type_with_no_id,
     type_with_nullable_id,
     variables_schema,
@@ -52,4 +53,5 @@ __all__ = [  # noqa: PLE0604
     optional_input_schema,
     custom_scalar_input_schema,
     mutation_schema,
+    root_type_no_id,
 ]

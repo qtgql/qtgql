@@ -37,6 +37,7 @@ from tests.test_codegen.test_py.testcases import (
     QGQLObjectTestCase,
     RootEnumTestCase,
     RootListOfTestCase,
+    RootTypeNoIDTestCase,
     ScalarsTestCase,
     TypeWithNoIDTestCase,
     TypeWithNullAbleIDTestCase,
@@ -368,6 +369,12 @@ class TestUpdates:
             with pytest.raises(pytestqt.exceptions.TimeoutError):
                 with qtbot.wait_signals(person_signals, timeout=1000):
                     handler.on_data(initialized_dict)
+
+    def test_root_type_no_id(self, qtbot):
+        with RootTypeNoIDTestCase.compile() as testcase:
+            handler = testcase.query_handler
+            handler.on_data(testcase.initialize_dict)
+            handler.on_data(testcase.initialize_dict)
 
     @staticmethod
     def _get_nested_obj_dict_same_id_diff_val(initialized_dict1: dict) -> dict:
