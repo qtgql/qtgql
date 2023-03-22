@@ -78,4 +78,25 @@ including scalars and custom-scalars.
 
 ## Usage
 
-(TBD)
+### Handling operation errors
+
+```python
+import logging
+from qtgql.codegen.py.runtime.queryhandler import BaseOperationHandler
+from qtgql.tools import slot
+
+from PySide6.QtCore import QObject
+
+logger = logging.getLogger()
+
+
+class Foo(QObject):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        operation: BaseOperationHandler  # some operation
+        operation.error.connect(self.on_error)
+
+    @slot
+    def on_error(self, err: list[dict]) -> None:
+        logger.warning(err)
+```
