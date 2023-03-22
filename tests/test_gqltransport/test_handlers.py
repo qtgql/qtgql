@@ -59,7 +59,7 @@ def test_subscribe_complete_pops_subscriber_with_this_id(qtbot, schemas_server, 
 
 @pytest.mark.skipif(
     "Windows" in platform.platform(),
-    reason="for wome reason the server will die here on windows",
+    reason="for some reason the server will die here on windows",
 )
 def test_gql_error_sends_error_to_subscriber(qtbot, default_client, default_handler):
     error_subscriber = PseudoHandler(get_subscription_str(raise_on_5=True))

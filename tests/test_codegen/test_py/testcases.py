@@ -136,6 +136,9 @@ class CompiledTestCase(QGQLObjectTestCase):
                         objectName: "rootObject"
                         autofetch: true
                         anchors.fill: parent;
+                        Text{{
+                            text: `is autofetch? ${{autofetch}}`
+                        }}
 
                     }}
                 """.format(

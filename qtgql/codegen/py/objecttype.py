@@ -3,7 +3,7 @@ from __future__ import annotations
 import contextlib
 import enum
 from functools import cached_property
-from typing import TYPE_CHECKING, Any, Generic, Optional, Type, TypeVar
+from typing import Any, Generic, Optional, Type, TypeVar
 
 from attrs import define
 
@@ -12,9 +12,6 @@ from qtgql.codegen.py.runtime.bases import QGraphQListModel
 from qtgql.codegen.py.runtime.custom_scalars import BaseCustomScalar, CustomScalarMap
 from qtgql.codegen.utils import AntiForwardRef
 from qtgql.utils.typingref import UNSET, TypeHinter
-
-if TYPE_CHECKING:
-    from graphql.language.ast import NamedTypeNode
 
 
 class Kinds(enum.Enum):
@@ -296,8 +293,3 @@ class GqlTypeHinter(TypeHinter):
 
     def as_annotation(self, object_map=None):  # pragma: no cover
         raise NotImplementedError("not safe to call on this type")
-
-    @classmethod
-    def from_named_type_node(cls, node: NamedTypeNode) -> GqlTypeHinter:
-        type_name = node
-        return cls(type=node.name.value)
