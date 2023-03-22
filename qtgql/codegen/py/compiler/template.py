@@ -8,8 +8,12 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 
 if TYPE_CHECKING:  # pragma: no cover
     from qtgql.codegen.py.compiler.config import QtGqlConfig
-    from qtgql.codegen.py.compiler.query import QtGqlQueriedField, QtGqlQueryHandlerDefinition
-    from qtgql.codegen.py.objecttype import GqlEnumDefinition, GqlTypeDefinition
+    from qtgql.codegen.py.compiler.query import QtGqlOperationDefinition, QtGqlQueriedField
+    from qtgql.codegen.py.objecttype import (
+        QtGqlEnumDefinition,
+        QtGqlInputObjectTypeDefinition,
+        QtGqlObjectTypeDefinition,
+    )
 
 template_env = Environment(loader=PackageLoader("qtgql.codegen.py"), autoescape=select_autoescape())
 
@@ -20,9 +24,11 @@ CONFIG_TEMPLATE = template_env.get_template("config.jinja.py")
 
 @define
 class TemplateContext:
-    enums: list[GqlEnumDefinition]
-    types: list[GqlTypeDefinition]
-    queries: list[QtGqlQueryHandlerDefinition]
+    enums: list[QtGqlEnumDefinition]
+    types: list[QtGqlObjectTypeDefinition]
+    queries: list[QtGqlOperationDefinition]
+    mutations: list[QtGqlOperationDefinition]
+    input_objects: list[QtGqlInputObjectTypeDefinition]
     config: QtGqlConfig
 
     @property

@@ -9,15 +9,16 @@ from tests.test_codegen.test_py.testcases import ObjectWithListOfObjectTestCase
 
 @pytest.fixture()
 def sample_model_initialized() -> QGraphQListModel:
-    testcase = ObjectWithListOfObjectTestCase.compile()
-    handler = testcase.query_handler
-    handler.on_data(testcase.initialize_dict)
-    return handler._data.persons
+    with ObjectWithListOfObjectTestCase.compile() as testcase:
+        handler = testcase.query_handler
+        handler.fetch()
+        handler.on_data(testcase.initialize_dict)
+        return handler._data.persons
 
 
 def test_returns_object_role(sample_model_initialized):
     assert sample_model_initialized.roleNames() == {
-        Qt.ItemDataRole.UserRole + 1: QByteArray("object")
+        Qt.ItemDataRole.UserRole + 1: QByteArray("object"),
     }
 
 
@@ -30,7 +31,8 @@ def test_returns_data(sample_model_initialized):
     sample_model_initialized._data[0] = 2
     assert (
         sample_model_initialized.data(
-            sample_model_initialized.index(0), QGraphQListModel.OBJECT_ROLE
+            sample_model_initialized.index(0),
+            QGraphQListModel.OBJECT_ROLE,
         )
         == 2
     )
@@ -72,7 +74,8 @@ def test_insert_after_max_index(qtbot, sample_model_initialized):
         sample_model_initialized.insert(sample_model_initialized.rowCount() + 200, "foo")
     assert (
         sample_model_initialized.data(
-            sample_model_initialized.index(sample_model_initialized.rowCount() - 1), 257
+            sample_model_initialized.index(sample_model_initialized.rowCount() - 1),
+            257,
         )
         == "foo"
     )

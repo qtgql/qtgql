@@ -22,6 +22,10 @@ is_selection_set = ast_identifier_factory(gql_lang.ast.SelectionSetNode)
 is_inline_fragment = ast_identifier_factory(gql_lang.InlineFragmentNode)
 is_operation_def_node = ast_identifier_factory(gql_def.OperationDefinitionNode)
 is_field_node = ast_identifier_factory(gql_def.FieldNode)
+is_nonnull_node = ast_identifier_factory(gql_lang.NonNullTypeNode)
+is_named_type_node = ast_identifier_factory(gql_lang.NamedTypeNode)
+
+
 T_Definition = TypeVar("T_Definition", bound=gql_def.GraphQLType)
 
 
@@ -41,3 +45,4 @@ is_list_definition = definition_identifier_factory(gql_def.GraphQLList)
 is_scalar_definition = definition_identifier_factory(gql_def.GraphQLScalarType)
 is_union_definition = definition_identifier_factory(gql_def.GraphQLUnionType)
 is_non_null_definition = definition_identifier_factory(gql_def.GraphQLNonNull)
+is_input_definition = definition_identifier_factory(gql_def.GraphQLInputObjectType)

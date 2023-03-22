@@ -4,7 +4,7 @@ from uuid import UUID
 import strawberry
 
 from tests.conftest import fake
-from tests.test_codegen.schemas.node_interface import Node
+from tests.test_codegen.schemas.node_interface import NODE_DB, Node
 
 
 @strawberry.type
@@ -24,10 +24,17 @@ class Query:
         return User()
 
 
-@strawberry.input
-class ChangeNameInput:
-    id: strawberry.ID
-    name: str
+@strawberry.type
+class Mutation:
+    @strawberry.mutation
+    def create_user(self) -> User:
+        return User()
+
+    @strawberry.mutation
+    def update_name(self, id: strawberry.ID, name: str) -> User:
+        user: User = NODE_DB.get(id)
+        user.name = name
+        return user
 
 
-schema = strawberry.Schema(query=Query)
+schema = strawberry.Schema(query=Query, mutation=Mutation)

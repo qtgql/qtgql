@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import os
+import platform
 import socket
 import subprocess
 import tempfile
@@ -21,6 +22,8 @@ if TYPE_CHECKING:
     from strawberry import Schema
 
 fake = Faker()
+
+IS_WINDOWS = platform.system() == "Windows"
 
 
 @define

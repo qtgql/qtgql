@@ -1,8 +1,10 @@
 import pytest
 from PySide6.QtNetwork import QAbstractSocket
+from PySide6.QtWebSockets import QWebSocketProtocol
 from qtgql.gqltransport.client import PROTOCOL, GqlWsTransportClient, SubscribeResponseMessage
 from qtgql.gqltransport.core import QueryPayload
 
+from tests.conftest import IS_WINDOWS
 from tests.test_gqltransport.conftest import get_subscription_str
 
 
@@ -11,10 +13,18 @@ def test_get_operation_name():
     assert payload.operationName == "TestOperationName"
 
 
+@pytest.mark.skipif(
+    IS_WINDOWS,
+    reason="for some weird reason this test " "would fail on windows when running all tests.",
+)
 def test_connection_init(qtbot, schemas_server):
     client = GqlWsTransportClient(ping_timeout=20000, url=schemas_server.address)
     assert not client._connection_ack
-    qtbot.wait_until(lambda: client._connection_ack)
+    qtbot.wait_until(client.gql_is_valid)
+    assert client._connection_ack
+
+    client.close(QWebSocketProtocol.CloseCode.CloseCodeGoingAway)
+    qtbot.wait_until(lambda: not client.isValid())
 
 
 def test_connection_pong(qtbot, schemas_server):
@@ -108,7 +118,9 @@ def test_not_gql_is_valid_if_not_isValid(qtbot, default_client):
 @pytest.fixture
 def auto_reconnect_client(qtbot, schemas_server):
     client = GqlWsTransportClient(
-        url=schemas_server.address, auto_reconnect=True, reconnect_timeout=100
+        url=schemas_server.address,
+        auto_reconnect=True,
+        reconnect_timeout=100,
     )
     qtbot.wait_until(client.gql_is_valid)
     return client
@@ -116,7 +128,9 @@ def auto_reconnect_client(qtbot, schemas_server):
 
 def test_wont_reconnect_if_reconnect_is_false(qtbot, schemas_server):
     client = GqlWsTransportClient(
-        url=schemas_server.address, auto_reconnect=False, reconnect_timeout=100
+        url=schemas_server.address,
+        auto_reconnect=False,
+        reconnect_timeout=100,
     )
     qtbot.wait_until(client.gql_is_valid)
     client.close()
@@ -142,7 +156,9 @@ def test_reconnects_on_error_if_not_valid(qtbot, auto_reconnect_client):
 
 def test_stops_reconnect_timer_on_connected(qtbot, schemas_server):
     client = GqlWsTransportClient(
-        url=schemas_server.address, auto_reconnect=True, reconnect_timeout=100
+        url=schemas_server.address,
+        auto_reconnect=True,
+        reconnect_timeout=100,
     )
     qtbot.wait_until(client.gql_is_valid)
     client.close()

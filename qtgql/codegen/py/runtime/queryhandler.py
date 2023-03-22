@@ -1,6 +1,16 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, ClassVar, Dict, Generic, NamedTuple, Optional, TypeVar
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    ClassVar,
+    Dict,
+    Generic,
+    NamedTuple,
+    Optional,
+    TypeVar,
+)
 
 from PySide6.QtCore import QObject, Signal
 from PySide6.QtQuick import QQuickItem
@@ -21,85 +31,81 @@ class SelectionConfig(NamedTuple):
 
 class OperationMetaData(NamedTuple):
     operation_name: str
-    selections: SelectionConfig
+    selections: Optional[SelectionConfig] = None
 
 
-class QSingletonMeta(type(QObject)):  # type: ignore
-    def __init__(cls, name, bases, dict):
-        super().__init__(name, bases, dict)
-        cls.instance = None
-
-    def __call__(cls, *args, **kw):
-        if cls.instance is None:
-            cls.instance = super().__call__(*args, **kw)
-        return cls.instance
+T = TypeVar("T")
 
 
-class BaseQueryHandler(Generic[T_QObject], QObject, metaclass=QSingletonMeta):
-    """Each handler will be exposed to QML and."""
-
-    instance: ClassVar[Optional[BaseQueryHandler]] = None
+class BaseOperationHandler(QObject, Generic[T]):
+    # class-vars
     ENV_NAME: ClassVar[str]
     OPERATION_METADATA: ClassVar[OperationMetaData]
     _message_template: ClassVar[GqlClientMessage]
 
-    graphqlChanged = Signal()
+    # signals
     dataChanged = Signal()
     completedChanged = Signal()
+    operationOnFlightChanged = Signal()
     errorChanged = Signal()
 
-    def __init__(self, parent: Optional[QObject] = None):
+    setVariables: Callable  # implementation by jinja.
+
+    def __init__(self, parent: Optional[QObject]):
         super().__init__(parent)
         name = self.__class__.__name__
         self.setObjectName(name)
-        self._completed: bool = False
-        self._data: Optional[T_QObject] = None
-        self.environment = get_gql_env(self.ENV_NAME)
-        self.environment.add_query_handler(self)
-        self._consumers_count: int = 0
+        self._completed: bool = False  # whether the graphql operation completed.
         self._operation_on_the_fly: bool = False
+        self._data: Optional[T] = None
+        self.environment = get_gql_env(self.ENV_NAME)
+        self._variables: dict = {}
+        self._consumer: Optional[QmlOperationConsumerABC] = None
+
+    def consume(self, consumer: QmlOperationConsumerABC) -> None:
+        self._consumer = consumer
+        self.dataChanged.connect(consumer.handlerDataChanged)
 
     def loose(self) -> None:
         """Releases retention from all children, real implementation is
         generated."""
         raise NotImplementedError
 
-    def unconsume(self) -> None:
-        self._consumers_count -= 1
-        if self._consumers_count <= 0:
-            self.loose()
-            self._data = None
+    @slot
+    def fetch(self) -> None:
+        if not self._operation_on_the_fly and not self._completed:
+            self.set_operation_on_flight(True)
+            self.environment.client.execute(self)  # type: ignore
 
-    def consume(self) -> None:
-        # if it is the first consumer (or first after all previous consumers disposed) fetch the data here.
-        if self._consumers_count <= 0 and not self._operation_on_the_fly:
-            if self._completed:
-                self.refetch()
-            else:
-                self.fetch()
-        self._consumers_count += 1
+    @slot
+    def refetch(self) -> None:
+        self.set_completed(False)
+        self.fetch()
 
     @property
     def message(self) -> GqlClientMessage:
+        self._message_template.payload.variables = self._variables
         return self._message_template
 
     @qproperty(QObject, notify=dataChanged)
-    def data(self) -> Optional[QObject]:
+    def data(self) -> Optional[T]:
         return self._data
+
+    def set_completed(self, v: bool) -> None:
+        self._completed = v
+        self.completedChanged.emit()
 
     @qproperty(bool, notify=completedChanged)
     def completed(self):
         return self._completed
 
-    def fetch(self) -> None:
-        self._operation_on_the_fly = True
-        self.environment.client.execute(self)  # type: ignore
+    def set_operation_on_flight(self, v: bool) -> None:
+        self._operation_on_the_fly = v
+        self.operationOnFlightChanged.emit()
 
-    @slot
-    def refetch(self) -> None:
-        if not self._operation_on_the_fly:
-            self._completed = False
-            self.fetch()
+    @qproperty(bool, notify=operationOnFlightChanged)
+    def operationOnFlight(self) -> bool:
+        return self._operation_on_the_fly
 
     def on_data(self, message: dict) -> None:  # pragma: no cover
         # real is on derived class.
@@ -113,34 +119,65 @@ class BaseQueryHandler(Generic[T_QObject], QObject, metaclass=QSingletonMeta):
         # This (unlike `on_data` is not implemented for real)
         raise NotImplementedError(message)
 
+    @slot
+    def dispose(self) -> None:
+        """Get rid of ownership on related data and set data to null."""
+        self.loose()
 
-class UseQueryABC(QQuickItem):
-    """Concrete implementation in the template."""
+    def deleteLater(self) -> None:
+        self.dispose()
+        super().deleteLater()
 
-    ENV_NAME: ClassVar[str]
 
+class BaseQueryHandler(BaseOperationHandler[T]):
+    """Each handler will be exposed to QML and."""
+
+    ...
+
+
+class BaseMutationHandler(BaseOperationHandler[T]):
+    @slot
+    def commit(self) -> None:
+        # ATM this is just an alias, we might add some functionality here later like optimistic updates.
+        self.refetch()
+
+
+class QmlOperationConsumerABC(QQuickItem, Generic[T]):
     # signals
     operationNameChanged = Signal()
+    autofetchChanged = Signal()
+    handlerDataChanged = Signal()
 
     def __init__(self, parent: Optional[QQuickItem] = None):
         super().__init__(parent)
-        self.destroyed.connect(self.unconsume)  # type: ignore
-        self._operationName: Optional[str] = None
-        self.env = get_gql_env(self.ENV_NAME)
-        self.handler: Optional[BaseQueryHandler] = None
+        self._autofetch: bool = False
+        self._handler: BaseOperationHandler[T] = self._get_handler()
+        self._handler.consume(self)
+        self.destroyed.connect(self._handler.dispose)  # type: ignore
+
+    @qproperty(type=BaseOperationHandler, constant=True)
+    def handler(self) -> BaseOperationHandler[T]:
+        return self._handler
+
+    def handlerData(self):  # property
+        # real implementation in template.
+        raise NotImplementedError
 
     @slot
-    def set_operationName(self, graphql: str) -> None:
-        self._operationName = graphql
-        self.handler = self.env.get_handler(graphql)
-        self.handler.consume()
-        self.operationNameChanged.emit()  # type: ignore
+    def set_autofetch(self, v: bool) -> None:
+        self._autofetch = v
+        self.autofetchChanged.emit()
 
-    @qproperty(str, fset=set_operationName, notify=operationNameChanged)
-    def operationName(self):
-        return self._operationName
+    @qproperty(type=bool, notify=autofetchChanged, fset=set_autofetch)
+    def autofetch(self) -> bool:
+        return self._autofetch
 
-    @slot
-    def unconsume(self) -> None:
-        assert self.handler
-        self.handler.unconsume()
+    def componentComplete(self) -> None:
+        if self._autofetch:
+            self._handler.fetch()
+        super().componentComplete()
+
+    @classmethod
+    def _get_handler(cls) -> BaseOperationHandler[T]:
+        # real implementation is generated.
+        raise NotImplementedError

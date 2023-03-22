@@ -9,7 +9,7 @@ from PySide6.QtQml import QmlElement, QmlSingleton
 
 from qtgql.codegen.py.runtime.queryhandler import SelectionConfig, OperationMetaData
 from qtgql.tools import qproperty
-from qtgql.codegen.py.runtime.bases import QGraphQListModel, NodeRecord
+from qtgql.codegen.py.runtime.bases import QGraphQListModel, NodeRecord, QGraphQLInputObjectABC
 
 {% for dep in context.dependencies %}
 {{dep}}{% endfor %}
@@ -115,4 +115,25 @@ class {{ type.name }}({{context.base_object_name}}):
 __TYPE_MAP__['{{ type.name }}'] = {{ type.name }}
 {% endfor %}
 
+{# --------- INPUT OBJECTS ---------- #}
 
+{% for type in context.input_objects %}
+class {{type.name}}(QGraphQLInputObjectABC):
+    """{{  type.docstring  }}"""
+
+
+    def __init__(self, parent: QObject = None, {% for f in type.fields %} {{f.name}}: {{f.annotation}} = None, {% endfor %}):
+        super().__init__(parent){% for f in type.fields %}
+        self.{{f.name}} = {{f.name}}{% endfor %}
+
+
+    def asdict(self) -> dict:
+        ret = {}
+        {% for f in type.fields %}{% set attr_name %}self.{{f.name}}{% endset %}
+        if {{attr_name}}:
+            ret['{{f.name}}'] = {{f.json_repr(attr_name)}}
+        {% endfor %}
+        return ret
+
+
+{% endfor %}

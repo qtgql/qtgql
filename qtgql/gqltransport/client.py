@@ -118,7 +118,7 @@ class GqlWsTransportClient(QtWebSockets.QWebSocket):
         self.ws_options.setSubprotocols(
             [
                 self.SUB_PROTOCOL,
-            ]
+            ],
         )
         self.textMessageReceived.connect(self.on_text_message)
         self.connected.connect(self._on_connected)
@@ -223,7 +223,8 @@ class GqlWsTransportClient(QtWebSockets.QWebSocket):
     def _on_ping_tester_timeout(self):
         logger.warning("pong timeout reached on {url}", extra={"url": self.requestUrl().url()})
         self.close(
-            QtWebSockets.QWebSocketProtocol.CloseCode.CloseCodeReserved1004, "Pong timeout reached"
+            QtWebSockets.QWebSocketProtocol.CloseCode.CloseCodeReserved1004,
+            "Pong timeout reached",
         )
         self.ping_tester_timer.stop()
 

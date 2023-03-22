@@ -69,7 +69,10 @@ class BaseTypeMeta(type):
                 # assign role and check if not exists
                 if field_is(IS_ROLE, field):
                     role_ = Role(
-                        name=field.name, num=role_num, type_map=cls.__types_map__, type=field.type
+                        name=field.name,
+                        num=role_num,
+                        type_map=cls.__types_map__,
+                        type=field.type,
                     )
                     # fill the role manager
                     roles.by_num[role_num] = role_
@@ -233,7 +236,7 @@ class GenericModel(Generic[_TBaseType], QAbstractListModel):
                 raise RoleDoesNotExist(
                     f"role {role} of type {self.type_} at index: [{index}] "
                     f"is not a valid role!\n"
-                    f"options are: {self.__roles__.qt_roles}"
+                    f"options are: {self.__roles__.qt_roles}",
                 ) from exc
 
     def setData(self, index, value, role=...):
@@ -283,7 +286,9 @@ class GenericModel(Generic[_TBaseType], QAbstractListModel):
     # CLASS METHODS
     @classmethod
     def from_role_defined(
-        cls, type_: type[_BaseType], parent: Optional[Type[GenericModel]] = None
+        cls,
+        type_: type[_BaseType],
+        parent: Optional[Type[GenericModel]] = None,
     ) -> type[GenericModel]:
         bases = (cls,)
         if parent:

@@ -19,17 +19,20 @@ You can play-around and tell us what is wrong / missing / awesome :smile:.
 - [x] enums
 - [x] custom scalars
 - [x] Unions
-- [x] query handlers: queries your server when a component uses this query (or imperatively fetched).
-- [x] query updates: fetch the same query multiple times would not instantiate everything from scratch
+- [x] Garbage collection
+- [x] Type-safe Mutation handlers
+- [x] Type-safe Query handlers: queries your server when a component uses this query (or imperatively fetched).
+- [x] Query updates: fetch the same query multiple times would not instantiate everything from scratch
 it would compare the current data with data received and emit __only__ the signals that are needed.
-- [x] "Qt-native" graphql-transport-ws network manager (supports subscriptions).
+- [x] Native-Qt client implementation of "[graphql-transport-ws](https://github.com/enisdenjo/graphql-ws/blob/master/PROTOCOL.md)" protocol (supports subscriptions) - You can provide your own network layer though.
+- [x] Mutations.
+- [x] Fully typed input variables.
 #### Helpers
 - [x] generic models that get created from dictionaries (with update, pop, insert implemented by default)
 - [x] `Property` classes that are accessible from QML, with dataclasses  syntax (using attrs)
 - [x] `@slot` - decorator to be replaced with `QtCore.Slot()` that get types from type hints.
 
 ### TODO
-- Mutations
 - Subscriptions
 - Migrate to C++
 - Fragments?

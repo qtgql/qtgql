@@ -58,7 +58,8 @@ def test_subscribe_complete_pops_subscriber_with_this_id(qtbot, schemas_server, 
 
 
 @pytest.mark.skipif(
-    "Windows" in platform.platform(), reason="for wome reason the server will die here on windows"
+    "Windows" in platform.platform(),
+    reason="for some reason the server will die here on windows",
 )
 def test_gql_error_sends_error_to_subscriber(qtbot, default_client, default_handler):
     error_subscriber = PseudoHandler(get_subscription_str(raise_on_5=True))
@@ -71,7 +72,9 @@ def test_gql_error_sends_error_to_subscriber(qtbot, default_client, default_hand
 
 
 def test_when_not_valid_pends_a_message_and_sends_on_connect(
-    qtbot, schemas_server, default_handler
+    qtbot,
+    schemas_server,
+    default_handler,
 ):
     client = GqlWsTransportClient(url=schemas_server.address)
     qtbot.wait(300)
@@ -115,7 +118,8 @@ def test_header_authentications_headers(qtbot, schemas_server):
     subscriber = PseudoHandler("query MyQuery {isAuthenticated}")
     token = "FakeToken"
     authorized_client = GqlWsTransportClient(
-        url=schemas_server.address, headers={b"Authorization": token.encode()}
+        url=schemas_server.address,
+        headers={b"Authorization": token.encode()},
     )
     authorized_client.execute(subscriber)
 

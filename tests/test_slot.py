@@ -87,7 +87,8 @@ def test_slot_return(ret):
 
 
 @pytest.mark.parametrize(
-    ("arg", "param"), list(zip(SignatureDefault.arguments, SignatureDefault.parameters))
+    ("arg", "param"),
+    list(zip(SignatureDefault.arguments, SignatureDefault.parameters)),
 )
 def test_slot_argument(arg, param):
     class T(QObjectHelper):
@@ -103,7 +104,8 @@ def test_slot_argument(arg, param):
 
 
 @pytest.mark.parametrize(
-    ("arg", "param"), list(zip(SignatureDefault.arguments, SignatureDefault.parameters))
+    ("arg", "param"),
+    list(zip(SignatureDefault.arguments, SignatureDefault.parameters)),
 )
 def test_slot_argument_result(arg, param):
     class T(QObjectHelper):
@@ -119,7 +121,8 @@ def test_slot_argument_result(arg, param):
 
 
 @pytest.mark.parametrize(
-    ("arg", "param"), list(zip(SignatureDefault.arguments, SignatureDefault.parameters))
+    ("arg", "param"),
+    list(zip(SignatureDefault.arguments, SignatureDefault.parameters)),
 )
 def test_generic_alias(qtbot, arg, param):
     class T(QObjectHelper):
@@ -148,7 +151,7 @@ def test_generic_alias(qtbot, arg, param):
     t.default_test(
         [
             param,
-        ]
+        ],
     )
     t.sig.emit(to_emit)
     qtbot.wait(100)

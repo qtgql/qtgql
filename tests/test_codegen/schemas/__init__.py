@@ -1,5 +1,7 @@
 from . import (
+    custom_scalar_input_schema,
     list_of_union,
+    mutation_schema,
     object_reference_each_other,
     object_with_date,
     object_with_datetime,
@@ -15,9 +17,12 @@ from . import (
     object_with_time_scalar,
     object_with_union,
     object_with_user_defined_scalar,
+    optional_input_schema,
+    root_enum_schema,
     root_list_of_object,
     type_with_no_id,
     type_with_nullable_id,
+    variables_schema,
     wrogn_id_type,
 )
 
@@ -42,4 +47,9 @@ __all__ = [  # noqa: PLE0604
     type_with_nullable_id,
     wrogn_id_type,
     list_of_union,
+    variables_schema,
+    root_enum_schema,
+    optional_input_schema,
+    custom_scalar_input_schema,
+    mutation_schema,
 ]

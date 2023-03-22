@@ -39,7 +39,7 @@ if '{{f.name}}' in config.selections.keys():
     {% elif f.type.is_builtin_scalar -%}
     {{ assign_to }} = field_data
     {% elif f.is_custom_scalar -%}
-    {{ assign_to }} = SCALARS.{{f.is_custom_scalar.__name__}}.from_graphql(field_data)
+    {{ assign_to }} = SCALARS.{{f.is_custom_scalar.__name__}}.deserialize(field_data)
     {% elif f.type.is_enum -%}
     {{ assign_to }} = {{f.type.is_enum.name}}[field_data]
     {% elif f.type.is_union() -%}
@@ -105,7 +105,7 @@ if '{{f.name}}' in config.selections.keys():
     if {{private_name}} != field_data:
         {{fset_name}}(field_data)
     {% elif f.is_custom_scalar %}
-    new = SCALARS.{{f.is_custom_scalar.__name__}}.from_graphql(field_data)
+    new = SCALARS.{{f.is_custom_scalar.__name__}}.deserialize(field_data)
     if new != {{private_name}}:
         {{fset_name}}(new)
     {% elif f.type.is_enum %}

@@ -31,20 +31,23 @@ NoIdOnQueryTestCase = QGQLObjectTestCase(
 
 def test_warns_if_no_id_on_type():
     with pytest.warns(match="QtGql enforces types to have ID field"):
-        TypeWithNoIDTestCase.compile()
+        with TypeWithNoIDTestCase.compile():
+            ...
 
 
 def test_raises_on_nullable_id():
     with pytest.warns(match="id field of type ID!"):
-        TypeWithNullAbleIDTestCase.compile()
+        with TypeWithNullAbleIDTestCase.compile():
+            ...
 
 
 def test_raises_on_wrong_id_type():
     with pytest.raises(QtGqlException):
-        TypeWithWrongIDTypeTestCase.compile()
+        with TypeWithWrongIDTypeTestCase.compile():
+            ...
 
 
 def test_appends_id_field_on_query_that_wont_define_id():
-    testcase = NoIdOnQueryTestCase.compile()
-    assert "id" not in testcase.query
-    assert "id" in testcase.query_handler._message_template.payload.query
+    with NoIdOnQueryTestCase.compile() as testcase:
+        assert "id" not in testcase.query
+        assert "id" in testcase.query_handler._message_template.payload.query
