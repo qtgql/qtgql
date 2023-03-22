@@ -47,7 +47,7 @@ class BaseOperationHandler(QObject, Generic[T]):
     dataChanged = Signal()
     completedChanged = Signal()
     operationOnFlightChanged = Signal()
-    errorChanged = Signal()
+    error = Signal(list)
 
     setVariables: Callable  # implementation by jinja.
 
@@ -116,8 +116,7 @@ class BaseOperationHandler(QObject, Generic[T]):
         self.completedChanged.emit()
 
     def on_error(self, message: list[dict[str, Any]]) -> None:  # pragma: no cover
-        # This (unlike `on_data` is not implemented for real)
-        raise NotImplementedError(message)
+        self.error.emit(message)
 
     @slot
     def dispose(self) -> None:

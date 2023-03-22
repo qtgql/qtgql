@@ -1,6 +1,14 @@
+from typing import Optional
+
+import pytest
 from qtgql.codegen.py.runtime.queryhandler import BaseOperationHandler, QmlOperationConsumerABC
 
-from tests.test_codegen.test_py.testcases import OperationVariableTestCase, ScalarsTestCase
+from tests.conftest import IS_WINDOWS
+from tests.test_codegen.test_py.testcases import (
+    OperationErrorTestCase,
+    OperationVariableTestCase,
+    ScalarsTestCase,
+)
 
 
 def test_data_fetched(qmlbot, schemas_server):
@@ -42,6 +50,22 @@ def test_operation_on_flight_prop(qtbot, schemas_server):
         assert handler.operationOnFlight
         qtbot.wait_until(lambda: handler.property("completed"))
         assert not handler.operationOnFlight
+
+
+@pytest.mark.skipif(IS_WINDOWS, reason="This would kill the server on windows for some reason.")
+def test_emits_error_on_error(qtbot, schemas_server):
+    with OperationErrorTestCase.compile(schemas_server.address) as testcase:
+        handler = testcase.query_handler
+        error: Optional[dict] = None
+
+        def catch_error(err):
+            nonlocal error
+            error = err
+
+        handler.error.connect(catch_error)
+        handler.fetch()
+        qtbot.wait_until(lambda: bool(error))
+        assert error
 
 
 class TestQQuickOperationConsumerComp:
