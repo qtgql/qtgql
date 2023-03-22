@@ -224,6 +224,7 @@ ScalarsTestCase = QGQLObjectTestCase(
         """,
     test_name="ScalarsTestCase",
 )
+
 OptionalScalarTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_optional_scalar.schema,
     query="""
@@ -236,6 +237,20 @@ OptionalScalarTestCase = QGQLObjectTestCase(
     """,
     test_name="OptionalScalarTestCase",
 )
+
+OperationErrorTestCase = QGQLObjectTestCase(
+    schema=schemas.operation_error.schema,
+    query="""
+    query MainQuery {
+        user{
+            name
+            age
+        }
+    }
+    """,
+    test_name="OperationErrorTestCase",
+)
+
 NestedObjectTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_object.schema,
     query="""
