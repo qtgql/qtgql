@@ -265,12 +265,14 @@ class SchemaEvaluator:
                         )
                 else:
                     warnings.warn(
-                        "It is best practice to have id field of type ID!"
+                        stacklevel=2,
+                        message="It is best practice to have id field of type ID!"
                         f"\ntype {type_} has: {id_field}",
                     )
             except KeyError:
                 warnings.warn(
-                    "QtGql enforces types to have ID field"
+                    stacklevel=2,
+                    message="QtGql enforces types to have ID field"
                     f"type {type_} does not not define an id field.\n"
                     f"fields: {type_.fields}",
                 )

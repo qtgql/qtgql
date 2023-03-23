@@ -52,6 +52,7 @@ def test_operation_on_flight_prop(qtbot, schemas_server):
         assert not handler.operationOnFlight
 
 
+@pytest.mark.skipif(IS_WINDOWS, reason="This would kill the server on windows for some reason.")
 def test_operation_on_flight_prop_on_error(qtbot, schemas_server):
     with OperationErrorTestCase.compile(schemas_server.address) as testcase:
         handler = testcase.query_handler
