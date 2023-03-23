@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+0.113.3 - 2023-03-23
+--------------------
+
+This release fixes a bug that `completed` and `operationOnFlight` wouldn't be updated
+correctly.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #164](https://github.com/nrbnlulu/qtgql/pull/164/)
+
+
 0.113.2 - 2023-03-22
 --------------------
 
