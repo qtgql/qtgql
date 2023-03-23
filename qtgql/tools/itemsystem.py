@@ -177,13 +177,14 @@ class GenericModel(Generic[_TBaseType], QAbstractListModel):
 
     __roledefined_type__: type[_TBaseType]
     __roles__: RoleMapper
-    layoutAboutToBeChanged: Signal
-    layoutChanged: Signal
-    dataChanged: Callable[[QModelIndex, QModelIndex, Optional[list[int]]], None]
+    layoutAboutToBeChanged: Signal  # type: ignore[misc]
+    layoutChanged: Signal  # type: ignore[misc]
+    dataChanged: Callable[[QModelIndex, QModelIndex, Optional[list[int]]], None]  # type: ignore[assignment, misc]
 
     def __init__(self, *, data: Optional[Union[list[dict], dict]] = None, parent=None):
         super().__init__(parent)
         self.rowsAb = None
+
         self.parent_model: Optional[GenericModel] = parent
         self.type_ = self.__roledefined_type__
         self._data: list[_TBaseType] = []

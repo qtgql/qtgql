@@ -51,8 +51,6 @@ QML_IMPORT_MAJOR_VERSION = 1
         {{macros.deserialize_field(operation_def.field, assign_to, include_selection_check=False) | indent(4)}}
         self.dataChanged.emit()
     def on_data(self, message: dict) -> None:
-        self._operation_on_the_fly = False
-
         if not self._data:
             self.deserialize(message)
 

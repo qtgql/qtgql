@@ -96,10 +96,11 @@ class QtGqlVisitor(visitor.Visitor):
             default_value=var.default_value,
         )
 
-    def enter_operation_definition(self, node, key, parent, path, ancestors):
+    def enter_operation_definition(self, node, key, parent, path, ancestors) -> None:
         if operation := is_operation_def_node(node):
             if operation.operation in (OperationType.QUERY, OperationType.MUTATION):
                 root_field: gql_lang.FieldNode = operation.selection_set.selections[0]  # type: ignore
+                assert operation.name, "QtGql enforces operations to have names."
                 op_name = operation.name.value
                 operation_vars: list[QtGqlVariableDefinition] = []
                 if variables_def := operation.variable_definitions:
@@ -120,6 +121,9 @@ class QtGqlVisitor(visitor.Visitor):
                     )
                     self.query_handlers[op_name] = operation_definition
                 elif operation.operation is OperationType.MUTATION:
+                    assert (
+                        self.evaluator._mutation_type
+                    ), "You don't have any mutations on your schema"
                     root_qtgql_field = self._get_root_type_field(
                         self.evaluator._mutation_type,
                         root_field,
@@ -265,12 +269,14 @@ class SchemaEvaluator:
                         )
                 else:
                     warnings.warn(
-                        "It is best practice to have id field of type ID!"
+                        stacklevel=2,
+                        message="It is best practice to have id field of type ID!"
                         f"\ntype {type_} has: {id_field}",
                     )
             except KeyError:
                 warnings.warn(
-                    "QtGql enforces types to have ID field"
+                    stacklevel=2,
+                    message="QtGql enforces types to have ID field"
                     f"type {type_} does not not define an id field.\n"
                     f"fields: {type_.fields}",
                 )
