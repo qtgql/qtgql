@@ -81,10 +81,10 @@ class MESSAGES:
 
 class GqlWsTransportClient(QtWebSockets.QWebSocket):
     SUB_PROTOCOL = "graphql-transport-ws"
-    textMessageReceived: QtCore.Signal
-    connected: QtCore.Signal
-    disconnected: QtCore.Signal
-    error: QtCore.Signal  # type: ignore
+    textMessageReceived: QtCore.Signal  # type: ignore[misc]
+    connected: QtCore.Signal  # type: ignore[misc]
+    disconnected: QtCore.Signal  # type: ignore[misc]
+    error: QtCore.Signal  # type: ignore[misc]
 
     def __init__(
         self,
