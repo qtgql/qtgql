@@ -93,6 +93,7 @@ class BaseOperationHandler(QObject, Generic[T]):
 
     def set_completed(self, v: bool) -> None:
         self._completed = v
+        self.set_operation_on_flight(False)
         self.completedChanged.emit()
 
     @qproperty(bool, notify=completedChanged)
@@ -112,10 +113,12 @@ class BaseOperationHandler(QObject, Generic[T]):
         raise NotImplementedError
 
     def on_completed(self) -> None:
-        self._completed = True
-        self.completedChanged.emit()
+        # https://github.com/enisdenjo/graphql-ws/blob/master/PROTOCOL.md#complete
+        self.set_completed(True)
 
-    def on_error(self, message: list[dict[str, Any]]) -> None:  # pragma: no cover
+    def on_error(self, message: list[dict[str, Any]]) -> None:
+        # https://github.com/enisdenjo/graphql-ws/blob/master/PROTOCOL.md#error
+        self.set_completed(True)
         self.error.emit(message)
 
     @slot
