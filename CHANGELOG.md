@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+0.115.0 - 2023-03-26
+--------------------
+
+This release adds initial support for subscriptions.
+
+_Also fixing [#157](https://github.com/nrbnlulu/qtgql/issues/157) because it was a two lines diff fix._
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #167](https://github.com/nrbnlulu/qtgql/pull/167/)
+
+
 0.114.0 - 2023-03-26
 --------------------
 
