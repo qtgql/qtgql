@@ -61,7 +61,7 @@ class TestTimeScalar(AbstractScalarTestCase):
     scalar_klass = TimeScalar
 
     def test_deserialize(self):
-        expected: time = datetime.now(tz=timezone.utc).time()
+        expected: time = datetime.now(tz=timezone.utc).time().replace(tzinfo=timezone.utc)
         scalar = TimeScalar.deserialize(expected.isoformat())
         assert scalar._value == expected
 
