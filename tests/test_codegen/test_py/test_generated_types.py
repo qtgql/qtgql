@@ -784,7 +784,7 @@ class ScalarsContainer:
     def from_datetime(cls, dt: datetime, dec: DecimalScalar):
         return ScalarsContainer(
             dt=DateTimeScalar(dt),
-            time_=TimeScalar(dt.time()),
+            time_=TimeScalar(dt.time().replace(tzinfo=timezone.utc)),
             date_=DateScalar(dt.date()),
             decimal=dec,
         )
@@ -797,7 +797,7 @@ class TestSubscriptions:
             subscription.fetch()
             count = 0
 
-            def count_tester(max_=5):
+            def count_tester():
                 nonlocal count
                 assert subscription._data == count
                 count += 1
