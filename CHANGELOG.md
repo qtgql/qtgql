@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+0.113.4 - 2023-03-26
+--------------------
+
+fix mypy plugin.
+
+I couldn't fix mypy for itemsystem `get_base_type()` ATM.
+
 0.113.3 - 2023-03-23
 --------------------
 
