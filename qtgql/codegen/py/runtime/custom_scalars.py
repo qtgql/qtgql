@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timezone
 from typing import Any, Generic, Optional, Type, TypeVar
 
 from _decimal import Decimal
@@ -70,7 +70,7 @@ class DateTimeScalar(BaseCustomScalar[datetime, str]):
     @classmethod
     def deserialize(cls, v=None) -> "DateTimeScalar":
         if v:
-            return cls(datetime.fromisoformat(v))
+            return cls(datetime.fromisoformat(v).replace(tzinfo=timezone.utc))
         return cls()
 
     def to_qt(self) -> str:
@@ -108,7 +108,7 @@ class TimeScalar(BaseCustomScalar[time, str]):
     @classmethod
     def deserialize(cls, v: Optional[str] = None) -> "TimeScalar":
         if v:
-            return cls(time.fromisoformat(v))
+            return cls(time.fromisoformat(v).replace(tzinfo=timezone.utc))
         return cls()
 
     def to_qt(self) -> str:
