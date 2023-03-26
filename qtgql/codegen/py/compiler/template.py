@@ -28,6 +28,7 @@ class TemplateContext:
     types: list[QtGqlObjectTypeDefinition]
     queries: list[QtGqlOperationDefinition]
     mutations: list[QtGqlOperationDefinition]
+    subscriptions: list[QtGqlOperationDefinition]
     input_objects: list[QtGqlInputObjectTypeDefinition]
     config: QtGqlConfig
 

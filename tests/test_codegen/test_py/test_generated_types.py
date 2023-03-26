@@ -18,7 +18,7 @@ from qtgql.codegen.py.runtime.custom_scalars import (
     DecimalScalar,
     TimeScalar,
 )
-from qtgql.codegen.py.runtime.queryhandler import SelectionConfig
+from qtgql.codegen.py.runtime.queryhandler import BaseSubscriptionHandler, SelectionConfig
 from qtgql.utils.typingref import TypeHinter
 
 from tests.conftest import fake
@@ -39,6 +39,7 @@ from tests.test_codegen.test_py.testcases import (
     RootListOfTestCase,
     RootTypeNoIDTestCase,
     ScalarsTestCase,
+    SubscriptionTestCase,
     TypeWithNoIDTestCase,
     TypeWithNullAbleIDTestCase,
     UnionTestCase,
@@ -787,3 +788,19 @@ class ScalarsContainer:
             date_=DateScalar(dt.date()),
             decimal=dec,
         )
+
+
+class TestSubscriptions:
+    def test_simple_subscription(self, qtbot, schemas_server):
+        with SubscriptionTestCase.compile(url=schemas_server.address) as testcase:
+            subscription: BaseSubscriptionHandler = testcase.get_query_handler("CountSubscription")
+            subscription.fetch()
+            count = 0
+
+            def count_tester(max_=5):
+                nonlocal count
+                assert subscription._data == count
+                count += 1
+
+            subscription.dataChanged.connect(count_tester)
+            qtbot.wait_until(lambda: count == 5)

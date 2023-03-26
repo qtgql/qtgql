@@ -137,6 +137,10 @@ class BaseQueryHandler(BaseOperationHandler[T]):
     ...
 
 
+class BaseSubscriptionHandler(BaseOperationHandler[T]):
+    ...
+
+
 class BaseMutationHandler(BaseOperationHandler[T]):
     @slot
     def commit(self) -> None:
