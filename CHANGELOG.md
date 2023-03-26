@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+0.114.0 - 2023-03-26
+--------------------
+
+This release adds initial subscription support.
+
 0.113.4 - 2023-03-26
 --------------------
 
