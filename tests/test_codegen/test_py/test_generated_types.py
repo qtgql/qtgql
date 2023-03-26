@@ -797,7 +797,7 @@ class TestSubscriptions:
             subscription.fetch()
             count = 0
 
-            def count_tester(max_=5):
+            def count_tester():
                 nonlocal count
                 assert subscription._data == count
                 count += 1
