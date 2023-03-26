@@ -22,6 +22,7 @@ from . import (
     root_enum_schema,
     root_list_of_object,
     root_type_no_id,
+    subscription_schema,
     type_with_no_id,
     type_with_nullable_id,
     variables_schema,
@@ -56,4 +57,5 @@ __all__ = [  # noqa: PLE0604
     mutation_schema,
     root_type_no_id,
     operation_error,
+    subscription_schema,
 ]

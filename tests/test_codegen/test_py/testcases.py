@@ -637,6 +637,18 @@ MutationOperationTestCase = QGQLObjectTestCase(
         }""",
     test_name="MutationOperationTestCase",
 )
+
+
+SubscriptionTestCase = QGQLObjectTestCase(
+    schema=schemas.subscription_schema.schema,
+    query="""
+    subscription CountSubscription ($target: Int = 5){
+        count(target: $target)
+}
+    """,
+    test_name="SubscriptionTestCase",
+)
+
 all_test_cases = [
     ScalarsTestCase,
     DateTimeTestCase,

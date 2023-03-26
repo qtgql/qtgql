@@ -71,6 +71,7 @@ class QtGqlVisitor(visitor.Visitor):
         super().__init__()
         self.query_handlers: dict[str, QtGqlOperationDefinition] = {}
         self.mutation_handlers: dict[str, QtGqlOperationDefinition] = {}
+        self.subscription_handlers: dict[str, QtGqlOperationDefinition] = {}
         self.evaluator = evaluator
 
     def _get_root_type_field(
@@ -98,7 +99,11 @@ class QtGqlVisitor(visitor.Visitor):
 
     def enter_operation_definition(self, node, key, parent, path, ancestors) -> None:
         if operation := is_operation_def_node(node):
-            if operation.operation in (OperationType.QUERY, OperationType.MUTATION):
+            if operation.operation in (
+                OperationType.QUERY,
+                OperationType.MUTATION,
+                OperationType.SUBSCRIPTION,
+            ):
                 root_field: gql_lang.FieldNode = operation.selection_set.selections[0]  # type: ignore
                 assert operation.name, "QtGql enforces operations to have names."
                 op_name = operation.name.value
@@ -137,6 +142,23 @@ class QtGqlVisitor(visitor.Visitor):
                     )
                     self.mutation_handlers[op_name] = operation_definition
 
+                elif operation.operation is OperationType.SUBSCRIPTION:
+                    assert (
+                        self.evaluator._subscription_type
+                    ), "You don't have a subscription type on your schema"
+                    root_qtgql_field = self._get_root_type_field(
+                        self.evaluator._subscription_type,
+                        root_field,
+                    )
+                    operation_definition = QtGqlOperationDefinition(
+                        query=graphql.print_ast(node),
+                        name=op_name,
+                        field=root_qtgql_field,
+                        directives=node.directives,
+                        variables=operation_vars,
+                    )
+                    self.subscription_handlers[op_name] = operation_definition
+
 
 class SchemaEvaluator:
     def __init__(self, config: QtGqlConfig):
@@ -146,8 +168,10 @@ class SchemaEvaluator:
         self._input_objects_def_map: dict[str, QtGqlInputObjectTypeDefinition] = {}
         self._query_handlers: dict[str, QtGqlOperationDefinition] = {}
         self._mutation_handlers: dict[str, QtGqlOperationDefinition] = {}
+        self._subscription_handlers: dict[str, QtGqlOperationDefinition] = {}
         self._query_type: Optional[QtGqlObjectTypeDefinition] = None
         self._mutation_type: Optional[QtGqlObjectTypeDefinition] = None
+        self._subscription_type: Optional[QtGqlObjectTypeDefinition] = None
 
     def get_type(self, node: gql_lang.TypeNode) -> GqlTypeHinter:
         if nonnull := is_nonnull_node(node):
@@ -329,6 +353,8 @@ class SchemaEvaluator:
                         self._query_type = object_type
                     elif object_definition is self.schema_definition.mutation_type:
                         self._mutation_type = object_type
+                    elif object_definition is self.schema_definition.subscription_type:
+                        self._subscription_type = object_type
 
             elif enum_def := is_enum_definition(type_):
                 if enum := self._evaluate_enum(enum_def):
@@ -347,6 +373,7 @@ class SchemaEvaluator:
         visitor.visit(operations, operation_miner)
         self._query_handlers.update(operation_miner.query_handlers)
         self._mutation_handlers.update(operation_miner.mutation_handlers)
+        self._subscription_handlers.update(operation_miner.subscription_handlers)
 
     def dumps(self) -> GeneratedNamespace:
         """:return: The generated modules as a string."""

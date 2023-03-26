@@ -24,10 +24,4 @@ class Query:
         return User()
 
 
-@strawberry.input
-class ChangeNameInput:
-    id: strawberry.ID
-    name: str
-
-
 schema = strawberry.Schema(query=Query)
