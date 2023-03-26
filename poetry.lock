@@ -1715,14 +1715,14 @@ files = [
 
 [[package]]
 name = "strawberry-graphql"
-version = "0.165.1"
+version = "0.167.0"
 description = "A library for creating GraphQL APIs"
 category = "dev"
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "strawberry_graphql-0.165.1-py3-none-any.whl", hash = "sha256:82b28dfd0ad44c3aab19c7bc0ec64ff73e278c04d39aef4ccc769ba1c96d9a24"},
-    {file = "strawberry_graphql-0.165.1.tar.gz", hash = "sha256:cc61712ac914431bb019e654784791a5ce62a16216935fc4e6f82eda4e7f0559"},
+    {file = "strawberry_graphql-0.167.0-py3-none-any.whl", hash = "sha256:d033c11acffd1b181376864ac1622e961db9213b20642ecfb8a8f8005dd377fc"},
+    {file = "strawberry_graphql-0.167.0.tar.gz", hash = "sha256:59fa8e4b3c6941625c9dba96ff3b945b2a55bd620219576bb4b19ea2989a3f5c"},
 ]
 
 [package.dependencies]
@@ -1732,14 +1732,14 @@ typing_extensions = ">=3.7.4,<5.0.0"
 
 [package.extras]
 aiohttp = ["aiohttp (>=3.7.4.post0,<4.0.0)"]
-asgi = ["python-multipart (>=0.0.5,<0.0.6)", "starlette (>=0.18.0)"]
+asgi = ["python-multipart (>=0.0.5,<0.0.7)", "starlette (>=0.18.0)"]
 chalice = ["chalice (>=1.22,<2.0)"]
 channels = ["asgiref (>=3.2,<4.0)", "channels (>=3.0.5)"]
 cli = ["click (>=7.0,<9.0)", "libcst (>=0.4.7)", "pygments (>=2.3,<3.0)", "rich (>=12.0.0)"]
 debug = ["libcst (>=0.4.7)", "rich (>=12.0.0)"]
-debug-server = ["click (>=7.0,<9.0)", "libcst (>=0.4.7)", "pygments (>=2.3,<3.0)", "python-multipart (>=0.0.5,<0.0.6)", "rich (>=12.0.0)", "starlette (>=0.18.0)", "uvicorn (>=0.11.6,<0.22.0)"]
+debug-server = ["click (>=7.0,<9.0)", "libcst (>=0.4.7)", "pygments (>=2.3,<3.0)", "python-multipart (>=0.0.5,<0.0.7)", "rich (>=12.0.0)", "starlette (>=0.18.0)", "uvicorn (>=0.11.6,<0.22.0)"]
 django = ["Django (>=3.2)", "asgiref (>=3.2,<4.0)"]
-fastapi = ["fastapi (>=0.65.2)", "python-multipart (>=0.0.5,<0.0.6)"]
+fastapi = ["fastapi (>=0.65.2)", "python-multipart (>=0.0.5,<0.0.7)"]
 flask = ["flask (>=1.1)"]
 opentelemetry = ["opentelemetry-api (<2)", "opentelemetry-sdk (<2)"]
 pydantic = ["pydantic (<2)"]
