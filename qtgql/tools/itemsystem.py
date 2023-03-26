@@ -97,7 +97,7 @@ class _BaseType(metaclass=BaseTypeMeta):
 _TBaseType = TypeVar("_TBaseType", bound=_BaseType)
 
 
-def get_base_type(name: str = "Default") -> type[_BaseType]:
+def get_base_type(name: str = "Default") -> Type[_BaseType]:
     """:return: BaseType to use for generating `GenericModel`'s"""
     cls: type[_BaseType] = types.new_class(name=f"{name}BaseType", kwds={"metaclass": BaseTypeMeta})
     # we need to inject this here in order for `get_type_hints()` to work.
