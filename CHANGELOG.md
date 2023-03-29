@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+0.115.1 - 2023-03-29
+--------------------
+
+This release migrates to use [typingref](https://github.com/nrbnlulu/typingref) for type annotations introspection.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #174](https://github.com/nrbnlulu/qtgql/pull/174/)
+
+
 0.115.0 - 2023-03-26
 --------------------
 
