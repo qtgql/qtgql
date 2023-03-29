@@ -2,8 +2,7 @@ import itertools
 from typing import Any, Callable, TypeVar, get_type_hints
 
 from PySide6 import QtCore
-
-from qtgql.utils.typingref import TypeHinter
+from typingref import TypeHinter
 
 
 def get_combos(stripped_optionals: list[TypeHinter], concretes: list[TypeHinter]):

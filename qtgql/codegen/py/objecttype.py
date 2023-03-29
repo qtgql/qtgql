@@ -6,12 +6,12 @@ from functools import cached_property
 from typing import Any, Generic, Optional, Type, TypeVar
 
 from attrs import define
+from typingref import UNSET, TypeHinter
 
 from qtgql.codegen.py.compiler.builtin_scalars import BuiltinScalar
 from qtgql.codegen.py.runtime.bases import QGraphQListModel
 from qtgql.codegen.py.runtime.custom_scalars import BaseCustomScalar, CustomScalarMap
 from qtgql.codegen.utils import AntiForwardRef
-from qtgql.utils.typingref import UNSET, TypeHinter
 
 
 class Kinds(enum.Enum):

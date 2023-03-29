@@ -8,10 +8,10 @@ from typing import Any, Optional
 
 from attrs import define, field
 from PySide6 import QtCore, QtNetwork, QtWebSockets
+from typingref import UNSET
 
 from qtgql.gqltransport.core import EncodeAble, GqlEncoder, QueryPayload, T
 from qtgql.tools import slot
-from qtgql.utils.typingref import UNSET
 
 logger = logging.getLogger(__name__)
 

@@ -3,9 +3,9 @@ import uuid
 from typing import Generic, Optional, TypeVar, Union
 
 from attr import asdict, define
+from typingref import UNSET
 
 from qtgql.utils.graphql import get_operation_name
-from qtgql.utils.typingref import UNSET
 
 
 @define

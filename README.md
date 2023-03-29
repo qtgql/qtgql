@@ -5,7 +5,7 @@
 ](https://github.com/nrbnlulu/qtgql/actions/workflows/tests.yml)
 [![Codecov](https://img.shields.io/codecov/c/github/nrbnlulu/qtgql?style=for-the-badge)](https://app.codecov.io/gh/nrbnlulu/qtgql)
 [![Discord](https://img.shields.io/discord/1067870318301032558?label=discord&style=for-the-badge)](https://discord.gg/5vmRRJp9fu)
-
+![PyPI - Downloads](https://img.shields.io/pypi/dm/qtgql?style=for-the-badge)
 
 ### Disclaimer
 This project is currently under development, and **it is not** production ready,
