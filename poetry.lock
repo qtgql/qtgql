@@ -1818,6 +1818,18 @@ files = [
 ]
 
 [[package]]
+name = "typingref"
+version = "0.100.0"
+description = "Introspect Python type annotation, with ease."
+category = "main"
+optional = false
+python-versions = ">=3.9,<3.12"
+files = [
+    {file = "typingref-0.100.0-py3-none-any.whl", hash = "sha256:2c3eaf8b03fee2c2b6f3035a018cec197bf81ed7745bc50079f96b861ea78e9c"},
+    {file = "typingref-0.100.0.tar.gz", hash = "sha256:a297131a941ec98f1a6052922db601001652617a1f59458c28295c8e3820cbb2"},
+]
+
+[[package]]
 name = "urllib3"
 version = "1.26.15"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
@@ -1999,4 +2011,4 @@ codegen = ["graphql-core", "jinja2", "toml", "typer"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.12"
-content-hash = "5dcc8c6a510344a4c082a2e27be29101c6298c7eabdbcd0dca3b2ad27d10972b"
+content-hash = "d21fc14d673a07811552956942d41d8881ce9d1497433de1e4a36ec1670fc8aa"

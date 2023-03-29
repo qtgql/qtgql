@@ -19,7 +19,7 @@ from qtgql.codegen.py.runtime.custom_scalars import (
     TimeScalar,
 )
 from qtgql.codegen.py.runtime.queryhandler import BaseSubscriptionHandler, SelectionConfig
-from qtgql.utils.typingref import TypeHinter
+from typingref import TypeHinter
 
 from tests.conftest import fake
 from tests.mini_gql_server import schema
