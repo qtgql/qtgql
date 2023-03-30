@@ -428,6 +428,7 @@ class SchemaEvaluator:
                 if name not in BuiltinScalars.keys()
             ],
             queries=list(self._query_handlers.values()),
+            interfaces=list(self._interfaces_map.values()),
             mutations=list(self._mutation_handlers.values()),
             subscriptions=list(self._subscription_handlers.values()),
             input_objects=list(self._input_objects_def_map.values()),

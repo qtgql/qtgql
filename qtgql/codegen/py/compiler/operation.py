@@ -54,20 +54,22 @@ def get_field_from_field_node(
     )
 
 
+class UniqueFieldsList(list["QtGqlQueriedField"]):
+    def append(self, obj: QtGqlQueriedField) -> None:
+        for v in self:
+            if v.name == obj.name:
+                pass
+        super().append(obj)
+
+    def extend(self, other: UniqueFieldsList) -> None:
+        for v in other:
+            self.append(v)
+
+
 @attrs.define
 class QtGqlQueriedField(QtGqlFieldDefinition):
-    selections: set[QtGqlQueriedField] = attrs.Factory(set)
-    choices: dict[str, set[QtGqlQueriedField]] = attrs.Factory(lambda: defaultdict(set))
-
-    def __hash__(self) -> int:
-        if cached := getattr(self, "_hash", None):
-            return cached
-        res = self.name
-        res += "".join([str(hash(selection)) for selection in self.selections])
-        res += "".join([name + str(hash(choice)) for name, choice in self.choices.items()])
-        hashed = hash(res)
-        self._hash = hashed
-        return hashed
+    selections: UniqueFieldsList = attrs.Factory(UniqueFieldsList)
+    choices: dict[str, UniqueFieldsList] = attrs.Factory(lambda: defaultdict(UniqueFieldsList))
 
     @classmethod
     def from_field(
@@ -98,35 +100,36 @@ class QtGqlQueriedField(QtGqlFieldDefinition):
         # inject id selection for types that supports it. unions are handled below.
         if f.can_select_id and not has_id_selection(selection_set):
             inject_id_selection(selection_set)
-        # validate that unions and interfaces has typename selection.
 
-        if tp_is_union or tp.is_interface:
-            if not has_typename_selection(selection_set):
-                inject_typename_selection(selection_set)
         # inject parent interface selections.
         if (tp.is_object_type or tp.is_interface) and parent_interface_field:
-            ret.selections.union(parent_interface_field.selections)
+            ret.selections.extend(parent_interface_field.selections)
 
         if tp_is_union:
             for selection in selection_set.selections:
-                if fragment := is_inline_fragment(selection):
-                    type_name = fragment.type_condition.name.value
-                    concrete = schema_evaluator.get_objecttype_by_name(type_name)
-                    if not has_id_selection(fragment.selection_set) and concrete.has_id_field:
-                        inject_id_selection(fragment.selection_set)
+                fragment = is_inline_fragment(selection)
+                assert fragment
 
-                    for selection_node in fragment.selection_set.selections:
-                        field_node = is_field_node(selection_node)
-                        assert field_node
-                        if not is_type_name_selection(field_node):
-                            ret.choices[type_name].append(
-                                get_field_from_field_node(
-                                    field_node,
-                                    concrete,
-                                    schema_evaluator,
-                                    parent_interface_field,
-                                ),
-                            )
+                type_name = fragment.type_condition.name.value
+                concrete = schema_evaluator.get_objecttype_by_name(type_name)
+                if not has_typename_selection(fragment.selection_set):
+                    inject_typename_selection(fragment.selection_set)
+                if not has_id_selection(fragment.selection_set) and concrete.has_id_field:
+                    inject_id_selection(fragment.selection_set)
+
+                for selection_node in fragment.selection_set.selections:
+                    field_node = is_field_node(selection_node)
+                    assert field_node
+
+                    if not is_type_name_selection(field_node):
+                        ret.choices[type_name].append(
+                            get_field_from_field_node(
+                                field_node,
+                                concrete,
+                                schema_evaluator,
+                                parent_interface_field,
+                            ),
+                        )
 
         elif interface_def := tp.is_interface:
             # first get all linear selections.
@@ -135,7 +138,7 @@ class QtGqlQueriedField(QtGqlFieldDefinition):
                     field_node = is_field_node(selection)
                     assert field_node
                     if not is_type_name_selection(field_node):
-                        ret.selections.add(
+                        ret.selections.append(
                             get_field_from_field_node(
                                 field_node,
                                 interface_def,
@@ -156,7 +159,7 @@ class QtGqlQueriedField(QtGqlFieldDefinition):
                         field_node = is_field_node(inner_selection)
                         assert field_node
                         if not is_type_name_selection(field_node):
-                            ret.choices[type_name].add(
+                            ret.choices[type_name].append(
                                 get_field_from_field_node(
                                     field_node,
                                     concrete,
@@ -172,7 +175,7 @@ class QtGqlQueriedField(QtGqlFieldDefinition):
                 field_node = is_field_node(selection)
                 assert field_node
                 if not is_type_name_selection(field_node):
-                    ret.selections.add(
+                    ret.selections.append(
                         get_field_from_field_node(
                             field_node,
                             obj_def,

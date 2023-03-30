@@ -44,9 +44,10 @@ class SCALARS:
     {{scalar}} = {{scalar}}{% endfor %}
 
 # ----------------------------------------- Interfaces -----------------------------------------
+{% for interface in context.interfaces %}
 
 
-
+{% endfor %}
 # ----------------------------------------- Object Types -----------------------------------------
 
 {% for type in context.types %}

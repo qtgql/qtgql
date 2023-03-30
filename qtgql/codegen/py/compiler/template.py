@@ -12,6 +12,7 @@ if TYPE_CHECKING:  # pragma: no cover
     from qtgql.codegen.py.objecttype import (
         QtGqlEnumDefinition,
         QtGqlInputObjectTypeDefinition,
+        QtGqlInterfaceDefinition,
         QtGqlObjectTypeDefinition,
     )
 
@@ -26,6 +27,7 @@ CONFIG_TEMPLATE = template_env.get_template("config.jinja.py")
 class TemplateContext:
     enums: list[QtGqlEnumDefinition]
     types: list[QtGqlObjectTypeDefinition]
+    interfaces: list[QtGqlInterfaceDefinition]
     queries: list[QtGqlOperationDefinition]
     mutations: list[QtGqlOperationDefinition]
     subscriptions: list[QtGqlOperationDefinition]
