@@ -27,6 +27,7 @@ from tests.test_codegen.test_py.testcases import (
     CustomScalarInputTestCase,
     DateTimeTestCase,
     EnumTestCase,
+    InterfaceFieldTestCase,
     InterfaceTestCase,
     NestedObjectTestCase,
     ObjectsThatReferenceEachOtherTestCase,
@@ -598,6 +599,10 @@ class TestDefaultConstructor:
     def test_wont_recursive(self):
         with ObjectsThatReferenceEachOtherTestCase.compile() as testcase:
             testcase.gql_type()
+
+    def test_interface_field(self, qtbot):
+        with InterfaceFieldTestCase.compile() as testcase:
+            ...
 
 
 class TestGarbageCollection:

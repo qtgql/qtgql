@@ -5,6 +5,7 @@ import enum
 from functools import cached_property
 from typing import Any, Generic, Optional, Type, TypeVar
 
+import attrs
 from attrs import define
 from typingref import UNSET, TypeHinter
 
@@ -123,14 +124,17 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
                 raise TypeError  # in py3.11 the get_type_hints won't explicitly raise.
             return self.fget_annotation
         except (TypeError, NameError):
-            if self.type.is_union():
-                # graphql doesn't support scalars in Unions ATM. (what about Enums in unions)?
-                return "QObject"
             if self.type.is_enum:
                 # QEnum value must be int
                 return "int"
             # might be a model, which is also QObject
-            assert self.type.is_model or self.type.is_object_type
+            # graphql doesn't support scalars or enums in Unions ATM.
+            assert (
+                self.type.is_model
+                or self.type.is_object_type
+                or self.type.is_interface
+                or self.type.is_union()
+            )
             return "QObject"
 
     @cached_property
@@ -155,7 +159,7 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
 
     @cached_property
     def can_select_id(self) -> Optional[QtGqlFieldDefinition]:
-        object_type = self.type.is_object_type
+        object_type = self.type.is_object_type or self.type.is_interface
         if not object_type:
             if self.type.is_model:
                 object_type = self.type.is_model.is_object_type
@@ -188,8 +192,13 @@ class QtGqlObjectTypeDefinition(BaseGqlTypeDefinition):
 
 
 @define(slots=False)
+class QtGqlInterfaceDefinition(QtGqlObjectTypeDefinition):
+    implementations: dict[str, BaseGqlTypeDefinition] = attrs.field(factory=dict)
+
+
+@define(slots=False)
 class QtGqlInputObjectTypeDefinition(BaseGqlTypeDefinition):
-    fields_dict: dict[str, QtGqlInputFieldDefinition] = {}  # type: ignore
+    fields_dict: dict[str, QtGqlInputFieldDefinition] = attrs.field(factory=dict)  # type: ignore
 
 
 @define
@@ -245,6 +254,12 @@ class GqlTypeHinter(TypeHinter):
             return t_self.of_type[0]
 
     @property
+    def is_interface(self) -> Optional[QtGqlInterfaceDefinition]:
+        t_self = optional_maybe(self).type
+        if isinstance(t_self, QtGqlInterfaceDefinition):
+            return t_self
+
+    @property
     def is_enum(self) -> Optional[QtGqlEnumDefinition]:
         t_self = optional_maybe(self).type
         with contextlib.suppress(TypeError):
@@ -282,7 +297,7 @@ class GqlTypeHinter(TypeHinter):
             return gql_enum.name
         if model_of := t_self.is_model:
             return f"{QGraphQListModel.__name__}[{model_of.annotation(scalars)}]"
-        if object_def := t_self.is_object_type:
+        if object_def := t_self.is_object_type or t_self.is_interface:
             return f"Optional[{object_def.name}]"
         if t_self.is_union():
             return "Union[" + ", ".join(th.annotation(scalars) for th in t_self.of_type) + "]"

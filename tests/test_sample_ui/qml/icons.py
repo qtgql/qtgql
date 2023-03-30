@@ -2852,7 +2852,7 @@ ICONS = {
     "glassMugVariant": "\U000f1116",
     "glassMugVariantOff": "\U000f15E8",
     "glassPintOutline": "\U000f130D",
-    "glassStange": "\U000f02A7",
+    "glassStrange": "\U000f02A7",
     "glassTulip": "\U000f02A8",
     "glassWine": "\U000f0876",
     "glasses": "\U000f02AA",

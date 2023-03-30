@@ -46,3 +46,43 @@ is_scalar_definition = definition_identifier_factory(gql_def.GraphQLScalarType)
 is_union_definition = definition_identifier_factory(gql_def.GraphQLUnionType)
 is_non_null_definition = definition_identifier_factory(gql_def.GraphQLNonNull)
 is_input_definition = definition_identifier_factory(gql_def.GraphQLInputObjectType)
+is_interface_definition = definition_identifier_factory(gql_def.GraphQLInterfaceType)
+
+
+ID_SELECTION_NODE = (
+    gql_lang.FieldNode(name=gql_lang.NameNode(value="id"), arguments=(), directives=()),
+)
+
+TYPENAME_SELECTION_NODE = (
+    gql_lang.FieldNode(name=gql_lang.NameNode(value="__typename"), arguments=(), directives=()),
+)
+
+
+def inject_selection_factory(
+    node: tuple[gql_lang.FieldNode],
+) -> Callable[[gql_lang.SelectionSetNode], None]:
+    def injector(selection_set: gql_lang.SelectionSetNode) -> None:
+        selection_set.selections += node
+
+    return injector
+
+
+inject_id_selection = inject_selection_factory(ID_SELECTION_NODE)
+inject_typename_selection = inject_selection_factory(TYPENAME_SELECTION_NODE)
+
+
+def selection_set_search_factory(
+    selection_name: str,
+) -> Callable[[gql_lang.SelectionSetNode], bool]:
+    def factory(selection_set: gql_lang.SelectionSetNode):
+        for field in selection_set.selections:
+            assert isinstance(field, gql_lang.FieldNode), f"{field} is not a field"
+            if field.name.value == selection_name:
+                return True
+        return False
+
+    return factory
+
+
+has_id_selection = selection_set_search_factory("id")
+has_typename_selection = selection_set_search_factory("__typename")

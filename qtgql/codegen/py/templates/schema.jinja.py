@@ -20,6 +20,7 @@ QML_IMPORT_MAJOR_VERSION = 1
 
 __TYPE_MAP__: dict[str, type[{{context.base_object_name}}]] = {}
 
+# ----------------------------------------- Enums -----------------------------------------
 
 {% for enum in context.enums %}
 class {{enum.name}}(Enum):
@@ -41,6 +42,12 @@ class Enums(QObject):
 class SCALARS:
     {% for scalar in context.custom_scalars %}
     {{scalar}} = {{scalar}}{% endfor %}
+
+# ----------------------------------------- Interfaces -----------------------------------------
+
+
+
+# ----------------------------------------- Object Types -----------------------------------------
 
 {% for type in context.types %}
 class {{ type.name }}({{context.base_object_name}}):
@@ -115,7 +122,7 @@ class {{ type.name }}({{context.base_object_name}}):
 __TYPE_MAP__['{{ type.name }}'] = {{ type.name }}
 {% endfor %}
 
-{# --------- INPUT OBJECTS ---------- #}
+# ----------------------------------------- INPUT OBJECTS -----------------------------------------
 
 {% for type in context.input_objects %}
 class {{type.name}}(QGraphQLInputObjectABC):

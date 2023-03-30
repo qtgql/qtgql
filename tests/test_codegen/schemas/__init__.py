@@ -1,5 +1,6 @@
 from . import (
     custom_scalar_input_schema,
+    interface_field,
     list_of_union,
     mutation_schema,
     object_reference_each_other,
@@ -58,4 +59,5 @@ __all__ = [  # noqa: PLE0604
     root_type_no_id,
     operation_error,
     subscription_schema,
+    interface_field,
 ]

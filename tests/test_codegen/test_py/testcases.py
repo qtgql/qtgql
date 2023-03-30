@@ -649,6 +649,30 @@ SubscriptionTestCase = QGQLObjectTestCase(
     test_name="SubscriptionTestCase",
 )
 
+
+InterfaceFieldTestCase = QGQLObjectTestCase(
+    schema=schemas.interface_field.schema,
+    query="""
+    query MainQuery ($ret: TypesEnum!) {
+      node(ret: $ret) {
+        id
+        __typename
+        ... on HasNameAgeInterface {
+          name
+          age
+        }
+        ... on User {
+          password
+        }
+        ... on Dog {
+          barks
+        }
+      }
+    }
+    """,
+    test_name="InterfaceFieldTestCase",
+)
+
 all_test_cases = [
     ScalarsTestCase,
     DateTimeTestCase,

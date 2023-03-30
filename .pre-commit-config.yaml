@@ -13,15 +13,16 @@ repos:
     rev: v2.4.0
     hooks:
     -   id: add-trailing-comma
-  - repo: https://github.com/codespell-project/codespell
-    rev: v2.2.4
+  - repo: https://github.com/crate-ci/typos
+    rev: v1.14.3
     hooks:
-      - id: codespell
+      - id: typos
         exclude: >
           (?x)^(
               .*\.css|
               .*\.js|
-              \.tox
+              \.tox|
+              tests/test_sample_ui/qml/icons.py
           )$
 
   - repo: https://github.com/charliermarsh/ruff-pre-commit
