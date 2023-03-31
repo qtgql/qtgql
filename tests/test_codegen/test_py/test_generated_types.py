@@ -3,50 +3,51 @@ import dataclasses
 import decimal
 import uuid
 import weakref
-from datetime import datetime, timezone
-from typing import Optional, Type
+from datetime import datetime
+from datetime import timezone
+from typing import Optional
+from typing import Type
 
 import pytest
 import pytestqt.exceptions
-from qtgql.codegen.introspection import introspection_query
-from qtgql.codegen.py.compiler.builtin_scalars import BuiltinScalar, BuiltinScalars
-from qtgql.codegen.py.runtime.bases import QGraphQListModel, _BaseQGraphQLObject
-from qtgql.codegen.py.runtime.custom_scalars import (
-    BaseCustomScalar,
-    DateScalar,
-    DateTimeScalar,
-    DecimalScalar,
-    TimeScalar,
-)
-from qtgql.codegen.py.runtime.queryhandler import BaseSubscriptionHandler, SelectionConfig
 from typingref import TypeHinter
 
+from qtgql.codegen.introspection import introspection_query
+from qtgql.codegen.py.compiler.builtin_scalars import BuiltinScalar
+from qtgql.codegen.py.compiler.builtin_scalars import BuiltinScalars
+from qtgql.codegen.py.runtime.bases import _BaseQGraphQLObject
+from qtgql.codegen.py.runtime.bases import QGraphQListModel
+from qtgql.codegen.py.runtime.custom_scalars import BaseCustomScalar
+from qtgql.codegen.py.runtime.custom_scalars import DateScalar
+from qtgql.codegen.py.runtime.custom_scalars import DateTimeScalar
+from qtgql.codegen.py.runtime.custom_scalars import DecimalScalar
+from qtgql.codegen.py.runtime.custom_scalars import TimeScalar
+from qtgql.codegen.py.runtime.queryhandler import BaseSubscriptionHandler
+from qtgql.codegen.py.runtime.queryhandler import SelectionConfig
 from tests.conftest import fake
 from tests.mini_gql_server import schema
-from tests.test_codegen.test_py.testcases import (
-    CustomScalarInputTestCase,
-    DateTimeTestCase,
-    EnumTestCase,
-    InterfaceFieldTestCase,
-    InterfaceTestCase,
-    NestedObjectTestCase,
-    ObjectsThatReferenceEachOtherTestCase,
-    ObjectWithListOfObjectTestCase,
-    OperationVariableTestCase,
-    OptionalInputTestCase,
-    OptionalNestedObjectTestCase,
-    QGQLObjectTestCase,
-    RootEnumTestCase,
-    RootListOfTestCase,
-    RootTypeNoIDTestCase,
-    ScalarsTestCase,
-    SubscriptionTestCase,
-    TypeWithNoIDTestCase,
-    TypeWithNullAbleIDTestCase,
-    UnionTestCase,
-    all_test_cases,
-    custom_scalar_testcases,
-)
+from tests.test_codegen.test_py.testcases import all_test_cases
+from tests.test_codegen.test_py.testcases import custom_scalar_testcases
+from tests.test_codegen.test_py.testcases import CustomScalarInputTestCase
+from tests.test_codegen.test_py.testcases import DateTimeTestCase
+from tests.test_codegen.test_py.testcases import EnumTestCase
+from tests.test_codegen.test_py.testcases import InterfaceFieldTestCase
+from tests.test_codegen.test_py.testcases import InterfaceTestCase
+from tests.test_codegen.test_py.testcases import NestedObjectTestCase
+from tests.test_codegen.test_py.testcases import ObjectsThatReferenceEachOtherTestCase
+from tests.test_codegen.test_py.testcases import ObjectWithListOfObjectTestCase
+from tests.test_codegen.test_py.testcases import OperationVariableTestCase
+from tests.test_codegen.test_py.testcases import OptionalInputTestCase
+from tests.test_codegen.test_py.testcases import OptionalNestedObjectTestCase
+from tests.test_codegen.test_py.testcases import QGQLObjectTestCase
+from tests.test_codegen.test_py.testcases import RootEnumTestCase
+from tests.test_codegen.test_py.testcases import RootListOfTestCase
+from tests.test_codegen.test_py.testcases import RootTypeNoIDTestCase
+from tests.test_codegen.test_py.testcases import ScalarsTestCase
+from tests.test_codegen.test_py.testcases import SubscriptionTestCase
+from tests.test_codegen.test_py.testcases import TypeWithNoIDTestCase
+from tests.test_codegen.test_py.testcases import TypeWithNullAbleIDTestCase
+from tests.test_codegen.test_py.testcases import UnionTestCase
 
 
 @pytest.fixture

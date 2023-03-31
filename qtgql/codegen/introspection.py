@@ -2,52 +2,45 @@ from __future__ import annotations
 
 import warnings
 from functools import cached_property
-from typing import (
-    TYPE_CHECKING,
-    List,
-    Optional,
-    TypedDict,
-    Union,
-)
+from typing import List
+from typing import Optional
+from typing import TYPE_CHECKING
+from typing import TypedDict
+from typing import Union
 
 import graphql
-from graphql import OperationType
 from graphql import language as gql_lang
+from graphql import OperationType
 from graphql.language import visitor
 from graphql.type import definition as gql_def
 
-from qtgql.codegen.graphql_ref import (
-    is_enum_definition,
-    is_input_definition,
-    is_interface_definition,
-    is_list_definition,
-    is_named_type_node,
-    is_non_null_definition,
-    is_nonnull_node,
-    is_object_definition,
-    is_operation_def_node,
-    is_scalar_definition,
-    is_union_definition,
-)
+from qtgql.codegen.graphql_ref import is_enum_definition
+from qtgql.codegen.graphql_ref import is_input_definition
+from qtgql.codegen.graphql_ref import is_interface_definition
+from qtgql.codegen.graphql_ref import is_list_definition
+from qtgql.codegen.graphql_ref import is_named_type_node
+from qtgql.codegen.graphql_ref import is_non_null_definition
+from qtgql.codegen.graphql_ref import is_nonnull_node
+from qtgql.codegen.graphql_ref import is_object_definition
+from qtgql.codegen.graphql_ref import is_operation_def_node
+from qtgql.codegen.graphql_ref import is_scalar_definition
+from qtgql.codegen.graphql_ref import is_union_definition
 from qtgql.codegen.py.compiler.builtin_scalars import BuiltinScalars
-from qtgql.codegen.py.compiler.operation import QtGqlOperationDefinition, QtGqlQueriedField
-from qtgql.codegen.py.compiler.template import (
-    TemplateContext,
-    handlers_template,
-    schema_types_template,
-)
-from qtgql.codegen.py.objecttype import (
-    EnumMap,
-    EnumValue,
-    GqlTypeHinter,
-    QtGqlEnumDefinition,
-    QtGqlFieldDefinition,
-    QtGqlInputFieldDefinition,
-    QtGqlInputObjectTypeDefinition,
-    QtGqlInterfaceDefinition,
-    QtGqlObjectTypeDefinition,
-    QtGqlVariableDefinition,
-)
+from qtgql.codegen.py.compiler.operation import QtGqlOperationDefinition
+from qtgql.codegen.py.compiler.operation import QtGqlQueriedField
+from qtgql.codegen.py.compiler.template import handlers_template
+from qtgql.codegen.py.compiler.template import schema_types_template
+from qtgql.codegen.py.compiler.template import TemplateContext
+from qtgql.codegen.py.objecttype import EnumMap
+from qtgql.codegen.py.objecttype import EnumValue
+from qtgql.codegen.py.objecttype import GqlTypeHinter
+from qtgql.codegen.py.objecttype import QtGqlEnumDefinition
+from qtgql.codegen.py.objecttype import QtGqlFieldDefinition
+from qtgql.codegen.py.objecttype import QtGqlInputFieldDefinition
+from qtgql.codegen.py.objecttype import QtGqlInputObjectTypeDefinition
+from qtgql.codegen.py.objecttype import QtGqlInterfaceDefinition
+from qtgql.codegen.py.objecttype import QtGqlObjectTypeDefinition
+from qtgql.codegen.py.objecttype import QtGqlVariableDefinition
 from qtgql.codegen.utils import anti_forward_ref
 from qtgql.exceptions import QtGqlException
 

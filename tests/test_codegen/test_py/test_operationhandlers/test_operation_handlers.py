@@ -1,14 +1,13 @@
 from typing import Optional
 
 import pytest
-from qtgql.codegen.py.runtime.queryhandler import BaseOperationHandler, QmlOperationConsumerABC
 
+from qtgql.codegen.py.runtime.queryhandler import BaseOperationHandler
+from qtgql.codegen.py.runtime.queryhandler import QmlOperationConsumerABC
 from tests.conftest import IS_WINDOWS
-from tests.test_codegen.test_py.testcases import (
-    OperationErrorTestCase,
-    OperationVariableTestCase,
-    ScalarsTestCase,
-)
+from tests.test_codegen.test_py.testcases import OperationErrorTestCase
+from tests.test_codegen.test_py.testcases import OperationVariableTestCase
+from tests.test_codegen.test_py.testcases import ScalarsTestCase
 
 
 def test_data_fetched(qmlbot, schemas_server):

@@ -9,14 +9,12 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
+
 from qtgql.codegen.py.compiler.config import QtGqlConfig
 from qtgql.exceptions import QtGqlException
-
-from tests.test_codegen.test_py.testcases import (
-    MutationOperationTestCase,
-    ScalarsTestCase,
-    SubscriptionTestCase,
-)
+from tests.test_codegen.test_py.testcases import MutationOperationTestCase
+from tests.test_codegen.test_py.testcases import ScalarsTestCase
+from tests.test_codegen.test_py.testcases import SubscriptionTestCase
 
 if TYPE_CHECKING:
     from types import ModuleType

@@ -1,9 +1,12 @@
 import platform
 
 import pytest
-from qtgql.gqltransport.client import PROTOCOL, GqlWsTransportClient, SubscribeResponseMessage
 
-from tests.test_gqltransport.conftest import PseudoHandler, get_subscription_str
+from qtgql.gqltransport.client import GqlWsTransportClient
+from qtgql.gqltransport.client import PROTOCOL
+from qtgql.gqltransport.client import SubscribeResponseMessage
+from tests.test_gqltransport.conftest import get_subscription_str
+from tests.test_gqltransport.conftest import PseudoHandler
 
 
 def test_generates_has_query_map_with_id_and_receivers(default_client):

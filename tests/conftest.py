@@ -8,14 +8,16 @@ import subprocess
 import tempfile
 import time
 from pathlib import Path
-from typing import TYPE_CHECKING, TypeVar
+from typing import TYPE_CHECKING
+from typing import TypeVar
 
 import pytest
 from attr import field
 from attrs import define
 from faker import Faker
 from PySide6.QtCore import QUrl
-from PySide6.QtQuick import QQuickItem, QQuickView
+from PySide6.QtQuick import QQuickItem
+from PySide6.QtQuick import QQuickView
 
 if TYPE_CHECKING:
     from pytestqt.qtbot import QtBot

@@ -3,14 +3,13 @@ from pathlib import Path
 
 import pytest
 import toml
-from qtgql.codegen.cli import (
-    QTGQL_CONFIG_KEY,
-    TOOL_NAME,
-    _find_pyproject,
-    _get_app_import_path,
-    app,
-)
 from typer.testing import CliRunner
+
+from qtgql.codegen.cli import _find_pyproject
+from qtgql.codegen.cli import _get_app_import_path
+from qtgql.codegen.cli import app
+from qtgql.codegen.cli import QTGQL_CONFIG_KEY
+from qtgql.codegen.cli import TOOL_NAME
 
 
 @pytest.fixture

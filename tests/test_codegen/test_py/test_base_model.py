@@ -1,9 +1,11 @@
 from unittest.mock import patch
 
 import pytest
-from PySide6.QtCore import QByteArray, QObject, Qt
-from qtgql.codegen.py.runtime.bases import QGraphQListModel
+from PySide6.QtCore import QByteArray
+from PySide6.QtCore import QObject
+from PySide6.QtCore import Qt
 
+from qtgql.codegen.py.runtime.bases import QGraphQListModel
 from tests.test_codegen.test_py.testcases import ObjectWithListOfObjectTestCase
 
 

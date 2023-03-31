@@ -31,7 +31,7 @@ class Frog(Node):
 class Query:
     @strawberry.field
     def usersAndFrogs(self) -> list[Union[Frog, User]]:
-        return [random.choice((User(), Frog())) for _ in range(7)]
+        return [random.choice((User(), Frog())) for _ in range(7)]  # noqa: S311
 
 
 schema = strawberry.Schema(query=Query)

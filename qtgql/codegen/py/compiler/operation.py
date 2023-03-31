@@ -2,27 +2,23 @@ from __future__ import annotations
 
 from collections import defaultdict
 from textwrap import dedent
-from typing import TYPE_CHECKING, NamedTuple, Optional
+from typing import NamedTuple
+from typing import Optional
+from typing import TYPE_CHECKING
 
 import attrs
 from typingref import UNSET
 
-from qtgql.codegen.graphql_ref import (
-    has_id_selection,
-    has_typename_selection,
-    inject_id_selection,
-    inject_typename_selection,
-    is_field_node,
-    is_inline_fragment,
-)
-from qtgql.codegen.py.compiler.template import (
-    ConfigContext,
-    config_template,
-)
-from qtgql.codegen.py.objecttype import (
-    QtGqlFieldDefinition,
-    QtGqlObjectTypeDefinition,
-)
+from qtgql.codegen.graphql_ref import has_id_selection
+from qtgql.codegen.graphql_ref import has_typename_selection
+from qtgql.codegen.graphql_ref import inject_id_selection
+from qtgql.codegen.graphql_ref import inject_typename_selection
+from qtgql.codegen.graphql_ref import is_field_node
+from qtgql.codegen.graphql_ref import is_inline_fragment
+from qtgql.codegen.py.compiler.template import config_template
+from qtgql.codegen.py.compiler.template import ConfigContext
+from qtgql.codegen.py.objecttype import QtGqlFieldDefinition
+from qtgql.codegen.py.objecttype import QtGqlObjectTypeDefinition
 
 if TYPE_CHECKING:
     from graphql import language as gql_lang

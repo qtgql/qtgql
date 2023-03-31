@@ -1,17 +1,16 @@
 from __future__ import annotations
 
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Callable,
-    Generic,
-    Optional,
-    TypeVar,
-    get_type_hints,
-    overload,
-)
+from typing import Any
+from typing import Callable
+from typing import Generic
+from typing import get_type_hints
+from typing import Optional
+from typing import overload
+from typing import TYPE_CHECKING
+from typing import TypeVar
 
-from PySide6.QtCore import Property, Signal
+from PySide6.QtCore import Property
+from PySide6.QtCore import Signal
 from typingref import TypeHinter
 
 __all__ = ["qproperty"]

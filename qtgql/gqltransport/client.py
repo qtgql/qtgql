@@ -4,13 +4,20 @@ import typing
 import uuid
 from abc import abstractmethod
 from collections import deque
-from typing import Any, Optional
+from typing import Any
+from typing import Optional
 
-from attrs import define, field
-from PySide6 import QtCore, QtNetwork, QtWebSockets
+from attrs import define
+from attrs import field
+from PySide6 import QtCore
+from PySide6 import QtNetwork
+from PySide6 import QtWebSockets
 from typingref import UNSET
 
-from qtgql.gqltransport.core import EncodeAble, GqlEncoder, QueryPayload, T
+from qtgql.gqltransport.core import EncodeAble
+from qtgql.gqltransport.core import GqlEncoder
+from qtgql.gqltransport.core import QueryPayload
+from qtgql.gqltransport.core import T
 from qtgql.tools import slot
 
 logger = logging.getLogger(__name__)

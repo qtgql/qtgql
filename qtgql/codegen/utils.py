@@ -1,4 +1,5 @@
-from typing import Any, Type
+from typing import Any
+from typing import Type
 
 
 class AntiForwardRef:

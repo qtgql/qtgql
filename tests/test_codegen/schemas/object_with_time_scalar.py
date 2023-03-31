@@ -1,4 +1,5 @@
-from datetime import time, timezone
+from datetime import time
+from datetime import timezone
 
 import strawberry
 

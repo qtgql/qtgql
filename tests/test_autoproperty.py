@@ -1,6 +1,9 @@
-from typing import TYPE_CHECKING, Any, Optional
+from typing import Any
+from typing import Optional
+from typing import TYPE_CHECKING
 
 from PySide6 import QtCore
+
 from qtgql.tools import define_properties
 
 if TYPE_CHECKING:

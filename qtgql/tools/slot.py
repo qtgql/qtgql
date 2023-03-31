@@ -1,5 +1,8 @@
 import itertools
-from typing import Any, Callable, TypeVar, get_type_hints
+from typing import Any
+from typing import Callable
+from typing import get_type_hints
+from typing import TypeVar
 
 from PySide6 import QtCore
 from typingref import TypeHinter

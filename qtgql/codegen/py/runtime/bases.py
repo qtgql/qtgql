@@ -1,9 +1,19 @@
 from __future__ import annotations
 
 import contextlib
-from typing import TYPE_CHECKING, ClassVar, Generic, NamedTuple, Optional, TypeVar
+from typing import ClassVar
+from typing import Generic
+from typing import NamedTuple
+from typing import Optional
+from typing import TYPE_CHECKING
+from typing import TypeVar
 
-from PySide6.QtCore import QAbstractListModel, QByteArray, QObject, Qt, Signal, Slot
+from PySide6.QtCore import QAbstractListModel
+from PySide6.QtCore import QByteArray
+from PySide6.QtCore import QObject
+from PySide6.QtCore import Qt
+from PySide6.QtCore import Signal
+from PySide6.QtCore import Slot
 
 if TYPE_CHECKING:
     from typing_extensions import Self

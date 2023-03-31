@@ -1,8 +1,12 @@
 import json
 import uuid
-from typing import Generic, Optional, TypeVar, Union
+from typing import Generic
+from typing import Optional
+from typing import TypeVar
+from typing import Union
 
-from attr import asdict, define
+from attr import asdict
+from attr import define
 from typingref import UNSET
 
 from qtgql.utils.graphql import get_operation_name

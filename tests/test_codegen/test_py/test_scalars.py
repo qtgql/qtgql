@@ -1,14 +1,16 @@
-from abc import ABC, abstractmethod
-from datetime import date, datetime, time, timezone
+from abc import ABC
+from abc import abstractmethod
+from datetime import date
+from datetime import datetime
+from datetime import time
+from datetime import timezone
 from decimal import Decimal
 from typing import Type
 
-from qtgql.codegen.py.runtime.custom_scalars import (
-    BaseCustomScalar,
-    DateScalar,
-    DecimalScalar,
-    TimeScalar,
-)
+from qtgql.codegen.py.runtime.custom_scalars import BaseCustomScalar
+from qtgql.codegen.py.runtime.custom_scalars import DateScalar
+from qtgql.codegen.py.runtime.custom_scalars import DecimalScalar
+from qtgql.codegen.py.runtime.custom_scalars import TimeScalar
 
 
 class AbstractScalarTestCase(ABC):

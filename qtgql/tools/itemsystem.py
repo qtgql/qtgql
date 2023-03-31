@@ -2,12 +2,27 @@ from __future__ import annotations
 
 import types
 from functools import cached_property
-from typing import TYPE_CHECKING, Any, Callable, ClassVar, Generic, Optional, Type, TypeVar, Union
+from typing import Any
+from typing import Callable
+from typing import ClassVar
+from typing import Generic
+from typing import Optional
+from typing import Type
+from typing import TYPE_CHECKING
+from typing import TypeVar
+from typing import Union
 
 import attrs
-from PySide6.QtCore import QAbstractListModel, QByteArray, QEventLoop, QModelIndex, Qt, Signal
-from typing_extensions import Self, dataclass_transform
-from typingref import UNSET, TypeHinter
+from PySide6.QtCore import QAbstractListModel
+from PySide6.QtCore import QByteArray
+from PySide6.QtCore import QEventLoop
+from PySide6.QtCore import QModelIndex
+from PySide6.QtCore import Qt
+from PySide6.QtCore import Signal
+from typing_extensions import dataclass_transform
+from typing_extensions import Self
+from typingref import TypeHinter
+from typingref import UNSET
 
 from qtgql.exceptions import QtGqlException
 from qtgql.tools import slot

@@ -1,8 +1,14 @@
-from typing import Any, Optional, Type
+from typing import Any
+from typing import Optional
+from typing import Type
 
 import pytest
 from attr import define
-from PySide6.QtCore import QMetaMethod, QObject, Signal, Slot
+from PySide6.QtCore import QMetaMethod
+from PySide6.QtCore import QObject
+from PySide6.QtCore import Signal
+from PySide6.QtCore import Slot
+
 from qtgql.tools import slot
 
 

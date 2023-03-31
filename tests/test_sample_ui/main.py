@@ -4,13 +4,19 @@ import sys
 from pathlib import Path
 from typing import Optional
 
-from PySide6 import QtCore, QtGui, QtQml, QtQuick
-from PySide6.QtCore import QObject, Signal
+from PySide6 import QtCore
+from PySide6 import QtGui
+from PySide6 import QtQml
+from PySide6 import QtQuick
+from PySide6.QtCore import QObject
+from PySide6.QtCore import Signal
 from PySide6.QtQml import QQmlApplicationEngine
-from qtgql.codegen.py.compiler.config import QtGqlConfig
-from qtgql.gqltransport.client import GqlClientMessage, GqlWsTransportClient, HandlerProto
-from qtgql.tools import slot
 
+from qtgql.codegen.py.compiler.config import QtGqlConfig
+from qtgql.gqltransport.client import GqlClientMessage
+from qtgql.gqltransport.client import GqlWsTransportClient
+from qtgql.gqltransport.client import HandlerProto
+from qtgql.tools import slot
 from tests.mini_gql_server import schema
 
 try:

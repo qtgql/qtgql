@@ -3,15 +3,21 @@ from __future__ import annotations
 import contextlib
 import enum
 from functools import cached_property
-from typing import Any, Generic, Optional, Type, TypeVar
+from typing import Any
+from typing import Generic
+from typing import Optional
+from typing import Type
+from typing import TypeVar
 
 import attrs
 from attrs import define
-from typingref import UNSET, TypeHinter
+from typingref import TypeHinter
+from typingref import UNSET
 
 from qtgql.codegen.py.compiler.builtin_scalars import BuiltinScalar
 from qtgql.codegen.py.runtime.bases import QGraphQListModel
-from qtgql.codegen.py.runtime.custom_scalars import BaseCustomScalar, CustomScalarMap
+from qtgql.codegen.py.runtime.custom_scalars import BaseCustomScalar
+from qtgql.codegen.py.runtime.custom_scalars import CustomScalarMap
 from qtgql.codegen.utils import AntiForwardRef
 
 

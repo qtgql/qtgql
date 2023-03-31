@@ -1,8 +1,14 @@
 import types
-from typing import Any, Type, TypeVar, Union, cast, get_args
+from typing import Any
+from typing import cast
+from typing import get_args
+from typing import Type
+from typing import TypeVar
+from typing import Union
 
 import attr
-from attr import Attribute, define
+from attr import Attribute
+from attr import define
 from PySide6 import QtCore
 from typing_extensions import dataclass_transform
 

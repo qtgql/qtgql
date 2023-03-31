@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Protocol
+from typing import Protocol
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
     from qtgql.gqltransport.client import HandlerProto

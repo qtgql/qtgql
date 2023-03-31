@@ -1,22 +1,22 @@
 from __future__ import annotations
 
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Callable,
-    ClassVar,
-    Dict,
-    Generic,
-    NamedTuple,
-    Optional,
-    TypeVar,
-)
+from typing import Any
+from typing import Callable
+from typing import ClassVar
+from typing import Dict
+from typing import Generic
+from typing import NamedTuple
+from typing import Optional
+from typing import TYPE_CHECKING
+from typing import TypeVar
 
-from PySide6.QtCore import QObject, Signal
+from PySide6.QtCore import QObject
+from PySide6.QtCore import Signal
 from PySide6.QtQuick import QQuickItem
 
 from qtgql.codegen.py.runtime.environment import get_gql_env
-from qtgql.tools import qproperty, slot
+from qtgql.tools import qproperty
+from qtgql.tools import slot
 
 if TYPE_CHECKING:
     from qtgql.gqltransport.client import GqlClientMessage

@@ -1,6 +1,9 @@
 from __future__ import annotations
 
-from typing import Callable, Optional, Type, TypeVar
+from typing import Callable
+from typing import Optional
+from typing import Type
+from typing import TypeVar
 
 from graphql import language as gql_lang
 from graphql.type import definition as gql_def

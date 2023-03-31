@@ -1,5 +1,8 @@
 import pytest
-from qtgql.gqltransport.client import GqlClientMessage, GqlWsTransportClient, HandlerProto
+
+from qtgql.gqltransport.client import GqlClientMessage
+from qtgql.gqltransport.client import GqlWsTransportClient
+from qtgql.gqltransport.client import HandlerProto
 
 
 def get_subscription_str(operation_name="defaultOpName", target: int = 10, raise_on_5=False) -> str:
