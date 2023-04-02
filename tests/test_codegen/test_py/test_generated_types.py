@@ -278,14 +278,9 @@ class TestDeserializers:
             assert handler.data.name == "Connected"
 
     def test_interface_field(self, qtbot):
-        from tests.test_sample_ui.__temp import MainQuery
-
         with InterfaceFieldTestCase.compile() as testcase:
             d = testcase.initialize_dict
             qh = testcase.query_handler
-            MainQuery.ENV_NAME = qh.ENV_NAME
-            mq = MainQuery(None)
-            mq.on_data(d)
             assert not qh._data
             qh.on_data(d)
             assert qh._data

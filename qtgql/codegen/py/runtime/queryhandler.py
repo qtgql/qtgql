@@ -35,10 +35,9 @@ class OperationMetaData(NamedTuple):
 
 
 T = TypeVar("T")
-T_RootType = TypeVar("T_RootType")
 
 
-class BaseOperationHandler(QObject, Generic[T, T_RootType]):
+class BaseOperationHandler(QObject, Generic[T]):
     # class-vars
     ENV_NAME: ClassVar[str]
     OPERATION_METADATA: ClassVar[OperationMetaData]
@@ -62,10 +61,6 @@ class BaseOperationHandler(QObject, Generic[T, T_RootType]):
         self.environment = get_gql_env(self.ENV_NAME)
         self._variables: dict = {}
         self._consumer: Optional[QmlOperationConsumerABC] = None
-        self._root_type: Optional[T_RootType] = None
-
-    def initialize(self) -> None:
-        raise NotImplementedError("Implementation on template.")
 
     def consume(self, consumer: QmlOperationConsumerABC) -> None:
         self._consumer = consumer
@@ -136,15 +131,17 @@ class BaseOperationHandler(QObject, Generic[T, T_RootType]):
         super().deleteLater()
 
 
-class BaseQueryHandler(BaseOperationHandler[T, T_RootType]):
+class BaseQueryHandler(BaseOperationHandler[T]):
+    """Each handler will be exposed to QML and."""
+
     ...
 
 
-class BaseSubscriptionHandler(BaseOperationHandler[T, T_RootType]):
+class BaseSubscriptionHandler(BaseOperationHandler[T]):
     ...
 
 
-class BaseMutationHandler(BaseOperationHandler[T, T_RootType]):
+class BaseMutationHandler(BaseOperationHandler[T]):
     @slot
     def commit(self) -> None:
         # ATM this is just an alias, we might add some functionality here later like optimistic updates.
