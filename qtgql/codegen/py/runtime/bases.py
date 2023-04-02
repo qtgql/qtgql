@@ -45,7 +45,13 @@ class _BaseQGraphQLObject(QObject):
         return self.TYPE_NAME
 
     @classmethod
-    def from_dict(cls, parent: QObject, data: dict, config: SelectionConfig):
+    def from_dict(
+        cls,
+        parent: QObject,
+        data: dict,
+        config: SelectionConfig,
+        metadata: OperationMetaData,
+    ):
         """Creates a new instance from GraphQL raw data."""
         raise NotImplementedError
 
