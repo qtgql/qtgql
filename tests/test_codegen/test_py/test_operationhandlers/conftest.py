@@ -1,5 +1,8 @@
 import pytest
-from qtgql.codegen.py.runtime.environment import _ENV_MAP, QtGqlEnvironment, set_gql_env
+
+from qtgql.codegen.py.runtime.environment import _ENV_MAP
+from qtgql.codegen.py.runtime.environment import QtGqlEnvironment
+from qtgql.codegen.py.runtime.environment import set_gql_env
 from qtgql.gqltransport.client import GqlWsTransportClient
 
 

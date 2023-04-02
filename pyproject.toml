@@ -85,6 +85,7 @@ line-length = 100
 select = ["ALL"]
 target-version = "py38"
 ignore = [
+    "I001", # isort, handled by pc-hook.
     "TID252",
     # we use asserts in tests and to hint mypy
     "E501", # line too long, handled by black.

@@ -10,8 +10,14 @@ import strawberry
 class Node:
     id: strawberry.ID = strawberry.field(default_factory=lambda: uuid.uuid4().hex)
 
+    def __init_subclass__(cls, **kwargs):
+        setattr(cls, f"_{cls.__name__}__typename", cls.__name__)
+
     def __post_init__(self):
         NODE_DB.insert(self)
+
+    def resolve_type(self) -> str:
+        return self.__type_name
 
 
 T_Node = TypeVar("T_Node", bound=Node)

@@ -3,14 +3,21 @@ from __future__ import annotations
 import contextlib
 import enum
 from functools import cached_property
-from typing import Any, Generic, Optional, Type, TypeVar
+from typing import Any
+from typing import Generic
+from typing import Optional
+from typing import Type
+from typing import TypeVar
 
+import attrs
 from attrs import define
-from typingref import UNSET, TypeHinter
+from typingref import TypeHinter
+from typingref import UNSET
 
 from qtgql.codegen.py.compiler.builtin_scalars import BuiltinScalar
 from qtgql.codegen.py.runtime.bases import QGraphQListModel
-from qtgql.codegen.py.runtime.custom_scalars import BaseCustomScalar, CustomScalarMap
+from qtgql.codegen.py.runtime.custom_scalars import BaseCustomScalar
+from qtgql.codegen.py.runtime.custom_scalars import CustomScalarMap
 from qtgql.codegen.utils import AntiForwardRef
 
 
@@ -123,14 +130,17 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
                 raise TypeError  # in py3.11 the get_type_hints won't explicitly raise.
             return self.fget_annotation
         except (TypeError, NameError):
-            if self.type.is_union():
-                # graphql doesn't support scalars in Unions ATM. (what about Enums in unions)?
-                return "QObject"
             if self.type.is_enum:
                 # QEnum value must be int
                 return "int"
             # might be a model, which is also QObject
-            assert self.type.is_model or self.type.is_object_type
+            # graphql doesn't support scalars or enums in Unions ATM.
+            assert (
+                self.type.is_model
+                or self.type.is_object_type
+                or self.type.is_interface
+                or self.type.is_union
+            )
             return "QObject"
 
     @cached_property
@@ -155,7 +165,7 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
 
     @cached_property
     def can_select_id(self) -> Optional[QtGqlFieldDefinition]:
-        object_type = self.type.is_object_type
+        object_type = self.type.is_object_type or self.type.is_interface
         if not object_type:
             if self.type.is_model:
                 object_type = self.type.is_model.is_object_type
@@ -176,6 +186,8 @@ class BaseGqlTypeDefinition:
 
 @define(slots=False)
 class QtGqlObjectTypeDefinition(BaseGqlTypeDefinition):
+    implements: list[QtGqlInterfaceDefinition] = attrs.Factory(list)
+
     @cached_property
     def has_id_field(self) -> Optional[QtGqlFieldDefinition]:
         return self.fields_dict.get("id", None)
@@ -186,10 +198,20 @@ class QtGqlObjectTypeDefinition(BaseGqlTypeDefinition):
             if id_f.type.is_optional():
                 return id_f
 
+    def __attrs_post_init__(self):
+        for base in self.implements:
+            if not base.implementations.get(self.name):
+                base.implementations[self.name] = self
+
+
+@define(slots=False)
+class QtGqlInterfaceDefinition(QtGqlObjectTypeDefinition):
+    implementations: dict[str, BaseGqlTypeDefinition] = attrs.field(factory=dict)
+
 
 @define(slots=False)
 class QtGqlInputObjectTypeDefinition(BaseGqlTypeDefinition):
-    fields_dict: dict[str, QtGqlInputFieldDefinition] = {}  # type: ignore
+    fields_dict: dict[str, QtGqlInputFieldDefinition] = attrs.field(factory=dict)  # type: ignore
 
 
 @define
@@ -223,8 +245,14 @@ class GqlTypeHinter(TypeHinter):
         self.of_type: tuple[GqlTypeHinter, ...] = of_type
 
     @property
+    def is_union(self) -> bool:
+        return super().is_union()
+
+    @property
     def is_object_type(self) -> Optional[QtGqlObjectTypeDefinition]:
         t_self = optional_maybe(self).type
+        if self.is_interface:
+            return None
         with contextlib.suppress(TypeError):
             if issubclass(t_self, AntiForwardRef):
                 ret = t_self.resolve()
@@ -243,6 +271,12 @@ class GqlTypeHinter(TypeHinter):
         if t_self.is_list():
             # scalars or unions are not supported in lists yet (valid graphql spec though)
             return t_self.of_type[0]
+
+    @property
+    def is_interface(self) -> Optional[QtGqlInterfaceDefinition]:
+        t_self = optional_maybe(self).type
+        if isinstance(t_self, QtGqlInterfaceDefinition):
+            return t_self
 
     @property
     def is_enum(self) -> Optional[QtGqlEnumDefinition]:
@@ -282,9 +316,9 @@ class GqlTypeHinter(TypeHinter):
             return gql_enum.name
         if model_of := t_self.is_model:
             return f"{QGraphQListModel.__name__}[{model_of.annotation(scalars)}]"
-        if object_def := t_self.is_object_type:
+        if object_def := t_self.is_object_type or t_self.is_interface:
             return f"Optional[{object_def.name}]"
-        if t_self.is_union():
+        if t_self.is_union:
             return "Union[" + ", ".join(th.annotation(scalars) for th in t_self.of_type) + "]"
         if input_obj := t_self.is_input_object_type:
             return input_obj.name

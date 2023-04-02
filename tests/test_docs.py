@@ -1,7 +1,9 @@
 from pathlib import Path
 
 import pytest
-from mktestdocs import check_docstring, check_md_file
+from mktestdocs import check_docstring
+from mktestdocs import check_md_file
+
 from qtgql.codegen.py.runtime.custom_scalars import BaseCustomScalar
 from qtgql.tools import define_properties
 

@@ -1,6 +1,7 @@
-from qtgql.tools.itemsystem import GenericModel, role
-
-from tests.test_itemsystem.conftest import FullClass, init_dict_fullClass
+from qtgql.tools.itemsystem import GenericModel
+from qtgql.tools.itemsystem import role
+from tests.test_itemsystem.conftest import FullClass
+from tests.test_itemsystem.conftest import init_dict_fullClass
 
 
 def test_has_inner_class_GenericModel(full_model):

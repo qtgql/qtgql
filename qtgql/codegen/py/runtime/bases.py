@@ -1,9 +1,19 @@
 from __future__ import annotations
 
 import contextlib
-from typing import TYPE_CHECKING, ClassVar, Generic, NamedTuple, Optional, TypeVar
+from typing import ClassVar
+from typing import Generic
+from typing import NamedTuple
+from typing import Optional
+from typing import TYPE_CHECKING
+from typing import TypeVar
 
-from PySide6.QtCore import QAbstractListModel, QByteArray, QObject, Qt, Signal, Slot
+from PySide6.QtCore import QAbstractListModel
+from PySide6.QtCore import QByteArray
+from PySide6.QtCore import QObject
+from PySide6.QtCore import Qt
+from PySide6.QtCore import Signal
+from PySide6.QtCore import Slot
 
 if TYPE_CHECKING:
     from typing_extensions import Self
@@ -20,23 +30,24 @@ class QGraphQLInputObjectABC(QObject):
 
 
 class _BaseQGraphQLObject(QObject):
-    _id: str
-    id: str
+    TYPE_NAME: ClassVar[str]
     __singleton__: Self
-    __store__: ClassVar[QGraphQLObjectStore[Self]]
-
-    def __init_subclass__(cls, **kwargs):
-        cls.__store__ = QGraphQLObjectStore()
 
     def __init__(self, parent: Optional[QObject] = None):
         super().__init__(parent)
 
     @qproperty(str, constant=True)
     def typename(self) -> str:
-        return self.__class__.__name__
+        return self.TYPE_NAME
 
     @classmethod
-    def from_dict(cls, parent: QObject, data: dict, config: SelectionConfig):
+    def from_dict(
+        cls,
+        parent: QObject,
+        data: dict,
+        config: SelectionConfig,
+        metadata: OperationMetaData,
+    ):
         """Creates a new instance from GraphQL raw data."""
         raise NotImplementedError
 
@@ -64,11 +75,27 @@ class _BaseQGraphQLObject(QObject):
             return cls.__singleton__
 
 
-T_BaseQGraphQLObject = TypeVar("T_BaseQGraphQLObject", bound=_BaseQGraphQLObject)
+class _BaseQGraphQLObjectWithID(_BaseQGraphQLObject):
+    _id: str
+
+    __store__: ClassVar[QGraphQLObjectStore[Self]]
+
+    def __init_subclass__(cls, **kwargs):
+        cls.__store__ = QGraphQLObjectStore()
+
+
+T_BaseQGraphQLObjectWithID = TypeVar("T_BaseQGraphQLObjectWithID", bound=_BaseQGraphQLObjectWithID)
+
+
+def compare_node(node: T_BaseQGraphQLObjectWithID, id_: str, typename: Optional[str] = None):
+    if node._id == id_:
+        if typename and node.TYPE_NAME != typename:
+            return False
+        return True
 
 
 class NodeRecord(NamedTuple):
-    node: _BaseQGraphQLObject
+    node: _BaseQGraphQLObjectWithID
     retainers: set[str]  # set of operation names.
 
     def retain(self, operation_name: str) -> Self:
@@ -76,7 +103,7 @@ class NodeRecord(NamedTuple):
         return self
 
 
-class QGraphQLObjectStore(Generic[T_BaseQGraphQLObject]):
+class QGraphQLObjectStore(Generic[T_BaseQGraphQLObjectWithID]):
     def __init__(self) -> None:
         self._data: dict[str, NodeRecord] = {}
 
@@ -86,22 +113,22 @@ class QGraphQLObjectStore(Generic[T_BaseQGraphQLObject]):
             return found.node
 
     def add_record(self, record: NodeRecord):
-        assert record.node.id
-        self._data[record.node.id] = record
+        assert record.node._id
+        self._data[record.node._id] = record
 
-    def loose(self, node: T_BaseQGraphQLObject, operation_name: str) -> None:
-        assert node.id
+    def loose(self, node: T_BaseQGraphQLObjectWithID, operation_name: str) -> None:
+        assert node._id
         with contextlib.suppress(
             KeyError,
         ):  # This node was already deleted, we can safely ignore it
-            record = self._data[node.id]
+            record = self._data[node._id]
             record.retainers.remove(operation_name)
             if not record.retainers:
-                self._data.pop(node.id)
+                self._data.pop(node._id)
                 node.deleteLater()  # we can delete it now since it has no retainers.
 
 
-class QGraphQListModel(QAbstractListModel, Generic[T_BaseQGraphQLObject]):
+class QGraphQListModel(QAbstractListModel, Generic[T_BaseQGraphQLObjectWithID]):
     OBJECT_ROLE = Qt.ItemDataRole.UserRole + 1
     _role_names = {OBJECT_ROLE: QByteArray("object")}  # type: ignore
     currentIndexChanged = Signal()
@@ -109,7 +136,7 @@ class QGraphQListModel(QAbstractListModel, Generic[T_BaseQGraphQLObject]):
     def __init__(
         self,
         parent: Optional[QObject],
-        data: list[T_BaseQGraphQLObject],
+        data: list[T_BaseQGraphQLObjectWithID],
     ):
         super().__init__(parent)
         self._data = data
@@ -125,7 +152,7 @@ class QGraphQListModel(QAbstractListModel, Generic[T_BaseQGraphQLObject]):
         return self._current_index
 
     @qproperty(QObject, notify=currentIndexChanged)  # type: ignore
-    def currentObject(self) -> Optional[T_BaseQGraphQLObject]:
+    def currentObject(self) -> Optional[T_BaseQGraphQLObjectWithID]:
         return self._data[self._current_index]
 
     def rowCount(self, *args, **kwargs) -> int:
@@ -134,7 +161,7 @@ class QGraphQListModel(QAbstractListModel, Generic[T_BaseQGraphQLObject]):
     def roleNames(self) -> dict:
         return self._role_names  # type: ignore
 
-    def data(self, index, role=...) -> Optional[T_BaseQGraphQLObject]:
+    def data(self, index, role=...) -> Optional[T_BaseQGraphQLObjectWithID]:
         if index.row() < len(self._data) and index.isValid():
             if role == self.OBJECT_ROLE:
                 return self._data[index.row()]
@@ -142,7 +169,7 @@ class QGraphQListModel(QAbstractListModel, Generic[T_BaseQGraphQLObject]):
                 f"role {role} is not a valid role for {self.__class__.__name__}",
             )
 
-    def append(self, node: T_BaseQGraphQLObject) -> None:
+    def append(self, node: T_BaseQGraphQLObjectWithID) -> None:
         count = self.rowCount()
         self.beginInsertRows(self.index(count), count, count)
         self._data.append(node)
@@ -164,7 +191,7 @@ class QGraphQListModel(QAbstractListModel, Generic[T_BaseQGraphQLObject]):
             self.endRemoveRows()
 
     @Slot(int, QObject)
-    def insert(self, index: int, v: T_BaseQGraphQLObject):
+    def insert(self, index: int, v: T_BaseQGraphQLObjectWithID):
         model_index = self.index(index)
         if index <= self.rowCount() - 1:
             self.beginInsertRows(model_index, index, index)

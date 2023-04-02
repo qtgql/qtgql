@@ -1,7 +1,9 @@
 from typing import Optional
 
 import pytest
-from PySide6.QtCore import Property, QObject
+from PySide6.QtCore import Property
+from PySide6.QtCore import QObject
+
 from qtgql.tools import qproperty
 
 

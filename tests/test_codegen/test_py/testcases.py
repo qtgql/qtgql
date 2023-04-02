@@ -2,32 +2,38 @@ import contextlib
 import importlib
 import sys
 import tempfile
+import traceback
 from functools import cached_property
 from pathlib import Path
 from textwrap import dedent
 from types import ModuleType
-from typing import TYPE_CHECKING, Optional, Type
+from typing import Optional
+from typing import Type
+from typing import TYPE_CHECKING
 
 import attrs
 import strawberry.utils
 from attr import define
 from PySide6.QtCore import QObject
+from strawberry import Schema
+
 from qtgql.codegen.introspection import SchemaEvaluator
 from qtgql.codegen.py.compiler.config import QtGqlConfig
 from qtgql.codegen.py.objecttype import QtGqlObjectTypeDefinition
-from qtgql.codegen.py.runtime.custom_scalars import (
-    BaseCustomScalar,
-    DateScalar,
-    DateTimeScalar,
-    DecimalScalar,
-    TimeScalar,
-)
-from qtgql.codegen.py.runtime.environment import _ENV_MAP, QtGqlEnvironment, set_gql_env
-from qtgql.codegen.py.runtime.queryhandler import BaseMutationHandler, BaseQueryHandler
+from qtgql.codegen.py.runtime.custom_scalars import BaseCustomScalar
+from qtgql.codegen.py.runtime.custom_scalars import DateScalar
+from qtgql.codegen.py.runtime.custom_scalars import DateTimeScalar
+from qtgql.codegen.py.runtime.custom_scalars import DecimalScalar
+from qtgql.codegen.py.runtime.custom_scalars import TimeScalar
+from qtgql.codegen.py.runtime.environment import _ENV_MAP
+from qtgql.codegen.py.runtime.environment import QtGqlEnvironment
+from qtgql.codegen.py.runtime.environment import set_gql_env
+from qtgql.codegen.py.runtime.queryhandler import BaseMutationHandler
+from qtgql.codegen.py.runtime.queryhandler import BaseQueryHandler
 from qtgql.gqltransport.client import GqlWsTransportClient
-from strawberry import Schema
-
-from tests.conftest import QmlBot, fake, hash_schema
+from tests.conftest import fake
+from tests.conftest import hash_schema
+from tests.conftest import QmlBot
 from tests.test_codegen import schemas
 
 if TYPE_CHECKING:
@@ -90,11 +96,13 @@ class QGQLObjectTestCase:
             try:
                 schema_mod = importlib.import_module(f"{gen_module_name}.objecttypes")
             except BaseException as e:
+                traceback.print_tb(e.__traceback__)
                 raise RuntimeError(generated["objecttypes"]) from e
 
             try:
                 handler_mod = importlib.import_module(f"{gen_module_name}.handlers")
             except BaseException as e:
+                traceback.print_tb(e.__traceback__)
                 raise RuntimeError(generated["handlers"]) from e
         testcase = CompiledTestCase(
             evaluator=self.evaluator,
@@ -649,6 +657,35 @@ SubscriptionTestCase = QGQLObjectTestCase(
     test_name="SubscriptionTestCase",
 )
 
+
+InterfaceFieldTestCase = QGQLObjectTestCase(
+    schema=schemas.interface_field.schema,
+    query="""
+    query MainQuery ($ret: TypesEnum! = Dog) {
+      node(ret: $ret) {
+        id
+        __typename
+        ... on HasNameAgeInterface {
+          name
+          age
+        }
+        ... on User {
+          password
+        }
+        ... on Dog {
+          barks
+        }
+      }
+    }
+    """,
+    test_name="InterfaceFieldTestCase",
+)
+
+ListOfInterfaceTestcase = QGQLObjectTestCase(
+    schema=schemas.list_of_interface.schema,
+    query=InterfaceFieldTestCase.query,
+    test_name="ListOfInterfaceTestcase",
+)
 all_test_cases = [
     ScalarsTestCase,
     DateTimeTestCase,

@@ -19,6 +19,7 @@ You can play-around and tell us what is wrong / missing / awesome :smile:.
 - [x] enums
 - [x] custom scalars
 - [x] Unions
+- [x] interfaces
 - [x] Garbage collection
 - [x] Type-safe Mutation handlers
 - [x] Type-safe Query handlers: queries your server when a component uses this query (or imperatively fetched).
@@ -28,6 +29,7 @@ it would compare the current data with data received and emit __only__ the signa
 - [x] Mutations.
 - [x] Subscriptions.
 - [x] Fully typed input variables.
+
 #### Helpers
 - [x] generic models that get created from dictionaries (with update, pop, insert implemented by default)
 - [x] `Property` classes that are accessible from QML, with dataclasses  syntax (using attrs)

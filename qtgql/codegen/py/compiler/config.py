@@ -1,13 +1,17 @@
 from functools import cached_property
 from pathlib import Path
-from typing import Callable, Type
+from typing import Callable
+from typing import Type
 
 from attrs import define
 
 from qtgql.codegen.introspection import SchemaEvaluator
-from qtgql.codegen.py.compiler.template import TemplateContext, schema_types_template
-from qtgql.codegen.py.runtime.bases import BaseGraphQLObject, _BaseQGraphQLObject
-from qtgql.codegen.py.runtime.custom_scalars import CUSTOM_SCALARS, CustomScalarMap
+from qtgql.codegen.py.compiler.template import schema_types_template
+from qtgql.codegen.py.compiler.template import TemplateContext
+from qtgql.codegen.py.runtime.bases import _BaseQGraphQLObject
+from qtgql.codegen.py.runtime.bases import BaseGraphQLObject
+from qtgql.codegen.py.runtime.custom_scalars import CUSTOM_SCALARS
+from qtgql.codegen.py.runtime.custom_scalars import CustomScalarMap
 
 
 @define(slots=False)

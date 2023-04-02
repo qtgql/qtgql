@@ -40,7 +40,7 @@ class MyApp(QObject):
 
     # expose the model to QML:
     @Property(type=QObject, constant=True)
-    def appleModel(self) -> GenricModel[Apple]:
+    def appleModel(self) -> GenericModel[Apple]:
         return self._apple_model
 
     def check_apple_color(self):

@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import asyncio
 import random
-from typing import TYPE_CHECKING, AsyncGenerator, Optional
+from typing import AsyncGenerator
+from typing import Optional
+from typing import TYPE_CHECKING
 
 import strawberry
 from aiohttp import web
@@ -23,16 +25,16 @@ fake = Faker()
 class Worm(Node):
     name: str = strawberry.field(default_factory=fake.name)
     family: str = strawberry.field(
-        default_factory=lambda: random.choice(
+        default_factory=lambda: random.choice(  # noqa: S311
             ["Platyhelminthes", "Annelida", "Nemertea", "Nematoda", "Acanthocephala"],
         ),
     )
-    size: int = strawberry.field(default_factory=lambda: random.randint(10, 100))
+    size: int = strawberry.field(default_factory=lambda: random.randint(10, 100))  # noqa: S311
 
 
 @strawberry.type
 class Apple(Node):
-    size: int = strawberry.field(default_factory=lambda: random.randint(10, 100))
+    size: int = strawberry.field(default_factory=lambda: random.randint(10, 100))  # noqa: S311
     owner: str = strawberry.field(default_factory=fake.name)
     worms: Optional[list[Worm]] = strawberry.field()
     color: str = strawberry.field(default_factory=fake.color)

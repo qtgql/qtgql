@@ -1,9 +1,11 @@
 import pytest
 from PySide6.QtNetwork import QAbstractSocket
 from PySide6.QtWebSockets import QWebSocketProtocol
-from qtgql.gqltransport.client import PROTOCOL, GqlWsTransportClient, SubscribeResponseMessage
-from qtgql.gqltransport.core import QueryPayload
 
+from qtgql.gqltransport.client import GqlWsTransportClient
+from qtgql.gqltransport.client import PROTOCOL
+from qtgql.gqltransport.client import SubscribeResponseMessage
+from qtgql.gqltransport.core import QueryPayload
 from tests.conftest import IS_WINDOWS
 from tests.test_gqltransport.conftest import get_subscription_str
 

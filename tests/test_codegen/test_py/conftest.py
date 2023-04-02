@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import uuid
 from types import ModuleType
-from typing import TYPE_CHECKING, Any, Callable
+from typing import Any
+from typing import Callable
+from typing import TYPE_CHECKING
 
 import pytest
 

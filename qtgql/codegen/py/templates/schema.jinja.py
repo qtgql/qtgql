@@ -9,17 +9,33 @@ from PySide6.QtQml import QmlElement, QmlSingleton
 
 from qtgql.codegen.py.runtime.queryhandler import SelectionConfig, OperationMetaData
 from qtgql.tools import qproperty
-from qtgql.codegen.py.runtime.bases import QGraphQListModel, NodeRecord, QGraphQLInputObjectABC
+from qtgql.codegen.py.runtime.bases import QGraphQListModel, NodeRecord, _BaseQGraphQLObjectWithID, _BaseQGraphQLObject, QGraphQLInputObjectABC, compare_node
 
 {% for dep in context.dependencies %}
 {{dep}}{% endfor %}
+{% macro init_and_props(type) %}
+    def __init__(self, parent: QObject = None, {% for f in type.fields %} {{f.name}}: Optional[{{f.annotation}}] = None, {% endfor %}):
+        super().__init__(parent){% for f in type.fields %}
+        self.{{  f.private_name  }} = {{f.name}} if {{f.name}} else {{f.default_value}}{% endfor %}
+    {%for f in type.fields %}
+    {{f.signal_name}} = Signal()
 
+    def {{f.setter_name}}(self, v: {{f.annotation}}) -> None:
+        self.{{f.private_name}} = v
+        self.{{f.signal_name}}.emit()
+
+    @qproperty(type={{f.property_type}}, fset={{f.setter_name}}, notify={{f.signal_name}})
+    def {{f.name}}(self) -> {{f.fget_annotation}}:
+        {{f.fget}}
+    {% endfor %}
+{% endmacro %}
 
 QML_IMPORT_NAME = "generated.{{context.config.env_name}}.types"
 QML_IMPORT_MAJOR_VERSION = 1
 
-__TYPE_MAP__: dict[str, type[{{context.base_object_name}}]] = {}
+__TYPE_MAP__: dict[str, type[_BaseQGraphQLObject]] = {}
 
+# ----------------------------------------- Enums -----------------------------------------
 
 {% for enum in context.enums %}
 class {{enum.name}}(Enum):
@@ -42,25 +58,31 @@ class SCALARS:
     {% for scalar in context.custom_scalars %}
     {{scalar}} = {{scalar}}{% endfor %}
 
+
+# ----------------------------------------- Interfaces -----------------------------------------
+{% for interface in context.interfaces -%}
+class {{interface.name}}({% for base in interface.implements %} {{base.name}}, {% endfor %}):
+
+    {{ init_and_props(interface) }}
+    @classmethod
+    def from_dict(cls, parent, data: dict, config: SelectionConfig, metadata: OperationMetaData) -> {{interface.name}}:
+        typename = data['__typename']
+        {% for impl in interface.implementations.values() -%}
+        if '{{impl.name}}' == typename:
+            return {{impl.name}}.from_dict(parent, data, config, metadata)
+        {% endfor %}
+
+{% endfor %}
+
+# ----------------------------------------- Object Types -----------------------------------------
+
 {% for type in context.types %}
-class {{ type.name }}({{context.base_object_name}}):
+class {{ type.name }}({% if type.has_id_field %}_BaseQGraphQLObjectWithID {% else %} _BaseQGraphQLObject {% endif %}, {% for base in type.implements %} {{base.name}}, {% endfor %}):
     """{{  type.docstring  }}"""
 
+    TYPE_NAME = "{{type.name}}"
 
-    def __init__(self, parent: QObject = None, {% for f in type.fields %} {{f.name}}: Optional[{{f.annotation}}] = None, {% endfor %}):
-        super().__init__(parent){% for f in type.fields %}
-        self.{{  f.private_name  }} = {{f.name}} if {{f.name}} else {{f.default_value}}{% endfor %}
-    {%for f in type.fields %}
-    {{f.signal_name}} = Signal()
-
-    def {{f.setter_name}}(self, v: {{f.annotation}}) -> None:
-        self.{{f.private_name}} = v
-        self.{{f.signal_name}}.emit()
-
-    @qproperty(type={{f.property_type}}, fset={{f.setter_name}}, notify={{f.signal_name}})
-    def {{f.name}}(self) -> {{f.fget_annotation}}:
-        {{f.fget}}
-    {% endfor %}
+    {{ init_and_props(type) }}
     
     def loose(self, metadata: OperationMetaData) -> None:
         metadata=metadata  {# no-op for types without children #}
@@ -115,7 +137,7 @@ class {{ type.name }}({{context.base_object_name}}):
 __TYPE_MAP__['{{ type.name }}'] = {{ type.name }}
 {% endfor %}
 
-{# --------- INPUT OBJECTS ---------- #}
+# ----------------------------------------- INPUT OBJECTS -----------------------------------------
 
 {% for type in context.input_objects %}
 class {{type.name}}(QGraphQLInputObjectABC):

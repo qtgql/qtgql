@@ -4,15 +4,16 @@ from unittest.mock import patch
 
 import pytest
 from PySide6 import QtCore
-from qtgql.tools.itemsystem import GenericModel, RoleDoesNotExist, RoleMapper, role
 
-from tests.test_itemsystem.conftest import (
-    CHILD,
-    FullClass,
-    WithChild,
-    init_dict_fullClass,
-    init_dict_withChild,
-)
+from qtgql.tools.itemsystem import GenericModel
+from qtgql.tools.itemsystem import role
+from qtgql.tools.itemsystem import RoleDoesNotExist
+from qtgql.tools.itemsystem import RoleMapper
+from tests.test_itemsystem.conftest import CHILD
+from tests.test_itemsystem.conftest import FullClass
+from tests.test_itemsystem.conftest import init_dict_fullClass
+from tests.test_itemsystem.conftest import init_dict_withChild
+from tests.test_itemsystem.conftest import WithChild
 
 
 def test_has_dunder_roles(full_model):

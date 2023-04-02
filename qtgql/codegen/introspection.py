@@ -2,50 +2,45 @@ from __future__ import annotations
 
 import warnings
 from functools import cached_property
-from typing import (
-    TYPE_CHECKING,
-    List,
-    Optional,
-    TypedDict,
-    Union,
-)
+from typing import List
+from typing import Optional
+from typing import TYPE_CHECKING
+from typing import TypedDict
+from typing import Union
 
 import graphql
-from graphql import OperationType
 from graphql import language as gql_lang
+from graphql import OperationType
 from graphql.language import visitor
 from graphql.type import definition as gql_def
 
-from qtgql.codegen.graphql_ref import (
-    is_enum_definition,
-    is_input_definition,
-    is_list_definition,
-    is_named_type_node,
-    is_non_null_definition,
-    is_nonnull_node,
-    is_object_definition,
-    is_operation_def_node,
-    is_scalar_definition,
-    is_union_definition,
-)
+from qtgql.codegen.graphql_ref import is_enum_definition
+from qtgql.codegen.graphql_ref import is_input_definition
+from qtgql.codegen.graphql_ref import is_interface_definition
+from qtgql.codegen.graphql_ref import is_list_definition
+from qtgql.codegen.graphql_ref import is_named_type_node
+from qtgql.codegen.graphql_ref import is_non_null_definition
+from qtgql.codegen.graphql_ref import is_nonnull_node
+from qtgql.codegen.graphql_ref import is_object_definition
+from qtgql.codegen.graphql_ref import is_operation_def_node
+from qtgql.codegen.graphql_ref import is_scalar_definition
+from qtgql.codegen.graphql_ref import is_union_definition
 from qtgql.codegen.py.compiler.builtin_scalars import BuiltinScalars
-from qtgql.codegen.py.compiler.query import QtGqlOperationDefinition, QtGqlQueriedField
-from qtgql.codegen.py.compiler.template import (
-    TemplateContext,
-    handlers_template,
-    schema_types_template,
-)
-from qtgql.codegen.py.objecttype import (
-    EnumMap,
-    EnumValue,
-    GqlTypeHinter,
-    QtGqlEnumDefinition,
-    QtGqlFieldDefinition,
-    QtGqlInputFieldDefinition,
-    QtGqlInputObjectTypeDefinition,
-    QtGqlObjectTypeDefinition,
-    QtGqlVariableDefinition,
-)
+from qtgql.codegen.py.compiler.operation import QtGqlOperationDefinition
+from qtgql.codegen.py.compiler.operation import QtGqlQueriedField
+from qtgql.codegen.py.compiler.template import handlers_template
+from qtgql.codegen.py.compiler.template import schema_types_template
+from qtgql.codegen.py.compiler.template import TemplateContext
+from qtgql.codegen.py.objecttype import EnumMap
+from qtgql.codegen.py.objecttype import EnumValue
+from qtgql.codegen.py.objecttype import GqlTypeHinter
+from qtgql.codegen.py.objecttype import QtGqlEnumDefinition
+from qtgql.codegen.py.objecttype import QtGqlFieldDefinition
+from qtgql.codegen.py.objecttype import QtGqlInputFieldDefinition
+from qtgql.codegen.py.objecttype import QtGqlInputObjectTypeDefinition
+from qtgql.codegen.py.objecttype import QtGqlInterfaceDefinition
+from qtgql.codegen.py.objecttype import QtGqlObjectTypeDefinition
+from qtgql.codegen.py.objecttype import QtGqlVariableDefinition
 from qtgql.codegen.utils import anti_forward_ref
 from qtgql.exceptions import QtGqlException
 
@@ -82,6 +77,8 @@ class QtGqlVisitor(visitor.Visitor):
         return QtGqlQueriedField.from_field(
             root_type.fields_dict[gql_field.name.value],
             gql_field.selection_set,
+            self.evaluator,
+            parent_interface_field=None,
         )
 
     def _parse_variable_definition(
@@ -119,6 +116,7 @@ class QtGqlVisitor(visitor.Visitor):
                     )
                     operation_definition = QtGqlOperationDefinition(
                         query=graphql.print_ast(node),
+                        operation_type=self.evaluator._query_type,
                         name=op_name,
                         field=root_qtgql_field,
                         directives=node.directives,
@@ -135,6 +133,7 @@ class QtGqlVisitor(visitor.Visitor):
                     )
                     operation_definition = QtGqlOperationDefinition(
                         query=graphql.print_ast(node),
+                        operation_type=self.evaluator._mutation_type,
                         name=op_name,
                         field=root_qtgql_field,
                         directives=node.directives,
@@ -152,6 +151,7 @@ class QtGqlVisitor(visitor.Visitor):
                     )
                     operation_definition = QtGqlOperationDefinition(
                         query=graphql.print_ast(node),
+                        operation_type=self.evaluator._subscription_type,
                         name=op_name,
                         field=root_qtgql_field,
                         directives=node.directives,
@@ -166,12 +166,19 @@ class SchemaEvaluator:
         self._objecttypes_def_map: dict[str, QtGqlObjectTypeDefinition] = {}
         self._enums_def_map: EnumMap = {}
         self._input_objects_def_map: dict[str, QtGqlInputObjectTypeDefinition] = {}
+        self._interfaces_map: dict[str, QtGqlInterfaceDefinition] = {}
         self._query_handlers: dict[str, QtGqlOperationDefinition] = {}
         self._mutation_handlers: dict[str, QtGqlOperationDefinition] = {}
         self._subscription_handlers: dict[str, QtGqlOperationDefinition] = {}
         self._query_type: Optional[QtGqlObjectTypeDefinition] = None
         self._mutation_type: Optional[QtGqlObjectTypeDefinition] = None
         self._subscription_type: Optional[QtGqlObjectTypeDefinition] = None
+
+    def get_interface_by_name(self, name: str) -> Optional[QtGqlInterfaceDefinition]:
+        return self._interfaces_map.get(name, None)
+
+    def get_objecttype_by_name(self, name: str) -> Optional[QtGqlObjectTypeDefinition]:
+        return self._objecttypes_def_map.get(name, None)
 
     def get_type(self, node: gql_lang.TypeNode) -> GqlTypeHinter:
         if nonnull := is_nonnull_node(node):
@@ -243,6 +250,11 @@ class SchemaEvaluator:
             assert isinstance(concrete, gql_def.GraphQLInputObjectType)
             ret = GqlTypeHinter(type=self._evaluate_input_type(input_def))
 
+        elif interface_def := is_interface_definition(t):
+            ret = GqlTypeHinter(
+                type=self._evaluate_interface_type(interface_def),
+                of_type=(),
+            )
         if not ret:  # pragma: no cover
             raise NotImplementedError(f"type {t} not supported yet")
 
@@ -304,8 +316,11 @@ class SchemaEvaluator:
                     f"type {type_} does not not define an id field.\n"
                     f"fields: {type_.fields}",
                 )
+        implements = [self._evaluate_interface_type(interface) for interface in type_.interfaces]
+
         ret = QtGqlObjectTypeDefinition(
             name=t_name,
+            implements=implements,
             docstring=type_.description,
             fields_dict={
                 name: self._evaluate_field(name, field) for name, field in type_.fields.items()
@@ -313,9 +328,15 @@ class SchemaEvaluator:
         )
         assert ret not in self.root_types
         self._objecttypes_def_map[ret.name] = ret
+        for interface in type_.interfaces:
+            qtgql_interface = self._evaluate_interface_type(interface)
+            qtgql_interface.implementations[type_.name] = ret
         return ret
 
-    def _evaluate_input_type(self, type_: gql_def.GraphQLInputObjectType):
+    def _evaluate_input_type(
+        self,
+        type_: gql_def.GraphQLInputObjectType,
+    ) -> QtGqlInputObjectTypeDefinition:
         ret = self._input_objects_def_map.get(type_.name, None)
         if not ret:
             ret = QtGqlInputObjectTypeDefinition(
@@ -329,19 +350,40 @@ class SchemaEvaluator:
             self._input_objects_def_map[ret.name] = ret
         return ret
 
+    def _evaluate_interface_type(
+        self,
+        interface: gql_def.GraphQLInterfaceType,
+    ) -> QtGqlInterfaceDefinition:
+        if ret := self._interfaces_map.get(interface.name, None):
+            return ret
+        implements = [self._evaluate_interface_type(base) for base in interface.interfaces]
+        ret = QtGqlInterfaceDefinition(
+            name=interface.name,
+            implements=implements,
+            docstring=interface.description,
+            fields_dict={
+                name: self._evaluate_field(name, field) for name, field in interface.fields.items()
+            },
+        )
+        self._interfaces_map[ret.name] = ret
+        return ret
+
     def _evaluate_enum(self, enum: gql_def.GraphQLEnumType) -> Optional[QtGqlEnumDefinition]:
         name: str = enum.name
 
-        if self._enums_def_map.get(name, None):
-            return None
+        if definition := self._enums_def_map.get(name, None):
+            return definition
 
-        return QtGqlEnumDefinition(
+        ret = QtGqlEnumDefinition(
             name=name,
             members=[
                 EnumValue(name=name, description=val.description or "")
                 for name, val in enum.values.items()
             ],
         )
+
+        self._enums_def_map[name] = ret
+        return ret
 
     def parse_schema_concretes(self) -> None:
         for name, type_ in self.schema_definition.type_map.items():
@@ -387,6 +429,7 @@ class SchemaEvaluator:
                 if name not in BuiltinScalars.keys()
             ],
             queries=list(self._query_handlers.values()),
+            interfaces=list(self._interfaces_map.values()),
             mutations=list(self._mutation_handlers.values()),
             subscriptions=list(self._subscription_handlers.values()),
             input_objects=list(self._input_objects_def_map.values()),

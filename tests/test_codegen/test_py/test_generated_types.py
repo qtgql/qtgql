@@ -3,49 +3,53 @@ import dataclasses
 import decimal
 import uuid
 import weakref
-from datetime import datetime, timezone
-from typing import Optional, Type
+from datetime import datetime
+from datetime import timezone
+from typing import Optional
+from typing import Type
 
 import pytest
 import pytestqt.exceptions
-from qtgql.codegen.introspection import introspection_query
-from qtgql.codegen.py.compiler.builtin_scalars import BuiltinScalar, BuiltinScalars
-from qtgql.codegen.py.runtime.bases import QGraphQListModel, _BaseQGraphQLObject
-from qtgql.codegen.py.runtime.custom_scalars import (
-    BaseCustomScalar,
-    DateScalar,
-    DateTimeScalar,
-    DecimalScalar,
-    TimeScalar,
-)
-from qtgql.codegen.py.runtime.queryhandler import BaseSubscriptionHandler, SelectionConfig
 from typingref import TypeHinter
 
+from qtgql.codegen.introspection import introspection_query
+from qtgql.codegen.py.compiler.builtin_scalars import BuiltinScalar
+from qtgql.codegen.py.compiler.builtin_scalars import BuiltinScalars
+from qtgql.codegen.py.runtime.bases import _BaseQGraphQLObject
+from qtgql.codegen.py.runtime.bases import QGraphQListModel
+from qtgql.codegen.py.runtime.bases import QGraphQLObjectStore
+from qtgql.codegen.py.runtime.custom_scalars import BaseCustomScalar
+from qtgql.codegen.py.runtime.custom_scalars import DateScalar
+from qtgql.codegen.py.runtime.custom_scalars import DateTimeScalar
+from qtgql.codegen.py.runtime.custom_scalars import DecimalScalar
+from qtgql.codegen.py.runtime.custom_scalars import TimeScalar
+from qtgql.codegen.py.runtime.queryhandler import BaseSubscriptionHandler
+from qtgql.codegen.py.runtime.queryhandler import SelectionConfig
 from tests.conftest import fake
 from tests.mini_gql_server import schema
-from tests.test_codegen.test_py.testcases import (
-    CustomScalarInputTestCase,
-    DateTimeTestCase,
-    EnumTestCase,
-    InterfaceTestCase,
-    NestedObjectTestCase,
-    ObjectsThatReferenceEachOtherTestCase,
-    ObjectWithListOfObjectTestCase,
-    OperationVariableTestCase,
-    OptionalInputTestCase,
-    OptionalNestedObjectTestCase,
-    QGQLObjectTestCase,
-    RootEnumTestCase,
-    RootListOfTestCase,
-    RootTypeNoIDTestCase,
-    ScalarsTestCase,
-    SubscriptionTestCase,
-    TypeWithNoIDTestCase,
-    TypeWithNullAbleIDTestCase,
-    UnionTestCase,
-    all_test_cases,
-    custom_scalar_testcases,
-)
+from tests.test_codegen.test_py.testcases import all_test_cases
+from tests.test_codegen.test_py.testcases import custom_scalar_testcases
+from tests.test_codegen.test_py.testcases import CustomScalarInputTestCase
+from tests.test_codegen.test_py.testcases import DateTimeTestCase
+from tests.test_codegen.test_py.testcases import EnumTestCase
+from tests.test_codegen.test_py.testcases import InterfaceFieldTestCase
+from tests.test_codegen.test_py.testcases import InterfaceTestCase
+from tests.test_codegen.test_py.testcases import ListOfInterfaceTestcase
+from tests.test_codegen.test_py.testcases import NestedObjectTestCase
+from tests.test_codegen.test_py.testcases import ObjectsThatReferenceEachOtherTestCase
+from tests.test_codegen.test_py.testcases import ObjectWithListOfObjectTestCase
+from tests.test_codegen.test_py.testcases import OperationVariableTestCase
+from tests.test_codegen.test_py.testcases import OptionalInputTestCase
+from tests.test_codegen.test_py.testcases import OptionalNestedObjectTestCase
+from tests.test_codegen.test_py.testcases import QGQLObjectTestCase
+from tests.test_codegen.test_py.testcases import RootEnumTestCase
+from tests.test_codegen.test_py.testcases import RootListOfTestCase
+from tests.test_codegen.test_py.testcases import RootTypeNoIDTestCase
+from tests.test_codegen.test_py.testcases import ScalarsTestCase
+from tests.test_codegen.test_py.testcases import SubscriptionTestCase
+from tests.test_codegen.test_py.testcases import TypeWithNoIDTestCase
+from tests.test_codegen.test_py.testcases import TypeWithNullAbleIDTestCase
+from tests.test_codegen.test_py.testcases import UnionTestCase
 
 
 @pytest.fixture
@@ -57,6 +61,13 @@ def introspected():
 def test_init_no_arguments(testcase: QGQLObjectTestCase):
     with testcase.compile() as testcase:
         assert isinstance(testcase.gql_type(None), _BaseQGraphQLObject)
+
+
+def test_has_type_name_const_property(qtbot):
+    with ScalarsTestCase.compile() as testcase:
+        user_klass = testcase.get_attr("User")
+        inst = user_klass(None)
+        assert inst.property("typename") == user_klass.__name__
 
 
 class TestAnnotations:
@@ -274,6 +285,21 @@ class TestDeserializers:
             handler = testcase.query_handler
             handler.on_data(testcase.initialize_dict)
             assert handler.data.name == "Connected"
+
+    def test_interface_field(self, qtbot):
+        with InterfaceFieldTestCase.compile() as testcase:
+            d = testcase.initialize_dict
+            qh = testcase.query_handler
+            assert not qh._data
+            qh.on_data(d)
+            assert qh._data
+
+    def test_list_of_interface(self, qtbot):
+        with ListOfInterfaceTestcase.compile() as testcase:
+            qh = testcase.query_handler
+            assert not qh._data
+            qh.on_data(testcase.initialize_dict)
+            assert qh._data
 
 
 class TestUpdates:
@@ -546,6 +572,28 @@ class TestUpdates:
             ):
                 handler.on_data(init_dict2)
 
+    def test_interface_field(self, qtbot):
+        with InterfaceFieldTestCase.compile() as testcase:
+            d = testcase.initialize_dict
+            qh = testcase.query_handler
+            assert not qh._data
+            qh.on_data(d)
+            assert qh._data.TYPE_NAME == "Dog"
+            d = testcase.schema.execute_sync(testcase.query.replace("= Dog", "= User")).data
+            qh.on_data(d)
+            assert qh._data.TYPE_NAME == "User"
+
+    def test_list_of_interface(self, qtbot):
+        with ListOfInterfaceTestcase.compile() as testcase:
+            d = testcase.initialize_dict
+            qh = testcase.query_handler
+            assert not qh._data
+            qh.on_data(d)
+            assert qh._data._data[0].TYPE_NAME == "Dog"
+            d = testcase.schema.execute_sync(testcase.query.replace("= Dog", "= User")).data
+            qh.on_data(d)
+            assert qh._data._data[0].TYPE_NAME == "User"
+
 
 class TestDefaultConstructor:
     @pytest.mark.parametrize("scalar", BuiltinScalars, ids=lambda v: v.graphql_name)
@@ -675,6 +723,21 @@ class TestGarbageCollection:
             handler.loose()
             qtbot.wait_until(lambda: not union_node())
 
+    def test_list_of_interface(self, qtbot):
+        with ListOfInterfaceTestcase.compile() as testcase:
+            d = testcase.initialize_dict
+            qh = testcase.query_handler
+            assert not qh._data
+            qh.on_data(d)
+            assert qh._data.rowCount()
+            ids = [node._id for node in qh._data._data]
+            store: QGraphQLObjectStore = qh._data._data[0].__store__
+            for i in ids:
+                assert store.get_node(i)
+            qh.loose()
+            for i in ids:
+                assert not store.get_node(i)
+
     def test_duplicate_object_on_same_handler(self, qtbot, monkeypatch):
         monkeypatch.setattr(
             ObjectWithListOfObjectTestCase,
@@ -690,6 +753,17 @@ class TestGarbageCollection:
             del person
             handler.loose()
             qtbot.wait_until(lambda: not p1())
+
+    def test_interface(self, qtbot):
+        with InterfaceFieldTestCase.compile() as testcase:
+            d = testcase.initialize_dict
+            qh = testcase.query_handler
+            assert not qh._data
+            qh.on_data(d)
+            assert qh._data
+            node = weakref.ref(qh._data)
+            qh.loose()
+            qtbot.wait_until(lambda: not node())
 
 
 class TestOperationVariables:

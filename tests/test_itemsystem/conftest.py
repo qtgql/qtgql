@@ -3,7 +3,11 @@ from __future__ import annotations
 from uuid import uuid4
 
 import pytest
-from qtgql.tools.itemsystem import GenericModel, _BaseType, get_base_type, role
+
+from qtgql.tools.itemsystem import _BaseType
+from qtgql.tools.itemsystem import GenericModel
+from qtgql.tools.itemsystem import get_base_type
+from qtgql.tools.itemsystem import role
 
 NORMAL_GQL = "normal_gql"
 NORMAL_GQL_CAMELIZED = "normalGql"

@@ -1,14 +1,13 @@
 from typing import Optional
 
 import pytest
-from qtgql.codegen.py.runtime.queryhandler import BaseOperationHandler, QmlOperationConsumerABC
 
+from qtgql.codegen.py.runtime.queryhandler import BaseOperationHandler
+from qtgql.codegen.py.runtime.queryhandler import QmlOperationConsumerABC
 from tests.conftest import IS_WINDOWS
-from tests.test_codegen.test_py.testcases import (
-    OperationErrorTestCase,
-    OperationVariableTestCase,
-    ScalarsTestCase,
-)
+from tests.test_codegen.test_py.testcases import OperationErrorTestCase
+from tests.test_codegen.test_py.testcases import OperationVariableTestCase
+from tests.test_codegen.test_py.testcases import ScalarsTestCase
 
 
 def test_data_fetched(qmlbot, schemas_server):
@@ -84,8 +83,8 @@ class TestQQuickOperationConsumerComp:
     def test_has_handler_prop(self, qmlbot, schemas_server):
         with ScalarsTestCase.compile(schemas_server.address) as testcase:
             testcase.load_qml(qmlbot)
-            operation_wraper = qmlbot.qquickiew.findChildren(QmlOperationConsumerABC)[0]
-            assert isinstance(operation_wraper.property("handler"), BaseOperationHandler)
+            operation_wrapper = qmlbot.qquickiew.findChildren(QmlOperationConsumerABC)[0]
+            assert isinstance(operation_wrapper.property("handler"), BaseOperationHandler)
             qmlbot.cleanup()
 
     def test_mutation_handler(self, qmlbot, schemas_server):

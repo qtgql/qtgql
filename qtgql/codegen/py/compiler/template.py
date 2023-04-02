@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 import inspect
-from typing import TYPE_CHECKING, Any
+from typing import Any
+from typing import TYPE_CHECKING
 
 from attrs import define
-from jinja2 import Environment, PackageLoader, select_autoescape
+from jinja2 import Environment
+from jinja2 import PackageLoader
+from jinja2 import select_autoescape
 
 if TYPE_CHECKING:  # pragma: no cover
     from qtgql.codegen.py.compiler.config import QtGqlConfig
@@ -12,6 +15,7 @@ if TYPE_CHECKING:  # pragma: no cover
     from qtgql.codegen.py.objecttype import (
         QtGqlEnumDefinition,
         QtGqlInputObjectTypeDefinition,
+        QtGqlInterfaceDefinition,
         QtGqlObjectTypeDefinition,
     )
 
@@ -26,6 +30,7 @@ CONFIG_TEMPLATE = template_env.get_template("config.jinja.py")
 class TemplateContext:
     enums: list[QtGqlEnumDefinition]
     types: list[QtGqlObjectTypeDefinition]
+    interfaces: list[QtGqlInterfaceDefinition]
     queries: list[QtGqlOperationDefinition]
     mutations: list[QtGqlOperationDefinition]
     subscriptions: list[QtGqlOperationDefinition]

@@ -1,7 +1,12 @@
-from PySide6.QtCore import Property, QObject, QTimer, Signal
-from qtgql.tools import slot
-from qtgql.tools.itemsystem import GenericModel, get_base_type, role
+from PySide6.QtCore import Property
+from PySide6.QtCore import QObject
+from PySide6.QtCore import QTimer
+from PySide6.QtCore import Signal
 
+from qtgql.tools import slot
+from qtgql.tools.itemsystem import GenericModel
+from qtgql.tools.itemsystem import get_base_type
+from qtgql.tools.itemsystem import role
 from tests.conftest import fake
 
 schema = get_base_type()
