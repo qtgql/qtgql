@@ -32,10 +32,6 @@ class QGraphQLInputObjectABC(QObject):
 class _BaseQGraphQLObject(QObject):
     TYPE_NAME: ClassVar[str]
     __singleton__: Self
-    __store__: ClassVar[QGraphQLObjectStore[Self]]
-
-    def __init_subclass__(cls, **kwargs):
-        cls.__store__ = QGraphQLObjectStore()
 
     def __init__(self, parent: Optional[QObject] = None):
         super().__init__(parent)
@@ -79,11 +75,20 @@ class _BaseQGraphQLObject(QObject):
             return cls.__singleton__
 
 
-T_BaseQGraphQLObject = TypeVar("T_BaseQGraphQLObject", bound=_BaseQGraphQLObject)
+class _BaseQGraphQLObjectWithID(_BaseQGraphQLObject):
+    _id: str
+
+    __store__: ClassVar[QGraphQLObjectStore[Self]]
+
+    def __init_subclass__(cls, **kwargs):
+        cls.__store__ = QGraphQLObjectStore()
+
+
+T_BaseQGraphQLObject = TypeVar("T_BaseQGraphQLObject", bound=_BaseQGraphQLObjectWithID)
 
 
 class NodeRecord(NamedTuple):
-    node: _BaseQGraphQLObject
+    node: _BaseQGraphQLObjectWithID
     retainers: set[str]  # set of operation names.
 
     def retain(self, operation_name: str) -> Self:
@@ -101,18 +106,18 @@ class QGraphQLObjectStore(Generic[T_BaseQGraphQLObject]):
             return found.node
 
     def add_record(self, record: NodeRecord):
-        assert record.node.id
-        self._data[record.node.id] = record
+        assert record.node._id
+        self._data[record.node._id] = record
 
     def loose(self, node: T_BaseQGraphQLObject, operation_name: str) -> None:
-        assert node.id
+        assert node._id
         with contextlib.suppress(
             KeyError,
         ):  # This node was already deleted, we can safely ignore it
-            record = self._data[node.id]
+            record = self._data[node._id]
             record.retainers.remove(operation_name)
             if not record.retainers:
-                self._data.pop(node.id)
+                self._data.pop(node._id)
                 node.deleteLater()  # we can delete it now since it has no retainers.
 
 

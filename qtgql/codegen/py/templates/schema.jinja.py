@@ -9,7 +9,7 @@ from PySide6.QtQml import QmlElement, QmlSingleton
 
 from qtgql.codegen.py.runtime.queryhandler import SelectionConfig, OperationMetaData
 from qtgql.tools import qproperty
-from qtgql.codegen.py.runtime.bases import QGraphQListModel, NodeRecord, QGraphQLInputObjectABC
+from qtgql.codegen.py.runtime.bases import QGraphQListModel, NodeRecord, _BaseQGraphQLObjectWithID, _BaseQGraphQLObject, QGraphQLInputObjectABC
 
 {% for dep in context.dependencies %}
 {{dep}}{% endfor %}
@@ -60,7 +60,7 @@ class {{interface.name}}({% for base in interface.implements %} {{base.name}}, {
 # ----------------------------------------- Object Types -----------------------------------------
 
 {% for type in context.types %}
-class {{ type.name }}({{context.base_object_name}}, {% for base in type.implements %} {{base.name}}, {% endfor %}):
+class {{ type.name }}({% if type.has_id_field %}_BaseQGraphQLObjectWithID {% else %} _BaseQGraphQLObject {% endif %}, {% for base in type.implements %} {{base.name}}, {% endfor %}):
     """{{  type.docstring  }}"""
 
     TYPE_NAME = "{{type.name}}"

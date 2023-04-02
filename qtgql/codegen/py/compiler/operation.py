@@ -57,7 +57,7 @@ class UniqueFieldsList(list["QtGqlQueriedField"]):
                 pass
         super().append(obj)
 
-    def extend(self, other: UniqueFieldsList) -> None:
+    def extend(self, other) -> None:
         for v in other:
             self.append(v)
 
@@ -109,6 +109,7 @@ class QtGqlQueriedField(QtGqlFieldDefinition):
 
                 type_name = fragment.type_condition.name.value
                 concrete = schema_evaluator.get_objecttype_by_name(type_name)
+                assert concrete
                 if not has_typename_selection(fragment.selection_set):
                     inject_typename_selection(fragment.selection_set)
                 if not has_id_selection(fragment.selection_set) and concrete.has_id_field:

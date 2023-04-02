@@ -13,6 +13,7 @@ This library is an attempt to provide a high-level graphql client to the QT worl
     - [x] Enums
     - [x] Custom scalars
     - [x] Unions
+    - [x] interfaces
     - [x] Garbage collection
     - [x] Garbage collection
     - [x] Type-safe Mutation handlers
