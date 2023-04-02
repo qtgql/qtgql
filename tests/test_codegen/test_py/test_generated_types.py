@@ -33,6 +33,7 @@ from tests.test_codegen.test_py.testcases import DateTimeTestCase
 from tests.test_codegen.test_py.testcases import EnumTestCase
 from tests.test_codegen.test_py.testcases import InterfaceFieldTestCase
 from tests.test_codegen.test_py.testcases import InterfaceTestCase
+from tests.test_codegen.test_py.testcases import ListOfInterfaceTestcase
 from tests.test_codegen.test_py.testcases import NestedObjectTestCase
 from tests.test_codegen.test_py.testcases import ObjectsThatReferenceEachOtherTestCase
 from tests.test_codegen.test_py.testcases import ObjectWithListOfObjectTestCase
@@ -290,6 +291,13 @@ class TestDeserializers:
             qh = testcase.query_handler
             assert not qh._data
             qh.on_data(d)
+            assert qh._data
+
+    def test_list_of_interface(self, qtbot):
+        with ListOfInterfaceTestcase.compile() as testcase:
+            qh = testcase.query_handler
+            assert not qh._data
+            qh.on_data(testcase.initialize_dict)
             assert qh._data
 
 
@@ -573,6 +581,17 @@ class TestUpdates:
             d = testcase.schema.execute_sync(testcase.query.replace("= Dog", "= User")).data
             qh.on_data(d)
             assert qh._data.TYPE_NAME == "User"
+
+    def test_list_of_interface(self, qtbot):
+        with ListOfInterfaceTestcase.compile() as testcase:
+            d = testcase.initialize_dict
+            qh = testcase.query_handler
+            assert not qh._data
+            qh.on_data(d)
+            assert qh._data._data[0].TYPE_NAME == "Dog"
+            d = testcase.schema.execute_sync(testcase.query.replace("= Dog", "= User")).data
+            qh.on_data(d)
+            assert qh._data._data[0].TYPE_NAME == "User"
 
 
 class TestDefaultConstructor:

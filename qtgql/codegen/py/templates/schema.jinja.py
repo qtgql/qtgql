@@ -9,7 +9,7 @@ from PySide6.QtQml import QmlElement, QmlSingleton
 
 from qtgql.codegen.py.runtime.queryhandler import SelectionConfig, OperationMetaData
 from qtgql.tools import qproperty
-from qtgql.codegen.py.runtime.bases import QGraphQListModel, NodeRecord, _BaseQGraphQLObjectWithID, _BaseQGraphQLObject, QGraphQLInputObjectABC
+from qtgql.codegen.py.runtime.bases import QGraphQListModel, NodeRecord, _BaseQGraphQLObjectWithID, _BaseQGraphQLObject, QGraphQLInputObjectABC, compare_node
 
 {% for dep in context.dependencies %}
 {{dep}}{% endfor %}

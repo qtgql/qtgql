@@ -92,7 +92,7 @@ class QtGqlQueriedField(QtGqlFieldDefinition):
             tp = tp.strip_optionals(tp)
             tp = tp.of_type[0]
 
-        tp_is_union = tp.is_union()
+        tp_is_union = tp.is_union
 
         # inject id selection for types that supports it. unions are handled below.
         if f.can_select_id and not has_id_selection(selection_set):

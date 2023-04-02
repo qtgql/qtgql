@@ -84,7 +84,14 @@ class _BaseQGraphQLObjectWithID(_BaseQGraphQLObject):
         cls.__store__ = QGraphQLObjectStore()
 
 
-T_BaseQGraphQLObject = TypeVar("T_BaseQGraphQLObject", bound=_BaseQGraphQLObjectWithID)
+T_BaseQGraphQLObjectWithID = TypeVar("T_BaseQGraphQLObjectWithID", bound=_BaseQGraphQLObjectWithID)
+
+
+def compare_node(node: T_BaseQGraphQLObjectWithID, id_: str, typename: Optional[str] = None):
+    if node._id == id_:
+        if typename and node.TYPE_NAME != typename:
+            return False
+        return True
 
 
 class NodeRecord(NamedTuple):
@@ -96,7 +103,7 @@ class NodeRecord(NamedTuple):
         return self
 
 
-class QGraphQLObjectStore(Generic[T_BaseQGraphQLObject]):
+class QGraphQLObjectStore(Generic[T_BaseQGraphQLObjectWithID]):
     def __init__(self) -> None:
         self._data: dict[str, NodeRecord] = {}
 
@@ -109,7 +116,7 @@ class QGraphQLObjectStore(Generic[T_BaseQGraphQLObject]):
         assert record.node._id
         self._data[record.node._id] = record
 
-    def loose(self, node: T_BaseQGraphQLObject, operation_name: str) -> None:
+    def loose(self, node: T_BaseQGraphQLObjectWithID, operation_name: str) -> None:
         assert node._id
         with contextlib.suppress(
             KeyError,
@@ -121,7 +128,7 @@ class QGraphQLObjectStore(Generic[T_BaseQGraphQLObject]):
                 node.deleteLater()  # we can delete it now since it has no retainers.
 
 
-class QGraphQListModel(QAbstractListModel, Generic[T_BaseQGraphQLObject]):
+class QGraphQListModel(QAbstractListModel, Generic[T_BaseQGraphQLObjectWithID]):
     OBJECT_ROLE = Qt.ItemDataRole.UserRole + 1
     _role_names = {OBJECT_ROLE: QByteArray("object")}  # type: ignore
     currentIndexChanged = Signal()
@@ -129,7 +136,7 @@ class QGraphQListModel(QAbstractListModel, Generic[T_BaseQGraphQLObject]):
     def __init__(
         self,
         parent: Optional[QObject],
-        data: list[T_BaseQGraphQLObject],
+        data: list[T_BaseQGraphQLObjectWithID],
     ):
         super().__init__(parent)
         self._data = data
@@ -145,7 +152,7 @@ class QGraphQListModel(QAbstractListModel, Generic[T_BaseQGraphQLObject]):
         return self._current_index
 
     @qproperty(QObject, notify=currentIndexChanged)  # type: ignore
-    def currentObject(self) -> Optional[T_BaseQGraphQLObject]:
+    def currentObject(self) -> Optional[T_BaseQGraphQLObjectWithID]:
         return self._data[self._current_index]
 
     def rowCount(self, *args, **kwargs) -> int:
@@ -154,7 +161,7 @@ class QGraphQListModel(QAbstractListModel, Generic[T_BaseQGraphQLObject]):
     def roleNames(self) -> dict:
         return self._role_names  # type: ignore
 
-    def data(self, index, role=...) -> Optional[T_BaseQGraphQLObject]:
+    def data(self, index, role=...) -> Optional[T_BaseQGraphQLObjectWithID]:
         if index.row() < len(self._data) and index.isValid():
             if role == self.OBJECT_ROLE:
                 return self._data[index.row()]
@@ -162,7 +169,7 @@ class QGraphQListModel(QAbstractListModel, Generic[T_BaseQGraphQLObject]):
                 f"role {role} is not a valid role for {self.__class__.__name__}",
             )
 
-    def append(self, node: T_BaseQGraphQLObject) -> None:
+    def append(self, node: T_BaseQGraphQLObjectWithID) -> None:
         count = self.rowCount()
         self.beginInsertRows(self.index(count), count, count)
         self._data.append(node)
@@ -184,7 +191,7 @@ class QGraphQListModel(QAbstractListModel, Generic[T_BaseQGraphQLObject]):
             self.endRemoveRows()
 
     @Slot(int, QObject)
-    def insert(self, index: int, v: T_BaseQGraphQLObject):
+    def insert(self, index: int, v: T_BaseQGraphQLObjectWithID):
         model_index = self.index(index)
         if index <= self.rowCount() - 1:
             self.beginInsertRows(model_index, index, index)

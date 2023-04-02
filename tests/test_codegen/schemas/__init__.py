@@ -1,5 +1,6 @@
 from . import custom_scalar_input_schema
 from . import interface_field
+from . import list_of_interface
 from . import list_of_union
 from . import mutation_schema
 from . import object_reference_each_other
@@ -58,4 +59,5 @@ __all__ = [  # noqa: PLE0604
     operation_error,
     subscription_schema,
     interface_field,
+    list_of_interface,
 ]

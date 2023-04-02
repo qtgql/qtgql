@@ -139,7 +139,7 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
                 self.type.is_model
                 or self.type.is_object_type
                 or self.type.is_interface
-                or self.type.is_union()
+                or self.type.is_union
             )
             return "QObject"
 
@@ -245,6 +245,10 @@ class GqlTypeHinter(TypeHinter):
         self.of_type: tuple[GqlTypeHinter, ...] = of_type
 
     @property
+    def is_union(self) -> bool:
+        return super().is_union()
+
+    @property
     def is_object_type(self) -> Optional[QtGqlObjectTypeDefinition]:
         t_self = optional_maybe(self).type
         if self.is_interface:
@@ -314,7 +318,7 @@ class GqlTypeHinter(TypeHinter):
             return f"{QGraphQListModel.__name__}[{model_of.annotation(scalars)}]"
         if object_def := t_self.is_object_type or t_self.is_interface:
             return f"Optional[{object_def.name}]"
-        if t_self.is_union():
+        if t_self.is_union:
             return "Union[" + ", ".join(th.annotation(scalars) for th in t_self.of_type) + "]"
         if input_obj := t_self.is_input_object_type:
             return input_obj.name

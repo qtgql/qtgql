@@ -681,6 +681,11 @@ InterfaceFieldTestCase = QGQLObjectTestCase(
     test_name="InterfaceFieldTestCase",
 )
 
+ListOfInterfaceTestcase = QGQLObjectTestCase(
+    schema=schemas.list_of_interface.schema,
+    query=InterfaceFieldTestCase.query,
+    test_name="ListOfInterfaceTestcase",
+)
 all_test_cases = [
     ScalarsTestCase,
     DateTimeTestCase,
