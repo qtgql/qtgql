@@ -155,11 +155,11 @@ if '{{f.name}}' in config.selections.keys():
 
 
 {% macro loose_field(f, private_name) -%}
-        {% if f.type.is_object_type or f.type.is_union %}
+        {% if f.type.is_object_type or f.type.is_union or f.type.is_interface %}
         if {{private_name}}:
             {{private_name}}.loose(metadata)
             {{private_name}} = None
-        {% elif f.type.is_model.is_object_type or f.type.is_model.is_union %}
+        {% elif f.type.is_model.is_object_type or f.type.is_model.is_union or f.type.is_model.is_interface %}
         if {{private_name}}:
             for node in {{private_name}}._data:
                 node.loose(metadata)

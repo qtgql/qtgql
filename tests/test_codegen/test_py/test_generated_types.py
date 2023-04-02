@@ -17,6 +17,7 @@ from qtgql.codegen.py.compiler.builtin_scalars import BuiltinScalar
 from qtgql.codegen.py.compiler.builtin_scalars import BuiltinScalars
 from qtgql.codegen.py.runtime.bases import _BaseQGraphQLObject
 from qtgql.codegen.py.runtime.bases import QGraphQListModel
+from qtgql.codegen.py.runtime.bases import QGraphQLObjectStore
 from qtgql.codegen.py.runtime.custom_scalars import BaseCustomScalar
 from qtgql.codegen.py.runtime.custom_scalars import DateScalar
 from qtgql.codegen.py.runtime.custom_scalars import DateTimeScalar
@@ -722,6 +723,21 @@ class TestGarbageCollection:
             handler.loose()
             qtbot.wait_until(lambda: not union_node())
 
+    def test_list_of_interface(self, qtbot):
+        with ListOfInterfaceTestcase.compile() as testcase:
+            d = testcase.initialize_dict
+            qh = testcase.query_handler
+            assert not qh._data
+            qh.on_data(d)
+            assert qh._data.rowCount()
+            ids = [node._id for node in qh._data._data]
+            store: QGraphQLObjectStore = qh._data._data[0].__store__
+            for i in ids:
+                assert store.get_node(i)
+            qh.loose()
+            for i in ids:
+                assert not store.get_node(i)
+
     def test_duplicate_object_on_same_handler(self, qtbot, monkeypatch):
         monkeypatch.setattr(
             ObjectWithListOfObjectTestCase,
@@ -737,6 +753,17 @@ class TestGarbageCollection:
             del person
             handler.loose()
             qtbot.wait_until(lambda: not p1())
+
+    def test_interface(self, qtbot):
+        with InterfaceFieldTestCase.compile() as testcase:
+            d = testcase.initialize_dict
+            qh = testcase.query_handler
+            assert not qh._data
+            qh.on_data(d)
+            assert qh._data
+            node = weakref.ref(qh._data)
+            qh.loose()
+            qtbot.wait_until(lambda: not node())
 
 
 class TestOperationVariables:
