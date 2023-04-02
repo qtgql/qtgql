@@ -61,6 +61,13 @@ def test_init_no_arguments(testcase: QGQLObjectTestCase):
         assert isinstance(testcase.gql_type(None), _BaseQGraphQLObject)
 
 
+def test_has_type_name_const_property(qtbot):
+    with ScalarsTestCase.compile() as testcase:
+        user_klass = testcase.get_attr("User")
+        inst = user_klass(None)
+        assert inst.property("typename") == user_klass.__name__
+
+
 class TestAnnotations:
     @pytest.mark.parametrize("scalar", BuiltinScalars, ids=lambda v: v.graphql_name)
     def test_scalars(self, scalar: BuiltinScalar):

@@ -89,6 +89,7 @@ class QtGqlQueriedField(QtGqlFieldDefinition):
         if (
             tp.is_model
         ):  # GraphQL's lists are basically the object beneath them in terms of selections.
+            tp = tp.strip_optionals(tp)
             tp = tp.of_type[0]
 
         tp_is_union = tp.is_union()
@@ -165,7 +166,7 @@ class QtGqlQueriedField(QtGqlFieldDefinition):
                             )
 
         else:  # object types.
-            obj_def = f.type.is_object_type
+            obj_def = tp.is_object_type
             assert obj_def
             for selection in selection_set.selections:
                 field_node = is_field_node(selection)
