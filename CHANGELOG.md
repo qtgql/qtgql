@@ -1,6 +1,19 @@
 CHANGELOG
 =========
 
+0.116.0 - 2023-04-02
+--------------------
+
+This release adds support for interfaces as field types.
+The property type would be of an interface
+and all the types that implement that interface
+would extend it.
+
+Note that querying an interface automatically adds `__typename` in the fragment.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #180](https://github.com/qtgql/qtgql/pull/180/)
+
+
 0.115.1 - 2023-03-29
 --------------------
 
