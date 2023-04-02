@@ -563,8 +563,7 @@ class TestUpdates:
             assert not qh._data
             qh.on_data(d)
             assert qh._data.TYPE_NAME == "Dog"
-            testcase.query = testcase.query.replace("= Dog", "= User")
-            d = testcase.initialize_dict
+            d = testcase.schema.execute_sync(testcase.query.replace("= Dog", "= User")).data
             qh.on_data(d)
             assert qh._data.TYPE_NAME == "User"
 

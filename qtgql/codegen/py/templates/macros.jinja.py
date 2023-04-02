@@ -18,6 +18,14 @@ if '{{f.name}}' in config.selections.keys():
         inner_config,
         metadata,
     )
+    {% elif f.type.is_interface -%}
+    if field_data:
+        {{ assign_to }} = {{f.type.is_interface.name}}.from_dict(
+        parent,
+        field_data,
+        inner_config,
+        metadata,
+    )
     {% elif f.type.is_model -%}
     {% if f.type.is_model.is_object_type -%}
     {{ assign_to }} = QGraphQListModel(
@@ -116,10 +124,17 @@ if '{{f.name}}' in config.selections.keys():
     {% elif f.type.is_union() %}
     type_name = field_data['__typename']
     choice = inner_config.choices[type_name]
-    if {{private_name}} and {{private_name}}._id == field_data['id']:
+    if {{private_name}} and {{private_name}}._id == field_data['id'] and {{private_name}}.TYPE_NAME == type_name:
         {{private_name}}.update(field_data, choice, metadata)
     else:
         {{fset_name}}(__TYPE_MAP__[type_name].from_dict(parent, field_data, choice, metadata))
+    {% elif f.type.is_interface %}
+    type_name = field_data['__typename']
+    choice = inner_config.choices[type_name]
+    if {{private_name}} and {{private_name}}._id == field_data['id'] and {{private_name}}.TYPE_NAME == type_name:
+        {{private_name}}.update(field_data, choice, metadata)
+    else:
+        {{fset_name}}({{f.type.is_interface.name}}.from_dict(parent, field_data, choice, metadata))
     {% endif %}
 {%- endmacro %}
 

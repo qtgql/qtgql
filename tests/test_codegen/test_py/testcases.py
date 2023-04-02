@@ -2,6 +2,7 @@ import contextlib
 import importlib
 import sys
 import tempfile
+import traceback
 from functools import cached_property
 from pathlib import Path
 from textwrap import dedent
@@ -95,11 +96,13 @@ class QGQLObjectTestCase:
             try:
                 schema_mod = importlib.import_module(f"{gen_module_name}.objecttypes")
             except BaseException as e:
+                traceback.print_tb(e.__traceback__)
                 raise RuntimeError(generated["objecttypes"]) from e
 
             try:
                 handler_mod = importlib.import_module(f"{gen_module_name}.handlers")
             except BaseException as e:
+                traceback.print_tb(e.__traceback__)
                 raise RuntimeError(generated["handlers"]) from e
         testcase = CompiledTestCase(
             evaluator=self.evaluator,
