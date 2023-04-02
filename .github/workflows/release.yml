@@ -7,7 +7,7 @@ on:
 jobs:
   deploy:
     name: Deploy
-    permissions: read-all|write-all
+    permissions: write-all
     environment: Deployment
     runs-on: ubuntu-latest
     if: ${{ github.ref=='refs/heads/main' && github.event_name!='pull_request' }}
