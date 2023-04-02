@@ -13,7 +13,6 @@ from strawberry.aiohttp.views import GraphQLView
 
 from tests.conftest import hash_schema
 from tests.test_codegen.schemas import __all__ as all_schemas
-from tests.test_codegen.schemas import interface_field
 from tests.test_codegen.schemas.node_interface import Node
 
 if TYPE_CHECKING:
@@ -79,7 +78,7 @@ schema = strawberry.Schema(query=Query, subscription=Subscription, mutation=Muta
 
 def init_func(argv):
     app = web.Application()
-    app.router.add_route("*", "/graphql", GraphQLView(schema=interface_field.schema))
+    app.router.add_route("*", "/graphql", GraphQLView(schema=schema))
     for mod in all_schemas:
         app.router.add_route("*", f"/{hash_schema(mod.schema)}", GraphQLView(schema=mod.schema))
     return app
