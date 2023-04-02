@@ -107,9 +107,9 @@ if '{{f.name}}' in config.selections.keys():
         {% elif f.type.is_model.is_union or f.type.is_model.is_interface %}
         type_name = node['__typename']
         if compare_node({{private_name}}._data[index], id_, type_name):
+        {% endif %}
             # same node on that index just call update there is no need call model signals.
             {{private_name}}._data[index].update(field_data[index], node_config, metadata)
-        {% endif %}
         else:
             {# get or create node if wasn't on the correct index.
              Note: it is safe to call [].insert(50, 50) (although index 50 doesn't exist). #}
