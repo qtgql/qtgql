@@ -30,8 +30,7 @@ class QGraphQLInputObjectABC(QObject):
 
 
 class _BaseQGraphQLObject(QObject):
-    _id: str
-    id: str
+    TYPE_NAME: ClassVar[str]
     __singleton__: Self
     __store__: ClassVar[QGraphQLObjectStore[Self]]
 
@@ -43,7 +42,7 @@ class _BaseQGraphQLObject(QObject):
 
     @qproperty(str, constant=True)
     def typename(self) -> str:
-        return self.__class__.__name__
+        return self.TYPE_NAME
 
     @classmethod
     def from_dict(cls, parent: QObject, data: dict, config: SelectionConfig):

@@ -192,6 +192,7 @@ class QtGqlQueriedField(QtGqlFieldDefinition):
 class QtGqlOperationDefinition(NamedTuple):
     query: str
     name: str
+    operation_type: QtGqlObjectTypeDefinition
     field: QtGqlQueriedField
     directives: list[str] = []
     fragments: list[str] = []

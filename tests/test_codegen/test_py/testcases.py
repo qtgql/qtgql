@@ -658,7 +658,7 @@ SubscriptionTestCase = QGQLObjectTestCase(
 InterfaceFieldTestCase = QGQLObjectTestCase(
     schema=schemas.interface_field.schema,
     query="""
-    query MainQuery ($ret: TypesEnum!) {
+    query MainQuery ($ret: TypesEnum! = Dog) {
       node(ret: $ret) {
         id
         __typename

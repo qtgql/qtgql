@@ -186,6 +186,8 @@ class BaseGqlTypeDefinition:
 
 @define(slots=False)
 class QtGqlObjectTypeDefinition(BaseGqlTypeDefinition):
+    implements: list[QtGqlInterfaceDefinition] = attrs.Factory(list)
+
     @cached_property
     def has_id_field(self) -> Optional[QtGqlFieldDefinition]:
         return self.fields_dict.get("id", None)
@@ -195,6 +197,11 @@ class QtGqlObjectTypeDefinition(BaseGqlTypeDefinition):
         if id_f := self.has_id_field:
             if id_f.type.is_optional():
                 return id_f
+
+    def __attrs_post_init__(self):
+        for base in self.implements:
+            if not base.implementations.get(self.name):
+                base.implementations[self.name] = self
 
 
 @define(slots=False)
@@ -240,6 +247,8 @@ class GqlTypeHinter(TypeHinter):
     @property
     def is_object_type(self) -> Optional[QtGqlObjectTypeDefinition]:
         t_self = optional_maybe(self).type
+        if isinstance(t_self, QtGqlObjectTypeDefinition):
+            return t_self
         with contextlib.suppress(TypeError):
             if issubclass(t_self, AntiForwardRef):
                 ret = t_self.resolve()

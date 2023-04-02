@@ -116,6 +116,7 @@ class QtGqlVisitor(visitor.Visitor):
                     )
                     operation_definition = QtGqlOperationDefinition(
                         query=graphql.print_ast(node),
+                        operation_type=self.evaluator._query_type,
                         name=op_name,
                         field=root_qtgql_field,
                         directives=node.directives,
@@ -132,6 +133,7 @@ class QtGqlVisitor(visitor.Visitor):
                     )
                     operation_definition = QtGqlOperationDefinition(
                         query=graphql.print_ast(node),
+                        operation_type=self.evaluator._mutation_type,
                         name=op_name,
                         field=root_qtgql_field,
                         directives=node.directives,
@@ -149,6 +151,7 @@ class QtGqlVisitor(visitor.Visitor):
                     )
                     operation_definition = QtGqlOperationDefinition(
                         query=graphql.print_ast(node),
+                        operation_type=self.evaluator._subscription_type,
                         name=op_name,
                         field=root_qtgql_field,
                         directives=node.directives,
@@ -313,8 +316,11 @@ class SchemaEvaluator:
                     f"type {type_} does not not define an id field.\n"
                     f"fields: {type_.fields}",
                 )
+        implements = [self._evaluate_interface_type(interface) for interface in type_.interfaces]
+
         ret = QtGqlObjectTypeDefinition(
             name=t_name,
+            implements=implements,
             docstring=type_.description,
             fields_dict={
                 name: self._evaluate_field(name, field) for name, field in type_.fields.items()
@@ -350,8 +356,10 @@ class SchemaEvaluator:
     ) -> QtGqlInterfaceDefinition:
         if ret := self._interfaces_map.get(interface.name, None):
             return ret
+        implements = [self._evaluate_interface_type(base) for base in interface.interfaces]
         ret = QtGqlInterfaceDefinition(
             name=interface.name,
+            implements=implements,
             docstring=interface.description,
             fields_dict={
                 name: self._evaluate_field(name, field) for name, field in interface.fields.items()

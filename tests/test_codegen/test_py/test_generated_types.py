@@ -277,6 +277,14 @@ class TestDeserializers:
             handler.on_data(testcase.initialize_dict)
             assert handler.data.name == "Connected"
 
+    def test_interface_field(self, qtbot):
+        with InterfaceFieldTestCase.compile() as testcase:
+            d = testcase.initialize_dict
+            qh = testcase.query_handler
+            assert not qh._data
+            qh.on_data(d)
+            assert qh._data
+
 
 class TestUpdates:
     def test_scalars_update(self, qtbot):
@@ -548,6 +556,18 @@ class TestUpdates:
             ):
                 handler.on_data(init_dict2)
 
+    def test_interface_field(self, qtbot):
+        with InterfaceFieldTestCase.compile() as testcase:
+            d = testcase.initialize_dict
+            qh = testcase.query_handler
+            assert not qh._data
+            qh.on_data(d)
+            assert qh._data.TYPE_NAME == "Dog"
+            testcase.query = testcase.query.replace("= Dog", "= User")
+            d = testcase.initialize_dict
+            qh.on_data(d)
+            assert qh._data.TYPE_NAME == "User"
+
 
 class TestDefaultConstructor:
     @pytest.mark.parametrize("scalar", BuiltinScalars, ids=lambda v: v.graphql_name)
@@ -600,10 +620,6 @@ class TestDefaultConstructor:
     def test_wont_recursive(self):
         with ObjectsThatReferenceEachOtherTestCase.compile() as testcase:
             testcase.gql_type()
-
-    def test_interface_field(self, qtbot):
-        with InterfaceFieldTestCase.compile() as testcase:
-            ...
 
 
 class TestGarbageCollection:

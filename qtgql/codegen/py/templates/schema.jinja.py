@@ -43,18 +43,27 @@ class SCALARS:
     {% for scalar in context.custom_scalars %}
     {{scalar}} = {{scalar}}{% endfor %}
 
-# ----------------------------------------- Interfaces -----------------------------------------
-{% for interface in context.interfaces %}
 
+# ----------------------------------------- Interfaces -----------------------------------------
+{% for interface in context.interfaces -%}
+class {{interface.name}}({% for base in interface.implements %} {{base.name}}, {% endfor %}):
+    @classmethod
+    def from_dict(cls, parent, data: dict, config: SelectionConfig, metadata: OperationMetaData) -> {{interface.name}}:
+        typename = data['__typename']
+        {% for impl in interface.implementations.values() -%}
+        if '{{impl.name}}' == typename:
+            return {{impl.name}}.from_dict(parent, data, config, metadata)
+        {% endfor %}
 
 {% endfor %}
+
 # ----------------------------------------- Object Types -----------------------------------------
 
 {% for type in context.types %}
-class {{ type.name }}({{context.base_object_name}}):
+class {{ type.name }}({{context.base_object_name}}, {% for base in type.implements %} {{base.name}}, {% endfor %}):
     """{{  type.docstring  }}"""
 
-
+    TYPE_NAME = "{{type.name}}"
     def __init__(self, parent: QObject = None, {% for f in type.fields %} {{f.name}}: Optional[{{f.annotation}}] = None, {% endfor %}):
         super().__init__(parent){% for f in type.fields %}
         self.{{  f.private_name  }} = {{f.name}} if {{f.name}} else {{f.default_value}}{% endfor %}
