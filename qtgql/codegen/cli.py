@@ -58,10 +58,13 @@ def _get_config() -> QtGqlConfig:
 @app.command()
 def gen():
     """Generates types based on your `QtGqlConfig` configuration object."""
-    with console.status("Fetching schema and generating types...") as s:
+    console.print("[bold blue]Generating...")
+    with console.status("Still generating...") as s:
         config = _get_config()
-        s.update("[bold blue]Configuration file loaded")
+        s.update("[green]Configuration file loaded")
+        s.update("[bold blue]Just a second I need some coffee ☕")
         config.generate()
+
     console.print(
         "[bold green]Types were generated to"
         f"[link={config.generated_types_dir.resolve()}]"
