@@ -241,7 +241,7 @@ class GqlTypeHinter(TypeHinter):
         self.type = type
         self.of_type: tuple[GqlTypeHinter, ...] = of_type
         self.scalars = scalars
-        self.__setattr__ = freeze
+        self.__setattr__ = freeze  # type: ignore
 
     @cached_property
     def optional_maybe(self) -> GqlTypeHinter:
