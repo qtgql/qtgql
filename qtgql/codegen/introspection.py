@@ -218,19 +218,28 @@ class SchemaEvaluator:
             is_optional = False
 
         if list_def := is_list_definition(t):
-            ret = GqlTypeHinter(type=list, of_type=(self._evaluate_field_type(list_def.of_type),))
+            ret = GqlTypeHinter(
+                type=list,
+                of_type=(self._evaluate_field_type(list_def.of_type),),
+                scalars=self.config.custom_scalars,
+            )
         elif scalar_def := is_scalar_definition(t):
             if builtin_scalar := BuiltinScalars.by_graphql_name(scalar_def.name):
-                ret = GqlTypeHinter(type=builtin_scalar)
+                ret = GqlTypeHinter(type=builtin_scalar, scalars=self.config.custom_scalars)
             else:
-                ret = GqlTypeHinter(type=self.config.custom_scalars[scalar_def.name])
+                ret = GqlTypeHinter(
+                    type=self.config.custom_scalars[scalar_def.name],
+                    scalars=self.config.custom_scalars,
+                )
         elif enum_def := is_enum_definition(t):
             ret = GqlTypeHinter(
                 type=anti_forward_ref(name=enum_def.name, type_map=self._enums_def_map),
+                scalars=self.config.custom_scalars,
             )
         elif obj_def := is_object_definition(t):
             ret = GqlTypeHinter(
                 type=anti_forward_ref(name=obj_def.name, type_map=self._objecttypes_def_map),
+                scalars=self.config.custom_scalars,
             )
         elif union_def := is_union_definition(t):
             ret = GqlTypeHinter(
@@ -241,25 +250,31 @@ class SchemaEvaluator:
                             name=possible.name,
                             type_map=self._objecttypes_def_map,
                         ),
+                        scalars=self.config.custom_scalars,
                     )
                     for possible in self.schema_definition.get_possible_types(union_def)
                 ),
+                scalars=self.config.custom_scalars,
             )
         elif input_def := is_input_definition(t):
             concrete = self.schema_definition.get_type(input_def.name)
             assert isinstance(concrete, gql_def.GraphQLInputObjectType)
-            ret = GqlTypeHinter(type=self._evaluate_input_type(input_def))
+            ret = GqlTypeHinter(
+                type=self._evaluate_input_type(input_def),
+                scalars=self.config.custom_scalars,
+            )
 
         elif interface_def := is_interface_definition(t):
             ret = GqlTypeHinter(
                 type=self._evaluate_interface_type(interface_def),
                 of_type=(),
+                scalars=self.config.custom_scalars,
             )
         if not ret:  # pragma: no cover
             raise NotImplementedError(f"type {t} not supported yet")
 
         if is_optional:
-            return GqlTypeHinter(type=Optional, of_type=(ret,))
+            return GqlTypeHinter(type=Optional, of_type=(ret,), scalars=self.config.custom_scalars)
         return ret
 
     def _evaluate_field(self, name: str, field: gql_def.GraphQLField) -> QtGqlFieldDefinition:

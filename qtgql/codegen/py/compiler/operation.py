@@ -89,8 +89,7 @@ class QtGqlQueriedField(QtGqlFieldDefinition):
         if (
             tp.is_model
         ):  # GraphQL's lists are basically the object beneath them in terms of selections.
-            tp = tp.strip_optionals(tp)
-            tp = tp.of_type[0]
+            tp = tp.is_model
 
         tp_is_union = tp.is_union
 
