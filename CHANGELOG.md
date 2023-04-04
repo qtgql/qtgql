@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+0.116.1 - 2023-04-04
+--------------------
+
+This release improves performance of `GqlTypeHinter` by caching
+evaluation of attributes.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #185](https://github.com/qtgql/qtgql/pull/185/)
+
+
 0.116.0 - 2023-04-02
 --------------------
 
