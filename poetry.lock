@@ -1821,14 +1821,14 @@ files = [
 
 [[package]]
 name = "typingref"
-version = "0.100.0"
+version = "0.103.0"
 description = "Introspect Python type annotation, with ease."
 category = "main"
 optional = false
 python-versions = ">=3.9,<3.12"
 files = [
-    {file = "typingref-0.100.0-py3-none-any.whl", hash = "sha256:2c3eaf8b03fee2c2b6f3035a018cec197bf81ed7745bc50079f96b861ea78e9c"},
-    {file = "typingref-0.100.0.tar.gz", hash = "sha256:a297131a941ec98f1a6052922db601001652617a1f59458c28295c8e3820cbb2"},
+    {file = "typingref-0.103.0-py3-none-any.whl", hash = "sha256:138ea7c5e73f70942529a0875ad544cf076deca5db08ea3b1b1506485cac700a"},
+    {file = "typingref-0.103.0.tar.gz", hash = "sha256:f9600b319d219b868bda15190300b118e51634ec4399afb3270171cead4a692d"},
 ]
 
 [[package]]
@@ -2013,4 +2013,4 @@ codegen = ["graphql-core", "jinja2", "typer", "toml"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.12"
-content-hash = "7d097f026b79c08b857e75a769fd210b7b3db213e04a153b09ab930306d73dcc"
+content-hash = "214ce2541618f9c1adc7590ab5c65f9fff3ba39ba2f11fc9f44e170a999c78ba"
