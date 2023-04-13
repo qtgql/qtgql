@@ -18,8 +18,8 @@ from PySide6.QtCore import QObject
 from strawberry import Schema
 
 from qtgql.codegen.introspection import SchemaEvaluator
+from qtgql.codegen.objecttype import QtGqlObjectTypeDefinition
 from qtgql.codegen.py.compiler.config import QtGqlConfig
-from qtgql.codegen.py.objecttype import QtGqlObjectTypeDefinition
 from qtgql.codegen.py.runtime.custom_scalars import BaseCustomScalar
 from qtgql.codegen.py.runtime.custom_scalars import DateScalar
 from qtgql.codegen.py.runtime.custom_scalars import DateTimeScalar

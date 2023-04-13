@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 import pytest
 
 if TYPE_CHECKING:
-    from qtgql.codegen.py.objecttype import QtGqlFieldDefinition, QtGqlObjectTypeDefinition
+    from qtgql.codegen.objecttype import QtGqlFieldDefinition, QtGqlObjectTypeDefinition
 
 
 @pytest.fixture()

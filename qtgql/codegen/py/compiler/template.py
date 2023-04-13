@@ -12,7 +12,7 @@ from jinja2 import select_autoescape
 if TYPE_CHECKING:  # pragma: no cover
     from qtgql.codegen.py.compiler.config import QtGqlConfig
     from qtgql.codegen.py.compiler.query import QtGqlOperationDefinition, QtGqlQueriedField
-    from qtgql.codegen.py.objecttype import (
+    from qtgql.codegen.objecttype import (
         QtGqlEnumDefinition,
         QtGqlInputObjectTypeDefinition,
         QtGqlInterfaceDefinition,

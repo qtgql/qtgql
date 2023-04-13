@@ -15,16 +15,16 @@ from qtgql.codegen.graphql_ref import inject_id_selection
 from qtgql.codegen.graphql_ref import inject_typename_selection
 from qtgql.codegen.graphql_ref import is_field_node
 from qtgql.codegen.graphql_ref import is_inline_fragment
+from qtgql.codegen.objecttype import QtGqlFieldDefinition
+from qtgql.codegen.objecttype import QtGqlObjectTypeDefinition
 from qtgql.codegen.py.compiler.template import config_template
 from qtgql.codegen.py.compiler.template import ConfigContext
-from qtgql.codegen.py.objecttype import QtGqlFieldDefinition
-from qtgql.codegen.py.objecttype import QtGqlObjectTypeDefinition
 
 if TYPE_CHECKING:
     from graphql import language as gql_lang
 
     from qtgql.codegen.introspection import SchemaEvaluator
-    from qtgql.codegen.py.objecttype import QtGqlVariableDefinition
+    from qtgql.codegen.objecttype import QtGqlVariableDefinition
 
 
 def is_type_name_selection(field_node: gql_lang.FieldNode):
