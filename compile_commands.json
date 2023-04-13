@@ -1,0 +1,12 @@
+[
+{
+  "directory": "/home/nir/Desktop/tzv5hob/qtgql/.cmake_build/qtgql/codegen/cpp/runtime",
+  "command": "/usr/bin/c++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_NO_DEBUG -DQT_OPENGL_LIB -DQT_QMLINTEGRATION_LIB -DQT_QMLMODELS_LIB -DQT_QML_LIB -DQT_QUICK_LIB -I/home/nir/Desktop/tzv5hob/qtgql/.cmake_build/qtgql/codegen/cpp/runtime/QTGQL_RUNTIME_autogen/include -isystem /home/nir/Qt/6.4.2/gcc_64/include/QtQml -isystem /home/nir/Qt/6.4.2/gcc_64/include -isystem /home/nir/Qt/6.4.2/gcc_64/include/QtCore -isystem /home/nir/Qt/6.4.2/gcc_64/mkspecs/linux-g++ -isystem /home/nir/Qt/6.4.2/gcc_64/include/QtQmlIntegration -isystem /home/nir/Qt/6.4.2/gcc_64/include/QtNetwork -isystem /home/nir/Qt/6.4.2/gcc_64/include/QtQuick -isystem /home/nir/Qt/6.4.2/gcc_64/include/QtGui -isystem /home/nir/Qt/6.4.2/gcc_64/include/QtQmlModels -isystem /home/nir/Qt/6.4.2/gcc_64/include/QtOpenGL -fPIC -std=gnu++17 -o CMakeFiles/QTGQL_RUNTIME.dir/QTGQL_RUNTIME_autogen/mocs_compilation.cpp.o -c /home/nir/Desktop/tzv5hob/qtgql/.cmake_build/qtgql/codegen/cpp/runtime/QTGQL_RUNTIME_autogen/mocs_compilation.cpp",
+  "file": "/home/nir/Desktop/tzv5hob/qtgql/.cmake_build/qtgql/codegen/cpp/runtime/QTGQL_RUNTIME_autogen/mocs_compilation.cpp"
+},
+{
+  "directory": "/home/nir/Desktop/tzv5hob/qtgql/.cmake_build/qtgql/codegen/cpp/runtime",
+  "command": "/usr/bin/c++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_NO_DEBUG -DQT_OPENGL_LIB -DQT_QMLINTEGRATION_LIB -DQT_QMLMODELS_LIB -DQT_QML_LIB -DQT_QUICK_LIB -I/home/nir/Desktop/tzv5hob/qtgql/.cmake_build/qtgql/codegen/cpp/runtime/QTGQL_RUNTIME_autogen/include -isystem /home/nir/Qt/6.4.2/gcc_64/include/QtQml -isystem /home/nir/Qt/6.4.2/gcc_64/include -isystem /home/nir/Qt/6.4.2/gcc_64/include/QtCore -isystem /home/nir/Qt/6.4.2/gcc_64/mkspecs/linux-g++ -isystem /home/nir/Qt/6.4.2/gcc_64/include/QtQmlIntegration -isystem /home/nir/Qt/6.4.2/gcc_64/include/QtNetwork -isystem /home/nir/Qt/6.4.2/gcc_64/include/QtQuick -isystem /home/nir/Qt/6.4.2/gcc_64/include/QtGui -isystem /home/nir/Qt/6.4.2/gcc_64/include/QtQmlModels -isystem /home/nir/Qt/6.4.2/gcc_64/include/QtOpenGL -fPIC -std=gnu++17 -o CMakeFiles/QTGQL_RUNTIME.dir/bases.cpp.o -c /home/nir/Desktop/tzv5hob/qtgql/qtgql/codegen/cpp/runtime/bases.cpp",
+  "file": "/home/nir/Desktop/tzv5hob/qtgql/qtgql/codegen/cpp/runtime/bases.cpp"
+}
+]

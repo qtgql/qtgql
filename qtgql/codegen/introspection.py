@@ -14,6 +14,12 @@ from graphql import OperationType
 from graphql.language import visitor
 from graphql.type import definition as gql_def
 
+from qtgql.codegen.cpp.compiler.builtin_scalars import BuiltinScalars
+from qtgql.codegen.cpp.compiler.operation import QtGqlOperationDefinition
+from qtgql.codegen.cpp.compiler.operation import QtGqlQueriedField
+from qtgql.codegen.cpp.compiler.template import handlers_template
+from qtgql.codegen.cpp.compiler.template import schema_types_template
+from qtgql.codegen.cpp.compiler.template import TemplateContext
 from qtgql.codegen.graphql_ref import is_enum_definition
 from qtgql.codegen.graphql_ref import is_input_definition
 from qtgql.codegen.graphql_ref import is_interface_definition
@@ -35,17 +41,11 @@ from qtgql.codegen.objecttype import QtGqlInputObjectTypeDefinition
 from qtgql.codegen.objecttype import QtGqlInterfaceDefinition
 from qtgql.codegen.objecttype import QtGqlObjectTypeDefinition
 from qtgql.codegen.objecttype import QtGqlVariableDefinition
-from qtgql.codegen.py.compiler.builtin_scalars import BuiltinScalars
-from qtgql.codegen.py.compiler.operation import QtGqlOperationDefinition
-from qtgql.codegen.py.compiler.operation import QtGqlQueriedField
-from qtgql.codegen.py.compiler.template import handlers_template
-from qtgql.codegen.py.compiler.template import schema_types_template
-from qtgql.codegen.py.compiler.template import TemplateContext
 from qtgql.codegen.utils import anti_forward_ref
 from qtgql.exceptions import QtGqlException
 
 if TYPE_CHECKING:  # pragma: no cover
-    from qtgql.codegen.py.compiler.config import QtGqlConfig
+    from qtgql.codegen.cpp.compiler.config import QtGqlConfig
 
 introspection_query = graphql.get_introspection_query(descriptions=True)
 
@@ -458,5 +458,5 @@ class SchemaEvaluator:
     def dump(self):
         """:param file: Path to the directory the codegen would dump to."""
         for fname, content in self.dumps().items():
-            with (self.config.graphql_dir / (fname + ".py")).open("w") as fh:
+            with (self.config.graphql_dir / (fname + ".cpp")).open("w") as fh:
                 fh.write(content)

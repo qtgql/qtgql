@@ -5,6 +5,10 @@ from typing import Type
 
 from attrs import define
 
+from qtgql.codegen.cpp.compiler.template import schema_types_template
+from qtgql.codegen.cpp.compiler.template import TemplateContext
+from qtgql.codegen.cpp.runtime.custom_scalars import CUSTOM_SCALARS
+from qtgql.codegen.cpp.runtime.custom_scalars import CustomScalarMap
 from qtgql.codegen.introspection import SchemaEvaluator
 
 
@@ -27,12 +31,10 @@ class QtGqlConfig:
     """
     evaluator: Type[SchemaEvaluator] = SchemaEvaluator
     """evaluates the schema and generates types."""
-    custom_scalars: CustomScalarMap = CUSTOM_SCALARS
+    custom_scalars: CustomScalarMap = {}
     """mapping of custom scalars, respected by the schema evaluator."""
     template_class: Callable[[TemplateContext], str] = schema_types_template
     """jinja template."""
-    base_object: Type[_BaseQGraphQLObject] = BaseGraphQLObject
-    """base object to be extended by all generated types."""
 
     @property
     def schema_path(self) -> Path:
