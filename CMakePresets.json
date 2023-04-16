@@ -1,0 +1,84 @@
+{
+    "version": 3,
+    "configurePresets": [
+        {
+            "name": "dev",
+            "binaryDir": ".cmake_build/",
+            "installDir": ".cmake_build/install",
+            "cacheVariables": {
+                "CMAKE_BUILD_DIR": ".cmake_build",
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_CXX_EXTENSIONS": "OFF",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+            }
+        },
+        {
+            "name": "coverage",
+            "inherits": "dev",
+            "cacheVariables": {
+                "CMAKE_CXX_FLAGS": "--coverage"
+            }
+        },
+        {
+            "name": "clang-tools",
+            "inherits": "dev",
+            "cacheVariables": {
+                "CMAKE_CXX_COMPILER": "clang++"
+            }
+        },
+        {
+            "name": "asan",
+            "inherits": "clang-tools",
+            "cacheVariables": {
+                "CMAKE_CXX_FLAGS": "-fno-omit-frame-pointer -fsanitize=address"
+            }
+        },
+        {
+            "name": "ubsan",
+            "inherits": "clang-tools",
+            "cacheVariables": {
+                "CMAKE_CXX_FLAGS": "-fno-omit-frame-pointer -fno-sanitize-recover=all -fsanitize=undefined"
+            }
+        },
+        {
+            "name": "test",
+            "inherits": [
+                "dev"
+            ],
+            "cacheVariables": {
+                "QTGQL_TESTING": true,
+                "QTGQL_VERBOSE": true
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "dev",
+            "configurePreset": "dev",
+            "jobs": 4,
+            "targets": [
+                "all"
+            ]
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "dev",
+            "configurePreset": "dev",
+            "output": {
+                "shortProgress": true,
+                "outputOnFailure": true
+            }
+        },
+        {
+            "name": "test",
+            "description": "",
+            "displayName": ""
+        },
+        {
+            "name": "tests",
+            "description": "",
+            "displayName": ""
+        }
+    ]
+}

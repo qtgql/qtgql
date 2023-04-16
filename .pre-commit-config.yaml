@@ -62,11 +62,18 @@ repos:
     rev: v0.1.5
     hooks:
       - id: qml-format
+
+
   - repo: https://gitlab.com/daverona/pre-commit/cpp
     rev: 0.8.0
     hooks:
       - id: docker-clang-format  # clang-format in Docker container
       - id: docker-cppcheck      # cppcheck in Docker container
+  - repo: https://github.com/cheshirekow/cmake-format-precommit
+    rev: v0.6.13
+    hooks:
+    - id: cmake-format
+    - id: cmake-lint
 
 exclude: >
           (?x)^(
