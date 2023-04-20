@@ -5,6 +5,9 @@
 #include <QtCore>
 #include <optional>
 
+// The WebSocket sub-protocol for this specification is: graphql-transport-
+// ws.
+// https://github.com/enisdenjo/graphql-ws/blob/master/PROTOCOL.md
 namespace PROTOCOL {
 const QString CONNECTION_INIT = "connection_init";
 const QString CONNECTION_ACK = "connection_ack";
@@ -30,47 +33,46 @@ struct HashAbleABC {
 
 struct BaseGqlWsTransportMessage : public HashAbleABC {
   QString type;
-  std::optional<QJsonObject> payload = {};
+  QJsonObject payload = {};
+  BaseGqlWsTransportMessage(const QString &type) {
+    this->type = type;
+    this->payload = QJsonObject{};
+  }
+
+  BaseGqlWsTransportMessage(const QString &type, const QJsonObject &payload) {
+    this->type = type;
+    this->payload = payload;
+  }
+
+  BaseGqlWsTransportMessage(const QJsonObject &data) {
+    if (data.contains("payload") && data["payload"].isObject()) {
+      this->payload = data["payload"].toObject();
+    }
+    if (data.contains("type") && data["type"].isString()) {
+      this->type = data["type"].toString();
+    }
+  }
 
   QJsonObject serialize() const {
     QJsonObject data;
     data["type"] = type;
-    if (payload.has_value()) {
-      data["payload"] = payload.value();
-    };
+    if (!payload.isEmpty()) {
+      data["payload"] = payload;
+    }
     return data;
-  };
-
-  BaseGqlWsTransportMessage from_json(const QJsonObject &data) {
-    BaseGqlWsTransportMessage ret;
-    if (data.contains("payload") && data["payload"].isObject()) {
-      ret.payload = data["payload"].toObject();
-    };
-    if (data.contains("type") && data["type"].isString()) {
-      ret.type = data["type"].toString();
-    };
-    return ret;
-  };
+  }
 };
 
 struct GqlClientMessage : public BaseGqlWsTransportMessage {
   QUuid id = QUuid::createUuid();
-
+  using BaseGqlWsTransportMessage::BaseGqlWsTransportMessage;
+  GqlClientMessage(const QJsonObject &data)
+      : BaseGqlWsTransportMessage(data) {  // NOLINT
+    this->id = QUuid::fromString(data["id"].toString());
+  }
   QJsonObject serialize() const {
     QJsonObject ret = BaseGqlWsTransportMessage::serialize();
-    ret["id"] == id.toString();
-    return ret;
-  }
-
-  GqlClientMessage from_json(const QJsonObject &data) {
-    GqlClientMessage ret;
-    if (data.contains("payload") && data["payload"].isObject()) {
-      ret.payload = data["payload"].toObject();
-    }
-    if (data.contains("type") && data["type"].isString()) {
-      ret.type = data["type"].toString();
-    }
-    ret.id = QUuid::fromString(data["id"].toString());
+    ret["id"] = id.toString();
     return ret;
   }
 };
@@ -91,3 +93,10 @@ struct GqlResult {
   const std::optional<QJsonObject> *data;
   const std::optional<QJsonObject> *errors;
 };
+
+namespace DEF_MESSAGES {
+const auto CONNECTION_INIT =
+    BaseGqlWsTransportMessage(PROTOCOL::CONNECTION_INIT);
+const auto PING = BaseGqlWsTransportMessage(PROTOCOL::PING);
+const auto PONG = BaseGqlWsTransportMessage(PROTOCOL::PONG);
+}  // namespace DEF_MESSAGES
