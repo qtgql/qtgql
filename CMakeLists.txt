@@ -19,7 +19,7 @@ find_package(Qt6 REQUIRED COMPONENTS Core Qml Quick)
 qt_standard_project_setup()
 
 add_subdirectory(./qtgql/codegen/cpp/)
-
+add_subdirectory(./qtgql/gqltransport_cpp)
 # --options--
 option(QTGQL_VERBOSE "display helpful build information" FALSE)
 option(QTGQL_TESTING "Enable tests" FALSE)

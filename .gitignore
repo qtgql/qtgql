@@ -6,7 +6,8 @@ __pycache__/
 .idea
 .fleet
 .vscode
-
+.kdev4
+CMakeLists.txt.user
 # C extensions
 *.so
 

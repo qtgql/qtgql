@@ -1,0 +1,5 @@
+set(HEADERS ./core.hpp)
+set(SRCS ./core.cpp)
+add_library(gqltransport STATIC ${SRCS})
+add_library(${CMAKE_PROJECT_NAME}::gqltransport ALIAS gqltransport)
+target_link_libraries(gqltransport PRIVATE Qt6::Core)
