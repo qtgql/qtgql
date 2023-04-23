@@ -111,7 +111,7 @@ class GqlWsHandlerABC {
   void onData(QVariantMap message);
   void onError(QVariantMap message);
   void onCompleted();
-  const GqlClientMessage &message();
+  const GqlClientMessage message();
 };
 
 class GqlWsTransportClient : public QObject {
@@ -133,7 +133,9 @@ class GqlWsTransportClient : public QObject {
   QTimer *m_ping_tester_timer;
 
   QMap<QUuid, std::shared_ptr<GqlWsHandlerABC>> m_handlers;
-  QList<GqlClientMessage> m_pendeing_messages;
+
+  // handlers that theier execution was deferred due to connection issues.
+  QSet<std::shared_ptr<GqlWsHandlerABC>> m_pending_handlers;
 
  private Q_SLOTS:
   void onReconnectTimeout();

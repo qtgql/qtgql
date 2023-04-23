@@ -63,6 +63,6 @@ void GqlWsTransportClient::execute(std::shared_ptr<GqlWsHandlerABC> handler) {
   if (m_ws.isValid()) {
     send_message(message);
   } else {
-    m_pendeing_messages.append(message);
+    m_pending_handlers << handler;  // refcount increased (copy constructor)
   }
 };
