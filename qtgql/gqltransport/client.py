@@ -167,7 +167,7 @@ class GqlWsTransportClient(QtWebSockets.QWebSocket):
             "{classname}: connection established with server {url}!",
             extra={
                 "classname": self.__class__.__name__,
-                "url": self.url.toString(),
+                "url": self.url.toDisplayString(),
             },
         )
         self.sendTextMessage(self.dumps(MESSAGES.CONNECTION_INIT))

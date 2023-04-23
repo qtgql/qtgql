@@ -119,9 +119,6 @@ class GqlWsTransportClient : public QObject {
  private:
   GqlWsTransportClient();  // make the default constructor private.
   QUrl m_url;
-  int m_ping_interval;
-  int m_ping_timeout;
-  int m_reconnect_timeout;
   bool m_autoconnect = true;
   bool m_ping_is_valid = true;
   bool m_connection_ack = false;
@@ -141,8 +138,7 @@ class GqlWsTransportClient : public QObject {
   void onReconnectTimeout();
   void onPingTimeout();
   void onPingTesterTimeout();
-
-  void send_message(const GqlClientMessage &message);
+  void send_message(const BaseGqlWsTransportMessage &message);
 
  public Q_SLOTS:
   void onTextMessageReceived(QString message);

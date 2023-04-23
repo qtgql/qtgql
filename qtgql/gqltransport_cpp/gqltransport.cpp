@@ -45,8 +45,25 @@ GqlWsTransportClient::GqlWsTransportClient(
   init_connection(req);
 }
 
-void GqlWsTransportClient::send_message(const GqlClientMessage &message) {
+void GqlWsTransportClient::send_message(
+    const BaseGqlWsTransportMessage &message) {
   m_ws.sendBinaryMessage(QJsonDocument(message.serialize()).toJson());
+}
+
+void GqlWsTransportClient::onConnected() {
+  qDebug() << "Connection established on url " << m_url.toDisplayString();
+  send_message(DEF_MESSAGES::CONNECTION_INIT);
+  if (m_reconnect_timer->isActive()) {
+    m_reconnect_timer->stop();
+  }
+}
+
+void GqlWsTransportClient::onDisconnected() {
+  qDebug() << "disconnected from " << m_url.toDisplayString()
+           << "close code: " << m_ws.closeCode() << " : " << m_ws.closeReason();
+  m_ping_timer->stop();
+  m_ping_tester_timer->stop();
+  m_reconnect_timer->start();
 }
 
 void GqlWsTransportClient::init_connection(const QNetworkRequest &request) {
