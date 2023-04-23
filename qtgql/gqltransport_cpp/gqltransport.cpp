@@ -3,7 +3,7 @@
 GqlWsTransportClient::GqlWsTransportClient(
     QUrl url, QObject *parent, int ping_interval, int ping_timeout,
     int reconnect_timeout, bool auto_reconnect,
-    std::optional<std::pair<QString, QString> > headers)
+    std::optional<QList<std::pair<QString, QString>>> headers)
     : QWebSocket::QWebSocket() {
   m_url = url;
   m_handlers = QMap<QString, GqlWsHandlerABC>{};
@@ -36,4 +36,13 @@ GqlWsTransportClient::GqlWsTransportClient(
           &GqlWsTransportClient::onDisconnected);
   connect(this, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error),
           this, &GqlWsTransportClient::onError);
+
+  auto req = QNetworkRequest(m_url);
+  if (headers.has_value()) {
+    auto _headers = headers.value();
+    for (auto header : qAsConst(_headers)) {
+      req.setRawHeader(header.first.toUtf8(), header.second.toUtf8());
+    }
+  }
+  init_connection(req);
 }

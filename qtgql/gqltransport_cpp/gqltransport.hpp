@@ -112,6 +112,7 @@ class GqlWsHandlerABC {
 };
 
 class GqlWsTransportClient : public QWebSocket {
+  Q_OBJECT
  private:
   GqlWsTransportClient();  // make the default constructor private.
   QUrl m_url;
@@ -139,14 +140,13 @@ class GqlWsTransportClient : public QWebSocket {
   void onDisconnected();
   void onError(QAbstractSocket::SocketError error);
 
-  auto deleteLater();
-
  public:
   inline static const QString SUB_PROTOCOL = "graphql-transport-ws";
 
-  GqlWsTransportClient(QUrl url, QObject *parent = nullptr,
-                       int ping_interval = 50000, int ping_timeout = 5000,
-                       int reconnect_timeout = 3000,
-                       bool auto_reconnect = false,
-                       std::optional<std::pair<QString, QString>> headers = {});
+  GqlWsTransportClient(
+      QUrl url, QObject *parent = nullptr, int ping_interval = 50000,
+      int ping_timeout = 5000, int reconnect_timeout = 3000,
+      bool auto_reconnect = false,
+      std::optional<QList<std::pair<QString, QString>>> headers = {});
 };
+void init_connection(const QNetworkRequest &request);
