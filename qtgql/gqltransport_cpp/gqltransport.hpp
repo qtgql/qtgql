@@ -111,7 +111,7 @@ class GqlWsHandlerABC {
   void onCompleted();
 };
 
-class GqlWsTransportClient : public QWebSocket {
+class GqlWsTransportClient : public QObject {
   Q_OBJECT
  private:
   GqlWsTransportClient();  // make the default constructor private.
@@ -122,6 +122,7 @@ class GqlWsTransportClient : public QWebSocket {
   bool m_autoconnect = true;
   bool m_ping_is_valid = true;
   bool m_connection_ack = false;
+  QWebSocket m_ws;
   QWebSocketHandshakeOptions m_ws_options;
 
   QTimer *m_reconnect_timer;

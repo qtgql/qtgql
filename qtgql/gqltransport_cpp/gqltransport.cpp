@@ -4,10 +4,7 @@ GqlWsTransportClient::GqlWsTransportClient(
     QUrl url, QObject *parent, int ping_interval, int ping_timeout,
     int reconnect_timeout, bool auto_reconnect,
     std::optional<QList<std::pair<QString, QString>>> headers)
-    : QWebSocket::QWebSocket() {
-  m_url = url;
-  m_handlers = QMap<QString, GqlWsHandlerABC>{};
-  m_pendeing_messages = std::deque<GqlClientMessage>{};
+    : QObject::QObject(parent), m_url{url} {
   m_reconnect_timer = new QTimer(this);
   if (auto_reconnect) {
     m_reconnect_timer->setInterval(reconnect_timeout);
@@ -28,14 +25,15 @@ GqlWsTransportClient::GqlWsTransportClient(
   m_ws_options.setSubprotocols(QList<QString>{
       this->SUB_PROTOCOL,
   });
-  connect(this, &QWebSocket::textMessageReceived, this,
+  connect(&m_ws, &QWebSocket::textMessageReceived, this,
           &GqlWsTransportClient::onTextMessageReceived);
-  connect(this, &QWebSocket::connected, this,
+  connect(&m_ws, &QWebSocket::connected, this,
           &GqlWsTransportClient::onConnected);
-  connect(this, &QWebSocket::disconnected, this,
+  connect(&m_ws, &QWebSocket::disconnected, this,
           &GqlWsTransportClient::onDisconnected);
-  connect(this, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error),
-          this, &GqlWsTransportClient::onError);
+  connect(&m_ws,
+          QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error), this,
+          &GqlWsTransportClient::onError);
 
   auto req = QNetworkRequest(m_url);
   if (headers.has_value()) {
