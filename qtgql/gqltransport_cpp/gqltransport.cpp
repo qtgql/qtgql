@@ -43,4 +43,8 @@ GqlWsTransportClient::GqlWsTransportClient(
     }
   }
   init_connection(req);
-}
+};
+
+void GqlWsTransportClient::init_connection(const QNetworkRequest &request) {
+  this->m_ws.open(request, this->m_ws_options);
+};

@@ -149,5 +149,6 @@ class GqlWsTransportClient : public QObject {
       int ping_timeout = 5000, int reconnect_timeout = 3000,
       bool auto_reconnect = false,
       std::optional<QList<std::pair<QString, QString>>> headers = {});
+
+  void init_connection(const QNetworkRequest &request);
 };
-void init_connection(const QNetworkRequest &request);
