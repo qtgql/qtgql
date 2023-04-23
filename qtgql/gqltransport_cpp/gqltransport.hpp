@@ -6,6 +6,7 @@
 #include <QWebSocketHandshakeOptions>
 #include <QtCore>
 #include <deque>
+#include <memory>
 #include <optional>
 
 // The WebSocket sub-protocol for this specification is: graphql-transport-
@@ -106,9 +107,11 @@ const auto PONG = BaseGqlWsTransportMessage(PROTOCOL::PONG);
 
 // Replaces HandlerProto, To be extended by all consumers.
 class GqlWsHandlerABC {
-  void onData(QJsonObject message);
-  void onError(QJsonObject message);
+ public:
+  void onData(QVariantMap message);
+  void onError(QVariantMap message);
   void onCompleted();
+  const GqlClientMessage &message();
 };
 
 class GqlWsTransportClient : public QObject {
@@ -129,12 +132,16 @@ class GqlWsTransportClient : public QObject {
   QTimer *m_ping_timer;
   QTimer *m_ping_tester_timer;
 
-  QMap<QString, GqlWsHandlerABC> m_handlers;
-  std::deque<GqlClientMessage> m_pendeing_messages;
+  QMap<QUuid, std::shared_ptr<GqlWsHandlerABC>> m_handlers;
+  QList<GqlClientMessage> m_pendeing_messages;
+
  private Q_SLOTS:
   void onReconnectTimeout();
   void onPingTimeout();
   void onPingTesterTimeout();
+
+  void send_message(const GqlClientMessage &message);
+
  public Q_SLOTS:
   void onTextMessageReceived(QString message);
   void onConnected();
@@ -151,4 +158,6 @@ class GqlWsTransportClient : public QObject {
       std::optional<QList<std::pair<QString, QString>>> headers = {});
 
   void init_connection(const QNetworkRequest &request);
+  bool gql_is_valid();
+  void execute(std::shared_ptr<GqlWsHandlerABC> handler);
 };

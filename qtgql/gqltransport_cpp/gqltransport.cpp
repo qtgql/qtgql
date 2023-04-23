@@ -38,13 +38,31 @@ GqlWsTransportClient::GqlWsTransportClient(
   auto req = QNetworkRequest(m_url);
   if (headers.has_value()) {
     auto _headers = headers.value();
-    for (auto header : qAsConst(_headers)) {
+    for (const auto &header : qAsConst(_headers)) {
       req.setRawHeader(header.first.toUtf8(), header.second.toUtf8());
     }
   }
   init_connection(req);
-};
+}
+
+void GqlWsTransportClient::send_message(const GqlClientMessage &message) {
+  m_ws.sendBinaryMessage(QJsonDocument(message.serialize()).toJson());
+}
 
 void GqlWsTransportClient::init_connection(const QNetworkRequest &request) {
   this->m_ws.open(request, this->m_ws_options);
+}
+
+bool GqlWsTransportClient::gql_is_valid() {
+  return m_ws.isValid() && m_connection_ack;
+}
+
+void GqlWsTransportClient::execute(std::shared_ptr<GqlWsHandlerABC> handler) {
+  auto message = handler->message();
+  m_handlers.insert(message.id, handler);
+  if (m_ws.isValid()) {
+    send_message(message);
+  } else {
+    m_pendeing_messages.append(message);
+  }
 };
