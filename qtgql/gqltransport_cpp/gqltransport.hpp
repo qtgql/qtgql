@@ -2,7 +2,10 @@
 #include <QJsonObject>
 #include <QRegularExpression>
 #include <QUuid>
+#include <QWebSocket>
+#include <QWebSocketHandshakeOptions>
 #include <QtCore>
+#include <deque>
 #include <optional>
 
 // The WebSocket sub-protocol for this specification is: graphql-transport-
@@ -100,3 +103,50 @@ const auto CONNECTION_INIT =
 const auto PING = BaseGqlWsTransportMessage(PROTOCOL::PING);
 const auto PONG = BaseGqlWsTransportMessage(PROTOCOL::PONG);
 }  // namespace DEF_MESSAGES
+
+// Replaces HandlerProto, To be extended by all consumers.
+class GqlWsHandlerABC {
+  void onData(QJsonObject message);
+  void onError(QJsonObject message);
+  void onCompleted();
+};
+
+class GqlWsTransportClient : public QWebSocket {
+ private:
+  GqlWsTransportClient();  // make the default constructor private.
+  QUrl m_url;
+  int m_ping_interval;
+  int m_ping_timeout;
+  int m_reconnect_timeout;
+  bool m_autoconnect = true;
+  bool m_ping_is_valid = true;
+  bool m_connection_ack = false;
+  QWebSocketHandshakeOptions m_ws_options;
+
+  QTimer *m_reconnect_timer;
+  QTimer *m_ping_timer;
+  QTimer *m_ping_tester_timer;
+
+  QMap<QString, GqlWsHandlerABC> m_handlers;
+  std::deque<GqlClientMessage> m_pendeing_messages;
+ private Q_SLOTS:
+  void onReconnectTimeout();
+  void onPingTimeout();
+  void onPingTesterTimeout();
+ public Q_SLOTS:
+  void onTextMessageReceived(QString message);
+  void onConnected();
+  void onDisconnected();
+  void onError();
+
+  auto deleteLater();
+
+ public:
+  inline static const QString SUB_PROTOCOL = "graphql-transport-ws";
+
+  GqlWsTransportClient(QUrl url, QObject *parent = nullptr,
+                       int ping_interval = 50000, int ping_timeout = 5000,
+                       int reconnect_timeout = 3000,
+                       bool auto_reconnect = false,
+                       std::optional<std::pair<QString, QString>> headers = {});
+};
