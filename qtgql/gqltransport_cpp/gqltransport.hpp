@@ -137,7 +137,7 @@ class GqlWsTransportClient : public QWebSocket {
   void onTextMessageReceived(QString message);
   void onConnected();
   void onDisconnected();
-  void onError();
+  void onError(QAbstractSocket::SocketError error);
 
   auto deleteLater();
 
