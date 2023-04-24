@@ -9,3 +9,5 @@ TEST_CASE("get operation name", "[single-file]") {
       get_operation_name("query SampleOperation {field1 field2}");
   REQUIRE(res_op_name.value() == operation_name);
 };
+
+TEST_CASE("test connection_init", "[single-file]") {}

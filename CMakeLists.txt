@@ -38,7 +38,7 @@ if(QTGQL_TESTING)
     message(STATUS "building tests")
   endif()
   include(CTest)
-  add_subdirectory(test_cpp)
+  add_subdirectory(tests/test_cpp)
 endif()
 
 add_custom_target(
