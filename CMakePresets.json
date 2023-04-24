@@ -2,7 +2,7 @@
     "version": 3,
     "configurePresets": [
         {
-            "name": "dev",
+            "name": "Debug",
             "binaryDir": ".cmake_build/",
             "installDir": ".cmake_build/install",
             "cacheVariables": {
@@ -14,14 +14,14 @@
         },
         {
             "name": "coverage",
-            "inherits": "dev",
+            "inherits": "Debug",
             "cacheVariables": {
                 "CMAKE_CXX_FLAGS": "--coverage"
             }
         },
         {
             "name": "clang-tools",
-            "inherits": "dev",
+            "inherits": "Debug",
             "cacheVariables": {
                 "CMAKE_CXX_COMPILER": "clang++"
             }
@@ -43,7 +43,7 @@
         {
             "name": "test",
             "inherits": [
-                "dev"
+                "Debug"
             ],
             "cacheVariables": {
                 "QTGQL_TESTING": true,
@@ -53,8 +53,8 @@
     ],
     "buildPresets": [
         {
-            "name": "dev",
-            "configurePreset": "dev",
+            "name": "Debug",
+            "configurePreset": "Debug",
             "jobs": 4,
             "targets": [
                 "all"
@@ -63,8 +63,8 @@
     ],
     "testPresets": [
         {
-            "name": "dev",
-            "configurePreset": "dev",
+            "name": "Debug",
+            "configurePreset": "Debug",
             "output": {
                 "shortProgress": true,
                 "outputOnFailure": true
