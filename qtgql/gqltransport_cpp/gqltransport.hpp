@@ -24,7 +24,8 @@ const QString SUBSCRIBE = "subscribe";
 };  // namespace PROTOCOL
 
 std::optional<QString> get_operation_name(const QString &query) {
-  QRegularExpression re(R"(subscription|mutation|query)(.*?({|\())");
+  static QRegularExpression re(
+      "(subscription|mutation|query)( [a-zA-Z]+)( |{)");
   auto match = re.match(query);
   if (match.hasMatch()) {
     return match.captured(2);

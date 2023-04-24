@@ -6,18 +6,25 @@ project(
   qtgql
   VERSION 0.116.1
   LANGUAGES CXX)
-set(QTGQL_VERBOSE TRUE)
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 find_package(Qt6 REQUIRED COMPONENTS Core Qml Quick WebSockets)
+
+set(HEADERS qtgql/gqltransport_cpp/gqltransport.hpp)
+set(SRCS ${HEADERS} qtgql/gqltransport_cpp/gqltransport.cpp)
+
+add_library(${PROJECT_NAME} ${SRCS})
+add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+target_link_libraries(${PROJECT_NAME} PUBLIC Qt6::Core Qt6::WebSockets)
+target_include_directories(
+  ${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/qtgql>
+                         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 qt_standard_project_setup()
 
-add_subdirectory(./qtgql/codegen/cpp/)
-add_subdirectory(./qtgql/gqltransport_cpp)
 # --options--
-option(QTGQL_VERBOSE "display helpful build information" FALSE)
+option(QTGQL_VERBOSE "display helpful build information" true)
 option(QTGQL_TESTING "Enable tests" FALSE)
 
 if(QTGQL_VERBOSE)

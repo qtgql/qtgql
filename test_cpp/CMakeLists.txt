@@ -11,4 +11,7 @@ include(Catch)
 
 add_executable(tests test_foo.cpp)
 target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
+target_link_libraries(tests PRIVATE Qt6::Core)
+target_link_libraries(tests PRIVATE qtgql)
+
 catch_discover_tests(tests)

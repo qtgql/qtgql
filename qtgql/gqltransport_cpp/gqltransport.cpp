@@ -1,5 +1,7 @@
 #include "./gqltransport.hpp"
 
+#include <QtGlobal>
+
 GqlWsTransportClient::GqlWsTransportClient(
     QUrl url, QObject *parent, int ping_interval, int ping_timeout,
     int reconnect_timeout, bool auto_reconnect,
@@ -31,9 +33,16 @@ GqlWsTransportClient::GqlWsTransportClient(
           &GqlWsTransportClient::onConnected);
   connect(&m_ws, &QWebSocket::disconnected, this,
           &GqlWsTransportClient::onDisconnected);
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 5, 0)
   connect(&m_ws,
           QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error), this,
           &GqlWsTransportClient::onError);
+#else
+
+  connect(&m_ws, &QWebSocket::errorOccurred, this,
+          &GqlWsTransportClient::onError);
+#endif
 
   auto req = QNetworkRequest(m_url);
   if (headers.has_value()) {
