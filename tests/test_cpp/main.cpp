@@ -16,9 +16,6 @@ int main(int argc, char** argv) {
   if (!app) {
     auto app = new QCoreApplication(argc, argv);
   }
-  Main inst = Main();
-  QSignalSpy spy(inst.proc, SIGNAL(readyReadStandardError()));
-  QSignalSpy spy2(inst.proc, SIGNAL(readyReadStandardOutput()));
   QTimer::singleShot(0, [&] { app->exit(Catch::Session().run(argc, argv)); });
   return app->exec();
 }

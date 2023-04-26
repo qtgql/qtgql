@@ -11,9 +11,10 @@ include(Catch)
 find_package(Qt6 REQUIRED COMPONENTS Test Core Network)
 
 add_executable(tests main.hpp main.cpp test_gqlwstransport.cpp)
+set_target_properties(tests PROPERTIES AUTOMOC TRUE)
 
 target_link_libraries(tests PRIVATE Catch2::Catch2)
 target_link_libraries(tests PRIVATE Qt6::Core Qt6::Test Qt6::Network)
-target_link_libraries(tests PRIVATE qtgql)
+target_link_libraries(tests PRIVATE qtgql::gqltransport)
 
 catch_discover_tests(tests)

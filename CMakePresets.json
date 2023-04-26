@@ -9,7 +9,9 @@
                 "CMAKE_BUILD_DIR": ".cmake_build",
                 "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_CXX_EXTENSIONS": "OFF",
-                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+                "QTGQL_VERSBOSE": "ON",
+                "QTGQL_TESTING": "OFF"
             }
         },
         {

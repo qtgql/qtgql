@@ -23,15 +23,8 @@ const QString PONG = "pong";
 const QString SUBSCRIBE = "subscribe";
 };  // namespace PROTOCOL
 
-std::optional<QString> get_operation_name(const QString &query) {
-  static QRegularExpression re(
-      "(subscription|mutation|query)( [a-zA-Z]+)( |{)");
-  auto match = re.match(query);
-  if (match.hasMatch()) {
-    return match.captured(2);
-  };
-  return {};
-};
+std::optional<QString> get_operation_name(const QString &query);
+;
 
 struct HashAbleABC {
   virtual QJsonObject serialize() const = 0;
@@ -111,10 +104,10 @@ const auto PONG = BaseGqlWsTrnsMsg(PROTOCOL::PONG);
 // Replaces HandlerProto, To be extended by all consumers.
 class GqlWsHandlerABC {
  public:
-  void onData(QVariantMap message);
-  void onError(QVariantMap message);
-  void onCompleted();
-  const GqlWsTrnsMsgWithID message();
+  virtual void onData(QVariantMap message) = 0;
+  virtual void onError(QVariantMap message) = 0;
+  virtual void onCompleted() = 0;
+  virtual const GqlWsTrnsMsgWithID message() = 0;
 };
 
 class GqlWsTransportClient : public QObject {

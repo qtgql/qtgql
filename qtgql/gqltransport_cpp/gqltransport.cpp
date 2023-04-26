@@ -183,3 +183,13 @@ void GqlWsTransportClient::execute(std::shared_ptr<GqlWsHandlerABC> handler) {
     m_pending_handlers << handler;  // refcount increased (copy constructor)
   }
 };
+
+std::optional<QString> get_operation_name(const QString &query) {
+  static QRegularExpression re(
+      "(subscription|mutation|query)( [a-zA-Z]+)( |{)");
+  auto match = re.match(query);
+  if (match.hasMatch()) {
+    return match.captured(2);
+  };
+  return {};
+}
