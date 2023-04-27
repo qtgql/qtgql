@@ -6,11 +6,15 @@ import time
 from pathlib import Path
 
 
-def runserver():
+def get_open_port():
     sock = socket.socket()
     sock.bind(("", 0))
     port = str(sock.getsockname()[1])
     sock.close()
+    return port
+
+
+def runserver():
     p = subprocess.Popen(
         args=[
             "poetry",
@@ -20,7 +24,7 @@ def runserver():
             "aiohttp.web",
             "-H",
             "localhost",
-            f"-P {port}",
+            f"-P {get_open_port()}",
             "tests.mini_gql_server:init_func",
         ],
         env=os.environ.copy(),

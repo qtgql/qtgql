@@ -9,12 +9,12 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(Catch2)
 include(Catch)
 find_package(Qt6 REQUIRED COMPONENTS Test Core Network)
+set(TESTS_TARGET "test_qtgql")
+add_executable(${TESTS_TARGET} main.cpp test_gqlwstransport.cpp)
+set_target_properties(${TESTS_TARGET} PROPERTIES AUTOMOC TRUE)
 
-add_executable(tests main.hpp main.cpp test_gqlwstransport.cpp)
-set_target_properties(tests PROPERTIES AUTOMOC TRUE)
+target_link_libraries(${TESTS_TARGET} PRIVATE Catch2::Catch2)
+target_link_libraries(${TESTS_TARGET} PRIVATE Qt6::Core Qt6::Test Qt6::Network)
+target_link_libraries(${TESTS_TARGET} PRIVATE qtgql::gqltransport)
 
-target_link_libraries(tests PRIVATE Catch2::Catch2)
-target_link_libraries(tests PRIVATE Qt6::Core Qt6::Test Qt6::Network)
-target_link_libraries(tests PRIVATE qtgql::gqltransport)
-
-catch_discover_tests(tests)
+catch_discover_tests(${TESTS_TARGET})

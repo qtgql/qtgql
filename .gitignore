@@ -13,7 +13,8 @@ CMakeLists.txt.user
 
 # Distribution / packaging
 .Python
-build/
+**/.build
+**/build
 .cmake_build/
 develop-eggs/
 dist/

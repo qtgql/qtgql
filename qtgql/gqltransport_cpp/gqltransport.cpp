@@ -170,8 +170,10 @@ void GqlWsTransportClient::init_connection(const QNetworkRequest &request) {
   this->m_ws.open(request, this->m_ws_options);
 }
 
+bool GqlWsTransportClient::is_valid() { return m_ws.isValid(); }
+
 bool GqlWsTransportClient::gql_is_valid() {
-  return m_ws.isValid() && m_connection_ack;
+  return is_valid() && m_connection_ack;
 }
 
 void GqlWsTransportClient::execute(std::shared_ptr<GqlWsHandlerABC> handler) {
@@ -182,7 +184,7 @@ void GqlWsTransportClient::execute(std::shared_ptr<GqlWsHandlerABC> handler) {
   } else if (!m_pending_handlers.contains(handler)) {
     m_pending_handlers << handler;  // refcount increased (copy constructor)
   }
-};
+}
 
 std::optional<QString> get_operation_name(const QString &query) {
   static QRegularExpression re(
@@ -190,6 +192,6 @@ std::optional<QString> get_operation_name(const QString &query) {
   auto match = re.match(query);
   if (match.hasMatch()) {
     return match.captured(2);
-  };
+  }
   return {};
 }

@@ -17,7 +17,7 @@ from qtgql.gqltransport.client import GqlClientMessage
 from qtgql.gqltransport.client import GqlWsTransportClient
 from qtgql.gqltransport.client import HandlerProto
 from qtgql.tools import slot
-from tests.mini_gql_server import schema
+from tests.scripts.tests_server import schema
 
 try:
     from tests.test_sample_ui.__temp import Query

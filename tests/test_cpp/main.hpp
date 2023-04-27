@@ -5,53 +5,48 @@
 #include <QSignalSpy>
 #include <QTcpServer>
 
-int get_open_port();
+QString get_open_port();
 
 class Main : public QObject {
   Q_OBJECT
 
   void on_server_proc_stdout_ready() {
     qDebug() << proc->readAllStandardOutput();
-    m_ready = true;
   }
   void on_server_proc_stderr_ready() {
     qDebug() << proc->readAllStandardError();
   }
-  bool m_ready = false;
 
  public:
   QProcess *proc;
+  QString server_address = "";
+  ~Main(){};
+  static Main &getInstance() {
+    static Main inst;
+    return inst;
+  }
 
-  Main() : QObject(nullptr) {
+ private:
+  QProcess m_proc;
+  explicit Main() : QObject(nullptr) {
     proc = new QProcess(this);
-    auto port = get_open_port();
-    proc->setArguments({
-        "poetry",
-        "run",
-        "python",
-        "-m",
-        "aiohttp.web",
-        "-H",
-        "localhost",
-        "-P",
-        QString::number(port),
-        "tests.mini_gql_server:init_func",
-    });
 
     auto dir = QDir(__FILE__);
     dir.cdUp();
     dir.cdUp();
     dir.cdUp();
     proc->setWorkingDirectory(dir.absolutePath());
-    connect(proc, &QProcess::finished, this,
-            [this](int exitCode, QProcess::ExitStatus exitStatus) {
-              qDebug() << "exitCode: " << exitCode
-                       << "exitStatus: " << exitStatus;
-            });
     connect(proc, &QProcess::readyReadStandardOutput, this,
             &Main::on_server_proc_stdout_ready);
     connect(proc, &QProcess::readyReadStandardError, this,
             &Main::on_server_proc_stderr_ready);
-    proc->start();
+
+    //    proc->start("poetry", {"run", "python", "-m", "aiohttp.web", "-P",
+    //    get_open_port(),
+    //                           "tests.scripts.tests_server:init_func"});
+
+    // proc->start("poetry",
+    //             {"run", "python", "-c", "from tests.scripts.tests_server
+    //             import main; main(8000)"}, QProcess::OpenModeFlag::ReadOnly);
   }
 };

@@ -1,13 +1,9 @@
+#include <QTest>
 #include <catch2/catch_test_macros.hpp>
 #include <gqltransport.hpp>
 
+#include "main.hpp"
 static int return_two(int number) { return 2; };
-QString get_server_addr() {
-  if (const char* addr = std::getenv("SCHEMAS_SERVER_ADDR")) {
-    return QString(addr);
-  }
-  throw "No server address found";
-}
 
 TEST_CASE("get operation name", "[single-file]") {
   const QString operation_name = " SampleOperation";
@@ -17,6 +13,8 @@ TEST_CASE("get operation name", "[single-file]") {
 };
 
 TEST_CASE("grahpql-ws-transport protocol", "[single-file]") {
-  auto addr = get_server_addr();
+  QString addr = "ws://localhost:8546/graphql";
   auto client = GqlWsTransportClient(addr);
+  auto success = QTest::qWaitFor([&]() { return client.is_valid(); }, 100);
+  REQUIRE(success);
 }

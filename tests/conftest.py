@@ -28,6 +28,10 @@ fake = Faker()
 IS_WINDOWS = platform.system() == "Windows"
 
 
+def hash_schema(schema: Schema) -> int:
+    return int(hashlib.sha256(str(schema).encode("utf-8")).hexdigest(), 16) % 10**8
+
+
 @define
 class MiniServer:
     process: subprocess.Popen
@@ -51,7 +55,7 @@ def schemas_server() -> MiniServer:
             "-H",
             "localhost",
             f"-P {port}",
-            "tests.mini_gql_server:init_func",
+            "tests.scripts.tests_server:init_func",
         ],
         env=os.environ.copy(),
         cwd=Path(__file__).parent.parent,
@@ -106,7 +110,3 @@ class QmlBot:
 def qmlbot(qtbot):
     bot = QmlBot(qtbot)
     return bot
-
-
-def hash_schema(schema: Schema) -> int:
-    return int(hashlib.sha256(str(schema).encode("utf-8")).hexdigest(), 16) % 10**8

@@ -75,16 +75,20 @@ class Subscription:
 
 schema = strawberry.Schema(query=Query, subscription=Subscription, mutation=Mutation)
 
+app = web.Application()
+app.router.add_route("*", "/graphql", GraphQLView(schema=schema))
+for mod in all_schemas:
+    app.router.add_route("*", f"/{hash_schema(mod.schema)}", GraphQLView(schema=mod.schema))
+
 
 def init_func(argv):
-    app = web.Application()
-    app.router.add_route("*", "/graphql", GraphQLView(schema=schema))
-    for mod in all_schemas:
-        app.router.add_route("*", f"/{hash_schema(mod.schema)}", GraphQLView(schema=mod.schema))
     return app
 
 
-if __name__ == "__main__":
-    from aiohttp.web import main
+def main(port: int = 8546):
+    server_address = f"ws://localhost:{port}/"
+    web.run_app(app, host="localhost", port=port)
 
-    main(["mini_gql_server:init_func"])
+
+if __name__ == "__main__":
+    main()

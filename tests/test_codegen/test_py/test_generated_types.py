@@ -26,7 +26,7 @@ from qtgql.codegen.py.runtime.custom_scalars import TimeScalar
 from qtgql.codegen.py.runtime.queryhandler import BaseSubscriptionHandler
 from qtgql.codegen.py.runtime.queryhandler import SelectionConfig
 from tests.conftest import fake
-from tests.mini_gql_server import schema
+from tests.scripts.tests_server import schema
 from tests.test_codegen.test_py.testcases import all_test_cases
 from tests.test_codegen.test_py.testcases import custom_scalar_testcases
 from tests.test_codegen.test_py.testcases import CustomScalarInputTestCase

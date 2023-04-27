@@ -159,6 +159,7 @@ class GqlWsTransportClient : public QObject {
   void on_gql_complete(const GqlWsTrnsMsgWithID &message);
 
   void init_connection(const QNetworkRequest &request);
+  bool is_valid();
   bool gql_is_valid();
   void execute(std::shared_ptr<GqlWsHandlerABC> handler);
 };
