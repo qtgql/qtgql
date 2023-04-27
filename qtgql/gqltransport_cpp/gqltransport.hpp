@@ -18,7 +18,7 @@ const QString CONNECTION_ACK = "connection_ack";
 const QString ERROR = "error";
 const QString COMPLETE = "complete";
 const QString NEXT = "next";
-const QString PING = "pint";
+const QString PING = "ping";
 const QString PONG = "pong";
 const QString SUBSCRIBE = "subscribe";
 };  // namespace PROTOCOL
@@ -141,7 +141,7 @@ class GqlWsTransportClient : public QObject {
   void send_message(const BaseGqlWsTrnsMsg &message);
 
  public Q_SLOTS:
-  void onTextMessageReceived(const QString &message);
+  virtual void onTextMessageReceived(const QString &message);
   void onConnected();
   void onDisconnected();
   void onError(const QAbstractSocket::SocketError &error);
@@ -154,9 +154,9 @@ class GqlWsTransportClient : public QObject {
       bool auto_reconnect = false,
       std::optional<QList<std::pair<QString, QString>>> headers = {});
 
-  void on_gql_next(const GqlWsTrnsMsgWithID &message);
-  void on_gql_error(const GqlWsTrnsMsgWithID &message);
-  void on_gql_complete(const GqlWsTrnsMsgWithID &message);
+  virtual void on_gql_next(const GqlWsTrnsMsgWithID &message);
+  virtual void on_gql_error(const GqlWsTrnsMsgWithID &message);
+  virtual void on_gql_complete(const GqlWsTrnsMsgWithID &message);
 
   void init_connection(const QNetworkRequest &request);
   bool is_valid();

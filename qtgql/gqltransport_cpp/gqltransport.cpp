@@ -113,7 +113,7 @@ void GqlWsTransportClient::onPingTesterTimeout() {
 }
 
 void GqlWsTransportClient::send_message(const BaseGqlWsTrnsMsg &message) {
-  m_ws.sendBinaryMessage(QJsonDocument(message.serialize()).toJson());
+  m_ws.sendTextMessage(QJsonDocument(message.serialize()).toJson());
 }
 
 void GqlWsTransportClient::onTextMessageReceived(const QString &message) {

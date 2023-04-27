@@ -85,7 +85,7 @@ def init_func(argv):
     return app
 
 
-def main(port: int = 8546):
+def main(port: int = 9000):
     server_address = f"ws://localhost:{port}/"
     web.run_app(app, host="localhost", port=port)
 
