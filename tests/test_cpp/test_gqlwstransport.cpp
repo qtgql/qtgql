@@ -13,7 +13,6 @@ QString get_server_address() {
 class DebugAbleClient : public qtgql::GqlWsTransportClient {
   void onTextMessageReceived(const QString &message) {
     auto raw_data = QJsonDocument::fromJson(message.toUtf8());
-    GqlWsTransportClient::onTextMessageReceived(message);
     if (raw_data.isObject()) {
       auto data = raw_data.object();
       if (data.contains("id")) {
@@ -25,6 +24,9 @@ class DebugAbleClient : public qtgql::GqlWsTransportClient {
         auto message_type = message.type;
         if (message_type == qtgql::PROTOCOL::PONG) {
           m_pong_received = true;
+          if (!handle_pong) {
+            return;
+          }
         }
       }
     }
@@ -33,33 +35,41 @@ class DebugAbleClient : public qtgql::GqlWsTransportClient {
 
  public:
   bool m_pong_received = false;
+  bool handle_pong = true;
 
-  DebugAbleClient(QString url = get_server_address())
-      : GqlWsTransportClient(url) {}
+  DebugAbleClient(QString url = get_server_address(), QObject *parent = nullptr,
+                  int ping_interval = 50000, int ping_timeout = 5000,
+                  int reconnect_timeout = 3000, bool auto_reconnect = false)
+      : GqlWsTransportClient(url, parent, ping_interval, ping_timeout,
+                             auto_reconnect) {}
+
+  void wait_for_valid() {
+    if (!QTest::qWaitFor([&]() { return gql_is_valid(); }, 1000)) {
+      throw "Client could not connect to the GraphQL server";
+    }
+  }
 };
 
 std::shared_ptr<DebugAbleClient> get_valid_client() {
   auto client = std::make_shared<DebugAbleClient>();
-  if (!QTest::qWaitFor([&]() { return client->gql_is_valid(); }, 1000)) {
-    throw "Client could not connect to the GraphQL server";
-  }
+  client->wait_for_valid();
   return client;
 }
 
-TEST_CASE("get operation name", "[single-file]") {
+TEST_CASE("get operation name", "gqlwstransport-client") {
   const QString operation_name = "SampleOperation";
   auto res_op_name =
       qtgql::get_operation_name("query SampleOperation {field1 field2}");
   REQUIRE(res_op_name.value() == operation_name);
 };
 
-TEST_CASE("Connection init is sent and receives ack", "[single-file]") {
+TEST_CASE("Connection init is sent and receives ack", "gqlwstransport-client") {
   auto client = qtgql::GqlWsTransportClient(get_server_address());
   auto success = QTest::qWaitFor([&]() { return client.gql_is_valid(); }, 1000);
   REQUIRE(success);
 }
 
-TEST_CASE("Send ping receive pong", "[single-file]") {
+TEST_CASE("Send ping receive pong", "gqlwstransport-client") {
   auto client = DebugAbleClient();
   REQUIRE(QTest::qWaitFor([&]() { return client.gql_is_valid(); }, 1000));
   auto success =
@@ -107,7 +117,7 @@ class DefaultHandler : public qtgql::GqlWsHandlerABC {
   }
 };
 
-TEST_CASE("Subscribe to data (next message)", "[single-file]") {
+TEST_CASE("Subscribe to data (next message)", "gqlwstransport-client") {
   auto client = get_valid_client();
   auto handler = std::make_shared<DefaultHandler>(get_subscription_str());
   client->execute(handler);
@@ -115,11 +125,19 @@ TEST_CASE("Subscribe to data (next message)", "[single-file]") {
       QTest::qWaitFor([&]() -> bool { return handler->count_eq_9(); }, 1500));
 }
 
-TEST_CASE("Subscribe get complete message on complete", "[single-file]") {
+TEST_CASE("Subscribe get complete message on complete",
+          "gqlwstransport-client") {
   auto client = get_valid_client();
   auto handler = std::make_shared<DefaultHandler>(get_subscription_str());
   REQUIRE(!handler->m_completed);
   client->execute(handler);
   REQUIRE(
       QTest::qWaitFor([&]() -> bool { return handler->m_completed; }, 1500));
+}
+
+TEST_CASE("Ping timeout close connection", "gqlwstransport-client") {
+  auto client = DebugAbleClient(get_server_address(), nullptr, 5000, 400);
+  client.handle_pong = false;
+  client.wait_for_valid();
+  REQUIRE(QTest::qWaitFor([&]() -> bool { return !client.is_valid(); }, 600));
 }

@@ -76,4 +76,6 @@ def test_cpp(command: CtestTestCommand, schemas_server: MiniServer):
     os.environ.setdefault("SCHEMAS_SERVER_ADDR", schemas_server.address)
     command.run()
     if log_file := command.failed_log:
-        pytest.fail(msg=f"\n {'-'*8} Test {command.test_name} Failed {'-'*8} \n {log_file}")
+        pytest.fail(  # noqa: PT016
+            reason=f"\n {'-'*8} Test {command.test_name} Failed {'-'*8} \n {log_file}",
+        )
