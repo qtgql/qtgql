@@ -2,7 +2,17 @@
 
 #include <QtGlobal>
 
-GqlWsTransportClient::GqlWsTransportClient(
+std::optional<QString> qtgql::get_operation_name(const QString &query) {
+  static QRegularExpression re(
+      "(subscription|mutation|query)( [a-zA-Z]+)( |{)");
+  auto match = re.match(query);
+  if (match.hasMatch()) {
+    return match.captured(2).trimmed();
+  }
+  return {};
+}
+
+qtgql::GqlWsTransportClient::GqlWsTransportClient(
     QUrl url, QObject *parent, int ping_interval, int ping_timeout,
     int reconnect_timeout, bool auto_reconnect,
     std::optional<QList<std::pair<QString, QString>>> headers)
@@ -54,25 +64,28 @@ GqlWsTransportClient::GqlWsTransportClient(
   init_connection(req);
 }
 
-void GqlWsTransportClient::on_gql_next(const GqlWsTrnsMsgWithID &message) {
+void qtgql::GqlWsTransportClient::on_gql_next(
+    const GqlWsTrnsMsgWithID &message) {
   if (message.has_payload()) {
     if (m_handlers.contains(message.id)) {
       auto handler = m_handlers.value(message.id);
-      handler->onData(message.payload.toVariantMap());
+      handler->onData(message.payload);
     }
   }
 }
 
-void GqlWsTransportClient::on_gql_error(const GqlWsTrnsMsgWithID &message) {
+void qtgql::GqlWsTransportClient::on_gql_error(
+    const GqlWsTrnsMsgWithID &message) {
   qWarning() << "GraphQL Error occurred on ID: " << message.id.toString();
   if (message.has_payload()) {
     if (m_handlers.contains(message.id)) {
-      m_handlers.value(message.id)->onError(message.payload.toVariantMap());
+      m_handlers.value(message.id)->onError(message.payload);
     }
   }
 }
 
-void GqlWsTransportClient::on_gql_complete(const GqlWsTrnsMsgWithID &message) {
+void qtgql::GqlWsTransportClient::on_gql_complete(
+    const GqlWsTrnsMsgWithID &message) {
   if (m_handlers.contains(message.id)) {
     auto handler = m_handlers.value(message.id);
     handler->onCompleted();
@@ -80,7 +93,7 @@ void GqlWsTransportClient::on_gql_complete(const GqlWsTrnsMsgWithID &message) {
   }
 }
 
-void GqlWsTransportClient::on_gql_ack() {
+void qtgql::GqlWsTransportClient::on_gql_ack() {
   send_message(DEF_MESSAGES::PING);
   m_ping_timer->start();
   m_ping_tester_timer->start();
@@ -90,33 +103,37 @@ void GqlWsTransportClient::on_gql_ack() {
   }
 }
 
-void GqlWsTransportClient::on_gql_pong() { m_ping_tester_timer->stop(); }
+void qtgql::GqlWsTransportClient::on_gql_pong() { m_ping_tester_timer->stop(); }
 
-void GqlWsTransportClient::on_gql_ping() { send_message(DEF_MESSAGES::PONG); }
+void qtgql::GqlWsTransportClient::on_gql_ping() {
+  send_message(DEF_MESSAGES::PONG);
+}
 
-void GqlWsTransportClient::onReconnectTimeout() {
+void qtgql::GqlWsTransportClient::onReconnectTimeout() {
   if (!m_ws.isValid()) {
     init_connection(m_ws.request());
   }
 }
 
-void GqlWsTransportClient::onPingTimeout() {
+void qtgql::GqlWsTransportClient::onPingTimeout() {
   send_message(DEF_MESSAGES::PING);
   m_ping_tester_timer->start();
 }
 
-void GqlWsTransportClient::onPingTesterTimeout() {
+void qtgql::GqlWsTransportClient::onPingTesterTimeout() {
   qDebug() << "pong timeout reached, endpoint (" << m_url.toDisplayString()
            << ") did not send a pong the configured maximum delay";
   m_ws.close(QWebSocketProtocol::CloseCodeReserved1004);
   m_ping_tester_timer->stop();
 }
 
-void GqlWsTransportClient::send_message(const BaseGqlWsTrnsMsg &message) {
+void qtgql::GqlWsTransportClient::send_message(
+    const BaseGqlWsTrnsMsg &message) {
   m_ws.sendTextMessage(QJsonDocument(message.serialize()).toJson());
 }
 
-void GqlWsTransportClient::onTextMessageReceived(const QString &message) {
+void qtgql::GqlWsTransportClient::onTextMessageReceived(
+    const QString &message) {
   auto raw_data = QJsonDocument::fromJson(message.toUtf8());
   if (raw_data.isObject()) {
     auto data = raw_data.object();
@@ -145,7 +162,7 @@ void GqlWsTransportClient::onTextMessageReceived(const QString &message) {
   }
 }
 
-void GqlWsTransportClient::onConnected() {
+void qtgql::GqlWsTransportClient::onConnected() {
   qDebug() << "Connection established on url " << m_url.toDisplayString();
   send_message(DEF_MESSAGES::CONNECTION_INIT);
   if (m_reconnect_timer->isActive()) {
@@ -153,7 +170,7 @@ void GqlWsTransportClient::onConnected() {
   }
 }
 
-void GqlWsTransportClient::onDisconnected() {
+void qtgql::GqlWsTransportClient::onDisconnected() {
   qDebug() << "disconnected from " << m_url.toDisplayString()
            << "close code: " << m_ws.closeCode() << " : " << m_ws.closeReason();
   m_ping_timer->stop();
@@ -161,22 +178,25 @@ void GqlWsTransportClient::onDisconnected() {
   m_reconnect_timer->start();
 }
 
-void GqlWsTransportClient::onError(const QAbstractSocket::SocketError &error) {
+void qtgql::GqlWsTransportClient::onError(
+    const QAbstractSocket::SocketError &error) {
   qDebug() << "connection error occurred in " << typeid(this).name() << ": "
            << error;
 }
 
-void GqlWsTransportClient::init_connection(const QNetworkRequest &request) {
+void qtgql::GqlWsTransportClient::init_connection(
+    const QNetworkRequest &request) {
   this->m_ws.open(request, this->m_ws_options);
 }
 
-bool GqlWsTransportClient::is_valid() { return m_ws.isValid(); }
+bool qtgql::GqlWsTransportClient::is_valid() { return m_ws.isValid(); }
 
-bool GqlWsTransportClient::gql_is_valid() {
+bool qtgql::GqlWsTransportClient::gql_is_valid() {
   return is_valid() && m_connection_ack;
 }
 
-void GqlWsTransportClient::execute(std::shared_ptr<GqlWsHandlerABC> handler) {
+void qtgql::GqlWsTransportClient::execute(
+    std::shared_ptr<GqlWsHandlerABC> handler) {
   auto message = handler->message();
   m_handlers.insert(message.id, handler);
   if (m_ws.isValid()) {
@@ -186,12 +206,5 @@ void GqlWsTransportClient::execute(std::shared_ptr<GqlWsHandlerABC> handler) {
   }
 }
 
-std::optional<QString> get_operation_name(const QString &query) {
-  static QRegularExpression re(
-      "(subscription|mutation|query)( [a-zA-Z]+)( |{)");
-  auto match = re.match(query);
-  if (match.hasMatch()) {
-    return match.captured(2);
-  }
-  return {};
-}
+qtgql::GqlWsTrnsMsgWithID::GqlWsTrnsMsgWithID(const OperationPayload &_payload)
+    : BaseGqlWsTrnsMsg(PROTOCOL::SUBSCRIBE, _payload.serialize()) {}

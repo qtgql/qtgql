@@ -9,6 +9,8 @@
 #include <memory>
 #include <optional>
 
+namespace qtgql {
+
 // The WebSocket sub-protocol for this specification is: graphql-transport-
 // ws.
 // https://github.com/enisdenjo/graphql-ws/blob/master/PROTOCOL.md
@@ -20,11 +22,10 @@ const QString COMPLETE = "complete";
 const QString NEXT = "next";
 const QString PING = "ping";
 const QString PONG = "pong";
-const QString SUBSCRIBE = "subscribe";
-};  // namespace PROTOCOL
+const QString SUBSCRIBE = "subscribe";  // for queries | mutations as well.
+};                                      // namespace PROTOCOL
 
 std::optional<QString> get_operation_name(const QString &query);
-;
 
 struct HashAbleABC {
   virtual QJsonObject serialize() const = 0;
@@ -32,10 +33,11 @@ struct HashAbleABC {
 
 struct BaseGqlWsTrnsMsg : public HashAbleABC {
   QString type;
-  QJsonObject payload = {};
+  QJsonObject payload;
+
   BaseGqlWsTrnsMsg(const QString &type) {
+    assert(!type.isEmpty());
     this->type = type;
-    this->payload = QJsonObject{};
   }
 
   BaseGqlWsTrnsMsg(const QString &type, const QJsonObject &payload) {
@@ -63,6 +65,18 @@ struct BaseGqlWsTrnsMsg : public HashAbleABC {
     return data;
   }
 };
+struct OperationPayload : public HashAbleABC {
+  QString query;
+  QString operationName;
+  OperationPayload(const QString &_query) : query{_query} {
+    auto op_name = get_operation_name(query);
+    assert(op_name.has_value());
+    operationName = op_name.value();
+  };
+  QJsonObject serialize() const {
+    return {{"operationName", operationName}, {"query", query}};
+  }
+};
 
 struct GqlWsTrnsMsgWithID : public BaseGqlWsTrnsMsg {
   QUuid id = QUuid::createUuid();
@@ -71,23 +85,13 @@ struct GqlWsTrnsMsgWithID : public BaseGqlWsTrnsMsg {
       : BaseGqlWsTrnsMsg(data) {  // NOLINT
     this->id = QUuid::fromString(data["id"].toString());
   }
+  GqlWsTrnsMsgWithID(const OperationPayload &payload);
+
   QJsonObject serialize() const {
     QJsonObject ret = BaseGqlWsTrnsMsg::serialize();
     ret["id"] = id.toString();
     return ret;
   }
-};
-
-struct OperationPayload : public HashAbleABC {
-  QString query;
-  QString operationName;
-  std::optional<QVariant> variables = {};
-  OperationPayload(QString query, const QVariant &variables) {
-    query = query;
-    auto op_name = get_operation_name(query);
-    assert(op_name.has_value());
-    operationName = op_name.value();
-  };
 };
 
 struct GqlResult {
@@ -104,8 +108,8 @@ const auto PONG = BaseGqlWsTrnsMsg(PROTOCOL::PONG);
 // Replaces HandlerProto, To be extended by all consumers.
 class GqlWsHandlerABC {
  public:
-  virtual void onData(QVariantMap message) = 0;
-  virtual void onError(QVariantMap message) = 0;
+  virtual void onData(const QJsonObject &message) = 0;
+  virtual void onError(const QJsonObject &message) = 0;
   virtual void onCompleted() = 0;
   virtual const GqlWsTrnsMsgWithID message() = 0;
 };
@@ -163,3 +167,5 @@ class GqlWsTransportClient : public QObject {
   bool gql_is_valid();
   void execute(std::shared_ptr<GqlWsHandlerABC> handler);
 };
+
+}  // namespace qtgql

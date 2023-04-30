@@ -1,4 +1,5 @@
 import json
+import os
 import re
 import subprocess
 from functools import cached_property
@@ -7,6 +8,8 @@ from typing import Optional
 
 import pytest
 from typing_extensions import TypedDict
+
+from tests.conftest import MiniServer
 
 build_dir = Path(__file__).parent.parent / "build"
 
@@ -69,7 +72,8 @@ test_commands = collect_tests()
 
 
 @pytest.mark.parametrize("command", test_commands, ids=lambda v: v.test_name)
-def test_cpp(command: CtestTestCommand):
+def test_cpp(command: CtestTestCommand, schemas_server: MiniServer):
+    os.environ.setdefault("SCHEMAS_SERVER_ADDR", schemas_server.address)
     command.run()
     if log_file := command.failed_log:
         pytest.fail(msg=f"\n {'-'*8} Test {command.test_name} Failed {'-'*8} \n {log_file}")

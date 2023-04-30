@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING
 import strawberry
 from aiohttp import web
 from faker import Faker
+from strawberry.aiohttp.handlers import GraphQLTransportWSHandler
 from strawberry.aiohttp.views import GraphQLView
 
 from tests.conftest import hash_schema
@@ -75,10 +76,21 @@ class Subscription:
 
 schema = strawberry.Schema(query=Query, subscription=Subscription, mutation=Mutation)
 
+
+class DebugGraphQLTransportWSHandler(GraphQLTransportWSHandler):
+    async def handle_message(self, message: dict):
+        print(f"message -> {message}")  # noqa
+        await super().handle_message(message)
+
+
+class DebugGqlView(GraphQLView):
+    graphql_transport_ws_handler_class = DebugGraphQLTransportWSHandler
+
+
 app = web.Application()
-app.router.add_route("*", "/graphql", GraphQLView(schema=schema))
+app.router.add_route("*", "/graphql", DebugGqlView(schema=schema))
 for mod in all_schemas:
-    app.router.add_route("*", f"/{hash_schema(mod.schema)}", GraphQLView(schema=mod.schema))
+    app.router.add_route("*", f"/{hash_schema(mod.schema)}", DebugGqlView(schema=mod.schema))
 
 
 def init_func(argv):
@@ -86,7 +98,6 @@ def init_func(argv):
 
 
 def main(port: int = 9000):
-    server_address = f"ws://localhost:{port}/"
     web.run_app(app, host="localhost", port=port)
 
 
