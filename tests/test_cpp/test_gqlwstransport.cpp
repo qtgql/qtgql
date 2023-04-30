@@ -114,3 +114,12 @@ TEST_CASE("Subscribe to data (next message)", "[single-file]") {
   REQUIRE(
       QTest::qWaitFor([&]() -> bool { return handler->count_eq_9(); }, 1500));
 }
+
+TEST_CASE("Subscribe get complete message on complete", "[single-file]") {
+  auto client = get_valid_client();
+  auto handler = std::make_shared<DefaultHandler>(get_subscription_str());
+  REQUIRE(!handler->m_completed);
+  client->execute(handler);
+  REQUIRE(
+      QTest::qWaitFor([&]() -> bool { return handler->m_completed; }, 1500));
+}
