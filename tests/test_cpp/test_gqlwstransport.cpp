@@ -126,7 +126,7 @@ TEST_CASE("Subscribe to data (next message)", "gqlwstransport-client") {
 }
 
 TEST_CASE("Subscribe get complete message on complete",
-          "gqlwstransport-client") {
+          "[gqlwstransport-client]") {
   auto client = get_valid_client();
   auto handler = std::make_shared<DefaultHandler>(get_subscription_str());
   REQUIRE(!handler->m_completed);
@@ -136,8 +136,8 @@ TEST_CASE("Subscribe get complete message on complete",
 }
 
 TEST_CASE("Ping timeout close connection", "gqlwstransport-client") {
-  auto client = DebugAbleClient(get_server_address(), nullptr, 5000, 400);
+  auto client = DebugAbleClient(get_server_address(), nullptr, 5000, 500);
   client.handle_pong = false;
   client.wait_for_valid();
-  REQUIRE(QTest::qWaitFor([&]() -> bool { return !client.is_valid(); }, 600));
+  REQUIRE(QTest::qWaitFor([&]() -> bool { return !client.is_valid(); }, 700));
 }
