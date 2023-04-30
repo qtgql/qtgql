@@ -27,6 +27,9 @@ class DebugAbleClient : public qtgql::GqlWsTransportClient {
           if (!handle_pong) {
             return;
           }
+        } else if (message_type == qtgql::PROTOCOL::CONNECTION_ACK &&
+                   !handle_ack) {
+          return;
         }
       }
     }
@@ -36,7 +39,7 @@ class DebugAbleClient : public qtgql::GqlWsTransportClient {
  public:
   bool m_pong_received = false;
   bool handle_pong = true;
-
+  bool handle_ack = true;
   DebugAbleClient(QString url = get_server_address(), QObject *parent = nullptr,
                   int ping_interval = 50000, int ping_timeout = 5000,
                   int reconnect_timeout = 3000, bool auto_reconnect = false)
@@ -54,27 +57,6 @@ std::shared_ptr<DebugAbleClient> get_valid_client() {
   auto client = std::make_shared<DebugAbleClient>();
   client->wait_for_valid();
   return client;
-}
-
-TEST_CASE("get operation name", "gqlwstransport-client") {
-  const QString operation_name = "SampleOperation";
-  auto res_op_name =
-      qtgql::get_operation_name("query SampleOperation {field1 field2}");
-  REQUIRE(res_op_name.value() == operation_name);
-};
-
-TEST_CASE("Connection init is sent and receives ack", "gqlwstransport-client") {
-  auto client = qtgql::GqlWsTransportClient(get_server_address());
-  auto success = QTest::qWaitFor([&]() { return client.gql_is_valid(); }, 1000);
-  REQUIRE(success);
-}
-
-TEST_CASE("Send ping receive pong", "gqlwstransport-client") {
-  auto client = DebugAbleClient();
-  REQUIRE(QTest::qWaitFor([&]() { return client.gql_is_valid(); }, 1000));
-  auto success =
-      QTest::qWaitFor([&]() { return client.m_pong_received; }, 1000);
-  REQUIRE(success);
 }
 
 QString get_subscription_str(bool raiseOn5 = false,
@@ -116,6 +98,34 @@ class DefaultHandler : public qtgql::GqlWsHandlerABC {
     return false;
   }
 };
+
+TEST_CASE("get operation name", "gqlwstransport-client") {
+  const QString operation_name = "SampleOperation";
+  auto res_op_name =
+      qtgql::get_operation_name("query SampleOperation {field1 field2}");
+  REQUIRE(res_op_name.value() == operation_name);
+};
+
+TEST_CASE("If ack not received - gql is not valid", "gqlwstransport-client") {
+  auto client = DebugAbleClient(get_server_address());
+  REQUIRE(QTest::qWaitFor([&]() { return client.is_valid(); }, 1000));
+  REQUIRE(
+      QTest::qWaitFor([&]() -> bool { return !client.gql_is_valid(); }, 700));
+}
+
+TEST_CASE("Connection init is sent and receives ack", "gqlwstransport-client") {
+  auto client = qtgql::GqlWsTransportClient(get_server_address());
+  auto success = QTest::qWaitFor([&]() { return client.gql_is_valid(); }, 1000);
+  REQUIRE(success);
+}
+
+TEST_CASE("Send ping receive pong", "gqlwstransport-client") {
+  auto client = DebugAbleClient();
+  REQUIRE(QTest::qWaitFor([&]() { return client.gql_is_valid(); }, 1000));
+  auto success =
+      QTest::qWaitFor([&]() { return client.m_pong_received; }, 1000);
+  REQUIRE(success);
+}
 
 TEST_CASE("Subscribe to data (next message)", "gqlwstransport-client") {
   auto client = get_valid_client();
