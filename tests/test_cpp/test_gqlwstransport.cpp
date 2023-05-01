@@ -52,6 +52,7 @@ class DebugAbleClient : public qtgql::GqlWsTransportClient {
       throw "Client could not connect to the GraphQL server";
     }
   }
+  bool is_reconnect_timer_active() { return m_reconnect_timer->isActive(); }
 };
 
 std::shared_ptr<DebugAbleClient> get_valid_client() {
@@ -172,4 +173,22 @@ TEST_CASE("wont reconnect if reconnect is false", "[gqlwstransport-client]") {
   client.wait_for_valid();
   client.close();
   REQUIRE(QTest::qWaitFor([&]() -> bool { return !client.is_valid(); }, 700));
+}
+
+TEST_CASE("Reconnection tests", "[gqlwstransport-client]") {
+  auto client = DebugAbleClient(
+      {.prod_settings = {.url = get_server_address(), .auto_reconnect = true}});
+  client.wait_for_valid();
+  client.close();
+  SECTION("reconnect on disconnected") {
+    REQUIRE(
+        QTest::qWaitFor([&]() -> bool { return client.gql_is_valid(); }, 700));
+  }
+
+  SECTION("reconnect timer won't call connection init again after reconnect") {
+    REQUIRE(client.is_reconnect_timer_active());
+    REQUIRE(
+        QTest::qWaitFor([&]() -> bool { return client.gql_is_valid(); }, 700));
+    REQUIRE(!client.is_reconnect_timer_active());
+  }
 }

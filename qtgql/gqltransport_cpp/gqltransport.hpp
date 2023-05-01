@@ -128,16 +128,23 @@ class GqlWsTransportClient : public QObject {
   Q_OBJECT
  private:
   GqlWsTransportClient();  // make the default constructor private.
+  void send_message(const BaseGqlWsTrnsMsg &message);
+
+ private Q_SLOTS:
+  void onReconnectTimeout();
+  void onPingTimeout();
+  void onPingTesterTimeout();
+
+ protected:
   QUrl m_url;
-  bool m_autoconnect = true;
+  bool m_auto_reconnect = true;
   bool m_ping_is_valid = true;
   bool m_connection_ack = false;
-  QWebSocket m_ws;
-  QWebSocketHandshakeOptions m_ws_options;
-
   QTimer *m_reconnect_timer;
   QTimer *m_ping_timer;
   QTimer *m_ping_tester_timer;
+  QWebSocket m_ws;
+  QWebSocketHandshakeOptions m_ws_options;
 
   QMap<QUuid, std::shared_ptr<GqlWsHandlerABC>> m_handlers;
   // handlers that theier execution was deferred due to connection issues.
@@ -147,14 +154,11 @@ class GqlWsTransportClient : public QObject {
   void on_gql_ack();
   void on_gql_pong();
   void on_gql_ping();
+  virtual void on_gql_next(const GqlWsTrnsMsgWithID &message);
+  virtual void on_gql_error(const GqlWsTrnsMsgWithID &message);
+  virtual void on_gql_complete(const GqlWsTrnsMsgWithID &message);
 
- private Q_SLOTS:
-  void onReconnectTimeout();
-  void onPingTimeout();
-  void onPingTesterTimeout();
-  void send_message(const BaseGqlWsTrnsMsg &message);
-
- public Q_SLOTS:
+ protected Q_SLOTS:
   virtual void onTextMessageReceived(const QString &message);
   void onConnected();
   void onDisconnected();
@@ -163,11 +167,6 @@ class GqlWsTransportClient : public QObject {
  public:
   inline static const QString SUB_PROTOCOL = "graphql-transport-ws";
   GqlWsTransportClient(const GqlWsTransportClientSettings &settings);
-
-  virtual void on_gql_next(const GqlWsTrnsMsgWithID &message);
-  virtual void on_gql_error(const GqlWsTrnsMsgWithID &message);
-  virtual void on_gql_complete(const GqlWsTrnsMsgWithID &message);
-
   void init_connection(const QNetworkRequest &request);
   void close(QWebSocketProtocol::CloseCode closeCode =
                  QWebSocketProtocol::CloseCodeNormal,

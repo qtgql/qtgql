@@ -15,6 +15,7 @@ std::optional<QString> qtgql::get_operation_name(const QString &query) {
 qtgql::GqlWsTransportClient::GqlWsTransportClient(
     const GqlWsTransportClientSettings &settings)
     : QObject::QObject(settings.parent), m_url{settings.url} {
+  m_auto_reconnect = settings.auto_reconnect;
   m_reconnect_timer = new QTimer(this);
   if (settings.auto_reconnect) {
     m_reconnect_timer->setInterval(settings.reconnect_timeout);
@@ -108,7 +109,7 @@ void qtgql::GqlWsTransportClient::on_gql_ping() {
 }
 
 void qtgql::GqlWsTransportClient::onReconnectTimeout() {
-  if (!m_ws.isValid()) {
+  if (!m_ws.isValid() || !m_connection_ack) {
     init_connection(m_ws.request());
   }
 }
@@ -169,11 +170,15 @@ void qtgql::GqlWsTransportClient::onConnected() {
 }
 
 void qtgql::GqlWsTransportClient::onDisconnected() {
+  m_connection_ack = false;
   qDebug() << "disconnected from " << m_url.toDisplayString()
            << "close code: " << m_ws.closeCode() << " : " << m_ws.closeReason();
   m_ping_timer->stop();
   m_ping_tester_timer->stop();
-  m_reconnect_timer->start();
+  if (m_auto_reconnect) {
+    init_connection(m_ws.request());
+    m_reconnect_timer->start();
+  }
 }
 
 void qtgql::GqlWsTransportClient::onError(
