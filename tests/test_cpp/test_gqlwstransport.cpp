@@ -53,6 +53,9 @@ class DebugAbleClient : public qtgql::GqlWsTransportClient {
     }
   }
   bool is_reconnect_timer_active() { return m_reconnect_timer->isActive(); }
+  bool has_handler(const std::shared_ptr<qtgql::GqlWsHandlerABC> &handler) {
+    return m_handlers.contains(handler->message().id);
+  }
 };
 
 std::shared_ptr<DebugAbleClient> get_valid_client() {
@@ -74,11 +77,11 @@ class DefaultHandler : public qtgql::GqlWsHandlerABC {
   qtgql::GqlWsTrnsMsgWithID m_message;
 
  public:
-  DefaultHandler(const QString &query)
+  DefaultHandler(const QString &query = get_subscription_str())
       : m_message{qtgql::GqlWsTrnsMsgWithID(qtgql::OperationPayload(query))} {
     qDebug() << QJsonDocument(m_message.serialize()).toJson();
   }
-
+  QJsonArray m_errors;
   QJsonObject m_data;
   bool m_completed = false;
   void onData(const QJsonObject &message) {
@@ -87,7 +90,7 @@ class DefaultHandler : public qtgql::GqlWsHandlerABC {
     m_data = message;
   }
 
-  void onError(const QJsonObject &message) { qDebug() << message; }
+  void onError(const QJsonArray &errors) { m_errors = errors; }
   void onCompleted() { m_completed = true; }
 
   const qtgql::GqlWsTrnsMsgWithID message() { return m_message; }
@@ -143,7 +146,7 @@ TEST_CASE("Send ping receive pong", "[gqlwstransport-client]") {
 
 TEST_CASE("Subscribe to data (next message)", "[gqlwstransport-client]") {
   auto client = get_valid_client();
-  auto handler = std::make_shared<DefaultHandler>(get_subscription_str());
+  auto handler = std::make_shared<DefaultHandler>();
   client->execute(handler);
   REQUIRE(
       QTest::qWaitFor([&]() -> bool { return handler->count_eq_9(); }, 1500));
@@ -190,5 +193,45 @@ TEST_CASE("Reconnection tests", "[gqlwstransport-client]") {
     REQUIRE(
         QTest::qWaitFor([&]() -> bool { return client.gql_is_valid(); }, 700));
     REQUIRE(!client.is_reconnect_timer_active());
+  }
+}
+
+TEST_CASE("Handlers tests", "[gqlwstransport-handlers]") {
+  auto client = get_valid_client();
+  auto sub1 = std::make_shared<DefaultHandler>();
+  auto sub2 = std::make_shared<DefaultHandler>();
+  REQUIRE(sub1->message().id != sub2->message().id);
+
+  SECTION("executing handlers adds them to handlers map") {
+    client->execute(sub1);
+    client->execute(sub2);
+    REQUIRE(bool(client->has_handler(sub1) && client->has_handler(sub2)));
+  }
+  SECTION("handler called on gql_next") {
+    REQUIRE(sub1->m_data.empty());
+    client->execute(sub1);
+    REQUIRE(QTest::qWaitFor([&]() -> bool { return sub1->count_eq_9(); }));
+  }
+  SECTION("handler called on completed") {
+    REQUIRE(!sub1->m_completed);
+    client->execute(sub1);
+    std::ignore = QTest::qWaitFor([&]() -> bool { return sub1->count_eq_9(); });
+    REQUIRE(sub1->m_completed);
+  }
+  SECTION("handler completed pops out of handlers vector") {
+    client->execute(sub1);
+    REQUIRE(client->has_handler(sub1));
+    REQUIRE(QTest::qWaitFor([&]() -> bool { return sub1->m_completed; }));
+    REQUIRE(!client->has_handler(sub1));
+  }
+  auto sub_with_error =
+      std::make_shared<DefaultHandler>(get_subscription_str(true));
+  SECTION("gql operation error passes error to operation handler") {
+    client->execute(sub_with_error);
+    REQUIRE(QTest::qWaitFor(
+        [&]() -> bool { return !sub_with_error->m_errors.isEmpty(); }));
+    REQUIRE(
+        sub_with_error->m_errors[0].toObject().value("message").toString() ==
+        "Test Gql Error");
   }
 }

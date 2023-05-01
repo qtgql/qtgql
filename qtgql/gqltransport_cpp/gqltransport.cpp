@@ -76,9 +76,9 @@ void qtgql::GqlWsTransportClient::on_gql_next(
 void qtgql::GqlWsTransportClient::on_gql_error(
     const GqlWsTrnsMsgWithID &message) {
   qWarning() << "GraphQL Error occurred on ID: " << message.id.toString();
-  if (message.has_payload()) {
+  if (message.has_errors()) {
     if (m_handlers.contains(message.id)) {
-      m_handlers.value(message.id)->onError(message.payload);
+      m_handlers.value(message.id)->onError(message.errors);
     }
   }
 }

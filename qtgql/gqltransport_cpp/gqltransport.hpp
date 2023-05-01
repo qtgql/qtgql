@@ -80,13 +80,18 @@ struct OperationPayload : public HashAbleABC {
 
 struct GqlWsTrnsMsgWithID : public BaseGqlWsTrnsMsg {
   QUuid id = QUuid::createUuid();
+  QJsonArray errors;
   using BaseGqlWsTrnsMsg::BaseGqlWsTrnsMsg;
   GqlWsTrnsMsgWithID(const QJsonObject &data)
       : BaseGqlWsTrnsMsg(data) {  // NOLINT
     this->id = QUuid::fromString(data["id"].toString());
+    if (this->type == PROTOCOL::ERROR) {
+      errors = data.value("payload").toArray();
+    }
   }
   GqlWsTrnsMsgWithID(const OperationPayload &payload);
 
+  bool has_errors() const { return !this->errors.isEmpty(); }
   QJsonObject serialize() const {
     QJsonObject ret = BaseGqlWsTrnsMsg::serialize();
     ret["id"] = id.toString();
@@ -109,7 +114,7 @@ const auto PONG = BaseGqlWsTrnsMsg(PROTOCOL::PONG);
 class GqlWsHandlerABC {
  public:
   virtual void onData(const QJsonObject &message) = 0;
-  virtual void onError(const QJsonObject &message) = 0;
+  virtual void onError(const QJsonArray &errors) = 0;
   virtual void onCompleted() = 0;
   virtual const GqlWsTrnsMsgWithID message() = 0;
 };
