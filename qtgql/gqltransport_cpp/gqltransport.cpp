@@ -110,7 +110,7 @@ void qtgql::GqlWsTransportClient::on_gql_ping() {
 
 void qtgql::GqlWsTransportClient::onReconnectTimeout() {
   if (!m_ws.isValid() || !m_connection_ack) {
-    init_connection(m_ws.request());
+    reconnect();
   }
 }
 
@@ -176,7 +176,7 @@ void qtgql::GqlWsTransportClient::onDisconnected() {
   m_ping_timer->stop();
   m_ping_tester_timer->stop();
   if (m_auto_reconnect) {
-    init_connection(m_ws.request());
+    reconnect();
     m_reconnect_timer->start();
   }
 }
@@ -197,9 +197,9 @@ void qtgql::GqlWsTransportClient::close(QWebSocketProtocol::CloseCode closeCode,
   m_ws.close(closeCode, reason);
 }
 
-bool qtgql::GqlWsTransportClient::is_valid() { return m_ws.isValid(); }
+bool qtgql::GqlWsTransportClient::is_valid() const { return m_ws.isValid(); }
 
-bool qtgql::GqlWsTransportClient::gql_is_valid() {
+bool qtgql::GqlWsTransportClient::gql_is_valid() const {
   return is_valid() && m_connection_ack;
 }
 
@@ -212,6 +212,10 @@ void qtgql::GqlWsTransportClient::execute(
   } else if (!m_pending_handlers.contains(handler)) {
     m_pending_handlers << handler;  // refcount increased (copy constructor)
   }
+}
+
+void qtgql::GqlWsTransportClient::reconnect() {
+  this->m_ws.open(m_ws.request(), m_ws_options);
 }
 
 qtgql::GqlWsTrnsMsgWithID::GqlWsTrnsMsgWithID(const OperationPayload &_payload)

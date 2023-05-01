@@ -207,6 +207,7 @@ TEST_CASE("Handlers tests", "[gqlwstransport-handlers]") {
     client->execute(sub2);
     REQUIRE(bool(client->has_handler(sub1) && client->has_handler(sub2)));
   }
+
   SECTION("handler called on gql_next") {
     REQUIRE(sub1->m_data.empty());
     client->execute(sub1);
@@ -224,9 +225,19 @@ TEST_CASE("Handlers tests", "[gqlwstransport-handlers]") {
     REQUIRE(QTest::qWaitFor([&]() -> bool { return sub1->m_completed; }));
     REQUIRE(!client->has_handler(sub1));
   }
-  auto sub_with_error =
-      std::make_shared<DefaultHandler>(get_subscription_str(true));
+
+  SECTION("if client is not connected pends the message to later") {
+    client->close();
+    REQUIRE(!client->is_valid());
+    REQUIRE(!sub1->m_completed);
+    client->execute(sub1);
+    client->reconnect();
+    REQUIRE(QTest::qWaitFor([&]() -> bool { return sub1->m_completed; }));
+  }
+
   SECTION("gql operation error passes error to operation handler") {
+    auto sub_with_error =
+        std::make_shared<DefaultHandler>(get_subscription_str(true));
     client->execute(sub_with_error);
     REQUIRE(QTest::qWaitFor(
         [&]() -> bool { return !sub_with_error->m_errors.isEmpty(); }));

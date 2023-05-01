@@ -162,6 +162,7 @@ class GqlWsTransportClient : public QObject {
   virtual void on_gql_next(const GqlWsTrnsMsgWithID &message);
   virtual void on_gql_error(const GqlWsTrnsMsgWithID &message);
   virtual void on_gql_complete(const GqlWsTrnsMsgWithID &message);
+  void init_connection(const QNetworkRequest &request);
 
  protected Q_SLOTS:
   virtual void onTextMessageReceived(const QString &message);
@@ -172,13 +173,16 @@ class GqlWsTransportClient : public QObject {
  public:
   inline static const QString SUB_PROTOCOL = "graphql-transport-ws";
   GqlWsTransportClient(const GqlWsTransportClientSettings &settings);
-  void init_connection(const QNetworkRequest &request);
   void close(QWebSocketProtocol::CloseCode closeCode =
                  QWebSocketProtocol::CloseCodeNormal,
              const QString &reason = QString());
-  bool is_valid();
-  bool gql_is_valid();
+  bool is_valid() const;
+  // whether received connection_ack message and ws is valid.
+  bool gql_is_valid() const;
+  // execute / pend a handler for execution.
   void execute(std::shared_ptr<GqlWsHandlerABC> handler);
+  // reconnect with previous settings.
+  void reconnect();
 };
 
 }  // namespace qtgql
