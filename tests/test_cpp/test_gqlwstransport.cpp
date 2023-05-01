@@ -9,6 +9,12 @@ QString get_server_address() {
   }
   return "ws://localhost:9000/graphql";
 }
+struct DebugClientSettings {
+  bool handle_ack = true;
+  bool handle_pong = true;
+  qtgql::GqlWsTransportClientSettings prod_settings = {
+      .url = get_server_address()};
+};
 
 class DebugAbleClient : public qtgql::GqlWsTransportClient {
   void onTextMessageReceived(const QString &message) {
@@ -23,11 +29,11 @@ class DebugAbleClient : public qtgql::GqlWsTransportClient {
         auto message_type = message.type;
         if (message_type == qtgql::PROTOCOL::PONG) {
           m_pong_received = true;
-          if (!handle_pong) {
+          if (!m_settings.handle_pong) {
             return;
           }
         } else if (message_type == qtgql::PROTOCOL::CONNECTION_ACK &&
-                   !handle_ack) {
+                   !m_settings.handle_ack) {
           return;
         }
       }
@@ -37,13 +43,9 @@ class DebugAbleClient : public qtgql::GqlWsTransportClient {
 
  public:
   bool m_pong_received = false;
-  bool handle_pong = true;
-  bool handle_ack = true;
-  DebugAbleClient(QString url = get_server_address(), QObject *parent = nullptr,
-                  int ping_interval = 50000, int ping_timeout = 5000,
-                  int reconnect_timeout = 3000, bool auto_reconnect = false)
-      : GqlWsTransportClient(url, parent, ping_interval, ping_timeout,
-                             auto_reconnect) {}
+  DebugClientSettings m_settings;
+  DebugAbleClient(const DebugClientSettings &settings = {})
+      : GqlWsTransportClient(settings.prod_settings), m_settings{settings} {}
 
   void wait_for_valid() {
     if (!QTest::qWaitFor([&]() { return gql_is_valid(); }, 1000)) {
@@ -116,8 +118,7 @@ TEST_CASE("If ws not valid gql_valid=false", "[gqlwstransport-client]") {
 }
 
 TEST_CASE("If ack not received - gql is not valid", "[gqlwstransport-client]") {
-  auto client = DebugAbleClient(get_server_address());
-  client.handle_ack = false;
+  auto client = DebugAbleClient({.handle_ack = false});
   REQUIRE(QTest::qWaitFor([&]() { return client.is_valid(); }, 1000));
   std::ignore =
       QTest::qWaitFor([&]() -> bool { return client.gql_is_valid(); }, 200);
@@ -126,7 +127,7 @@ TEST_CASE("If ack not received - gql is not valid", "[gqlwstransport-client]") {
 
 TEST_CASE("Connection init is sent and receives ack",
           "[gqlwstransport-client]") {
-  auto client = qtgql::GqlWsTransportClient(get_server_address());
+  auto client = DebugAbleClient();
   auto success = QTest::qWaitFor([&]() { return client.gql_is_valid(); }, 1000);
   REQUIRE(success);
 }
@@ -158,8 +159,17 @@ TEST_CASE("Subscribe get complete message on complete",
 }
 
 TEST_CASE("Ping timeout close connection", "[gqlwstransport-client]") {
-  auto client = DebugAbleClient(get_server_address(), nullptr, 5000, 500);
-  client.handle_pong = false;
+  auto client = DebugAbleClient(
+      {.handle_pong = false,
+       .prod_settings = {.url = get_server_address(), .ping_timeout = 500}});
   client.wait_for_valid();
+  REQUIRE(QTest::qWaitFor([&]() -> bool { return !client.is_valid(); }, 700));
+}
+
+TEST_CASE("wont reconnect if reconnect is false", "[gqlwstransport-client]") {
+  auto client = DebugAbleClient({.prod_settings = {.url = get_server_address(),
+                                                   .auto_reconnect = false}});
+  client.wait_for_valid();
+  client.close();
   REQUIRE(QTest::qWaitFor([&]() -> bool { return !client.is_valid(); }, 700));
 }

@@ -114,6 +114,16 @@ class GqlWsHandlerABC {
   virtual const GqlWsTrnsMsgWithID message() = 0;
 };
 
+struct GqlWsTransportClientSettings {
+  const QUrl &url;
+  QObject *parent = nullptr;
+  int ping_interval = 50000;
+  int ping_timeout = 5000;
+  int reconnect_timeout = 3000;
+  bool auto_reconnect = false;
+  const std::optional<QList<std::pair<QString, QString>>> &headers = {};
+};
+
 class GqlWsTransportClient : public QObject {
   Q_OBJECT
  private:
@@ -152,11 +162,7 @@ class GqlWsTransportClient : public QObject {
 
  public:
   inline static const QString SUB_PROTOCOL = "graphql-transport-ws";
-  GqlWsTransportClient(
-      QUrl url, QObject *parent = nullptr, int ping_interval = 50000,
-      int ping_timeout = 5000, int reconnect_timeout = 3000,
-      bool auto_reconnect = false,
-      std::optional<QList<std::pair<QString, QString>>> headers = {});
+  GqlWsTransportClient(const GqlWsTransportClientSettings &settings);
 
   virtual void on_gql_next(const GqlWsTrnsMsgWithID &message);
   virtual void on_gql_error(const GqlWsTrnsMsgWithID &message);
