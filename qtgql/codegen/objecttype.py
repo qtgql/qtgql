@@ -15,7 +15,7 @@ from typingref import TypeHinter
 from typingref import UNSET
 
 from qtgql.codegen.compiler.builtin_scalars import BuiltinScalar
-from qtgql.codegen.runtime.bases import QGraphQListModel
+from qtgql.codegen.cppref import QtGqlTypes
 from qtgql.codegen.runtime.custom_scalars import BaseCustomScalar
 from qtgql.codegen.runtime.custom_scalars import CustomScalarMap
 from qtgql.codegen.utils import AntiForwardRef
@@ -320,7 +320,7 @@ class GqlTypeHinter(TypeHinter):
         if gql_enum := t_self.is_enum:
             return gql_enum.name
         if model_of := t_self.is_model:
-            return f"{QGraphQListModel.__name__}[{model_of.annotation}]"
+            return f"{QtGqlTypes.QGraphQLList.name}[{model_of.annotation}]"
         if object_def := t_self.is_object_type or t_self.is_interface:
             return f"Optional[{object_def.name}]"
         if t_self.is_union:

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import contextlib
 import importlib
 import sys
@@ -6,7 +8,6 @@ import traceback
 from functools import cached_property
 from pathlib import Path
 from textwrap import dedent
-from types import ModuleType
 from typing import Optional
 from typing import Type
 from typing import TYPE_CHECKING
@@ -17,20 +18,16 @@ from attr import define
 from PySide6.QtCore import QObject
 from strawberry import Schema
 
+from qtgql.codegen.compiler.config import QtGqlConfig
 from qtgql.codegen.introspection import SchemaEvaluator
-from qtgql.codegen.objecttype import QtGqlObjectTypeDefinition
-from qtgql.codegen.py.compiler.config import QtGqlConfig
-from qtgql.codegen.py.runtime.custom_scalars import BaseCustomScalar
-from qtgql.codegen.py.runtime.custom_scalars import DateScalar
-from qtgql.codegen.py.runtime.custom_scalars import DateTimeScalar
-from qtgql.codegen.py.runtime.custom_scalars import DecimalScalar
-from qtgql.codegen.py.runtime.custom_scalars import TimeScalar
-from qtgql.codegen.py.runtime.environment import _ENV_MAP
-from qtgql.codegen.py.runtime.environment import QtGqlEnvironment
-from qtgql.codegen.py.runtime.environment import set_gql_env
-from qtgql.codegen.py.runtime.queryhandler import BaseMutationHandler
-from qtgql.codegen.py.runtime.queryhandler import BaseQueryHandler
-from qtgql.gqltransport.client import GqlWsTransportClient
+from qtgql.codegen.runtime.custom_scalars import BaseCustomScalar
+from qtgql.codegen.runtime.custom_scalars import DateScalar
+from qtgql.codegen.runtime.custom_scalars import DateTimeScalar
+from qtgql.codegen.runtime.custom_scalars import DecimalScalar
+from qtgql.codegen.runtime.custom_scalars import TimeScalar
+from qtgql.codegen.runtime.environment import _ENV_MAP
+from qtgql.codegen.runtime.environment import QtGqlEnvironment
+from qtgql.codegen.runtime.environment import set_gql_env
 from tests.conftest import fake
 from tests.conftest import hash_schema
 from tests.conftest import QmlBot
@@ -38,7 +35,12 @@ from tests.test_codegen import schemas
 
 if TYPE_CHECKING:
     from PySide6 import QtCore
-    from qtgql.codegen.py.runtime.bases import _BaseQGraphQLObject
+    from qtgql.codegen.runtime.bases import _BaseQGraphQLObject
+    from qtgql.codegen.runtime.queryhandler import BaseMutationHandler
+    from types import ModuleType
+    from qtgql.codegen.objecttype import QtGqlObjectTypeDefinition
+
+BaseQueryHandler = None  # TODO: remove this when done migrating, this is just for readability.
 
 
 @define(slots=False, kw_only=True)
@@ -70,9 +72,9 @@ class QGQLObjectTestCase:
             return res.data
 
     @contextlib.contextmanager
-    def compile(self, url: Optional[str] = "") -> "CompiledTestCase":
+    def compile(self, url: Optional[str] = "") -> CompiledTestCase:
         url = url.replace("graphql", f"{hash_schema(self.schema)}")
-        client = GqlWsTransportClient(url=url)
+        client = GqlWsTransportClient(url=url)  # noqa
         self.config.env_name = env_name = fake.pystr()
         env = QtGqlEnvironment(client=client, name=env_name)
         set_gql_env(env)
@@ -163,12 +165,12 @@ class CompiledTestCase(QGQLObjectTestCase):
         return self.objecttypes_mod
 
     @property
-    def gql_type(self) -> Type["_BaseQGraphQLObject"]:
+    def gql_type(self) -> Type[_BaseQGraphQLObject]:
         assert self.tested_type
         return getattr(self.objecttypes_mod, self.tested_type.name)
 
     @cached_property
-    def query_handler(self) -> "BaseQueryHandler":
+    def query_handler(self) -> BaseQueryHandler:
         return getattr(self.handlers_mod, self.query_operationName)(self.parent_obj)
 
     def get_attr(self, attr: str):
@@ -180,7 +182,7 @@ class CompiledTestCase(QGQLObjectTestCase):
     def get_mutation_handler(self, operation_name: str) -> BaseMutationHandler:
         return self.get_attr(operation_name)(self.parent_obj)
 
-    def get_signals(self) -> dict[str, "QtCore.Signal"]:
+    def get_signals(self) -> dict[str, QtCore.Signal]:
         return {
             field.signal_name: getattr(self.query_handler.data, field.signal_name)
             for field in self.tested_type.fields
@@ -472,7 +474,7 @@ class CountryScalar(BaseCustomScalar[Optional[str], str]):
     DEFAULT_VALUE = "isr"
 
     @classmethod
-    def deserialize(cls, v=None) -> "BaseCustomScalar":
+    def deserialize(cls, v=None) -> BaseCustomScalar:
         if v:
             return cls(cls.countrymap[v])
         return cls()

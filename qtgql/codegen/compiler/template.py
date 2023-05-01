@@ -20,7 +20,7 @@ if TYPE_CHECKING:  # pragma: no cover
     )
 
 template_env = Environment(
-    loader=PackageLoader("qtgql.codegen.cpp"),
+    loader=PackageLoader("qtgql.codegen"),
     autoescape=select_autoescape(),
 )
 

@@ -9,6 +9,8 @@ from typing import TYPE_CHECKING
 import attrs
 from typingref import UNSET
 
+from qtgql.codegen.compiler.template import config_template
+from qtgql.codegen.compiler.template import ConfigContext
 from qtgql.codegen.graphql_ref import has_id_selection
 from qtgql.codegen.graphql_ref import has_typename_selection
 from qtgql.codegen.graphql_ref import inject_id_selection
@@ -17,8 +19,6 @@ from qtgql.codegen.graphql_ref import is_field_node
 from qtgql.codegen.graphql_ref import is_inline_fragment
 from qtgql.codegen.objecttype import QtGqlFieldDefinition
 from qtgql.codegen.objecttype import QtGqlObjectTypeDefinition
-from qtgql.codegen.py.compiler.template import config_template
-from qtgql.codegen.py.compiler.template import ConfigContext
 
 if TYPE_CHECKING:
     from graphql import language as gql_lang

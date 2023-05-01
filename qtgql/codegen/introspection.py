@@ -14,12 +14,12 @@ from graphql import OperationType
 from graphql.language import visitor
 from graphql.type import definition as gql_def
 
-from qtgql.codegen.cpp.compiler.builtin_scalars import BuiltinScalars
-from qtgql.codegen.cpp.compiler.operation import QtGqlOperationDefinition
-from qtgql.codegen.cpp.compiler.operation import QtGqlQueriedField
-from qtgql.codegen.cpp.compiler.template import handlers_template
-from qtgql.codegen.cpp.compiler.template import schema_types_template
-from qtgql.codegen.cpp.compiler.template import TemplateContext
+from qtgql.codegen.compiler.builtin_scalars import BuiltinScalars
+from qtgql.codegen.compiler.operation import QtGqlOperationDefinition
+from qtgql.codegen.compiler.operation import QtGqlQueriedField
+from qtgql.codegen.compiler.template import handlers_template
+from qtgql.codegen.compiler.template import schema_types_template
+from qtgql.codegen.compiler.template import TemplateContext
 from qtgql.codegen.graphql_ref import is_enum_definition
 from qtgql.codegen.graphql_ref import is_input_definition
 from qtgql.codegen.graphql_ref import is_interface_definition
@@ -45,7 +45,7 @@ from qtgql.codegen.utils import anti_forward_ref
 from qtgql.exceptions import QtGqlException
 
 if TYPE_CHECKING:  # pragma: no cover
-    from qtgql.codegen.cpp.compiler.config import QtGqlConfig
+    from qtgql.codegen.compiler.config import QtGqlConfig
 
 introspection_query = graphql.get_introspection_query(descriptions=True)
 

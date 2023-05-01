@@ -21,7 +21,7 @@ class _BuiltinScalars:
     ID = BuiltinScalar(CType("QString"), "9b2a0828-880d-4023-9909-de067984523c", graphql_name="ID")
     BOOLEAN = BuiltinScalar(CType("bool"), False, graphql_name="Boolean")
     UUID = BuiltinScalar(
-        CType("QString"),
+        CType("QUuid"),
         "9b2a0828-880d-4023-9909-de067984523c",
         graphql_name="UUID",
     )
