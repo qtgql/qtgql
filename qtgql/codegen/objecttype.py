@@ -14,10 +14,10 @@ from attrs import define
 from typingref import TypeHinter
 from typingref import UNSET
 
-from qtgql.codegen.py.compiler.builtin_scalars import BuiltinScalar
-from qtgql.codegen.py.runtime.bases import QGraphQListModel
-from qtgql.codegen.py.runtime.custom_scalars import BaseCustomScalar
-from qtgql.codegen.py.runtime.custom_scalars import CustomScalarMap
+from qtgql.codegen.compiler.builtin_scalars import BuiltinScalar
+from qtgql.codegen.runtime.bases import QGraphQListModel
+from qtgql.codegen.runtime.custom_scalars import BaseCustomScalar
+from qtgql.codegen.runtime.custom_scalars import CustomScalarMap
 from qtgql.codegen.utils import AntiForwardRef
 
 
