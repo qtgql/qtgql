@@ -12,7 +12,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(Qt6 REQUIRED COMPONENTS Core Qml Quick WebSockets)
 
 qt_standard_project_setup()
-add_subdirectory(qtgql/gqltransport_cpp)
+add_subdirectory(qtgql/gqlwstransport)
 
 # --options--
 option(QTGQL_VERBOSE "display helpful build information" true)

@@ -1,6 +1,6 @@
 #include <QTest>
 #include <catch2/catch_test_macros.hpp>
-#include <gqltransport.hpp>
+#include <gqlwstransport.hpp>
 
 QString get_server_address() {
   auto env_addr = std::getenv("SCHEMAS_SERVER_ADDR");

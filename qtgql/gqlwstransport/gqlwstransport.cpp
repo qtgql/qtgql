@@ -1,4 +1,4 @@
-#include "./gqltransport.hpp"
+#include "./gqlwstransport.hpp"
 
 #include <QtGlobal>
 
