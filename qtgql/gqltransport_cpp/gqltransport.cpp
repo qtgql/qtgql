@@ -189,6 +189,11 @@ void qtgql::GqlWsTransportClient::init_connection(
   this->m_ws.open(request, this->m_ws_options);
 }
 
+void qtgql::GqlWsTransportClient::close(QWebSocketProtocol::CloseCode closeCode,
+                                        const QString &reason) {
+  m_ws.close(closeCode, reason);
+}
+
 bool qtgql::GqlWsTransportClient::is_valid() { return m_ws.isValid(); }
 
 bool qtgql::GqlWsTransportClient::gql_is_valid() {

@@ -163,6 +163,9 @@ class GqlWsTransportClient : public QObject {
   virtual void on_gql_complete(const GqlWsTrnsMsgWithID &message);
 
   void init_connection(const QNetworkRequest &request);
+  void close(QWebSocketProtocol::CloseCode closeCode =
+                 QWebSocketProtocol::CloseCodeNormal,
+             const QString &reason = QString());
   bool is_valid();
   bool gql_is_valid();
   void execute(std::shared_ptr<GqlWsHandlerABC> handler);

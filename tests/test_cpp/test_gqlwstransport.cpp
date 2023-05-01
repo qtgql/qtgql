@@ -18,7 +18,6 @@ class DebugAbleClient : public qtgql::GqlWsTransportClient {
       if (data.contains("id")) {
         // Any that contains ID is directed to a single handler.
         auto message = qtgql::GqlWsTrnsMsgWithID(data);
-        auto message_type = message.type;
       } else {
         auto message = qtgql::BaseGqlWsTrnsMsg(data);
         auto message_type = message.type;
@@ -99,27 +98,40 @@ class DefaultHandler : public qtgql::GqlWsHandlerABC {
   }
 };
 
-TEST_CASE("get operation name", "gqlwstransport-client") {
+TEST_CASE("get operation name", "[gqlwstransport-client]") {
   const QString operation_name = "SampleOperation";
   auto res_op_name =
       qtgql::get_operation_name("query SampleOperation {field1 field2}");
   REQUIRE(res_op_name.value() == operation_name);
 };
 
-TEST_CASE("If ack not received - gql is not valid", "gqlwstransport-client") {
-  auto client = DebugAbleClient(get_server_address());
-  REQUIRE(QTest::qWaitFor([&]() { return client.is_valid(); }, 1000));
+TEST_CASE("If ws not valid gql_valid=false", "[gqlwstransport-client]") {
+  auto client = get_valid_client();
+  REQUIRE(QTest::qWaitFor([&]() { return client->gql_is_valid(); }, 1000));
+  client->close();
+
+  REQUIRE(QTest::qWaitFor([&]() -> bool { return !client->is_valid(); }, 700));
   REQUIRE(
-      QTest::qWaitFor([&]() -> bool { return !client.gql_is_valid(); }, 700));
+      QTest::qWaitFor([&]() -> bool { return !client->gql_is_valid(); }, 700));
 }
 
-TEST_CASE("Connection init is sent and receives ack", "gqlwstransport-client") {
+TEST_CASE("If ack not received - gql is not valid", "[gqlwstransport-client]") {
+  auto client = DebugAbleClient(get_server_address());
+  client.handle_ack = false;
+  REQUIRE(QTest::qWaitFor([&]() { return client.is_valid(); }, 1000));
+  std::ignore =
+      QTest::qWaitFor([&]() -> bool { return client.gql_is_valid(); }, 200);
+  REQUIRE(!client.gql_is_valid());
+}
+
+TEST_CASE("Connection init is sent and receives ack",
+          "[gqlwstransport-client]") {
   auto client = qtgql::GqlWsTransportClient(get_server_address());
   auto success = QTest::qWaitFor([&]() { return client.gql_is_valid(); }, 1000);
   REQUIRE(success);
 }
 
-TEST_CASE("Send ping receive pong", "gqlwstransport-client") {
+TEST_CASE("Send ping receive pong", "[gqlwstransport-client]") {
   auto client = DebugAbleClient();
   REQUIRE(QTest::qWaitFor([&]() { return client.gql_is_valid(); }, 1000));
   auto success =
@@ -127,7 +139,7 @@ TEST_CASE("Send ping receive pong", "gqlwstransport-client") {
   REQUIRE(success);
 }
 
-TEST_CASE("Subscribe to data (next message)", "gqlwstransport-client") {
+TEST_CASE("Subscribe to data (next message)", "[gqlwstransport-client]") {
   auto client = get_valid_client();
   auto handler = std::make_shared<DefaultHandler>(get_subscription_str());
   client->execute(handler);
@@ -145,7 +157,7 @@ TEST_CASE("Subscribe get complete message on complete",
       QTest::qWaitFor([&]() -> bool { return handler->m_completed; }, 1500));
 }
 
-TEST_CASE("Ping timeout close connection", "gqlwstransport-client") {
+TEST_CASE("Ping timeout close connection", "[gqlwstransport-client]") {
   auto client = DebugAbleClient(get_server_address(), nullptr, 5000, 500);
   client.handle_pong = false;
   client.wait_for_valid();
