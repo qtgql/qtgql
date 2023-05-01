@@ -126,7 +126,7 @@ struct GqlWsTransportClientSettings {
   int ping_timeout = 5000;
   int reconnect_timeout = 3000;
   bool auto_reconnect = false;
-  const std::optional<QList<std::pair<QString, QString>>> &headers = {};
+  const QList<std::pair<QString, QString>> &headers = {};
 };
 
 class GqlWsTransportClient : public QObject {

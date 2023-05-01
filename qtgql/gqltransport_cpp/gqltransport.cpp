@@ -54,9 +54,8 @@ qtgql::GqlWsTransportClient::GqlWsTransportClient(
 #endif
 
   auto req = QNetworkRequest(m_url);
-  if (settings.headers.has_value()) {
-    auto _headers = settings.headers.value();
-    for (const auto &header : qAsConst(_headers)) {
+  if (!settings.headers.empty()) {
+    for (const auto &header : qAsConst(settings.headers)) {
       req.setRawHeader(header.first.toUtf8(), header.second.toUtf8());
     }
   }
