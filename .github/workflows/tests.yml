@@ -2,9 +2,9 @@ name: 🔂 Unit tests
 
 on:
   push:
-    branches: [master, main]
+    branches: [cpp, main]
   pull_request:
-    branches: [master, main]
+    branches: [cpp, main]
     paths:
       - "qtgql/**"
       - "tests/**"

@@ -12,9 +12,9 @@ import pytest
 
 from qtgql.codegen.py.compiler.config import QtGqlConfig
 from qtgql.exceptions import QtGqlException
-from tests.test_codegen.test_py.testcases import MutationOperationTestCase
-from tests.test_codegen.test_py.testcases import ScalarsTestCase
-from tests.test_codegen.test_py.testcases import SubscriptionTestCase
+from tests.test_codegen.testcases import MutationOperationTestCase
+from tests.test_codegen.testcases import ScalarsTestCase
+from tests.test_codegen.testcases import SubscriptionTestCase
 
 if TYPE_CHECKING:
     from types import ModuleType

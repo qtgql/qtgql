@@ -14,18 +14,18 @@ from tests.conftest import MiniServer
 build_dir = Path(__file__).parent.parent / "build"
 
 
-class TestProperty(TypedDict):
+class CtestTestProperty(TypedDict):
     name: str
     value: str
 
 
-class TestDefinition(TypedDict):
+class CtestTestDefinition(TypedDict):
     name: str
-    properties: list[TestProperty]
+    properties: list[CtestTestProperty]
 
 
 class CtestDiscoveryResult(TypedDict):
-    tests: list[TestDefinition]
+    tests: list[CtestTestDefinition]
 
 
 class CtestTestCommand:
