@@ -10,6 +10,7 @@ import pytest
 from typing_extensions import TypedDict
 
 from tests.conftest import MiniServer
+from tests.conftest import PATHS
 
 build_dir = Path(__file__).parent.parent / "build"
 
@@ -56,6 +57,12 @@ class CtestTestCommand:
 
 
 def collect_tests() -> list[CtestTestCommand]:
+    subprocess.run("cmake --preset=test".split(" "), cwd=PATHS.PROJECT_ROOT).check_returncode()
+    subprocess.run(
+        "cmake --build --preset=test".split(" "),
+        cwd=PATHS.PROJECT_ROOT,
+    ).check_returncode()
+
     ret: list[CtestTestCommand] = []
     res = subprocess.run(
         ["ctest", "--show-only=json-v1"],
@@ -68,10 +75,7 @@ def collect_tests() -> list[CtestTestCommand]:
     return ret
 
 
-test_commands = collect_tests()
-
-
-@pytest.mark.parametrize("command", test_commands, ids=lambda v: v.test_name)
+@pytest.mark.parametrize("command", collect_tests(), ids=lambda v: v.test_name)
 def test_cpp(command: CtestTestCommand, schemas_server: MiniServer):
     os.environ.setdefault("SCHEMAS_SERVER_ADDR", schemas_server.address)
     command.run()

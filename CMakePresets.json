@@ -56,8 +56,16 @@
     ],
     "buildPresets": [
         {
-            "name": "Debug",
+            "name": "Build default",
             "configurePreset": "Debug",
+            "jobs": 4,
+            "targets": [
+                "all"
+            ]
+        },
+        {
+            "name": "test",
+            "configurePreset": "test",
             "jobs": 4,
             "targets": [
                 "all"
@@ -66,22 +74,12 @@
     ],
     "testPresets": [
         {
-            "name": "Debug",
-            "configurePreset": "Debug",
+            "name": "Test default preset",
+            "configurePreset": "test",
             "output": {
                 "shortProgress": true,
                 "outputOnFailure": true
             }
-        },
-        {
-            "name": "test",
-            "description": "",
-            "displayName": ""
-        },
-        {
-            "name": "tests",
-            "description": "",
-            "displayName": ""
         }
     ]
 }

@@ -28,6 +28,10 @@ fake = Faker()
 IS_WINDOWS = platform.system() == "Windows"
 
 
+class PATHS:
+    PROJECT_ROOT = Path(__file__).parent.parent
+
+
 def hash_schema(schema: Schema) -> int:
     return int(hashlib.sha256(str(schema).encode("utf-8")).hexdigest(), 16) % 10**8
 
