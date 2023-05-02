@@ -5,11 +5,11 @@ import pytest
 import toml
 from typer.testing import CliRunner
 
-from qtgql.codegen.cli import _find_pyproject
-from qtgql.codegen.cli import _get_app_import_path
-from qtgql.codegen.cli import app
-from qtgql.codegen.cli import QTGQL_CONFIG_KEY
-from qtgql.codegen.cli import TOOL_NAME
+from qtgqlcodegen.cli import _find_pyproject
+from qtgqlcodegen.cli import _get_app_import_path
+from qtgqlcodegen.cli import app
+from qtgqlcodegen.cli import QTGQL_CONFIG_KEY
+from qtgqlcodegen.cli import TOOL_NAME
 
 
 @pytest.fixture
@@ -23,7 +23,7 @@ def monkey_pyproject(monkeypatch, tmp_path) -> Path:
     with monkey_toml.open("w") as tf:
         toml.dump(cop, tf)
 
-    from qtgql.codegen import cli
+    from qtgqlcodegen.codegen import cli
 
     monkeypatch.setattr(cli, _get_app_import_path.__name__, partial(_get_app_import_path, tmp_path))
     return monkey_toml

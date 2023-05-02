@@ -5,11 +5,11 @@ from typing import Type
 
 from attrs import define
 
-from qtgql.codegen.compiler.template import schema_types_template
-from qtgql.codegen.compiler.template import TemplateContext
-from qtgql.codegen.introspection import SchemaEvaluator
-from qtgql.codegen.runtime.custom_scalars import CUSTOM_SCALARS
-from qtgql.codegen.runtime.custom_scalars import CustomScalarMap
+from qtgqlcodegen.compiler.template import schema_types_template
+from qtgqlcodegen.compiler.template import TemplateContext
+from qtgqlcodegen.introspection import SchemaEvaluator
+from qtgqlcodegen.runtime.custom_scalars import CUSTOM_SCALARS
+from qtgqlcodegen.runtime.custom_scalars import CustomScalarMap
 
 
 @define(slots=False)

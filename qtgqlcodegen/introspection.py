@@ -14,38 +14,38 @@ from graphql import OperationType
 from graphql.language import visitor
 from graphql.type import definition as gql_def
 
-from qtgql.codegen.compiler.builtin_scalars import BuiltinScalars
-from qtgql.codegen.compiler.operation import QtGqlOperationDefinition
-from qtgql.codegen.compiler.operation import QtGqlQueriedField
-from qtgql.codegen.compiler.template import handlers_template
-from qtgql.codegen.compiler.template import schema_types_template
-from qtgql.codegen.compiler.template import TemplateContext
-from qtgql.codegen.graphql_ref import is_enum_definition
-from qtgql.codegen.graphql_ref import is_input_definition
-from qtgql.codegen.graphql_ref import is_interface_definition
-from qtgql.codegen.graphql_ref import is_list_definition
-from qtgql.codegen.graphql_ref import is_named_type_node
-from qtgql.codegen.graphql_ref import is_non_null_definition
-from qtgql.codegen.graphql_ref import is_nonnull_node
-from qtgql.codegen.graphql_ref import is_object_definition
-from qtgql.codegen.graphql_ref import is_operation_def_node
-from qtgql.codegen.graphql_ref import is_scalar_definition
-from qtgql.codegen.graphql_ref import is_union_definition
-from qtgql.codegen.objecttype import EnumMap
-from qtgql.codegen.objecttype import EnumValue
-from qtgql.codegen.objecttype import GqlTypeHinter
-from qtgql.codegen.objecttype import QtGqlEnumDefinition
-from qtgql.codegen.objecttype import QtGqlFieldDefinition
-from qtgql.codegen.objecttype import QtGqlInputFieldDefinition
-from qtgql.codegen.objecttype import QtGqlInputObjectTypeDefinition
-from qtgql.codegen.objecttype import QtGqlInterfaceDefinition
-from qtgql.codegen.objecttype import QtGqlObjectTypeDefinition
-from qtgql.codegen.objecttype import QtGqlVariableDefinition
-from qtgql.codegen.utils import anti_forward_ref
-from qtgql.exceptions import QtGqlException
+from qtgqlcodegen.compiler.builtin_scalars import BuiltinScalars
+from qtgqlcodegen.compiler.operation import QtGqlOperationDefinition
+from qtgqlcodegen.compiler.operation import QtGqlQueriedField
+from qtgqlcodegen.compiler.template import handlers_template
+from qtgqlcodegen.compiler.template import schema_types_template
+from qtgqlcodegen.compiler.template import TemplateContext
+from qtgqlcodegen.exceptions import QtGqlException
+from qtgqlcodegen.graphql_ref import is_enum_definition
+from qtgqlcodegen.graphql_ref import is_input_definition
+from qtgqlcodegen.graphql_ref import is_interface_definition
+from qtgqlcodegen.graphql_ref import is_list_definition
+from qtgqlcodegen.graphql_ref import is_named_type_node
+from qtgqlcodegen.graphql_ref import is_non_null_definition
+from qtgqlcodegen.graphql_ref import is_nonnull_node
+from qtgqlcodegen.graphql_ref import is_object_definition
+from qtgqlcodegen.graphql_ref import is_operation_def_node
+from qtgqlcodegen.graphql_ref import is_scalar_definition
+from qtgqlcodegen.graphql_ref import is_union_definition
+from qtgqlcodegen.objecttype import EnumMap
+from qtgqlcodegen.objecttype import EnumValue
+from qtgqlcodegen.objecttype import GqlTypeHinter
+from qtgqlcodegen.objecttype import QtGqlEnumDefinition
+from qtgqlcodegen.objecttype import QtGqlFieldDefinition
+from qtgqlcodegen.objecttype import QtGqlInputFieldDefinition
+from qtgqlcodegen.objecttype import QtGqlInputObjectTypeDefinition
+from qtgqlcodegen.objecttype import QtGqlInterfaceDefinition
+from qtgqlcodegen.objecttype import QtGqlObjectTypeDefinition
+from qtgqlcodegen.objecttype import QtGqlVariableDefinition
+from qtgqlcodegen.utils import anti_forward_ref
 
 if TYPE_CHECKING:  # pragma: no cover
-    from qtgql.codegen.compiler.config import QtGqlConfig
+    from qtgqlcodegen.compiler.config import QtGqlConfig
 
 introspection_query = graphql.get_introspection_query(descriptions=True)
 

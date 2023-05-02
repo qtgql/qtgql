@@ -10,7 +10,7 @@ import toml
 import typer
 
 if TYPE_CHECKING:
-    from qtgql.codegen.py.compiler.config import QtGqlConfig
+    from qtgqlcodegen.py.compiler.config import QtGqlConfig
 
 console = rich.console.Console()
 

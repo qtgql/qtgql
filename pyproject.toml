@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "qtgql"
 version = "0.116.1"
-packages = [{ include = "qtgql" }]
+packages = [{ include = "qtgqlcodegen" }]
 description = "Qt framework for building graphql driven QML applications"
 authors = ["Nir <88795475+nrbnlulu@users.noreply.github.com>"]
 maintainers = ["Nir.J Benlulu <nrbnlulu@gmail.com>"]
@@ -248,4 +248,4 @@ project-name = "qtgql"
 append-github-contributor = true
 
 [tool.poetry.scripts]
-qtgql = "qtgql.codegen.cli:entrypoint"
+qtgql = "qtgql.cli:entrypoint"

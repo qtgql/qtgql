@@ -10,7 +10,7 @@ Here is a simple implementation
 
 ```python
 from __future__ import annotations
-from qtgql.codegen.py.runtime.custom_scalars import BaseCustomScalar
+from qtgqlcodegen.py.runtime.custom_scalars import BaseCustomScalar
 from typing import Optional
 
 country_map = {
@@ -41,7 +41,7 @@ assert CountryCode.deserialize('isr').to_qt() == 'israel' == CountryCode().to_qt
         You would need to add this in your config
     ```python
     # config.py
-    from qtgql.codegen.py.compiler.config import QtGqlConfig
+    from qtgqlcodegen.py.compiler.config import QtGqlConfig
 
 
     QtGqlConfig(custom_scalars={CountryCode.GRAPHQL_NAME: CountryCode}, ...)
@@ -49,4 +49,4 @@ assert CountryCode.deserialize('isr').to_qt() == 'israel' == CountryCode().to_qt
 
 ## API
 
-::: qtgql.codegen.py.runtime.custom_scalars
+::: qtgql.py.runtime.custom_scalars

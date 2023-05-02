@@ -13,6 +13,7 @@ find_package(Qt6 REQUIRED COMPONENTS Core Qml Quick WebSockets)
 
 qt_standard_project_setup()
 add_subdirectory(qtgql/gqlwstransport)
+add_subdirectory(qtgql/bases)
 
 # --options--
 option(QTGQL_VERBOSE "display helpful build information" true)
@@ -25,7 +26,7 @@ if(QTGQL_TESTING)
     message(STATUS "building tests")
   endif()
   include(CTest)
-  add_subdirectory(tests/test_cpp)
+  add_subdirectory(tests)
 endif()
 
 add_custom_target(

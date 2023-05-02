@@ -9,22 +9,22 @@ from typing import TYPE_CHECKING
 import attrs
 from typingref import UNSET
 
-from qtgql.codegen.compiler.template import config_template
-from qtgql.codegen.compiler.template import ConfigContext
-from qtgql.codegen.graphql_ref import has_id_selection
-from qtgql.codegen.graphql_ref import has_typename_selection
-from qtgql.codegen.graphql_ref import inject_id_selection
-from qtgql.codegen.graphql_ref import inject_typename_selection
-from qtgql.codegen.graphql_ref import is_field_node
-from qtgql.codegen.graphql_ref import is_inline_fragment
-from qtgql.codegen.objecttype import QtGqlFieldDefinition
-from qtgql.codegen.objecttype import QtGqlObjectTypeDefinition
+from qtgqlcodegen.compiler.template import config_template
+from qtgqlcodegen.compiler.template import ConfigContext
+from qtgqlcodegen.graphql_ref import has_id_selection
+from qtgqlcodegen.graphql_ref import has_typename_selection
+from qtgqlcodegen.graphql_ref import inject_id_selection
+from qtgqlcodegen.graphql_ref import inject_typename_selection
+from qtgqlcodegen.graphql_ref import is_field_node
+from qtgqlcodegen.graphql_ref import is_inline_fragment
+from qtgqlcodegen.objecttype import QtGqlFieldDefinition
+from qtgqlcodegen.objecttype import QtGqlObjectTypeDefinition
 
 if TYPE_CHECKING:
     from graphql import language as gql_lang
 
-    from qtgql.codegen.introspection import SchemaEvaluator
-    from qtgql.codegen.objecttype import QtGqlVariableDefinition
+    from qtgqlcodegen.introspection import SchemaEvaluator
+    from qtgqlcodegen.objecttype import QtGqlVariableDefinition
 
 
 def is_type_name_selection(field_node: gql_lang.FieldNode):

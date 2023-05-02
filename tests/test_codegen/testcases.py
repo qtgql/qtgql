@@ -18,16 +18,16 @@ from attr import define
 from PySide6.QtCore import QObject
 from strawberry import Schema
 
-from qtgql.codegen.compiler.config import QtGqlConfig
-from qtgql.codegen.introspection import SchemaEvaluator
-from qtgql.codegen.runtime.custom_scalars import BaseCustomScalar
-from qtgql.codegen.runtime.custom_scalars import DateScalar
-from qtgql.codegen.runtime.custom_scalars import DateTimeScalar
-from qtgql.codegen.runtime.custom_scalars import DecimalScalar
-from qtgql.codegen.runtime.custom_scalars import TimeScalar
-from qtgql.codegen.runtime.environment import _ENV_MAP
-from qtgql.codegen.runtime.environment import QtGqlEnvironment
-from qtgql.codegen.runtime.environment import set_gql_env
+from qtgqlcodegen.compiler.config import QtGqlConfig
+from qtgqlcodegen.introspection import SchemaEvaluator
+from qtgqlcodegen.runtime.custom_scalars import BaseCustomScalar
+from qtgqlcodegen.runtime.custom_scalars import DateScalar
+from qtgqlcodegen.runtime.custom_scalars import DateTimeScalar
+from qtgqlcodegen.runtime.custom_scalars import DecimalScalar
+from qtgqlcodegen.runtime.custom_scalars import TimeScalar
+from qtgqlcodegen.runtime.environment import _ENV_MAP
+from qtgqlcodegen.runtime.environment import QtGqlEnvironment
+from qtgqlcodegen.runtime.environment import set_gql_env
 from tests.conftest import fake
 from tests.conftest import hash_schema
 from tests.conftest import QmlBot
@@ -35,10 +35,10 @@ from tests.test_codegen import schemas
 
 if TYPE_CHECKING:
     from PySide6 import QtCore
-    from qtgql.codegen.runtime.bases import _BaseQGraphQLObject
-    from qtgql.codegen.runtime.queryhandler import BaseMutationHandler
+    from qtgqlcodegen.runtime.bases import _BaseQGraphQLObject
+    from qtgqlcodegen.runtime.queryhandler import BaseMutationHandler
     from types import ModuleType
-    from qtgql.codegen.objecttype import QtGqlObjectTypeDefinition
+    from qtgqlcodegen.objecttype import QtGqlObjectTypeDefinition
 
 BaseQueryHandler = None  # TODO: remove this when done migrating, this is just for readability.
 

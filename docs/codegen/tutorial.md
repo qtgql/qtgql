@@ -11,7 +11,7 @@ and another file named `operations.graphql` and declare the queries you want to 
 Point your config to that directory
 ```python
 # myapp/config.py
-from qtgql.codegen.py.compiler.config import QtGqlConfig
+from qtgqlcodegen.py.compiler.config import QtGqlConfig
 from pathlib import Path
 # normally you would use `Path(__file__).parent` though this doc is tested
 # and has no __file__...
@@ -82,8 +82,8 @@ including scalars and custom-scalars.
 
 ```python
 import logging
-from qtgql.codegen.py.runtime.queryhandler import BaseOperationHandler
-from qtgql.tools import slot
+from qtgqlcodegen.py.runtime.queryhandler import BaseOperationHandler
+from qtgqlcodegen.tools import slot
 
 from PySide6.QtCore import QObject
 

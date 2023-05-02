@@ -4,7 +4,7 @@ from typing import Protocol
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from qtgql.gqltransport.client import HandlerProto
+    from qtgqlcodegen.gqltransport.client import HandlerProto
 
 
 class NetworkLayerProto(Protocol):

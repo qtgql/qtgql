@@ -12,7 +12,7 @@ generate a QAbstractListModel with the proper roles in it.
 ```python
 from __future__ import annotations
 from PySide6.QtCore import QObject, Property, QCoreApplication
-from qtgql.tools.itemsystem import get_base_type, role, GenericModel, asdict
+from qtgqlcodegen.tools.itemsystem import get_base_type, role, GenericModel, asdict
 
 MyBaseType = get_base_type()
 class Apple(MyBaseType):

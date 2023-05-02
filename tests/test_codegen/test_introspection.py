@@ -1,6 +1,6 @@
 import pytest
 
-from qtgql.exceptions import QtGqlException
+from qtgqlcodegen.exceptions import QtGqlException
 from tests.test_codegen import schemas
 from tests.test_codegen.testcases import QGQLObjectTestCase
 from tests.test_codegen.testcases import TypeWithNoIDTestCase

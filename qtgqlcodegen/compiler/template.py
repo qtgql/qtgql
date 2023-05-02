@@ -10,9 +10,9 @@ from jinja2 import PackageLoader
 from jinja2 import select_autoescape
 
 if TYPE_CHECKING:  # pragma: no cover
-    from qtgql.codegen.py.compiler.config import QtGqlConfig
-    from qtgql.codegen.py.compiler.query import QtGqlOperationDefinition, QtGqlQueriedField
-    from qtgql.codegen.objecttype import (
+    from qtgqlcodegen.py.compiler.config import QtGqlConfig
+    from qtgqlcodegen.py.compiler.query import QtGqlOperationDefinition, QtGqlQueriedField
+    from qtgqlcodegen.objecttype import (
         QtGqlEnumDefinition,
         QtGqlInputObjectTypeDefinition,
         QtGqlInterfaceDefinition,
@@ -20,7 +20,7 @@ if TYPE_CHECKING:  # pragma: no cover
     )
 
 template_env = Environment(
-    loader=PackageLoader("qtgql.codegen"),
+    loader=PackageLoader("qtgqlcodegen"),
     autoescape=select_autoescape(),
 )
 

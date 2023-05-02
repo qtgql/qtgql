@@ -5,7 +5,7 @@ general helpers for ease of development.
 Creates a [slot](https://doc.qt.io/qt-6/signalsandslots.html) out of type annotation.
 
 ```python
-from qtgql.tools import slot
+from qtgqlcodegen.tools import slot
 from PySide6.QtCore import QObject
 
 
@@ -33,7 +33,7 @@ Create [Properties](https://doc.qt.io/qt-6/qproperty.html) with a dataclass synt
 
 Example:
 ```python
-from qtgql.tools import define_properties
+from qtgqlcodegen.tools import define_properties
 
 @define_properties
 class Apple:

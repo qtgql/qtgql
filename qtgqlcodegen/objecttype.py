@@ -14,11 +14,11 @@ from attrs import define
 from typingref import TypeHinter
 from typingref import UNSET
 
-from qtgql.codegen.compiler.builtin_scalars import BuiltinScalar
-from qtgql.codegen.cppref import QtGqlTypes
-from qtgql.codegen.runtime.custom_scalars import BaseCustomScalar
-from qtgql.codegen.runtime.custom_scalars import CustomScalarMap
-from qtgql.codegen.utils import AntiForwardRef
+from qtgqlcodegen.compiler.builtin_scalars import BuiltinScalar
+from qtgqlcodegen.cppref import QtGqlTypes
+from qtgqlcodegen.runtime.custom_scalars import BaseCustomScalar
+from qtgqlcodegen.runtime.custom_scalars import CustomScalarMap
+from qtgqlcodegen.utils import AntiForwardRef
 
 
 class Kinds(enum.Enum):

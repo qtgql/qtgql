@@ -68,7 +68,7 @@ struct BaseGqlWsTrnsMsg : public HashAbleABC {
 struct OperationPayload : public HashAbleABC {
   QString query;
   QString operationName;
-  OperationPayload(const QString &_query) : query{_query} {
+  explicit OperationPayload(const QString &_query) : query{_query} {
     auto op_name = get_operation_name(query);
     assert(op_name.has_value());
     operationName = op_name.value();
@@ -82,14 +82,14 @@ struct GqlWsTrnsMsgWithID : public BaseGqlWsTrnsMsg {
   QUuid id = QUuid::createUuid();
   QJsonArray errors;
   using BaseGqlWsTrnsMsg::BaseGqlWsTrnsMsg;
-  GqlWsTrnsMsgWithID(const QJsonObject &data)
+  explicit GqlWsTrnsMsgWithID(const QJsonObject &data)
       : BaseGqlWsTrnsMsg(data) {  // NOLINT
     this->id = QUuid::fromString(data["id"].toString());
     if (this->type == PROTOCOL::ERROR) {
       errors = data.value("payload").toArray();
     }
   }
-  GqlWsTrnsMsgWithID(const OperationPayload &payload);
+  explicit GqlWsTrnsMsgWithID(const OperationPayload &payload);
 
   bool has_errors() const { return !this->errors.isEmpty(); }
   QJsonObject serialize() const {
@@ -172,7 +172,7 @@ class GqlWsTransportClient : public QObject {
 
  public:
   inline static const QString SUB_PROTOCOL = "graphql-transport-ws";
-  GqlWsTransportClient(const GqlWsTransportClientSettings &settings);
+  explicit GqlWsTransportClient(const GqlWsTransportClientSettings &settings);
   void close(QWebSocketProtocol::CloseCode closeCode =
                  QWebSocketProtocol::CloseCodeNormal,
              const QString &reason = QString());

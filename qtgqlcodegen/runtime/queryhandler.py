@@ -14,12 +14,12 @@ from PySide6.QtCore import QObject
 from PySide6.QtCore import Signal
 from PySide6.QtQuick import QQuickItem
 
-from qtgql.codegen.py.runtime.environment import get_gql_env
-from qtgql.tools import qproperty
-from qtgql.tools import slot
+from qtgqlcodegen.py.runtime.environment import get_gql_env
+from qtgqlcodegen.tools import qproperty
+from qtgqlcodegen.tools import slot
 
 if TYPE_CHECKING:
-    from qtgql.gqltransport.client import GqlClientMessage
+    from qtgqlcodegen.gqltransport.client import GqlClientMessage
 
 T_QObject = TypeVar("T_QObject", bound=QObject)
 

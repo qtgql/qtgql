@@ -1,18 +1,18 @@
-from qtgql.tools import slot, qproperty
+from qtgqlcodegen.tools import slot, qproperty
 
 {% import "macros.jinja.py" as macros %}
 
 from typing import Optional, Union
 from PySide6.QtCore import Signal, QObject
 from PySide6.QtQml import QmlElement
-from qtgql.codegen.py.runtime.queryhandler import (BaseQueryHandler,
+from qtgqlcodegen.py.runtime.queryhandler import (BaseQueryHandler,
                                                    QmlOperationConsumerABC,
                                                    SelectionConfig,
                                                    OperationMetaData,
                                                    BaseMutationHandler,
                                                    BaseSubscriptionHandler)
-from qtgql.gqltransport.client import  GqlClientMessage, QueryPayload
-from qtgql.codegen.py.runtime.bases import QGraphQListModel
+from qtgqlcodegen.gqltransport.client import  GqlClientMessage, QueryPayload
+from qtgqlcodegen.py.runtime.bases import QGraphQListModel
 from .objecttypes import * # noqa
 
 

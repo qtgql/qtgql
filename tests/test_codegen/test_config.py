@@ -10,8 +10,8 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from qtgql.codegen.compiler.config import QtGqlConfig
-from qtgql.exceptions import QtGqlException
+from qtgqlcodegen.compiler.config import QtGqlConfig
+from qtgqlcodegen.exceptions import QtGqlException
 from tests.test_codegen.testcases import MutationOperationTestCase
 from tests.test_codegen.testcases import ScalarsTestCase
 from tests.test_codegen.testcases import SubscriptionTestCase
