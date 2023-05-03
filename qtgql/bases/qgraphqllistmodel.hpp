@@ -66,15 +66,18 @@ class QGraphQLListModelABC : public _QGraphQLListModelMixin {
  protected:
   T_sharedObjectQlist m_data;
 
-  void insert_common(const int from, const int to, std::function<void()> func) {
+  void insert_common(const int from, const int to) {
     beginInsertRows(invalid_index(), from, to);
-    func();
+  }
+  void end_insert_common() {
     update_count();
     endInsertRows();
   }
-  void remove_common(const int from, const int to, std::function<void()> func) {
+  void remove_common(int from, int to) {
     beginRemoveRows(invalid_index(), from, to);
-    func();
+  }
+
+  void end_remove_common() {
     update_count();
     endRemoveRows();
   }
@@ -97,6 +100,9 @@ class QGraphQLListModelABC : public _QGraphQLListModelMixin {
     }
     return {};
   }
+
+  T_sharedQObject get(int index) const { return m_data->value(index); }
+
   int rowCount(const QModelIndex& parent = QModelIndex()) const override final {
     return m_count;
   }
@@ -112,33 +118,41 @@ class QGraphQLListModelABC : public _QGraphQLListModelMixin {
                  << "The item will be inserted at the beginning of the list";
       index = 0;
     }
-    beginInsertRows(invalid_index(), index, index);
-    insert_common(index, index, [&] { m_data->insert(index, shared_obj_ref); });
+    insert_common(index, index);
+    m_data->insert(index, shared_obj_ref);
+    end_insert_common();
   }
 
   void append(const T_sharedQObject& shared_obj_ref) {
-    insert_common(m_count, m_count,
-                  [&]() -> void { m_data->append(shared_obj_ref); });
+    insert_common(m_count, m_count);
+    m_data->append(shared_obj_ref);
+    end_insert_common();
   }
 
-  void pop(const int index = -1) {
-    int real_index = (index > -1 ? index : m_count);
-    remove_common(real_index, real_index, [&] { m_data->remove(real_index); });
+  void pop(int index = -1) {
+    bool index_is_valid = (-1 < index && index < m_count);
+    int real_index = index_is_valid ? index : (m_count - 1);
+    qDebug() << "real index is" << real_index << "index is valid?"
+             << index_is_valid;
+    remove_common(real_index, real_index);
+    m_data->remove(real_index);
+    end_remove_common();
   }
 
   void clear() {
     if (!m_data.isEmpty()) {
-      remove_common(0, m_count - 1, [&] {
-        m_data->clear();
-        update_count();
-      });
+      remove_common(0, m_count - 1);
+      m_data->clear();
+      end_remove_common();
     }
   }
 
   bool removeRows(int row, int count,
                   const QModelIndex& parent = QModelIndex()) override {
     if ((row + count) <= m_count) {
-      remove_common(row, count, [&] { m_data->remove(row, count); });
+      remove_common(row, count);
+      m_data->remove(row, count);
+      end_remove_common();
       return true;
     }
     return false;
