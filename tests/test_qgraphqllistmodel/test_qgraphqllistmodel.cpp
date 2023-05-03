@@ -48,9 +48,10 @@ TEST_CASE("default QGraphQLListModelABC modifications and operations",
   }
 
   SECTION("test pop") {
-    //    QSignalSpy spy(&model_with_data,
-    //    SIGNAL(rowsAboutToBeRemoved(QModelIndex &, int , int )));
+    QSignalSpy spy(&model_with_data,
+                   SIGNAL(rowsAboutToBeRemoved(QModelIndex&, int, int)));
     model_with_data.pop();
+    spy.wait(500);
     REQUIRE(model_with_data.rowCount() == init_list_copy.length() - 1);
     auto val = model_with_data.get(model_with_data.rowCount() - 1)->val;
     auto val2 = init_list_copy.value(model_with_data.rowCount() - 1)->val;
