@@ -1,8 +1,8 @@
 #pragma once
 
+#include <QDebug>
 #include <QObject>
 #include <QSet>
-#include <QSharedData>
 
 #include "graphqlmetadata.hpp"
 
@@ -55,12 +55,17 @@ class NodeRecord {
   static_assert(std::is_base_of<BaseGraphQLObjectWithID, T>::value,
                 "<T> Must derive from BaseGraphQLObjectWithID");
   QSet<QString> m_retainers;
+  typedef std::shared_ptr<T> T_sharedQObject;
 
  public:
-  T node;
+  T_sharedQObject node;
   void retain(const QString &operation_name) {
     m_retainers.insert(operation_name);
   }
+  void loose(const QString &operation_name) {
+    m_retainers.remove(operation_name);
+  }
+  bool has_retainers() const { return m_retainers.isEmpty(); }
 };
 
 template <typename T>
@@ -68,21 +73,33 @@ template <typename T>
 class QGraphQLObjectStore {
   static_assert(std::is_base_of<BaseGraphQLObjectWithID, T>::value,
                 "<T> Must derive from BaseGraphQLObjectWithID");
-  typedef NodeRecord<T> SharedRecord_T;
-  typedef std::shared_ptr<T> Shared_T;
+  typedef std::shared_ptr<NodeRecord<T>> T_sharedRecord;
 
  protected:
-  QMap<QString, SharedRecord_T> m_data;
+  QMap<QString, T_sharedRecord> m_data;
 
  public:
-  std::optional<SharedRecord_T> get_node(const QString &id) {
+  std::optional<T_sharedRecord> get_record(const QString &id) {
     if (m_data.contains(id)) {
       return {m_data.value(id).node};
     }
     return {};
   }
 
-  void add_node(const Shared_T &node) { m_data.insert(node.id, node); };
+  void add_record(const T_sharedRecord &record) {
+    m_data.insert(record->node->id, record);
+  };
+
+  void loose(const T_sharedRecord::T_sharedQObject &node,
+             const QString &operation_name) {
+    auto record = m_data.value(node->id);
+    record->loose(operation_name);
+    if (!record->has_retainers()) {
+      m_data.remove(node->id);
+      qDebug() << "Node with ID: " << node->id << "has ref count of "
+               << node.use_count();
+    }
+  }
 };
 
 }  // namespace qtgql
