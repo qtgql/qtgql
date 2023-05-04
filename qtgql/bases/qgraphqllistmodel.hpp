@@ -30,11 +30,6 @@ class _QGraphQLListModelMixin : public QAbstractListModel {
   int m_count = 0;
   int m_current_index = 0;
 
-  void set_current_index(int index) {
-    m_current_index = index;
-    emit currentIndexChanged();
-  }
-
  public:
   explicit _QGraphQLListModelMixin(QObject* parent = nullptr)
       : QAbstractListModel(parent) {}
@@ -44,14 +39,19 @@ class _QGraphQLListModelMixin : public QAbstractListModel {
   }
   static const int QOBJECT_ROLE = Qt::UserRole + 1;
   QHash<int, QByteArray> roleNames() const override { return c_role_names; }
+  void set_current_index(int index) {
+    m_current_index = index;
+    emit currentIndexChanged();
+  }
 
  signals:
   void countChanged();
   void currentIndexChanged();
 };
 
-template <typename T_sharedQObject>
+template <typename T_QObject>
 class QGraphQLListModelABC : public _QGraphQLListModelMixin {
+  typedef std::shared_ptr<T_QObject> T_sharedQObject;
   typedef std::unique_ptr<QList<T_sharedQObject>> T_sharedObjectQlist;
 
  private:

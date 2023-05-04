@@ -7,13 +7,13 @@
 
 typedef std::shared_ptr<FooQObject> SharedFoo;
 
-class SampleQGraphQLListModel : public qtgql::QGraphQLListModelABC<SharedFoo> {
+class SampleQGraphQLListModel : public qtgql::QGraphQLListModelABC<FooQObject> {
   void update(const QList<QJsonObject>& data,
               const SelectionsConfig& selections) override {
     std::ignore = data;
     std::ignore = selections;
   }
-  using qtgql::QGraphQLListModelABC<SharedFoo>::QGraphQLListModelABC;
+  using qtgql::QGraphQLListModelABC<FooQObject>::QGraphQLListModelABC;
 };
 
 struct CompleteSpy {
@@ -95,6 +95,7 @@ TEST_CASE("default QGraphQLListModelABC modifications and operations",
     REQUIRE(model_with_data.rowCount() == 3);
     auto first_item = model_with_data.first();
     REQUIRE(model_with_data.removeRows(1, model_with_data.rowCount() - 1));
+    remove_spy.validate();
     REQUIRE(model_with_data.rowCount() == 1);
     auto new_last = model_with_data.first();
     REQUIRE(new_last.get() == first_item.get());
@@ -128,5 +129,21 @@ TEST_CASE("default QGraphQLListModelABC modifications and operations",
     auto after_count = model_with_data.rowCount();
     REQUIRE(before_count == after_count - 1);
     REQUIRE(model_with_data.last().get() == new_obj.get());
+  }
+
+  SECTION("test current index prop") {
+    bool ok = false;
+    REQUIRE(model_with_data.property("currentIndex").toInt(&ok) == 0);
+    REQUIRE(ok);
+  }
+
+  SECTION("test current index emits on set") {
+    QSignalSpy spy(&model_with_data,
+                   &SampleQGraphQLListModel::currentIndexChanged);
+    model_with_data.set_current_index(1);
+    REQUIRE(!spy.isEmpty());
+    bool ok = false;
+    REQUIRE(model_with_data.property("currentIndex").toInt(&ok) == 2);
+    REQUIRE(ok);
   }
 }
