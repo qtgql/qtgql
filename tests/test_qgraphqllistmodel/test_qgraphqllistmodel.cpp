@@ -16,6 +16,21 @@ class SampleQGraphQLListModel : public qtgql::QGraphQLListModelABC<SharedFoo> {
   using qtgql::QGraphQLListModelABC<SharedFoo>::QGraphQLListModelABC;
 };
 
+struct CompleteSpy {
+  QSignalSpy* about_to;
+  QSignalSpy* after;
+  explicit CompleteSpy(QSignalSpy* about, QSignalSpy* _after)
+      : about_to{about}, after{_after} {
+    REQUIRE(about->isEmpty());
+    REQUIRE(after->isEmpty());
+  }
+
+  void validate() {
+    REQUIRE(!about_to->isEmpty());
+    REQUIRE(!after->isEmpty());
+  }
+};
+
 TEST_CASE("default QGraphQLListModelABC modifications and operations",
           "[qgraphqllistmodle-raw]") {
   std::unique_ptr<std::vector<int>> a = std::make_unique<std::vector<int>>();
@@ -29,6 +44,16 @@ TEST_CASE("default QGraphQLListModelABC modifications and operations",
   }
   auto model_with_data =
       SampleQGraphQLListModel{nullptr, std::move(__init_list)};
+  QSignalSpy __pre_remove(&model_with_data,
+                          &SampleQGraphQLListModel::rowsAboutToBeRemoved);
+  QSignalSpy __after_remove(&model_with_data,
+                            &SampleQGraphQLListModel::rowsRemoved);
+  CompleteSpy remove_spy(&__pre_remove, &__after_remove);
+  QSignalSpy __pre_insert(&model_with_data,
+                          &SampleQGraphQLListModel::rowsAboutToBeInserted);
+  QSignalSpy __after_insert(&model_with_data,
+                            &SampleQGraphQLListModel::rowsInserted);
+  CompleteSpy insert_spy(&__pre_insert, &__after_insert);
 
   SECTION("object role is USER_ROLE + 1") {
     int expected = Qt::UserRole + 1;
@@ -48,13 +73,60 @@ TEST_CASE("default QGraphQLListModelABC modifications and operations",
   }
 
   SECTION("test pop") {
-    QSignalSpy spy(&model_with_data,
-                   SIGNAL(rowsAboutToBeRemoved(QModelIndex&, int, int)));
     model_with_data.pop();
-    spy.wait(500);
     REQUIRE(model_with_data.rowCount() == init_list_copy.length() - 1);
     auto val = model_with_data.get(model_with_data.rowCount() - 1)->val;
     auto val2 = init_list_copy.value(model_with_data.rowCount() - 1)->val;
     REQUIRE(val == val2);
+    remove_spy.validate();
+  }
+
+  SECTION("test clear") {
+    model_with_data.clear();
+    remove_spy.validate();
+    REQUIRE(model_with_data.rowCount() == 0);
+  }
+  SECTION("test remove rows") {
+    model_with_data.removeRows(0, model_with_data.rowCount());
+    REQUIRE(model_with_data.rowCount() == 0);
+    remove_spy.validate();
+  }
+  SECTION("test remove rows inside") {
+    REQUIRE(model_with_data.rowCount() == 3);
+    auto first_item = model_with_data.first();
+    REQUIRE(model_with_data.removeRows(1, model_with_data.rowCount() - 1));
+    REQUIRE(model_with_data.rowCount() == 1);
+    auto new_last = model_with_data.first();
+    REQUIRE(new_last.get() == first_item.get());
+  }
+
+  SECTION("test append") {
+    auto new_obj = std::make_shared<FooQObject>("zib");
+    auto before_count = model_with_data.rowCount();
+    model_with_data.append(new_obj);
+    insert_spy.validate();
+    auto after_count = model_with_data.rowCount();
+    REQUIRE(before_count == after_count - 1);
+    REQUIRE(model_with_data.last().get() == new_obj.get());
+  }
+  SECTION("test insert") {
+    auto new_obj = std::make_shared<FooQObject>("zib");
+    auto before_count = model_with_data.rowCount();
+    model_with_data.insert(0, new_obj);
+    insert_spy.validate();
+    auto after_count = model_with_data.rowCount();
+    REQUIRE(before_count == after_count - 1);
+    REQUIRE(model_with_data.first().get() == new_obj.get());
+  }
+  SECTION("test insert after max index") {
+    QSignalSpy spy(&model_with_data,
+                   &SampleQGraphQLListModel::rowsAboutToBeInserted);
+    auto new_obj = std::make_shared<FooQObject>("zib");
+    auto before_count = model_with_data.rowCount();
+    model_with_data.insert(20000, new_obj);
+    insert_spy.validate();
+    auto after_count = model_with_data.rowCount();
+    REQUIRE(before_count == after_count - 1);
+    REQUIRE(model_with_data.last().get() == new_obj.get());
   }
 }

@@ -102,6 +102,8 @@ class QGraphQLListModelABC : public _QGraphQLListModelMixin {
   }
 
   T_sharedQObject get(int index) const { return m_data->value(index); }
+  T_sharedQObject& first() const { return m_data->first(); }
+  T_sharedQObject& last() const { return m_data->last(); }
 
   int rowCount(const QModelIndex& parent = QModelIndex()) const override final {
     return m_count;
@@ -132,21 +134,21 @@ class QGraphQLListModelABC : public _QGraphQLListModelMixin {
   void pop(int index = -1) {
     bool index_is_valid = (-1 < index && index < m_count);
     int real_index = index_is_valid ? index : (m_count - 1);
-    qDebug() << "real index is" << real_index << "index is valid?"
-             << index_is_valid;
     remove_common(real_index, real_index);
     m_data->remove(real_index);
     end_remove_common();
   }
 
   void clear() {
-    if (!m_data.isEmpty()) {
+    if (!m_data->isEmpty()) {
       remove_common(0, m_count - 1);
       m_data->clear();
       end_remove_common();
     }
   }
 
+  // if count == 0 nothing would be removed.
+  // rows count starts from 0, for [1, 2, 3] removeRows(1, 2) would cause [1, ].
   bool removeRows(int row, int count,
                   const QModelIndex& parent = QModelIndex()) override {
     if ((row + count) <= m_count) {
