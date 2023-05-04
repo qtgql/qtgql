@@ -84,16 +84,16 @@ class DefaultHandler : public qtgql::GqlWsHandlerABC {
   QJsonArray m_errors;
   QJsonObject m_data;
   bool m_completed = false;
-  void onData(const QJsonObject &message) {
+  void onData(const QJsonObject &message) override {
     // here we copy the message though generally user wouldn't do this as it
     // would just use the reference to initialize some data
     m_data = message["data"].toObject();
   }
 
-  void onError(const QJsonArray &errors) { m_errors = errors; }
-  void onCompleted() { m_completed = true; }
+  void onError(const QJsonArray &errors) override { m_errors = errors; }
+  void onCompleted() override { m_completed = true; }
 
-  const qtgql::GqlWsTrnsMsgWithID message() { return m_message; }
+  const qtgql::OperationMessage &message() override { return m_message; }
   bool wait_for_completed() const {
     return QTest::qWaitFor([&]() -> bool { return m_completed; }, 1500);
   }
@@ -151,11 +151,18 @@ TEST_CASE("Send ping receive pong", "[gqlwstransport][ws-client]") {
 TEST_CASE("Subscribe to data (next message)", "[gqlwstransport][ws-client]") {
   auto client = get_valid_client();
   auto handler = std::make_shared<DefaultHandler>();
+  auto serialized = handler->message().serialize();
   client->execute(handler);
   REQUIRE(
       QTest::qWaitFor([&]() -> bool { return handler->count_eq_9(); }, 1500));
 }
 
+// TEST_CASE("execute via environment", "[gqlwstransport]"){
+//  std::unique_ptr<qtgql::QtGqlNetworkLayer> client =
+//  std::make_unique<DebugAbleClient>(); qtgql::QtGqlEnvironment("Sample env",
+//  std::move(client));
+
+//}
 TEST_CASE("Subscribe get complete message on complete",
           "[gqlwstransport][ws-client]") {
   auto client = get_valid_client();

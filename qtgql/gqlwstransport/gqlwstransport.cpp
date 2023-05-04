@@ -14,7 +14,7 @@ std::optional<QString> qtgql::get_operation_name(const QString &query) {
 
 qtgql::GqlWsTransportClient::GqlWsTransportClient(
     const GqlWsTransportClientSettings &settings)
-    : QObject::QObject(settings.parent), m_url{settings.url} {
+    : m_url{settings.url}, QObject::QObject(settings.parent) {
   m_auto_reconnect = settings.auto_reconnect;
   m_reconnect_timer = new QTimer(this);
   if (settings.auto_reconnect) {
@@ -125,8 +125,7 @@ void qtgql::GqlWsTransportClient::onPingTesterTimeout() {
   m_ping_tester_timer->stop();
 }
 
-void qtgql::GqlWsTransportClient::send_message(
-    const BaseGqlWsTrnsMsg &message) {
+void qtgql::GqlWsTransportClient::send_message(const HashAbleABC &message) {
   m_ws.sendTextMessage(QJsonDocument(message.serialize()).toJson());
 }
 

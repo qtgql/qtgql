@@ -8,6 +8,7 @@
 #include <deque>
 #include <memory>
 #include <optional>
+#include <qtgqlnetworklayer.hpp>
 
 namespace qtgql {
 
@@ -26,10 +27,6 @@ const QString SUBSCRIBE = "subscribe";  // for queries | mutations as well.
 };                                      // namespace PROTOCOL
 
 std::optional<QString> get_operation_name(const QString &query);
-
-struct HashAbleABC {
-  virtual QJsonObject serialize() const = 0;
-};
 
 struct BaseGqlWsTrnsMsg : public HashAbleABC {
   QString type;
@@ -56,7 +53,7 @@ struct BaseGqlWsTrnsMsg : public HashAbleABC {
 
   bool has_payload() const { return !payload.isEmpty(); };
 
-  QJsonObject serialize() const {
+  QJsonObject serialize() const override {
     QJsonObject data;
     data["type"] = type;
     if (!payload.isEmpty()) {
@@ -73,13 +70,12 @@ struct OperationPayload : public HashAbleABC {
     assert(op_name.has_value());
     operationName = op_name.value();
   };
-  QJsonObject serialize() const {
+  QJsonObject serialize() const override {
     return {{"operationName", operationName}, {"query", query}};
   }
 };
 
-struct GqlWsTrnsMsgWithID : public BaseGqlWsTrnsMsg {
-  QUuid id = QUuid::createUuid();
+struct GqlWsTrnsMsgWithID : public BaseGqlWsTrnsMsg, OperationMessage {
   QJsonArray errors;
   using BaseGqlWsTrnsMsg::BaseGqlWsTrnsMsg;
   explicit GqlWsTrnsMsgWithID(const QJsonObject &data)
@@ -92,7 +88,7 @@ struct GqlWsTrnsMsgWithID : public BaseGqlWsTrnsMsg {
   explicit GqlWsTrnsMsgWithID(const OperationPayload &payload);
 
   bool has_errors() const { return !this->errors.isEmpty(); }
-  QJsonObject serialize() const {
+  QJsonObject serialize() const override {
     QJsonObject ret = BaseGqlWsTrnsMsg::serialize();
     ret["id"] = id.toString();
     return ret;
@@ -110,15 +106,6 @@ const auto PING = BaseGqlWsTrnsMsg(PROTOCOL::PING);
 const auto PONG = BaseGqlWsTrnsMsg(PROTOCOL::PONG);
 }  // namespace DEF_MESSAGES
 
-// Replaces HandlerProto, To be extended by all consumers.
-class GqlWsHandlerABC {
- public:
-  virtual void onData(const QJsonObject &message) = 0;
-  virtual void onError(const QJsonArray &errors) = 0;
-  virtual void onCompleted() = 0;
-  virtual const GqlWsTrnsMsgWithID message() = 0;
-};
-
 struct GqlWsTransportClientSettings {
   const QUrl &url;
   QObject *parent = nullptr;
@@ -129,11 +116,11 @@ struct GqlWsTransportClientSettings {
   const QList<std::pair<QString, QString>> &headers = {};
 };
 
-class GqlWsTransportClient : public QObject {
+class GqlWsTransportClient : public QObject, public QtGqlNetworkLayer {
   Q_OBJECT
  private:
-  GqlWsTransportClient();  // make the default constructor private.
-  void send_message(const BaseGqlWsTrnsMsg &message);
+  GqlWsTransportClient() = delete;
+  void send_message(const HashAbleABC &message);
 
  private Q_SLOTS:
   void onReconnectTimeout();
@@ -180,7 +167,7 @@ class GqlWsTransportClient : public QObject {
   // whether received connection_ack message and ws is valid.
   bool gql_is_valid() const;
   // execute / pend a handler for execution.
-  void execute(std::shared_ptr<GqlWsHandlerABC> handler);
+  void execute(std::shared_ptr<GqlWsHandlerABC> handler) override;
   // reconnect with previous settings.
   void reconnect();
 };

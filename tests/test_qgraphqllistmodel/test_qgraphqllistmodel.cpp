@@ -140,7 +140,7 @@ TEST_CASE("default QGraphQLListModelABC modifications and operations",
   SECTION("test current index emits on set") {
     QSignalSpy spy(&model_with_data,
                    &SampleQGraphQLListModel::currentIndexChanged);
-    model_with_data.set_current_index(1);
+    model_with_data.set_current_index(2);
     REQUIRE(!spy.isEmpty());
     bool ok = false;
     REQUIRE(model_with_data.property("currentIndex").toInt(&ok) == 2);

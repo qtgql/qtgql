@@ -52,7 +52,7 @@ class _QGraphQLListModelMixin : public QAbstractListModel {
 template <typename T_QObject>
 class QGraphQLListModelABC : public _QGraphQLListModelMixin {
   typedef std::shared_ptr<T_QObject> T_sharedQObject;
-  typedef std::unique_ptr<QList<T_sharedQObject>> T_sharedObjectQlist;
+  typedef std::unique_ptr<QList<T_sharedQObject>> T_uniqueObjectQlist;
 
  private:
   void update_count() {
@@ -64,7 +64,7 @@ class QGraphQLListModelABC : public _QGraphQLListModelMixin {
   };
 
  protected:
-  T_sharedObjectQlist m_data;
+  T_uniqueObjectQlist m_data;
 
   void insert_common(const int from, const int to) {
     beginInsertRows(invalid_index(), from, to);
@@ -85,7 +85,7 @@ class QGraphQLListModelABC : public _QGraphQLListModelMixin {
  public:
   explicit QGraphQLListModelABC(
       QObject* parent = nullptr,
-      T_sharedObjectQlist data = std::make_unique<QList<T_sharedQObject>>())
+      T_uniqueObjectQlist data = std::make_unique<QList<T_sharedQObject>>())
       : _QGraphQLListModelMixin(parent), m_data{std::move(data)} {
     m_count = m_data->length();
   };

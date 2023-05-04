@@ -1,10 +1,6 @@
 from __future__ import annotations
 
 import contextlib
-import importlib
-import sys
-import tempfile
-import traceback
 from functools import cached_property
 from pathlib import Path
 from textwrap import dedent
@@ -26,8 +22,6 @@ from qtgqlcodegen.runtime.custom_scalars import DateTimeScalar
 from qtgqlcodegen.runtime.custom_scalars import DecimalScalar
 from qtgqlcodegen.runtime.custom_scalars import TimeScalar
 from qtgqlcodegen.runtime.environment import _ENV_MAP
-from qtgqlcodegen.runtime.environment import QtGqlEnvironment
-from qtgqlcodegen.runtime.environment import set_gql_env
 from tests.conftest import fake
 from tests.conftest import hash_schema
 from tests.conftest import QmlBot
@@ -41,6 +35,11 @@ if TYPE_CHECKING:
     from qtgqlcodegen.objecttype import QtGqlObjectTypeDefinition
 
 BaseQueryHandler = None  # TODO: remove this when done migrating, this is just for readability.
+
+
+GENERATED_TESTS_DIR = Path(__file__).parent / "generated_test_projects"
+if not GENERATED_TESTS_DIR.exists:
+    GENERATED_TESTS_DIR.mkdir()
 
 
 @define(slots=False, kw_only=True)
@@ -71,45 +70,17 @@ class QGQLObjectTestCase:
         else:
             return res.data
 
+    @cached_property
+    def test_dir(self) -> Path:
+        return GENERATED_TESTS_DIR / self.test_name
+
     @contextlib.contextmanager
     def compile(self, url: Optional[str] = "") -> CompiledTestCase:
         url = url.replace("graphql", f"{hash_schema(self.schema)}")
-        client = GqlWsTransportClient(url=url)  # noqa
         self.config.env_name = env_name = fake.pystr()
-        env = QtGqlEnvironment(client=client, name=env_name)
-        set_gql_env(env)
 
-        with tempfile.TemporaryDirectory() as raw_tmp_dir:
-            tmp_dir = Path(raw_tmp_dir).resolve()
-            self.config.graphql_dir = tmp_dir
-            (tmp_dir / "__init__.py").resolve().write_text("import os")
-            (tmp_dir / "operations.graphql").resolve().write_text(self.query)
-            (tmp_dir / "schema.graphql").resolve().write_text(str(self.schema))
-            gen_module_name = fake.pystr()
-            generated_dir = tmp_dir / gen_module_name
-            generated_dir.mkdir()
-            generated = self.evaluator.dumps()
-            (generated_dir / "__init__.py").resolve().write_text("import os")
-            schema_dir = (generated_dir / "objecttypes.py").resolve()
-            schema_dir.write_text(generated["objecttypes"])
-            handlers_dir = (generated_dir / "handlers.py").resolve()
-            handlers_dir.write_text(generated["handlers"])
-            sys.path.append(str(tmp_dir))
-            try:
-                schema_mod = importlib.import_module(f"{gen_module_name}.objecttypes")
-            except BaseException as e:
-                traceback.print_tb(e.__traceback__)
-                raise RuntimeError(generated["objecttypes"]) from e
-
-            try:
-                handler_mod = importlib.import_module(f"{gen_module_name}.handlers")
-            except BaseException as e:
-                traceback.print_tb(e.__traceback__)
-                raise RuntimeError(generated["handlers"]) from e
         testcase = CompiledTestCase(
             evaluator=self.evaluator,
-            objecttypes_mod=schema_mod,
-            handlers_mod=handler_mod,
             config=self.config,
             query=self.query,
             schema=self.schema,
@@ -120,15 +91,11 @@ class QGQLObjectTestCase:
             tested_type=self.evaluator._objecttypes_def_map.get(self.type_name, None),
         )
         yield testcase
-        testcase.cleanup()
-        client.deleteLater()
         _ENV_MAP.pop(env_name)
 
 
 @define
 class CompiledTestCase(QGQLObjectTestCase):
-    objecttypes_mod: ModuleType
-    handlers_mod: ModuleType
     config: QtGqlConfig
     tested_type: QtGqlObjectTypeDefinition
     evaluator: SchemaEvaluator
@@ -149,16 +116,12 @@ class CompiledTestCase(QGQLObjectTestCase):
                         Text{{
                             text: `is autofetch? ${{autofetch}}`
                         }}
-
                     }}
                 """.format(
                     self.config.env_name,
                     self.query_operationName,
                 ),
             )
-
-    def cleanup(self) -> None:
-        self.parent_obj.deleteLater()
 
     @property
     def module(self) -> ModuleType:
