@@ -458,4 +458,4 @@ class SchemaEvaluator:
     def dump(self):
         """:param file: Path to the directory the codegen would dump to."""
         for fname, content in self.dumps().items():
-            (self.config.generated_dir / (fname + ".cpp")).write_text(content)
+            (self.config.generated_dir / (fname + ".hpp")).write_text(content)

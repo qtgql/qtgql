@@ -77,5 +77,5 @@ repos:
 
 exclude: >
           (?x)^(
-              .*\.jinja.py|
+              .*\.jinja.*|
           )$

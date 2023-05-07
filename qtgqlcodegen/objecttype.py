@@ -149,7 +149,7 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
 
     @cached_property
     def private_name(self) -> str:
-        return "_" + self.name
+        return "m_" + self.name
 
     @property
     def fget(self) -> str:

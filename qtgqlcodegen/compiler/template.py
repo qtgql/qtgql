@@ -24,7 +24,7 @@ template_env = Environment(
     autoescape=select_autoescape(),
 )
 
-SCHEMA_TEMPLATE = template_env.get_template("schema.jinja.py")
+SCHEMA_TEMPLATE = template_env.get_template("schema.jinja.cpp")
 HANDLERS_TEMPLATE = template_env.get_template("handlers.jinja.py")
 CONFIG_TEMPLATE = template_env.get_template("config.jinja.py")
 

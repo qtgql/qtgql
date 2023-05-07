@@ -1,6 +1,6 @@
 from qtgqlcodegen.tools import slot, qproperty
 
-{% import "macros.jinja.py" as macros %}
+{% import "macros.jinja.cpp" as macros %}
 
 from typing import Optional, Union
 from PySide6.QtCore import Signal, QObject
