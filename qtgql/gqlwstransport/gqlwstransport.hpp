@@ -62,6 +62,7 @@ struct BaseGqlWsTrnsMsg : public HashAbleABC {
     return data;
   }
 };
+
 struct OperationPayload : public HashAbleABC {
   QString query;
   QString operationName;
@@ -75,29 +76,28 @@ struct OperationPayload : public HashAbleABC {
   }
 };
 
-struct GqlWsTrnsMsgWithID : public BaseGqlWsTrnsMsg, OperationMessage {
+struct GqlWsTrnsMsgWithID : public BaseGqlWsTrnsMsg {
   QJsonArray errors;
-  using BaseGqlWsTrnsMsg::BaseGqlWsTrnsMsg;
+  QUuid op_id;
+
   explicit GqlWsTrnsMsgWithID(const QJsonObject &data)
       : BaseGqlWsTrnsMsg(data) {  // NOLINT
-    this->id = QUuid::fromString(data["id"].toString());
+    this->op_id = QUuid::fromString(data["id"].toString());
     if (this->type == PROTOCOL::ERROR) {
       errors = data.value("payload").toArray();
     }
   }
-  explicit GqlWsTrnsMsgWithID(const OperationPayload &payload);
+  explicit GqlWsTrnsMsgWithID(const OperationPayload &payload,
+                              QUuid id = QUuid::createUuid())
+      : BaseGqlWsTrnsMsg(PROTOCOL::SUBSCRIBE, payload.serialize()),
+        op_id{id} {};
 
   bool has_errors() const { return !this->errors.isEmpty(); }
   QJsonObject serialize() const override {
     QJsonObject ret = BaseGqlWsTrnsMsg::serialize();
-    ret["id"] = id.toString();
+    ret["id"] = op_id.toString();
     return ret;
   }
-};
-
-struct GqlResult {
-  const std::optional<QJsonObject> *data;
-  const std::optional<QJsonObject> *errors;
 };
 
 namespace DEF_MESSAGES {
@@ -138,9 +138,9 @@ class GqlWsTransportClient : public QObject, public QtGqlNetworkLayer {
   QWebSocket m_ws;
   QWebSocketHandshakeOptions m_ws_options;
 
-  QMap<QUuid, std::shared_ptr<GqlWsHandlerABC>> m_handlers;
+  QMap<QUuid, std::shared_ptr<QtGqlHandlerABC>> m_handlers;
   // handlers that theier execution was deferred due to connection issues.
-  QSet<std::shared_ptr<GqlWsHandlerABC>> m_pending_handlers;
+  QSet<std::shared_ptr<QtGqlHandlerABC>> m_pending_handlers;
 
   // general protocol handlers:
   void on_gql_ack();
@@ -167,7 +167,7 @@ class GqlWsTransportClient : public QObject, public QtGqlNetworkLayer {
   // whether received connection_ack message and ws is valid.
   bool gql_is_valid() const;
   // execute / pend a handler for execution.
-  void execute(std::shared_ptr<GqlWsHandlerABC> handler) override;
+  void execute(std::shared_ptr<QtGqlHandlerABC> handler) override;
   // reconnect with previous settings.
   void reconnect();
 };

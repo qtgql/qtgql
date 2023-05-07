@@ -65,8 +65,8 @@ qtgql::GqlWsTransportClient::GqlWsTransportClient(
 void qtgql::GqlWsTransportClient::on_gql_next(
     const GqlWsTrnsMsgWithID &message) {
   if (message.has_payload()) {
-    if (m_handlers.contains(message.id)) {
-      auto handler = m_handlers.value(message.id);
+    if (m_handlers.contains(message.op_id)) {
+      auto handler = m_handlers.value(message.op_id);
       handler->onData(message.payload);
     }
   }
@@ -74,20 +74,20 @@ void qtgql::GqlWsTransportClient::on_gql_next(
 
 void qtgql::GqlWsTransportClient::on_gql_error(
     const GqlWsTrnsMsgWithID &message) {
-  qWarning() << "GraphQL Error occurred on ID: " << message.id.toString();
+  qWarning() << "GraphQL Error occurred on ID: " << message.op_id.toString();
   if (message.has_errors()) {
-    if (m_handlers.contains(message.id)) {
-      m_handlers.value(message.id)->onError(message.errors);
+    if (m_handlers.contains(message.op_id)) {
+      m_handlers.value(message.op_id)->onError(message.errors);
     }
   }
 }
 
 void qtgql::GqlWsTransportClient::on_gql_complete(
     const GqlWsTrnsMsgWithID &message) {
-  if (m_handlers.contains(message.id)) {
-    auto handler = m_handlers.value(message.id);
+  if (m_handlers.contains(message.op_id)) {
+    auto handler = m_handlers.value(message.op_id);
     handler->onCompleted();
-    m_handlers.remove(message.id);
+    m_handlers.remove(message.op_id);
   }
 }
 
@@ -202,11 +202,10 @@ bool qtgql::GqlWsTransportClient::gql_is_valid() const {
 }
 
 void qtgql::GqlWsTransportClient::execute(
-    std::shared_ptr<GqlWsHandlerABC> handler) {
-  auto message = handler->message();
-  m_handlers.insert(message.id, handler);
+    std::shared_ptr<QtGqlHandlerABC> handler) {
+  m_handlers.insert(handler->operation_id(), handler);
   if (m_ws.isValid()) {
-    send_message(message);
+    send_message(handler->message());
   } else if (!m_pending_handlers.contains(handler)) {
     m_pending_handlers << handler;  // refcount increased (copy constructor)
   }
@@ -215,6 +214,3 @@ void qtgql::GqlWsTransportClient::execute(
 void qtgql::GqlWsTransportClient::reconnect() {
   this->m_ws.open(m_ws.request(), m_ws_options);
 }
-
-qtgql::GqlWsTrnsMsgWithID::GqlWsTrnsMsgWithID(const OperationPayload &_payload)
-    : BaseGqlWsTrnsMsg(PROTOCOL::SUBSCRIBE, _payload.serialize()) {}

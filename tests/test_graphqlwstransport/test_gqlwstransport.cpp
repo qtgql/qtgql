@@ -53,8 +53,8 @@ class DebugAbleClient : public qtgql::GqlWsTransportClient {
     }
   }
   bool is_reconnect_timer_active() { return m_reconnect_timer->isActive(); }
-  bool has_handler(const std::shared_ptr<qtgql::GqlWsHandlerABC> &handler) {
-    return m_handlers.contains(handler->message().id);
+  bool has_handler(const std::shared_ptr<qtgql::QtGqlHandlerABC> &handler) {
+    return m_handlers.contains(handler->operation_id());
   }
 };
 
@@ -72,8 +72,8 @@ QString get_subscription_str(bool raiseOn5 = false,
       .arg(op_name, QString::number(target), ro5);
 }
 
-class DefaultHandler : public qtgql::GqlWsHandlerABC {
- private:
+class DefaultHandler : public qtgql::QtGqlHandlerABC {
+ protected:
   qtgql::GqlWsTrnsMsgWithID m_message;
 
  public:
@@ -84,6 +84,7 @@ class DefaultHandler : public qtgql::GqlWsHandlerABC {
   QJsonArray m_errors;
   QJsonObject m_data;
   bool m_completed = false;
+  const QUuid &operation_id() const override { return m_message.op_id; }
   void onData(const QJsonObject &message) override {
     // here we copy the message though generally user wouldn't do this as it
     // would just use the reference to initialize some data
@@ -93,7 +94,7 @@ class DefaultHandler : public qtgql::GqlWsHandlerABC {
   void onError(const QJsonArray &errors) override { m_errors = errors; }
   void onCompleted() override { m_completed = true; }
 
-  const qtgql::OperationMessage &message() override { return m_message; }
+  const qtgql::HashAbleABC &message() override { return m_message; }
   bool wait_for_completed() const {
     return QTest::qWaitFor([&]() -> bool { return m_completed; }, 1500);
   }
@@ -225,7 +226,7 @@ TEST_CASE("Handlers tests", "[gqlwstransport][handlers]") {
   auto client = get_valid_client();
   auto sub1 = std::make_shared<DefaultHandler>();
   auto sub2 = std::make_shared<DefaultHandler>();
-  REQUIRE(sub1->message().id != sub2->message().id);
+  REQUIRE(sub1->operation_id() != sub2->operation_id());
 
   SECTION("executing handlers adds them to handlers map") {
     client->execute(sub1);
