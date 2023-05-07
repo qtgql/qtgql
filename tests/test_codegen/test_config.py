@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from qtgqlcodegen.compiler.config import QtGqlConfig
+from qtgqlcodegen.config import QtGqlConfig
 from qtgqlcodegen.exceptions import QtGqlException
 from tests.test_codegen.testcases import MutationOperationTestCase
 from tests.test_codegen.testcases import ScalarsTestCase

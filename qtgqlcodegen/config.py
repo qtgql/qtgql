@@ -18,11 +18,10 @@ class QtGqlConfig:
     schema."""
 
     graphql_dir: Path
-    """A directory contains [schema.graphql, query.graphql, mutation.graphql,
-    subscription.graphql] generated types come from the schema.
+    """A directory contains.
 
-    and queries, mutations, subscription handlers would be generated
-    from the corresponding `.graphql` files.
+    - schema.graphql, represents the current schema definition at the server.
+    - operations.graphql, queries, mutations and subscription handlers would be generated based on the operations defined there.
     """
     env_name: str = "QGqlEnv"
     """The generated types would find the environment by this name.
@@ -36,21 +35,20 @@ class QtGqlConfig:
     template_class: Callable[[TemplateContext], str] = schema_types_template
     """jinja template."""
 
-    @property
+    @cached_property
     def schema_path(self) -> Path:
         return self.graphql_dir / "schema.graphql"
 
-    @property
+    @cached_property
     def operations_dir(self) -> Path:
         return self.graphql_dir / "operations.graphql"
 
-    @property
-    def generated_types_dir(self) -> Path:
-        return self.graphql_dir / "objecttypes.py"
-
-    @property
-    def generated_handlers_dir(self) -> Path:
-        return self.graphql_dir / "handlers.py"
+    @cached_property
+    def generated_dir(self):
+        ret = self.graphql_dir / "__generated__"
+        if not ret.exists():
+            ret.mkdir()
+        return ret
 
     @cached_property
     def _evaluator(self) -> SchemaEvaluator:

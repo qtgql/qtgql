@@ -5,22 +5,16 @@ import os
 import platform
 import socket
 import subprocess
-import tempfile
 import time
 from pathlib import Path
 from typing import TYPE_CHECKING
-from typing import TypeVar
 
 import pytest
-from attr import field
 from attrs import define
 from faker import Faker
-from PySide6.QtCore import QUrl
-from PySide6.QtQuick import QQuickItem
-from PySide6.QtQuick import QQuickView
+
 
 if TYPE_CHECKING:
-    from pytestqt.qtbot import QtBot
     from strawberry import Schema
 
 fake = Faker()
@@ -73,44 +67,3 @@ def schemas_server() -> MiniServer:
     yield ms
     if p.poll() is None:
         p.terminate()
-
-
-T = TypeVar("T")
-
-
-@define(slots=False)
-class QmlBot:
-    bot: QtBot
-    qquickiew: QQuickView = field(factory=QQuickView)
-
-    @property
-    def engine(self):
-        return self.qquickiew.engine()
-
-    def load(self, path: Path) -> QQuickItem:
-        self.engine.clearComponentCache()
-        self.qquickiew.setSource(QUrl(path.as_uri()))
-        if errors := self.qquickiew.errors():
-            raise RuntimeError("errors in view", errors)
-        self.qquickiew.show()
-        return self.find("rootObject")
-
-    def loads(self, content: str) -> QQuickItem:
-        with tempfile.TemporaryDirectory() as d:
-            target = Path(d) / "TestComp.qml"
-            target.write_text(content)
-            return self.load(target)
-
-    def find(self, objectname: str, type: T = QQuickItem) -> T:
-        return self.qquickiew.findChild(type, objectname)
-
-    def cleanup(self):
-        self.qquickiew.close()
-        self.qquickiew.engine().deleteLater()
-        self.qquickiew.deleteLater()
-
-
-@pytest.fixture()
-def qmlbot(qtbot):
-    bot = QmlBot(qtbot)
-    return bot

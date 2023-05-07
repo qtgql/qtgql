@@ -1,0 +1,12 @@
+
+        query MainQuery {
+          user {
+            id
+            name
+            age
+            agePoint
+            male
+            id
+            uuid
+          }
+        }

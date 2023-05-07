@@ -1,58 +1,43 @@
 from __future__ import annotations
 
+import glob
 import importlib
+import os
+import sys
 from pathlib import Path
-from typing import Optional
 from typing import TYPE_CHECKING
 
 import rich
-import toml
 import typer
 
 if TYPE_CHECKING:
-    from qtgqlcodegen.py.compiler.config import QtGqlConfig
+    from qtgqlcodegen.config import QtGqlConfig
 
 console = rich.console.Console()
-
-
-# these lines are covered coverage failed to catch them.
-def _get_pyproject(p: Path) -> Optional[Path]:
-    pproject = p / "pyproject.toml"
-    if pproject.exists():
-        return pproject
-
-
-def _find_pyproject(p: Path) -> Optional[Path]:
-    if pp := _get_pyproject(p):
-        return pp
-    for parent in p.parents:  # pragma: no cover
-        return _find_pyproject(parent)
-
-
-def _get_app_import_path(root: Path = Path.cwd()) -> str:
-    pyproject = _find_pyproject(root)
-    assert pyproject
-    pp = toml.load(pyproject)
-    try:
-        return pp["tool"][TOOL_NAME][QTGQL_CONFIG_KEY]
-    except KeyError as e:
-        raise KeyError(
-            f"Could not find 'tool.{TOOL_NAME}' in your pyproject.toml.",
-            f"or you haven't defined '{QTGQL_CONFIG_KEY}'",
-            "Make sure you have configured your project properly",
-        ) from e
-
-
 app = typer.Typer(pretty_exceptions_show_locals=False)
 
-TOOL_NAME = "qtgql"
-QTGQL_CONFIG_KEY = "config"
+QTGQL_CONFIG_FNAME = "qtgqlconfig.py"
 
 
 def _get_config() -> QtGqlConfig:
-    console.print("[bold blue]Running system checks")
-    mod, conf = _get_app_import_path().split(":")
-    return getattr(importlib.import_module(mod), conf)
+    console.print("[bold blue]Looking for you config file...")
+    res = glob.glob(f"{QTGQL_CONFIG_FNAME}")
+
+    if not len(res) > 1:
+        console.print(
+            f"[bold red]Found more than one config file. {len(res)}"
+            f" found: {os.linesep.join(res)}",
+        )
+        typer.Abort()
+    if len(res) == 0:
+        console.print("[bold red]Found more than one config file using the first one")
+        typer.Abort()
+    mod_path = Path(res[0]).resolve(True)
+    spec = importlib.util.spec_from_file_location(QTGQL_CONFIG_FNAME, mod_path)
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[QTGQL_CONFIG_FNAME] = module
+    spec.loader.exec_module(module)
+    return module.config
 
 
 @app.command()

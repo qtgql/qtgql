@@ -45,7 +45,7 @@ from qtgqlcodegen.objecttype import QtGqlVariableDefinition
 from qtgqlcodegen.utils import anti_forward_ref
 
 if TYPE_CHECKING:  # pragma: no cover
-    from qtgqlcodegen.compiler.config import QtGqlConfig
+    from qtgqlcodegen.config import QtGqlConfig
 
 introspection_query = graphql.get_introspection_query(descriptions=True)
 
@@ -458,5 +458,4 @@ class SchemaEvaluator:
     def dump(self):
         """:param file: Path to the directory the codegen would dump to."""
         for fname, content in self.dumps().items():
-            with (self.config.graphql_dir / (fname + ".cpp")).open("w") as fh:
-                fh.write(content)
+            (self.config.generated_dir / (fname + ".cpp")).write_text(content)

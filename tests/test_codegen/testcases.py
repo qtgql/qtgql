@@ -1,37 +1,32 @@
 from __future__ import annotations
 
-import contextlib
+import os
 from functools import cached_property
 from pathlib import Path
 from textwrap import dedent
 from typing import Optional
-from typing import Type
 from typing import TYPE_CHECKING
 
-import attrs
+import jinja2
 import strawberry.utils
 from attr import define
-from PySide6.QtCore import QObject
 from strawberry import Schema
+from typer.testing import CliRunner
 
-from qtgqlcodegen.compiler.config import QtGqlConfig
+from qtgqlcodegen.cli import app
+from qtgqlcodegen.config import QtGqlConfig
 from qtgqlcodegen.introspection import SchemaEvaluator
 from qtgqlcodegen.runtime.custom_scalars import BaseCustomScalar
 from qtgqlcodegen.runtime.custom_scalars import DateScalar
 from qtgqlcodegen.runtime.custom_scalars import DateTimeScalar
 from qtgqlcodegen.runtime.custom_scalars import DecimalScalar
 from qtgqlcodegen.runtime.custom_scalars import TimeScalar
-from qtgqlcodegen.runtime.environment import _ENV_MAP
 from tests.conftest import fake
 from tests.conftest import hash_schema
-from tests.conftest import QmlBot
 from tests.test_codegen import schemas
 
 if TYPE_CHECKING:
-    from PySide6 import QtCore
-    from qtgqlcodegen.runtime.bases import _BaseQGraphQLObject
     from qtgqlcodegen.runtime.queryhandler import BaseMutationHandler
-    from types import ModuleType
     from qtgqlcodegen.objecttype import QtGqlObjectTypeDefinition
 
 BaseQueryHandler = None  # TODO: remove this when done migrating, this is just for readability.
@@ -40,6 +35,20 @@ BaseQueryHandler = None  # TODO: remove this when done migrating, this is just f
 GENERATED_TESTS_DIR = Path(__file__).parent / "generated_test_projects"
 if not GENERATED_TESTS_DIR.exists:
     GENERATED_TESTS_DIR.mkdir()
+template_env = jinja2.Environment(
+    loader=jinja2.FileSystemLoader(Path(__file__).parent / "tst_templates"),
+    autoescape=jinja2.select_autoescape(),
+)
+
+TST_CONFIG_TEMPLATE = template_env.get_template("configtemplate.py")
+CLI_RUNNER = CliRunner()
+
+
+@define
+class TstTemplateContext:
+    config: QtGqlConfig
+    url: str
+    test_name: str
 
 
 @define(slots=False, kw_only=True)
@@ -48,10 +57,7 @@ class QGQLObjectTestCase:
     schema: Schema
     test_name: str
     type_name: str = "User"
-    qmlbot: Optional[QmlBot] = None
-    config: QtGqlConfig = attrs.field(
-        factory=lambda: QtGqlConfig(graphql_dir=Path(__file__).parent, env_name="TestEnv"),
-    )
+    custom_scalars: dict = {}
     query_operationName: str = "MainQuery"
     first_field: str = "user"
     qml_file: str = ""
@@ -72,26 +78,49 @@ class QGQLObjectTestCase:
 
     @cached_property
     def test_dir(self) -> Path:
-        return GENERATED_TESTS_DIR / self.test_name
+        ret = GENERATED_TESTS_DIR / self.test_name
+        if not ret.exists():
+            ret.mkdir()
+        return ret
 
-    @contextlib.contextmanager
-    def compile(self, url: Optional[str] = "") -> CompiledTestCase:
-        url = url.replace("graphql", f"{hash_schema(self.schema)}")
-        self.config.env_name = env_name = fake.pystr()
+    @cached_property
+    def graphql_dir(self) -> Path:
+        ret = self.test_dir / "graphql"
+        if not ret.exists():
+            ret.mkdir()
+        return ret
 
-        testcase = CompiledTestCase(
-            evaluator=self.evaluator,
-            config=self.config,
-            query=self.query,
-            schema=self.schema,
-            qml_file=self.qml_file,
-            query_operationName=self.query_operationName,
-            first_field=self.first_field,
-            test_name=self.test_name,
-            tested_type=self.evaluator._objecttypes_def_map.get(self.type_name, None),
+    @cached_property
+    def config_dir(self) -> Path:
+        return self.test_dir / "qtgqlconfig.py"
+
+    @cached_property
+    def schema_dir(self) -> Path:
+        return self.graphql_dir / "schema.graphql"
+
+    @cached_property
+    def operations_dir(self) -> Path:
+        return self.graphql_dir / "operations.graphql"
+
+    @cached_property
+    def config(self) -> QtGqlConfig:
+        return QtGqlConfig(
+            graphql_dir=self.graphql_dir,
+            env_name="default_env",
+            custom_scalars=self.custom_scalars,
         )
-        yield testcase
-        _ENV_MAP.pop(env_name)
+
+    def generate(self, url: Optional[str] = "") -> None:
+        url = url.replace("graphql", f"{hash_schema(self.schema)}")
+        self.config.env_name = fake.pystr()
+        template_context = TstTemplateContext(config=self.config, url=url, test_name=self.test_name)
+        self.schema_dir.write_text(self.schema.as_str())
+        self.operations_dir.write_text(self.query)
+        self.config_dir.write_text(TST_CONFIG_TEMPLATE.render(context=template_context))
+        cwd = Path.cwd()
+        os.chdir(self.config_dir.parent)
+        CLI_RUNNER.invoke(app, "gen")
+        os.chdir(cwd)
 
 
 @define
@@ -99,7 +128,6 @@ class CompiledTestCase(QGQLObjectTestCase):
     config: QtGqlConfig
     tested_type: QtGqlObjectTypeDefinition
     evaluator: SchemaEvaluator
-    parent_obj: QObject = attrs.field(factory=QObject)
 
     def __attrs_post_init__(self):
         self.query = dedent(self.query)
@@ -123,15 +151,6 @@ class CompiledTestCase(QGQLObjectTestCase):
                 ),
             )
 
-    @property
-    def module(self) -> ModuleType:
-        return self.objecttypes_mod
-
-    @property
-    def gql_type(self) -> Type[_BaseQGraphQLObject]:
-        assert self.tested_type
-        return getattr(self.objecttypes_mod, self.tested_type.name)
-
     @cached_property
     def query_handler(self) -> BaseQueryHandler:
         return getattr(self.handlers_mod, self.query_operationName)(self.parent_obj)
@@ -144,12 +163,6 @@ class CompiledTestCase(QGQLObjectTestCase):
 
     def get_mutation_handler(self, operation_name: str) -> BaseMutationHandler:
         return self.get_attr(operation_name)(self.parent_obj)
-
-    def get_signals(self) -> dict[str, QtCore.Signal]:
-        return {
-            field.signal_name: getattr(self.query_handler.data, field.signal_name)
-            for field in self.tested_type.fields
-        }
 
     def get_field_by_type(self, t):
         for field in self.tested_type.fields:
@@ -172,13 +185,6 @@ class CompiledTestCase(QGQLObjectTestCase):
             if field_name == strawberry.utils.str_converters.to_camel_case(sf.name):
                 return sf
 
-    def load_qml(self, qmlbot: QmlBot):
-        qmlbot.loads(self.qml_file)
-        return self
-
-    def get_qml_query_handler(self, bot: QmlBot) -> BaseQueryHandler:
-        return bot.qquickiew.findChildren(BaseQueryHandler)[0]
-
 
 ScalarsTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_scalar.schema,
@@ -197,6 +203,10 @@ ScalarsTestCase = QGQLObjectTestCase(
         """,
     test_name="ScalarsTestCase",
 )
+
+if __name__ == "__main__":
+    ScalarsTestCase.generate()
+
 
 OptionalScalarTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_optional_scalar.schema,
@@ -448,10 +458,7 @@ class CountryScalar(BaseCustomScalar[Optional[str], str]):
 
 CustomUserScalarTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_user_defined_scalar.schema,
-    config=QtGqlConfig(
-        graphql_dir=None,
-        custom_scalars={CountryScalar.GRAPHQL_NAME: CountryScalar},
-    ),
+    custom_scalars={CountryScalar.GRAPHQL_NAME: CountryScalar},
     test_name="CustomUserScalarTestCase",
     query="""
      query MainQuery {
