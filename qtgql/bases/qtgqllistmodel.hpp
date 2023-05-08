@@ -2,11 +2,11 @@
 #include <QAbstractListModel>
 #include <Qt>
 
-#include "baseqgraphqlobject.hpp"
-#include "graphqlmetadata.hpp"
+#include "qtgqlmetadata.hpp"
+#include "qtgqlobjecttype.hpp"
 
 namespace qtgql {
-class _QGraphQLListModelMixin : public QAbstractListModel {
+class QTGqlListModelMixin : public QAbstractListModel {
   Q_OBJECT
 
   Q_PROPERTY(int count MEMBER m_count NOTIFY countChanged)
@@ -31,9 +31,9 @@ class _QGraphQLListModelMixin : public QAbstractListModel {
   int m_current_index = 0;
 
  public:
-  explicit _QGraphQLListModelMixin(QObject* parent = nullptr)
+  explicit QTGqlListModelMixin(QObject* parent = nullptr)
       : QAbstractListModel(parent) {}
-  virtual ~_QGraphQLListModelMixin() = default;
+  virtual ~QTGqlListModelMixin() = default;
   int rowCount(const QModelIndex& parent = QModelIndex()) const override {
     return (!parent.isValid() ? m_count : 0);
   }
@@ -50,7 +50,7 @@ class _QGraphQLListModelMixin : public QAbstractListModel {
 };
 
 template <typename T_QObject>
-class QGraphQLListModelABC : public _QGraphQLListModelMixin {
+class QtGqlListModelABC : public QTGqlListModelMixin {
   typedef std::shared_ptr<T_QObject> T_sharedQObject;
   typedef std::unique_ptr<QList<T_sharedQObject>> T_uniqueObjectQlist;
 
@@ -83,10 +83,10 @@ class QGraphQLListModelABC : public _QGraphQLListModelMixin {
   }
 
  public:
-  explicit QGraphQLListModelABC(
+  explicit QtGqlListModelABC(
       QObject* parent = nullptr,
       T_uniqueObjectQlist data = std::make_unique<QList<T_sharedQObject>>())
-      : _QGraphQLListModelMixin(parent), m_data{std::move(data)} {
+      : QTGqlListModelMixin(parent), m_data{std::move(data)} {
     m_count = m_data->length();
   };
 

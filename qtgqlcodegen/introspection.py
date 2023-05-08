@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import subprocess
 import warnings
 from functools import cached_property
 from typing import List
@@ -17,6 +18,7 @@ from graphql.type import definition as gql_def
 from qtgqlcodegen.compiler.builtin_scalars import BuiltinScalars
 from qtgqlcodegen.compiler.operation import QtGqlOperationDefinition
 from qtgqlcodegen.compiler.operation import QtGqlQueriedField
+from qtgqlcodegen.compiler.template import cmake_template
 from qtgqlcodegen.compiler.template import handlers_template
 from qtgqlcodegen.compiler.template import schema_types_template
 from qtgqlcodegen.compiler.template import TemplateContext
@@ -43,6 +45,7 @@ from qtgqlcodegen.objecttype import QtGqlInterfaceDefinition
 from qtgqlcodegen.objecttype import QtGqlObjectTypeDefinition
 from qtgqlcodegen.objecttype import QtGqlVariableDefinition
 from qtgqlcodegen.utils import anti_forward_ref
+from qtgqlcodegen.utils import FileSpec
 
 if TYPE_CHECKING:  # pragma: no cover
     from qtgqlcodegen.config import QtGqlConfig
@@ -207,6 +210,10 @@ class SchemaEvaluator:
             self.schema_definition.get_root_type(OperationType.SUBSCRIPTION),
         ]
 
+    @cached_property
+    def root_types_names(self) -> str:
+        return " ".join([tp.name for tp in self.root_types if tp])
+
     def _evaluate_field_type(self, t: gql_def.GraphQLType) -> GqlTypeHinter:
         # even though every type in qtgql has a default constructor,
         # hence there is no "real" non-null values
@@ -308,7 +315,7 @@ class SchemaEvaluator:
         t_name: str = type_.name
         if evaluated := self._objecttypes_def_map.get(t_name, None):
             return evaluated
-        if type_ not in self.root_types:
+        if type_.name not in self.root_types_names:
             try:
                 id_field = type_.fields["id"]
                 if nonull := is_non_null_definition(id_field.type):
@@ -341,7 +348,6 @@ class SchemaEvaluator:
                 name: self._evaluate_field(name, field) for name, field in type_.fields.items()
             },
         )
-        assert ret not in self.root_types
         self._objecttypes_def_map[ret.name] = ret
         for interface in type_.interfaces:
             qtgql_interface = self._evaluate_interface_type(interface)
@@ -432,8 +438,7 @@ class SchemaEvaluator:
         self._mutation_handlers.update(operation_miner.mutation_handlers)
         self._subscription_handlers.update(operation_miner.subscription_handlers)
 
-    def dumps(self) -> GeneratedNamespace:
-        """:return: The generated modules as a string."""
+    def generate(self) -> list[FileSpec]:
         self.parse_schema_concretes()
         self.parse_operations()
         context = TemplateContext(
@@ -441,7 +446,7 @@ class SchemaEvaluator:
             types=[
                 t
                 for name, t in self._objecttypes_def_map.items()
-                if name not in BuiltinScalars.keys()
+                if name not in BuiltinScalars.keys() and name not in self.root_types_names
             ],
             queries=list(self._query_handlers.values()),
             interfaces=list(self._interfaces_map.values()),
@@ -450,12 +455,28 @@ class SchemaEvaluator:
             input_objects=list(self._input_objects_def_map.values()),
             config=self.config,
         )
-        return GeneratedNamespace(
-            handlers=handlers_template(context),
-            objecttypes=schema_types_template(context),
+        handlers = FileSpec(
+            content=handlers_template(context),
+            path=self.config.generated_dir / "handlers.hpp",
         )
+        schema = FileSpec(
+            content=schema_types_template(context),
+            path=self.config.generated_dir / "schema.hpp",
+        )
+        cmake = FileSpec(
+            content=cmake_template(context),
+            path=self.config.generated_dir / "CMakeLists.txt",
+        )
+        return [handlers, schema, cmake]
 
     def dump(self):
         """:param file: Path to the directory the codegen would dump to."""
-        for fname, content in self.dumps().items():
-            (self.config.generated_dir / (fname + ".hpp")).write_text(content)
+        files = self.generate()
+
+        args = ["clang-format"] + [
+            str(f.path) for f in files if f.path.suffix in ("cpp", "h", "hpp")
+        ]
+        args.append("-i")
+        for f in files:
+            f.dump()
+        subprocess.run(args)

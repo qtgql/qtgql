@@ -313,7 +313,7 @@ class GqlTypeHinter(TypeHinter):
 
         # int, str, float etc...
         if builtin_scalar := t_self.is_builtin_scalar:
-            return builtin_scalar.tp.__name__
+            return builtin_scalar.tp
 
         if scalar := t_self.is_custom_scalar:
             return f"SCALARS.{scalar.__name__}"
@@ -322,9 +322,9 @@ class GqlTypeHinter(TypeHinter):
         if model_of := t_self.is_model:
             return f"{QtGqlTypes.QGraphQLList.name}[{model_of.annotation}]"
         if object_def := t_self.is_object_type or t_self.is_interface:
-            return f"Optional[{object_def.name}]"
+            return f"{object_def.name}"
         if t_self.is_union:
-            return "Union[" + ", ".join(th.annotation for th in t_self.of_type) + "]"
+            return "std::variant<" + ", ".join(th.annotation for th in t_self.of_type) + ">"
         if input_obj := t_self.is_input_object_type:
             return input_obj.name
 

@@ -3,17 +3,17 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "fooqobject.hpp"
-#include "qgraphqllistmodel.hpp"
+#include "qtgqllistmodel.hpp"
 
 typedef std::shared_ptr<FooQObject> SharedFoo;
 
-class SampleQGraphQLListModel : public qtgql::QGraphQLListModelABC<FooQObject> {
+class SampleQGraphQLListModel : public qtgql::QtGqlListModelABC<FooQObject> {
   void update(const QList<QJsonObject>& data,
-              const SelectionsConfig& selections) override {
+              const qtgql::SelectionsConfig& selections) override {
     std::ignore = data;
     std::ignore = selections;
   }
-  using qtgql::QGraphQLListModelABC<FooQObject>::QGraphQLListModelABC;
+  using qtgql::QtGqlListModelABC<FooQObject>::QtGqlListModelABC;
 };
 
 struct CompleteSpy {

@@ -12,18 +12,40 @@ class BuiltinScalar:
     tp: CType
     default_value: Any
     graphql_name: str
+    from_json_convertor: str
 
 
 class _BuiltinScalars:
-    INT = BuiltinScalar(CType("int"), 0, graphql_name="Int")
-    FLOAT = BuiltinScalar(CType("float"), 0.0, graphql_name="Float")
-    STRING = BuiltinScalar(CType("QString"), " - ", graphql_name="String")
-    ID = BuiltinScalar(CType("QString"), "9b2a0828-880d-4023-9909-de067984523c", graphql_name="ID")
-    BOOLEAN = BuiltinScalar(CType("bool"), False, graphql_name="Boolean")
+    INT = BuiltinScalar(CType("int"), 0, graphql_name="Int", from_json_convertor="toInt()")
+    FLOAT = BuiltinScalar(
+        CType("float"),
+        0.0,
+        graphql_name="Float",
+        from_json_convertor="toDouble()",
+    )
+    STRING = BuiltinScalar(
+        CType("QString"),
+        '" - "',
+        graphql_name="String",
+        from_json_convertor="toString()",
+    )
+    ID = BuiltinScalar(
+        CType("QString"),
+        "qtgql::CONSTANTS::ID",
+        graphql_name="ID",
+        from_json_convertor="toString()",
+    )
+    BOOLEAN = BuiltinScalar(
+        CType("bool"),
+        "false",
+        graphql_name="Boolean",
+        from_json_convertor="toBool()",
+    )
     UUID = BuiltinScalar(
         CType("QUuid"),
-        "9b2a0828-880d-4023-9909-de067984523c",
+        "qtgql::CONSTANTS::UUID",
         graphql_name="UUID",
+        from_json_convertor="toVariant().toUuid()",
     )
 
     @classmethod

@@ -9,9 +9,10 @@ from jinja2 import Environment
 from jinja2 import PackageLoader
 from jinja2 import select_autoescape
 
+
 if TYPE_CHECKING:  # pragma: no cover
-    from qtgqlcodegen.py.compiler.config import QtGqlConfig
-    from qtgqlcodegen.py.compiler.query import QtGqlOperationDefinition, QtGqlQueriedField
+    from qtgqlcodegen.config import QtGqlConfig
+    from qtgqlcodegen.compiler.operation import QtGqlOperationDefinition, QtGqlQueriedField
     from qtgqlcodegen.objecttype import (
         QtGqlEnumDefinition,
         QtGqlInputObjectTypeDefinition,
@@ -19,14 +20,27 @@ if TYPE_CHECKING:  # pragma: no cover
         QtGqlObjectTypeDefinition,
     )
 
+
 template_env = Environment(
     loader=PackageLoader("qtgqlcodegen"),
     autoescape=select_autoescape(),
+    variable_start_string="👉",  # originally {{ variable }}, using 👉 variable 👈 because C++ uses curly brackets.
+    variable_end_string="👈",
 )
+
+
+def wrap_curly_filter(v: str, ignore: bool = False) -> str:
+    if ignore:
+        return v
+    return "{" + v + "}"
+
+
+template_env.filters["wrapcurly"] = wrap_curly_filter
 
 SCHEMA_TEMPLATE = template_env.get_template("schema.jinja.cpp")
 HANDLERS_TEMPLATE = template_env.get_template("handlers.jinja.py")
 CONFIG_TEMPLATE = template_env.get_template("config.jinja.py")
+CMAKE_TEMPLATE = template_env.get_template("CMakeLists.jinja.txt")
 
 
 @define
@@ -66,6 +80,10 @@ def schema_types_template(context: TemplateContext) -> str:
 
 def handlers_template(context: TemplateContext) -> str:
     return HANDLERS_TEMPLATE.render(context=context)
+
+
+def cmake_template(context: TemplateContext) -> str:
+    return CMAKE_TEMPLATE.render(context=context)
 
 
 @define

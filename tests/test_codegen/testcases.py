@@ -21,7 +21,6 @@ from qtgqlcodegen.runtime.custom_scalars import DateScalar
 from qtgqlcodegen.runtime.custom_scalars import DateTimeScalar
 from qtgqlcodegen.runtime.custom_scalars import DecimalScalar
 from qtgqlcodegen.runtime.custom_scalars import TimeScalar
-from tests.conftest import fake
 from tests.conftest import hash_schema
 from tests.test_codegen import schemas
 
@@ -42,6 +41,7 @@ template_env = jinja2.Environment(
 
 TST_CONFIG_TEMPLATE = template_env.get_template("configtemplate.py")
 CLI_RUNNER = CliRunner()
+TST_CMAKE = (Path(__file__).parent / "CMakeLists.txt").resolve(True)
 
 
 @define
@@ -112,7 +112,7 @@ class QGQLObjectTestCase:
 
     def generate(self, url: Optional[str] = "") -> None:
         url = url.replace("graphql", f"{hash_schema(self.schema)}")
-        self.config.env_name = fake.pystr()
+        self.config.env_name = self.test_name
         template_context = TstTemplateContext(config=self.config, url=url, test_name=self.test_name)
         self.schema_dir.write_text(self.schema.as_str())
         self.operations_dir.write_text(self.query)
@@ -121,6 +121,12 @@ class QGQLObjectTestCase:
         os.chdir(self.config_dir.parent)
         CLI_RUNNER.invoke(app, "gen")
         os.chdir(cwd)
+        prev = TST_CMAKE.read_text()
+        link_line = "target_link_libraries(${TESTS_TARGET} PRIVATE __generated__::%s)" % (
+            self.config.env_name
+        )
+        if link_line not in prev:
+            TST_CMAKE.write_text(prev + f"\n {link_line}")
 
 
 @define

@@ -4,11 +4,11 @@
 #include <QObject>
 #include <QSet>
 
-#include "graphqlmetadata.hpp"
+#include "qtgqlmetadata.hpp"
 
 namespace qtgql {
 
-class BaseQGraphQLObject : public QObject {
+class QtGqlObjectTypeABC : public QObject {
   Q_OBJECT
   Q_PROPERTY(QString typeName READ getTypeName CONSTANT)
 
@@ -17,7 +17,8 @@ class BaseQGraphQLObject : public QObject {
 
  public:
   inline static const QString TYPE_NAME = "__NOT_IMPLEMENTED__";
-  explicit BaseQGraphQLObject(QObject *parent = nullptr);
+  explicit QtGqlObjectTypeABC(QObject *parent = nullptr);
+  using QObject::QObject;
 
   template <typename T>
   static std::shared_ptr<T> from_dict(QObject *parent, const QJsonObject &data,
@@ -41,7 +42,7 @@ class BaseQGraphQLObject : public QObject {
   virtual void loose(const OperationMetadata &metadata) = 0;
 };
 
-class BaseGraphQLObjectWithID : public BaseQGraphQLObject {
+class BaseGraphQLObjectWithID : public QtGqlObjectTypeABC {
   Q_OBJECT
 
  protected:

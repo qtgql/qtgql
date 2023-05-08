@@ -1,5 +1,19 @@
+import re
+from pathlib import Path
 from typing import Any
+from typing import Optional
 from typing import Type
+
+from attr import define
+
+
+@define
+class FileSpec:
+    path: Path
+    content: str
+
+    def dump(self) -> None:
+        self.path.write_text(self.content)
 
 
 class AntiForwardRef:
@@ -21,3 +35,8 @@ class AntiForwardRef:
 
 def anti_forward_ref(name: str, type_map: dict) -> Type[AntiForwardRef]:
     return type(name, (AntiForwardRef,), {"name": name, "type_map": type_map})
+
+
+def get_operation_name(query: str) -> Optional[str]:
+    if match := re.search(r"(subscription|mutation|query)(.*?({|\())", query):
+        return match.group(2).replace(" ", "").strip("{").strip("(")

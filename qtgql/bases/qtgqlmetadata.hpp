@@ -1,5 +1,6 @@
 #pragma once
 #include <QMap>
+namespace qtgql {
 
 struct SelectionsConfig {
   // describes selections of a graphql operation.
@@ -13,3 +14,4 @@ struct OperationMetadata {
   const QString operation_name;
   const SelectionsConfig selections;
 };
+}  // namespace qtgql
