@@ -10,7 +10,7 @@ namespace ScalarsTestCase {
 
 // ----------- Object Types -----------
 
-class User : public qtgql::BaseGraphQLObjectWithID {
+class User : public qtgql::QtGqlObjectTypeABC {
   inline static const QString TYPE_NAME = "User";
 
  protected:
@@ -23,7 +23,7 @@ class User : public qtgql::BaseGraphQLObjectWithID {
 
  public:
   User(QObject *parent = nullptr)
-      : qtgql::BaseGraphQLObjectWithID::BaseGraphQLObjectWithID(parent){};
+      : qtgql::QtGqlObjectTypeABC::QtGqlObjectTypeABC(parent){};
 
  signals:
   void idChanged();
@@ -100,9 +100,16 @@ class User : public qtgql::BaseGraphQLObjectWithID {
       inst->m_uuid = data.value("uuid").toVariant().toUuid();
     };
 
+    record = NodeRecord(node = inst, retainers = set())
+                 .retain(metadata.operation_name);
+    cls.__store__.add_record(record);
+
     return inst;
   };
 
+  void loose(const qtgql::OperationMetadata &metadata) {
+    throw "not implemented";
+  };
   void update(const QJsonObject &data,
               const qtgql::SelectionsConfig &selections) {
     throw "not implemented";

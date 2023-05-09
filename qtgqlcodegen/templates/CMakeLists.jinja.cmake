@@ -1,6 +1,7 @@
 set(SCHEMA_TARGET "👉 context.target_name 👈")
 add_library(${SCHEMA_TARGET} "")
 add_library(__generated__::${SCHEMA_TARGET} ALIAS ${SCHEMA_TARGET})
+# cmake-lint: disable=C0301
 target_sources(${SCHEMA_TARGET} PUBLIC 
 {% for file in context.sources -%}
 👉 file.path 👈
