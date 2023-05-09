@@ -140,16 +140,20 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
             return "QObject"
 
     @cached_property
+    def getter_name(self) -> str:
+        return f"get_{self.name}"
+
+    @cached_property
     def setter_name(self) -> str:
-        return self.name + "_setter"
+        return f"{self.name}_setter"
 
     @cached_property
     def signal_name(self) -> str:
-        return self.name + "Changed"
+        return f"{self.name}Changed"
 
     @cached_property
     def private_name(self) -> str:
-        return "m_" + self.name
+        return f"m_{self.name}"
 
     @property
     def fget(self) -> str:

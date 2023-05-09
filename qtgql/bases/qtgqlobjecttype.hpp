@@ -16,17 +16,15 @@ class QtGqlObjectTypeABC : public QObject {
   const QString getTypeName() const { return TYPE_NAME; }
 
  public:
-  inline static const QString TYPE_NAME = "__NOT_IMPLEMENTED__";
-  explicit QtGqlObjectTypeABC(QObject *parent = nullptr);
   using QObject::QObject;
+  inline static const QString TYPE_NAME = "__NOT_IMPLEMENTED__";
+};
 
-  template <typename T>
-  static std::shared_ptr<T> from_dict(QObject *parent, const QJsonObject &data,
-                                      const SelectionsConfig &selections,
-                                      const OperationMetadata &metadata) {
-    throw "not implemented, should be implemented by the template";
-  };
-
+class BaseGraphQLObjectWithID : public QtGqlObjectTypeABC {
+ public:
+  using QtGqlObjectTypeABC::QtGqlObjectTypeABC;
+  const QString id;
+  // TODO: can't use constructor for this class since it is abstract.
   // updates a node based on new GraphQL data.
   virtual void update(const QJsonObject &data,
                       const SelectionsConfig &selections) = 0;
@@ -40,14 +38,6 @@ class QtGqlObjectTypeABC : public QObject {
   would be deleted.
   */
   virtual void loose(const OperationMetadata &metadata) = 0;
-};
-
-class BaseGraphQLObjectWithID : public QtGqlObjectTypeABC {
-  Q_OBJECT
-
- protected:
- public:
-  const QString id;
 };
 
 // stores global node of graphql type and it's retainers.

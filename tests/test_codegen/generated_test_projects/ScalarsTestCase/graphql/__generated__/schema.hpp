@@ -10,7 +10,7 @@ namespace ScalarsTestCase {
 
 // ----------- Object Types -----------
 
-class User : public qtgql::QtGqlObjectTypeABC {
+class User : public qtgql::BaseGraphQLObjectWithID {
   inline static const QString TYPE_NAME = "User";
 
  protected:
@@ -22,7 +22,8 @@ class User : public qtgql::QtGqlObjectTypeABC {
   QUuid m_uuid = qtgql::CONSTANTS::UUID;
 
  public:
-  User(QObject *parent = nullptr) : QObject::QObject(parent){};
+  User(QObject *parent = nullptr)
+      : qtgql::BaseGraphQLObjectWithID::BaseGraphQLObjectWithID(parent){};
 
  signals:
   void idChanged();
@@ -33,31 +34,37 @@ class User : public qtgql::QtGqlObjectTypeABC {
   void uuidChanged();
 
  public:
+  QString get_id() const { return m_id; }
   void id_setter(const QString &v) {
     m_id = v;
     emit idChanged();
   };
 
+  QString get_name() const { return m_name; }
   void name_setter(const QString &v) {
     m_name = v;
     emit nameChanged();
   };
 
+  int get_age() const { return m_age; }
   void age_setter(const int &v) {
     m_age = v;
     emit ageChanged();
   };
 
+  float get_agePoint() const { return m_agePoint; }
   void agePoint_setter(const float &v) {
     m_agePoint = v;
     emit agePointChanged();
   };
 
+  bool get_male() const { return m_male; }
   void male_setter(const bool &v) {
     m_male = v;
     emit maleChanged();
   };
 
+  QUuid get_uuid() const { return m_uuid; }
   void uuid_setter(const QUuid &v) {
     m_uuid = v;
     emit uuidChanged();
@@ -93,11 +100,12 @@ class User : public qtgql::QtGqlObjectTypeABC {
       inst->m_uuid = data.value("uuid").toVariant().toUuid();
     };
 
-    record = NodeRecord(node = inst, retainers = set())
-                 .retain(metadata.operation_name);
-    cls.__store__.add_record(record);
-
     return inst;
+  };
+
+  void update(const QJsonObject &data,
+              const qtgql::SelectionsConfig &selections) {
+    throw "not implemented";
   };
 };
 

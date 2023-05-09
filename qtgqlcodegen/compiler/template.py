@@ -9,10 +9,10 @@ from jinja2 import Environment
 from jinja2 import PackageLoader
 from jinja2 import select_autoescape
 
-
 if TYPE_CHECKING:  # pragma: no cover
     from qtgqlcodegen.config import QtGqlConfig
     from qtgqlcodegen.compiler.operation import QtGqlOperationDefinition, QtGqlQueriedField
+    from qtgqlcodegen.utils import FileSpec
     from qtgqlcodegen.objecttype import (
         QtGqlEnumDefinition,
         QtGqlInputObjectTypeDefinition,
@@ -40,7 +40,7 @@ template_env.filters["wrapcurly"] = wrap_curly_filter
 SCHEMA_TEMPLATE = template_env.get_template("schema.jinja.hpp")
 OPERATION_TEMPLATE = template_env.get_template("operation.jinja.hpp")
 CONFIG_TEMPLATE = template_env.get_template("config.jinja.hpp")
-CMAKE_TEMPLATE = template_env.get_template("CMakeLists.jinja.txt")
+CMAKE_TEMPLATE = template_env.get_template("CMakeLists.jinja.cmake")
 
 
 @define
@@ -91,6 +91,16 @@ def schema_types_template(context: SchemaTemplateContext) -> str:
 
 def operation_template(context: SchemaTemplateContext) -> str:
     return OPERATION_TEMPLATE.render(context=context)
+
+
+@define(slots=False)
+class CmakeTemplateContext:
+    config: QtGqlConfig
+    sources: list[FileSpec]
+
+    @property
+    def target_name(self) -> str:
+        return self.config.env_name
 
 
 def cmake_template(context: SchemaTemplateContext) -> str:

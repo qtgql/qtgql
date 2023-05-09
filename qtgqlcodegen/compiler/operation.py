@@ -25,7 +25,7 @@ if TYPE_CHECKING:
     from graphql import language as gql_lang, OperationType
 
     from qtgqlcodegen.introspection import SchemaEvaluator
-    from qtgqlcodegen.objecttype import QtGqlVariableDefinition
+    from qtgqlcodegen.objecttype import QtGqlVariableDefinition, GqlTypeHinter
     from qtgqlcodegen.objecttype import QtGqlFieldDefinition
     from qtgqlcodegen.objecttype import QtGqlObjectTypeDefinition
 
@@ -58,6 +58,14 @@ class QtGqlQueriedField:
     definition: QtGqlFieldDefinition = attrs.field(on_setattr=attrs.setters.frozen)
     choices: frozendict[str, frozenset[QtGqlQueriedField]] = attrs.Factory(frozendict)
     selections: frozenset[QtGqlQueriedField] = attrs.Factory(frozenset)
+
+    @property
+    def type(self) -> GqlTypeHinter:
+        return self.definition.type
+
+    @property
+    def name(self) -> str:
+        return self.definition.name
 
     @property
     def ctype(self) -> str:

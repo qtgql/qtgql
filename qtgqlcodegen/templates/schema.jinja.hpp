@@ -17,7 +17,7 @@ protected:
 
 public:
 👉type.name👈 (QObject* parent = nullptr)
-    : QObject::QObject(parent) {};
+    : qtgql::QtGqlObjectTypeABC::QtGqlObjectTypeABC(parent) {};
 
 signals:
 {%for f in type.fields -%}
@@ -26,6 +26,9 @@ void 👉f.signal_name👈();
 
 public:
 {%for f in type.fields %}
+👉f.annotation👈 👉f.getter_name👈() const {
+    return 👉f.private_name👈;
+}
 void 👉f.setter_name👈(const 👉f.annotation👈 &v)
 {
   👉f.private_name👈 = v;
@@ -50,20 +53,25 @@ auto inst = std::make_shared<👉type.name👈>();
 {% set assign_to %} inst->👉f.private_name👈 {% endset %}
 👉macros.deserialize_field(f, assign_to)👈
 {% endfor %}
+
 {% if type.id_is_optional %}
 if (inst->id) {
   auto record = NodeRecord(node = inst, retainers = set())
                     .retain(metadata.operation_name)
                         cls.__store__.add_record(record)
 }
-{% elif type.has_id_field and not type.id_is_optional %} record =
-    NodeRecord(node = inst, retainers = set())
-        .retain(metadata.operation_name);
-    cls.__store__.add_record(record); 
+{% elif type.has_id_field and not type.id_is_optional %}
+record = NodeRecord(node = inst, retainers = set()).retain(metadata.operation_name);
+cls.__store__.add_record(record); 
 {% endif %}
 return inst;
   };
-  
-};
+
 {% endfor %}
+void loose(const qtgql::OperationMetadata &metadata){throw "not implemented";};
+void update(const QJsonObject &data,
+            const qtgql::SelectionsConfig &selections){throw "not implemented";};
+
+};
+
 }

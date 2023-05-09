@@ -19,6 +19,7 @@ from qtgqlcodegen.compiler.builtin_scalars import BuiltinScalars
 from qtgqlcodegen.compiler.operation import QtGqlOperationDefinition
 from qtgqlcodegen.compiler.operation import QtGqlQueriedField
 from qtgqlcodegen.compiler.template import cmake_template
+from qtgqlcodegen.compiler.template import CmakeTemplateContext
 from qtgqlcodegen.compiler.template import operation_template
 from qtgqlcodegen.compiler.template import OperationTemplateContext
 from qtgqlcodegen.compiler.template import schema_types_template
@@ -469,20 +470,22 @@ class SchemaEvaluator:
             content=schema_types_template(context),
             path=self.config.generated_dir / "schema.hpp",
         )
-        cmake = FileSpec(
-            content=cmake_template(context),
-            path=self.config.generated_dir / "CMakeLists.txt",
-        )
-        return [schema, cmake, *operations]
+
+        return [schema, *operations]
 
     def dump(self):
         """:param file: Path to the directory the codegen would dump to."""
-        files = self.generate()
+        headers = self.generate()
 
         args = ["clang-format"] + [
-            str(f.path) for f in files if f.path.suffix in ("cpp", "h", "hpp")
+            str(f.path) for f in headers if f.path.suffix in ("cpp", "h", "hpp")
         ]
+        cmake = FileSpec(
+            content=cmake_template(CmakeTemplateContext(config=self.config, sources=headers)),
+            path=self.config.generated_dir / "CMakeLists.txt",
+        )
+        headers.append(cmake)
         args.append("-i")
-        for f in files:
+        for f in headers:
             f.dump()
         subprocess.run(args)

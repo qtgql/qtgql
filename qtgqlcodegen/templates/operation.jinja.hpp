@@ -11,8 +11,13 @@ class 👉 t.name 👈: public QObject{
 👉context.schema_ns👈::👉 t.definition.name 👈* m_inst;
 
 public:
-    {% for f in t.fields %}
-    {% endfor %}
+{% for f in t.fields %}
+
+👉 f.type.annotation 👈  👉 f.definition.getter_name 👈() const {
+    return m_inst->👉 f.definition.getter_name 👈();
+};
+
+{% endfor %}
 
 
 };
