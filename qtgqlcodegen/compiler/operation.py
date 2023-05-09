@@ -53,11 +53,15 @@ def get_field_from_field_node(
     )
 
 
-@attrs.define(slots=False)
+@attrs.define
 class QtGqlQueriedField:
     definition: QtGqlFieldDefinition = attrs.field(on_setattr=attrs.setters.frozen)
     choices: frozendict[str, frozenset[QtGqlQueriedField]] = attrs.Factory(frozendict)
     selections: frozenset[QtGqlQueriedField] = attrs.Factory(frozenset)
+
+    @property
+    def ctype(self) -> str:
+        return self.definition.type.annotation
 
     def __hash__(self) -> int:
         return hash((hash(self.selections), hash(self.choices), self.definition.name))
@@ -198,7 +202,7 @@ class QtGqlQueriedObjectType:
     @cached_property
     def name(self) -> str:
         return (
-            f"{self.definition.name}🔸{'↔'.join([field.definition.name for field in self.fields])}"
+            f"{self.definition.name}__{'$'.join([field.definition.name for field in self.fields])}"
         )
 
 
@@ -219,20 +223,25 @@ class QtGqlOperationDefinition:
 
     @cached_property
     def narrowed_types(self) -> list[QtGqlQueriedObjectType]:
-        ret: list[QtGqlQueriedObjectType] = []
+        ret: dict[str, QtGqlQueriedObjectType] = {}
 
         def recurse(f: QtGqlQueriedField):
             field_type = f.definition.type.is_object_type
             assert field_type
-            ret.append(
-                QtGqlQueriedObjectType(
-                    definition=field_type,
-                    fields=f.selections,
-                ),
+            obj = QtGqlQueriedObjectType(
+                definition=field_type,
+                fields=f.selections,
             )
+            # even though one type could have been queried the same at one level but differently
+            # on deeper levels we don't need to distinguish between them since
+            # these should just be a proxy object of the real instance.
+            if obj.name not in ret.keys():
+                ret[obj.name] = obj
+
+            # we still need to recurse deeper in that field though.
             for selection in f.selections:
                 if selection.definition.type.is_object_type:
                     recurse(selection)
 
         recurse(self.field)
-        return ret
+        return list(ret.values())

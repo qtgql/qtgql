@@ -74,6 +74,15 @@ class SchemaTemplateContext:
 @define(slots=False)
 class OperationTemplateContext:
     operation: QtGqlOperationDefinition
+    config: QtGqlConfig
+
+    @property
+    def ns(self) -> str:
+        return self.operation.name.lower()
+
+    @property
+    def schema_ns(self) -> str:
+        return self.config.env_name
 
 
 def schema_types_template(context: SchemaTemplateContext) -> str:

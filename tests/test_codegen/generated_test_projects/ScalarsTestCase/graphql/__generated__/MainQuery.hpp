@@ -1,9 +1,12 @@
 #include "./schema.hpp"
 
-namespace MainQuery {
+namespace mainquery {
 
-class t.name : public QObject{Q_OBJECT
+class User__id$uuid$agePoint$male$name$age : public QObject {
+  Q_OBJECT
+  ScalarsTestCase::User* m_inst;
 
-               };
-
+ public:
 };
+
+};  // namespace mainquery

@@ -459,6 +459,7 @@ class SchemaEvaluator:
                     content=operation_template(
                         OperationTemplateContext(
                             operation=op,
+                            config=self.config,
                         ),
                     ),
                     path=self.config.generated_dir / f"{op_name}.hpp",

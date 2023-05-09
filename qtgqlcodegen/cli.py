@@ -52,8 +52,8 @@ def gen():
 
     console.print(
         "[bold green]Types were generated to"
-        f"[link={config.generated_types_dir.resolve()}]"
-        f"file://{config.generated_types_dir.resolve()}[/link] successfully!",
+        f"[link={config.generated_dir.resolve()}]"
+        f"file://{config.generated_dir.resolve()}[/link] successfully!",
     )
 
 

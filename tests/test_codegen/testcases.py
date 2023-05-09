@@ -119,7 +119,8 @@ class QGQLObjectTestCase:
         self.config_dir.write_text(TST_CONFIG_TEMPLATE.render(context=template_context))
         cwd = Path.cwd()
         os.chdir(self.config_dir.parent)
-        CLI_RUNNER.invoke(app, "gen")
+        if exc := CLI_RUNNER.invoke(app, "gen").exception:
+            raise exc
         os.chdir(cwd)
         prev = TST_CMAKE.read_text()
         link_line = "target_link_libraries(${TESTS_TARGET} PRIVATE __generated__::%s)" % (
