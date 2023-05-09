@@ -1,4 +1,4 @@
-{% import "macros.jinja.cpp" as macros -%}
+{% import "macros.jinja.hpp" as macros -%}
 #pragma once
 #include <QObject>
 #include <QJsonObject>
@@ -6,6 +6,7 @@
 #include <qtgqlobjecttype.hpp>
 #include <qtgqlmetadata.hpp>
 #include <qtgqlconstants.hpp>
+
 namespace 👉context.config.env_name👈{
 {% macro init_and_props(type) %}
 protected:

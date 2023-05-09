@@ -5,6 +5,7 @@
 #include <qtgqlconstants.hpp>
 #include <qtgqlmetadata.hpp>
 #include <qtgqlobjecttype.hpp>
+
 namespace ScalarsTestCase {
 
 // ----------- Object Types -----------

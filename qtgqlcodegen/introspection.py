@@ -19,9 +19,10 @@ from qtgqlcodegen.compiler.builtin_scalars import BuiltinScalars
 from qtgqlcodegen.compiler.operation import QtGqlOperationDefinition
 from qtgqlcodegen.compiler.operation import QtGqlQueriedField
 from qtgqlcodegen.compiler.template import cmake_template
-from qtgqlcodegen.compiler.template import handlers_template
+from qtgqlcodegen.compiler.template import operation_template
+from qtgqlcodegen.compiler.template import OperationTemplateContext
 from qtgqlcodegen.compiler.template import schema_types_template
-from qtgqlcodegen.compiler.template import TemplateContext
+from qtgqlcodegen.compiler.template import SchemaTemplateContext
 from qtgqlcodegen.exceptions import QtGqlException
 from qtgqlcodegen.graphql_ref import is_enum_definition
 from qtgqlcodegen.graphql_ref import is_input_definition
@@ -67,9 +68,7 @@ class QtGqlVisitor(visitor.Visitor):
 
     def __init__(self, evaluator: SchemaEvaluator):
         super().__init__()
-        self.query_handlers: dict[str, QtGqlOperationDefinition] = {}
-        self.mutation_handlers: dict[str, QtGqlOperationDefinition] = {}
-        self.subscription_handlers: dict[str, QtGqlOperationDefinition] = {}
+        self.operations: dict[str, QtGqlOperationDefinition] = {}
         self.evaluator = evaluator
 
     def _get_root_type_field(
@@ -108,9 +107,12 @@ class QtGqlVisitor(visitor.Visitor):
                 assert operation.name, "QtGql enforces operations to have names."
                 op_name = operation.name.value
                 operation_vars: list[QtGqlVariableDefinition] = []
+
+                # input variables
                 if variables_def := operation.variable_definitions:
                     for var in variables_def:
                         operation_vars.append(self._parse_variable_definition(var))
+
                 if operation.operation is OperationType.QUERY:
                     assert self.evaluator._query_type
                     root_qtgql_field = self._get_root_type_field(
@@ -119,13 +121,13 @@ class QtGqlVisitor(visitor.Visitor):
                     )
                     operation_definition = QtGqlOperationDefinition(
                         query=graphql.print_ast(node),
-                        operation_type=self.evaluator._query_type,
+                        root_type=self.evaluator._query_type,
+                        operation_kind=operation.operation,
                         name=op_name,
                         field=root_qtgql_field,
                         directives=node.directives,
                         variables=operation_vars,
                     )
-                    self.query_handlers[op_name] = operation_definition
                 elif operation.operation is OperationType.MUTATION:
                     assert (
                         self.evaluator._mutation_type
@@ -136,15 +138,16 @@ class QtGqlVisitor(visitor.Visitor):
                     )
                     operation_definition = QtGqlOperationDefinition(
                         query=graphql.print_ast(node),
-                        operation_type=self.evaluator._mutation_type,
+                        root_type=self.evaluator._mutation_type,
+                        operation_kind=operation.operation,
                         name=op_name,
                         field=root_qtgql_field,
                         directives=node.directives,
                         variables=operation_vars,
                     )
-                    self.mutation_handlers[op_name] = operation_definition
 
-                elif operation.operation is OperationType.SUBSCRIPTION:
+                else:
+                    assert operation.operation is OperationType.SUBSCRIPTION
                     assert (
                         self.evaluator._subscription_type
                     ), "You don't have a subscription type on your schema"
@@ -160,7 +163,7 @@ class QtGqlVisitor(visitor.Visitor):
                         directives=node.directives,
                         variables=operation_vars,
                     )
-                    self.subscription_handlers[op_name] = operation_definition
+                self.operations[operation_definition.name] = operation_definition
 
 
 class SchemaEvaluator:
@@ -170,9 +173,7 @@ class SchemaEvaluator:
         self._enums_def_map: EnumMap = {}
         self._input_objects_def_map: dict[str, QtGqlInputObjectTypeDefinition] = {}
         self._interfaces_map: dict[str, QtGqlInterfaceDefinition] = {}
-        self._query_handlers: dict[str, QtGqlOperationDefinition] = {}
-        self._mutation_handlers: dict[str, QtGqlOperationDefinition] = {}
-        self._subscription_handlers: dict[str, QtGqlOperationDefinition] = {}
+        self._operations: dict[str, QtGqlOperationDefinition] = {}
         self._query_type: Optional[QtGqlObjectTypeDefinition] = None
         self._mutation_type: Optional[QtGqlObjectTypeDefinition] = None
         self._subscription_type: Optional[QtGqlObjectTypeDefinition] = None
@@ -434,31 +435,35 @@ class SchemaEvaluator:
         # get QtGql fields from the query AST and inject ID field.
         operation_miner = QtGqlVisitor(self)
         visitor.visit(operations, operation_miner)
-        self._query_handlers.update(operation_miner.query_handlers)
-        self._mutation_handlers.update(operation_miner.mutation_handlers)
-        self._subscription_handlers.update(operation_miner.subscription_handlers)
+        self._operations.update(operation_miner.operations)
 
     def generate(self) -> list[FileSpec]:
         self.parse_schema_concretes()
         self.parse_operations()
-        context = TemplateContext(
+        context = SchemaTemplateContext(
             enums=list(self._enums_def_map.values()),
             types=[
                 t
                 for name, t in self._objecttypes_def_map.items()
                 if name not in BuiltinScalars.keys() and name not in self.root_types_names
             ],
-            queries=list(self._query_handlers.values()),
             interfaces=list(self._interfaces_map.values()),
-            mutations=list(self._mutation_handlers.values()),
-            subscriptions=list(self._subscription_handlers.values()),
             input_objects=list(self._input_objects_def_map.values()),
             config=self.config,
         )
-        handlers = FileSpec(
-            content=handlers_template(context),
-            path=self.config.generated_dir / "handlers.hpp",
-        )
+
+        operations: list[FileSpec] = []
+        for op_name, op in self._operations.items():
+            operations.append(
+                FileSpec(
+                    content=operation_template(
+                        OperationTemplateContext(
+                            operation=op,
+                        ),
+                    ),
+                    path=self.config.generated_dir / f"{op_name}.hpp",
+                ),
+            )
         schema = FileSpec(
             content=schema_types_template(context),
             path=self.config.generated_dir / "schema.hpp",
@@ -467,7 +472,7 @@ class SchemaEvaluator:
             content=cmake_template(context),
             path=self.config.generated_dir / "CMakeLists.txt",
         )
-        return [handlers, schema, cmake]
+        return [schema, cmake, *operations]
 
     def dump(self):
         """:param file: Path to the directory the codegen would dump to."""

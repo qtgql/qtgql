@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 from collections import defaultdict
+from functools import cached_property
 from textwrap import dedent
-from typing import NamedTuple
 from typing import Optional
 from typing import TYPE_CHECKING
 
 import attrs
+from attr import define
+from frozendict import frozendict
 from typingref import UNSET
 
 from qtgqlcodegen.compiler.template import config_template
@@ -17,14 +19,15 @@ from qtgqlcodegen.graphql_ref import inject_id_selection
 from qtgqlcodegen.graphql_ref import inject_typename_selection
 from qtgqlcodegen.graphql_ref import is_field_node
 from qtgqlcodegen.graphql_ref import is_inline_fragment
-from qtgqlcodegen.objecttype import QtGqlFieldDefinition
-from qtgqlcodegen.objecttype import QtGqlObjectTypeDefinition
+
 
 if TYPE_CHECKING:
-    from graphql import language as gql_lang
+    from graphql import language as gql_lang, OperationType
 
     from qtgqlcodegen.introspection import SchemaEvaluator
     from qtgqlcodegen.objecttype import QtGqlVariableDefinition
+    from qtgqlcodegen.objecttype import QtGqlFieldDefinition
+    from qtgqlcodegen.objecttype import QtGqlObjectTypeDefinition
 
 
 def is_type_name_selection(field_node: gql_lang.FieldNode):
@@ -50,22 +53,14 @@ def get_field_from_field_node(
     )
 
 
-class UniqueFieldsList(list["QtGqlQueriedField"]):
-    def append(self, obj: QtGqlQueriedField) -> None:
-        for v in self:
-            if v.name == obj.name:
-                pass
-        super().append(obj)
+@attrs.define(slots=False)
+class QtGqlQueriedField:
+    definition: QtGqlFieldDefinition = attrs.field(on_setattr=attrs.setters.frozen)
+    choices: frozendict[str, frozenset[QtGqlQueriedField]] = attrs.Factory(frozendict)
+    selections: frozenset[QtGqlQueriedField] = attrs.Factory(frozenset)
 
-    def extend(self, other) -> None:
-        for v in other:
-            self.append(v)
-
-
-@attrs.define
-class QtGqlQueriedField(QtGqlFieldDefinition):
-    selections: UniqueFieldsList = attrs.Factory(UniqueFieldsList)
-    choices: dict[str, UniqueFieldsList] = attrs.Factory(lambda: defaultdict(UniqueFieldsList))
+    def __hash__(self) -> int:
+        return hash((hash(self.selections), hash(self.choices), self.definition.name))
 
     @classmethod
     def from_field(
@@ -81,11 +76,10 @@ class QtGqlQueriedField(QtGqlFieldDefinition):
         Any other fields should not have inner selections.
         """
         assert parent_interface_field is not UNSET
-        ret = cls(**attrs.asdict(f, recurse=False))
         if not hasattr(selection_set, "selections"):
-            return ret
+            return cls(definition=f)
         assert selection_set
-        tp = ret.type
+        tp = f.type
         if (
             tp.is_model
         ):  # GraphQL's lists are basically the object beneath them in terms of selections.
@@ -97,9 +91,11 @@ class QtGqlQueriedField(QtGqlFieldDefinition):
         if f.can_select_id and not has_id_selection(selection_set):
             inject_id_selection(selection_set)
 
+        selections: list[QtGqlQueriedField] = []
+        choices: defaultdict[str, list[QtGqlQueriedField]] = defaultdict(list)
         # inject parent interface selections.
         if (tp.is_object_type or tp.is_interface) and parent_interface_field:
-            ret.selections.extend(parent_interface_field.selections)
+            selections.extend(parent_interface_field.selections)
 
         if tp_is_union:
             for selection in selection_set.selections:
@@ -119,7 +115,7 @@ class QtGqlQueriedField(QtGqlFieldDefinition):
                     assert field_node
 
                     if not is_type_name_selection(field_node):
-                        ret.choices[type_name].append(
+                        choices[type_name].append(
                             get_field_from_field_node(
                                 field_node,
                                 concrete,
@@ -135,7 +131,7 @@ class QtGqlQueriedField(QtGqlFieldDefinition):
                     field_node = is_field_node(selection)
                     assert field_node
                     if not is_type_name_selection(field_node):
-                        ret.selections.append(
+                        selections.append(
                             get_field_from_field_node(
                                 field_node,
                                 interface_def,
@@ -156,7 +152,7 @@ class QtGqlQueriedField(QtGqlFieldDefinition):
                         field_node = is_field_node(inner_selection)
                         assert field_node
                         if not is_type_name_selection(field_node):
-                            ret.choices[type_name].append(
+                            choices[type_name].append(
                                 get_field_from_field_node(
                                     field_node,
                                     concrete,
@@ -172,7 +168,7 @@ class QtGqlQueriedField(QtGqlFieldDefinition):
                 field_node = is_field_node(selection)
                 assert field_node
                 if not is_type_name_selection(field_node):
-                    ret.selections.append(
+                    selections.append(
                         get_field_from_field_node(
                             field_node,
                             obj_def,
@@ -180,7 +176,11 @@ class QtGqlQueriedField(QtGqlFieldDefinition):
                             parent_interface_field,
                         ),
                     )
-        return ret
+        return cls(
+            definition=f,
+            selections=frozenset(selections),
+            choices=frozendict({k: frozenset(v) for k, v in choices}),
+        )
 
     def as_conf_string(self) -> str:
         return dedent(
@@ -190,10 +190,24 @@ class QtGqlQueriedField(QtGqlFieldDefinition):
         )
 
 
-class QtGqlOperationDefinition(NamedTuple):
+@define(slots=False)
+class QtGqlQueriedObjectType:
+    definition: QtGqlObjectTypeDefinition = attrs.field(on_setattr=attrs.setters.frozen)
+    fields: list[QtGqlQueriedField] = attrs.Factory(list)
+
+    @cached_property
+    def name(self) -> str:
+        return (
+            f"{self.definition.name}🔸{'↔'.join([field.definition.name for field in self.fields])}"
+        )
+
+
+@define(slots=False)
+class QtGqlOperationDefinition:
     query: str
     name: str
-    operation_type: QtGqlObjectTypeDefinition
+    root_type: QtGqlObjectTypeDefinition
+    operation_kind: OperationType
     field: QtGqlQueriedField
     directives: list[str] = []
     fragments: list[str] = []
@@ -202,3 +216,23 @@ class QtGqlOperationDefinition(NamedTuple):
     @property
     def operation_config(self) -> str:
         return self.field.as_conf_string()
+
+    @cached_property
+    def narrowed_types(self) -> list[QtGqlQueriedObjectType]:
+        ret: list[QtGqlQueriedObjectType] = []
+
+        def recurse(f: QtGqlQueriedField):
+            field_type = f.definition.type.is_object_type
+            assert field_type
+            ret.append(
+                QtGqlQueriedObjectType(
+                    definition=field_type,
+                    fields=f.selections,
+                ),
+            )
+            for selection in f.selections:
+                if selection.definition.type.is_object_type:
+                    recurse(selection)
+
+        recurse(self.field)
+        return ret

@@ -37,20 +37,17 @@ def wrap_curly_filter(v: str, ignore: bool = False) -> str:
 
 template_env.filters["wrapcurly"] = wrap_curly_filter
 
-SCHEMA_TEMPLATE = template_env.get_template("schema.jinja.cpp")
-HANDLERS_TEMPLATE = template_env.get_template("handlers.jinja.py")
-CONFIG_TEMPLATE = template_env.get_template("config.jinja.py")
+SCHEMA_TEMPLATE = template_env.get_template("schema.jinja.hpp")
+OPERATION_TEMPLATE = template_env.get_template("operation.jinja.hpp")
+CONFIG_TEMPLATE = template_env.get_template("config.jinja.hpp")
 CMAKE_TEMPLATE = template_env.get_template("CMakeLists.jinja.txt")
 
 
 @define
-class TemplateContext:
+class SchemaTemplateContext:
     enums: list[QtGqlEnumDefinition]
     types: list[QtGqlObjectTypeDefinition]
     interfaces: list[QtGqlInterfaceDefinition]
-    queries: list[QtGqlOperationDefinition]
-    mutations: list[QtGqlOperationDefinition]
-    subscriptions: list[QtGqlOperationDefinition]
     input_objects: list[QtGqlInputObjectTypeDefinition]
     config: QtGqlConfig
 
@@ -74,15 +71,20 @@ class TemplateContext:
         return self.config.base_object.__name__
 
 
-def schema_types_template(context: TemplateContext) -> str:
+@define(slots=False)
+class OperationTemplateContext:
+    operation: QtGqlOperationDefinition
+
+
+def schema_types_template(context: SchemaTemplateContext) -> str:
     return SCHEMA_TEMPLATE.render(context=context)
 
 
-def handlers_template(context: TemplateContext) -> str:
-    return HANDLERS_TEMPLATE.render(context=context)
+def operation_template(context: SchemaTemplateContext) -> str:
+    return OPERATION_TEMPLATE.render(context=context)
 
 
-def cmake_template(context: TemplateContext) -> str:
+def cmake_template(context: SchemaTemplateContext) -> str:
     return CMAKE_TEMPLATE.render(context=context)
 
 

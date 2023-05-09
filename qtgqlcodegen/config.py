@@ -6,7 +6,7 @@ from typing import Type
 from attrs import define
 
 from qtgqlcodegen.compiler.template import schema_types_template
-from qtgqlcodegen.compiler.template import TemplateContext
+from qtgqlcodegen.compiler.template import SchemaTemplateContext
 from qtgqlcodegen.introspection import SchemaEvaluator
 from qtgqlcodegen.runtime.custom_scalars import CUSTOM_SCALARS
 from qtgqlcodegen.runtime.custom_scalars import CustomScalarMap
@@ -32,7 +32,7 @@ class QtGqlConfig:
     """evaluates the schema and generates types."""
     custom_scalars: CustomScalarMap = {}
     """mapping of custom scalars, respected by the schema evaluator."""
-    template_class: Callable[[TemplateContext], str] = schema_types_template
+    template_class: Callable[[SchemaTemplateContext], str] = schema_types_template
     """jinja template."""
 
     @cached_property
