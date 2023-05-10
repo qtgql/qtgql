@@ -15,7 +15,7 @@ class 👉 t.name 👈{
 
 public:
 {%- for f in t.fields.values() %}
-👉 f.type.annotation 👈  👉 f.definition.getter_name 👈() const {
+const 👉 f.type.annotation 👈 & 👉 f.definition.getter_name 👈() const {
     return m_inst->👉 f.definition.getter_name 👈();
 };
 {% endfor -%}

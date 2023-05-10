@@ -21,7 +21,7 @@ void 👉f.signal_name👈();
 
 public:
 {%for f in type.fields %}
-👉f.annotation👈 👉f.getter_name👈() const {
+const 👉f.annotation👈 & 👉f.getter_name👈() const {
     return 👉f.private_name👈;
 }
 void 👉f.setter_name👈(const 👉f.annotation👈 &v)

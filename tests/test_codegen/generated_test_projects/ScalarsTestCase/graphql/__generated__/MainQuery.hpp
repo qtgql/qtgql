@@ -17,17 +17,17 @@ class User__age$agePoint$id$male$name$uuid {
   ScalarsTestCase::User* m_inst;
 
  public:
-  int get_age() const { return m_inst->get_age(); };
+  const int& get_age() const { return m_inst->get_age(); };
 
-  float get_agePoint() const { return m_inst->get_agePoint(); };
+  const float& get_agePoint() const { return m_inst->get_agePoint(); };
 
   const QString& get_id() const { return m_inst->get_id(); };
 
-  bool get_male() const { return m_inst->get_male(); };
+  const bool& get_male() const { return m_inst->get_male(); };
 
-  QString get_name() const { return m_inst->get_name(); };
+  const QString& get_name() const { return m_inst->get_name(); };
 
-  QUuid get_uuid() const { return m_inst->get_uuid(); };
+  const QUuid& get_uuid() const { return m_inst->get_uuid(); };
 };
 
 };  // namespace mainquery

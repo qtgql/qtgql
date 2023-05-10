@@ -33,31 +33,31 @@ class User : public qtgql::QtGqlObjectTypeABCWithID {
     emit idChanged();
   };
 
-  QString get_name() const { return m_name; }
+  const QString &get_name() const { return m_name; }
   void name_setter(const QString &v) {
     m_name = v;
     emit nameChanged();
   };
 
-  int get_age() const { return m_age; }
+  const int &get_age() const { return m_age; }
   void age_setter(const int &v) {
     m_age = v;
     emit ageChanged();
   };
 
-  float get_agePoint() const { return m_agePoint; }
+  const float &get_agePoint() const { return m_agePoint; }
   void agePoint_setter(const float &v) {
     m_agePoint = v;
     emit agePointChanged();
   };
 
-  bool get_male() const { return m_male; }
+  const bool &get_male() const { return m_male; }
   void male_setter(const bool &v) {
     m_male = v;
     emit maleChanged();
   };
 
-  QUuid get_uuid() const { return m_uuid; }
+  const QUuid &get_uuid() const { return m_uuid; }
   void uuid_setter(const QUuid &v) {
     m_uuid = v;
     emit uuidChanged();
