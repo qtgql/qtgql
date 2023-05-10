@@ -8,17 +8,12 @@
 #include <qtgqlconstants.hpp>
 
 namespace 👉context.config.env_name👈{
-{% macro init_and_props(type) %}
+{% macro props(type) %}
 protected:
 
 {% for f in type.fields -%}
 👉f.annotation👈 👉f.private_name👈 = 👉f.default_value👈;
 {% endfor %}
-
-public:
-👉type.name👈 (QObject* parent = nullptr)
-    : qtgql::QtGqlObjectTypeABC::QtGqlObjectTypeABC(parent) {};
-
 signals:
 {%for f in type.fields -%}
 void 👉f.signal_name👈();
@@ -38,13 +33,15 @@ void 👉f.setter_name👈(const 👉f.annotation👈 &v)
 {% endmacro %}
 // ----------- Object Types -----------
 {% for type in context.types %}
-class 👉 type.name 👈 : public {% if type.has_id_field %}
-qtgql::QtGqlObjectTypeABC {% else %} qtgql::QtGqlObjectTypeWithIdABC{% endif %}{
-
-inline static const QString TYPE_NAME = "👉type.name👈";
-👉init_and_props(type)👈
-
+{%- set base_class -%}{% if type.has_id_field %}QtGqlObjectTypeABCWithID{% else %}QtGqlObjectTypeABC{% endif %}{%- endset -%}
+class 👉 type.name 👈 : public qtgql::👉 base_class 👈{
+👉 props(type) 👈
 public:
+inline static const QString TYPE_NAME = "👉 type.name 👈";
+👉type.name👈 (QObject* parent = nullptr)
+: qtgql::👉 base_class 👈::👉 base_class 👈(parent) {};
+
+
 std::shared_ptr<👉type.name👈> from_json(QObject * parent, const QJsonObject& data,
                                  const qtgql::SelectionsConfig& config,
                                  const qtgql::OperationMetadata& metadata){
@@ -66,8 +63,8 @@ cls.__store__.add_record(record);
 {% endif %}
 return inst;
   };
-
 {% endfor %}
+
 void loose(const qtgql::OperationMetadata &metadata){throw "not implemented";};
 void update(const QJsonObject &data,
             const qtgql::SelectionsConfig &selections){throw "not implemented";};

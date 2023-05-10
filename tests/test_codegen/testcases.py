@@ -35,11 +35,11 @@ GENERATED_TESTS_DIR = Path(__file__).parent / "generated_test_projects"
 if not GENERATED_TESTS_DIR.exists:
     GENERATED_TESTS_DIR.mkdir()
 template_env = jinja2.Environment(
-    loader=jinja2.FileSystemLoader(Path(__file__).parent / "tst_templates"),
+    loader=jinja2.FileSystemLoader(Path(__file__).parent / "templates_for_tests"),
     autoescape=jinja2.select_autoescape(),
 )
 
-TST_CONFIG_TEMPLATE = template_env.get_template("configtemplate.py")
+TST_CONFIG_TEMPLATE = template_env.get_template("configtemplate.jinja.py")
 CLI_RUNNER = CliRunner()
 TST_CMAKE = (Path(__file__).parent / "CMakeLists.txt").resolve(True)
 

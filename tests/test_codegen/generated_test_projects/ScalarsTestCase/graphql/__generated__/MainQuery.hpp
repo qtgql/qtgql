@@ -21,7 +21,7 @@ class User__age$agePoint$id$male$name$uuid {
 
   float get_agePoint() const { return m_inst->get_agePoint(); };
 
-  QString get_id() const { return m_inst->get_id(); };
+  const QString& get_id() const { return m_inst->get_id(); };
 
   bool get_male() const { return m_inst->get_male(); };
 

@@ -9,10 +9,7 @@
 namespace ScalarsTestCase {
 
 // ----------- Object Types -----------
-
-class User : public qtgql::QtGqlObjectTypeABC {
-  inline static const QString TYPE_NAME = "User";
-
+class User : public qtgql::QtGqlObjectTypeABCWithID {
  protected:
   QString m_id = qtgql::CONSTANTS::ID;
   QString m_name = " - ";
@@ -20,10 +17,6 @@ class User : public qtgql::QtGqlObjectTypeABC {
   float m_agePoint = 0.0;
   bool m_male = false;
   QUuid m_uuid = qtgql::CONSTANTS::UUID;
-
- public:
-  User(QObject *parent = nullptr)
-      : qtgql::QtGqlObjectTypeABC::QtGqlObjectTypeABC(parent){};
 
  signals:
   void idChanged();
@@ -34,7 +27,7 @@ class User : public qtgql::QtGqlObjectTypeABC {
   void uuidChanged();
 
  public:
-  QString get_id() const { return m_id; }
+  const QString &get_id() const { return m_id; }
   void id_setter(const QString &v) {
     m_id = v;
     emit idChanged();
@@ -71,6 +64,10 @@ class User : public qtgql::QtGqlObjectTypeABC {
   };
 
  public:
+  inline static const QString TYPE_NAME = "User";
+  User(QObject *parent = nullptr)
+      : qtgql::QtGqlObjectTypeABCWithID::QtGqlObjectTypeABCWithID(parent){};
+
   std::shared_ptr<User> from_json(QObject *parent, const QJsonObject &data,
                                   const qtgql::SelectionsConfig &config,
                                   const qtgql::OperationMetadata &metadata) {

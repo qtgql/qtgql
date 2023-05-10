@@ -14,13 +14,11 @@ class 👉 t.name 👈{
 👉context.schema_ns👈::👉 t.definition.name 👈* m_inst;
 
 public:
-{% for f in t.fields.values() %}
-
+{%- for f in t.fields.values() %}
 👉 f.type.annotation 👈  👉 f.definition.getter_name 👈() const {
     return m_inst->👉 f.definition.getter_name 👈();
 };
-
-{% endfor %}
+{% endfor -%}
 
 
 };

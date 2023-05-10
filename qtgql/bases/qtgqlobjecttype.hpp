@@ -1,8 +1,8 @@
 #pragma once
-
 #include <QDebug>
 #include <QObject>
 #include <QSet>
+#include <type_traits>
 
 #include "qtgqlmetadata.hpp"
 
@@ -20,10 +20,11 @@ class QtGqlObjectTypeABC : public QObject {
   inline static const QString TYPE_NAME = "__NOT_IMPLEMENTED__";
 };
 
-class BaseGraphQLObjectWithID : public QtGqlObjectTypeABC {
+class QtGqlObjectTypeABCWithID : public QtGqlObjectTypeABC {
  public:
   using QtGqlObjectTypeABC::QtGqlObjectTypeABC;
-  const QString id;
+  virtual const QString &get_id() const = 0;
+
   // TODO: can't use constructor for this class since it is abstract.
   // updates a node based on new GraphQL data.
   virtual void update(const QJsonObject &data,
@@ -43,13 +44,14 @@ class BaseGraphQLObjectWithID : public QtGqlObjectTypeABC {
 // stores global node of graphql type and it's retainers.
 template <typename T>
 class NodeRecord {
-  static_assert(std::is_base_of<BaseGraphQLObjectWithID, T>::value,
-                "<T> Must derive from BaseGraphQLObjectWithID");
   QSet<QString> m_retainers;
   typedef std::shared_ptr<T> T_sharedQObject;
 
  public:
   T_sharedQObject node;
+  NodeRecord() { throw "tried to instantiate without arguments"; };
+  NodeRecord(const T_sharedQObject &node_) { node = node_; };
+
   void retain(const QString &operation_name) {
     m_retainers.insert(operation_name);
   }
@@ -60,34 +62,35 @@ class NodeRecord {
 };
 
 template <typename T>
-
 class QGraphQLObjectStore {
-  static_assert(std::is_base_of<BaseGraphQLObjectWithID, T>::value,
-                "<T> Must derive from BaseGraphQLObjectWithID");
   typedef std::shared_ptr<NodeRecord<T>> T_sharedRecord;
 
  protected:
   QMap<QString, T_sharedRecord> m_data;
 
  public:
-  std::optional<T_sharedRecord> get_record(const QString &id) {
+  std::optional<T_sharedRecord> get_record(const QString &id) const {
     if (m_data.contains(id)) {
-      return {m_data.value(id).node};
+      return {m_data.value(id)};
     }
     return {};
   }
 
   void add_record(const T_sharedRecord &record) {
-    m_data.insert(record->node->id, record);
+    if (record) {
+      auto node = record->node;
+      if (node) {
+        m_data.insert(node->get_id(), record);
+      }
+    }
   };
 
-  void loose(const T_sharedRecord::T_sharedQObject &node,
-             const QString &operation_name) {
-    auto record = m_data.value(node->id);
+  void loose(const std::shared_ptr<T> &node, const QString &operation_name) {
+    auto record = m_data.value(node->get_id());
     record->loose(operation_name);
     if (!record->has_retainers()) {
-      m_data.remove(node->id);
-      qDebug() << "Node with ID: " << node->id << "has ref count of "
+      m_data.remove(node->get_id());
+      qDebug() << "Node with ID: " << node->get_id() << "has ref count of "
                << node.use_count();
     }
   }
