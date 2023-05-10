@@ -49,3 +49,11 @@ def test_appends_id_field_on_query_that_wont_define_id():
     with NoIdOnQueryTestCase.compile() as testcase:
         assert "id" not in testcase.query
         assert "id" in testcase.query_handler._message_template.payload.query
+
+
+class TestQtGqlQueriedObjectType:
+    def test_deterministic_name(self):
+        raise NotImplementedError
+
+    def test_deterministic_fields_order(self):
+        raise NotImplementedError

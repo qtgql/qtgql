@@ -100,10 +100,6 @@ class User : public qtgql::QtGqlObjectTypeABC {
       inst->m_uuid = data.value("uuid").toVariant().toUuid();
     };
 
-    record = NodeRecord(node = inst, retainers = set())
-                 .retain(metadata.operation_name);
-    cls.__store__.add_record(record);
-
     return inst;
   };
 
