@@ -478,7 +478,7 @@ class SchemaEvaluator:
         headers = self.generate()
 
         args = ["clang-format"] + [
-            str(f.path) for f in headers if f.path.suffix in ("cpp", "h", "hpp")
+            str(f.path) for f in headers if f.path.suffix in (".cpp", ".h", ".hpp")
         ]
         cmake = FileSpec(
             content=cmake_template(CmakeTemplateContext(config=self.config, sources=headers)),

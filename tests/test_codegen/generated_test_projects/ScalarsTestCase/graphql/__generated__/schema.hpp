@@ -11,6 +11,12 @@ namespace ScalarsTestCase {
 // ----------- Object Types -----------
 class User : public qtgql::QtGqlObjectTypeABCWithID {
  protected:
+  static auto &__store__() {
+    static qtgql::QGraphQLObjectStore<User> _store;
+    return _store;
+  }
+
+ protected:
   QString m_id = qtgql::CONSTANTS::ID;
   QString m_name = " - ";
   int m_age = 0;
@@ -96,6 +102,10 @@ class User : public qtgql::QtGqlObjectTypeABCWithID {
     if (config.selections.contains("uuid") && data.contains("uuid")) {
       inst->m_uuid = data.value("uuid").toVariant().toUuid();
     };
+
+    auto record = std::make_shared<qtgql::NodeRecord<User>>(inst);
+    record->retain(metadata.operation_name);
+    __store__().add_record(record);
 
     return inst;
   };

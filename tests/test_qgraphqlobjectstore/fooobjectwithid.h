@@ -10,6 +10,7 @@ class Foo : public qtgql::QtGqlObjectTypeABCWithID {
         m_id(id_){};
 
   const QString &get_id() const override { return m_id; }
+
   static auto &__store__() {
     static qtgql::QGraphQLObjectStore<Foo> _store;
     return _store;

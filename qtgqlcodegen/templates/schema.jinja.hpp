@@ -35,6 +35,12 @@ void 👉f.setter_name👈(const 👉f.annotation👈 &v)
 {% for type in context.types %}
 {%- set base_class -%}{% if type.has_id_field %}QtGqlObjectTypeABCWithID{% else %}QtGqlObjectTypeABC{% endif %}{%- endset -%}
 class 👉 type.name 👈 : public qtgql::👉 base_class 👈{
+protected:
+static auto & __store__() {
+    static qtgql::QGraphQLObjectStore<👉 type.name 👈> _store;
+    return _store;
+}
+
 👉 props(type) 👈
 public:
 inline static const QString TYPE_NAME = "👉 type.name 👈";
@@ -58,8 +64,9 @@ if (inst->id) {
                         cls.__store__.add_record(record)
 }
 {% elif type.has_id_field and not type.id_is_optional %}
-record = NodeRecord(node = inst, retainers = set()).retain(metadata.operation_name);
-cls.__store__.add_record(record); 
+auto record = std::make_shared<qtgql::NodeRecord<👉 type.name 👈>>(inst);
+record->retain(metadata.operation_name);
+__store__().add_record(record);
 {% endif %}
 return inst;
   };
