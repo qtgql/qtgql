@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import random
 from typing import AsyncGenerator
 from typing import Optional
@@ -71,7 +70,6 @@ class Subscription:
             if raise_on_5 and i == 5:
                 raise Exception("Test Gql Error")
             yield i
-            await asyncio.sleep(0.001)
 
 
 schema = strawberry.Schema(query=Query, subscription=Subscription, mutation=Mutation)

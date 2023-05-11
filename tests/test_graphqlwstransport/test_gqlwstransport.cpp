@@ -73,15 +73,11 @@ QString get_subscription_str(bool raiseOn5 = false,
       .arg(op_name, QString::number(target), ro5);
 }
 
-class DefaultHandler : public qtgql::QtGqlHandlerABC {
- protected:
+struct DefaultHandler : public qtgql::QtGqlHandlerABC {
   qtgql::GqlWsTrnsMsgWithID m_message;
-
- public:
   DefaultHandler(const QString &query = get_subscription_str())
-      : m_message{qtgql::GqlWsTrnsMsgWithID(qtgql::OperationPayload(query))} {
-    qDebug() << QJsonDocument(m_message.serialize()).toJson();
-  }
+      : m_message{qtgql::GqlWsTrnsMsgWithID(qtgql::OperationPayload(query))} {};
+
   QJsonArray m_errors;
   QJsonObject m_data;
   bool m_completed = false;
@@ -113,6 +109,7 @@ TEST_CASE("get operation name", "[gqlwstransport][ws-client]") {
   const QString operation_name = "SampleOperation";
   auto res_op_name =
       qtgql::get_operation_name("query SampleOperation {field1 field2}");
+  REQUIRE(res_op_name);
   REQUIRE(res_op_name.value() == operation_name);
 };
 
@@ -295,4 +292,18 @@ TEST_CASE("Mutation and Query operations compatibility",
     query_handler->wait_for_completed();
     REQUIRE(query_handler->m_data["hello"].toString() == "world");
   }
+}
+
+TEST_CASE("Test variables", "[gqlwstransport][handlers]") {
+  auto client = get_valid_client();
+  auto sub1 = std::make_shared<DefaultHandler>(
+      QString("subscription Sub1($target: Int!, $raiseOn5: Boolean = false) {\n"
+              "  count(target: $target, raiseOn5: $raiseOn5)\n"
+              "}"));
+
+  sub1->m_message.set_variables({{"target", 2}});
+  client->wait_for_valid();
+  client->execute(sub1);
+  sub1->wait_for_completed();
+  REQUIRE(sub1->m_data.value("count").toInt() == 1);
 }

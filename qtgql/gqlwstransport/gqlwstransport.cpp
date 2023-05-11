@@ -3,8 +3,7 @@
 #include <QtGlobal>
 
 std::optional<QString> qtgql::get_operation_name(const QString &query) {
-  static QRegularExpression re(
-      "(subscription|mutation|query)( [a-zA-Z]+)( |{)");
+  static QRegularExpression re("(subscription|mutation|query)( [0-9a-zA-Z]+)*");
   auto match = re.match(query);
   if (match.hasMatch()) {
     return match.captured(2).trimmed();

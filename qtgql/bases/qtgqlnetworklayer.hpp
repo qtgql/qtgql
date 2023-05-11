@@ -2,9 +2,12 @@
 #include <QJsonObject>
 #include <QUuid>
 
+#include "../utils/utils.hpp"
 namespace qtgql {
 struct HashAbleABC {
-  virtual QJsonObject serialize() const { throw "not implemented"; };
+  [[nodiscard]] virtual QJsonObject serialize() const {
+    throw NotImplementedError({});
+  };
 };
 
 // Replaces HandlerProto, To be extended by all consumers.
@@ -24,7 +27,7 @@ class that should  support executing handlers
 class QtGqlNetworkLayer {
  public:
   virtual void execute(const std::shared_ptr<QtGqlHandlerABC> &handler) {
-    throw "not implemented";
+    throw NotImplementedError({});
   }
 };
 }  // namespace qtgql

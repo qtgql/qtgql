@@ -3,31 +3,12 @@
 
 #include <QAbstractListModel>
 namespace qtgql {
-class NoHeap {
- private:
-  void* operator new(size_t);
-  void operator delete(void*);
-  void* operator new[](size_t);
-  void operator delete[](void*);
-};
+class NotImplementedError : public std::logic_error {
+  struct Msg {
+    const char* msg = "Function not yet implemented";
+  };
 
-class QListModelModifier : private NoHeap {
-  QListModelModifier() = delete;
-
- protected:
-  QAbstractListModel* m_model;
-  const QModelIndex* m_model_index;
-  int m_first;
-  int m_last;
-};
-
-class QListModelInserter : public QListModelModifier {
  public:
-  explicit QListModelInserter(QAbstractListModel* model_ptr) {
-    m_model = model_ptr;
-    m_model->begineInsertRows(m_model_index, m_first, m_last);
-  }
-  ~QListModelInserter() { m_model->endInsertRows(); }
+  explicit NotImplementedError(const Msg& msg) : std::logic_error(msg.msg){};
 };
-
 }  // namespace qtgql

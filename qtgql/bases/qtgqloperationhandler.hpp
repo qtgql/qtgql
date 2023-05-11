@@ -29,6 +29,7 @@ class _QtGqlOperationHandlerBaseSignals : public QObject {
   using QObject::QObject;
 };
 
+// NOTE: This class should not be defined in the .cpp since it is abstract.
 class QtGqlOperationHandlerBase
     : public QtGqlHandlerABC,
       public _QtGqlOperationHandlerBaseSignals,
@@ -66,4 +67,3 @@ class QtGqlOperationHandlerBase
   };
 };
 };  // namespace qtgql
-const auto a = std::shared_ptr<qtgql::QtGqlOperationHandlerBase>();

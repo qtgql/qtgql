@@ -53,7 +53,7 @@ struct BaseGqlWsTrnsMsg : public HashAbleABC {
 
   bool has_payload() const { return !payload.isEmpty(); };
 
-  QJsonObject serialize() const override {
+  [[nodiscard]] QJsonObject serialize() const override {
     QJsonObject data;
     data["type"] = type;
     if (!payload.isEmpty()) {
@@ -68,7 +68,9 @@ struct OperationPayload : public HashAbleABC {
   QString operationName;
   explicit OperationPayload(const QString &_query) : query{_query} {
     auto op_name = get_operation_name(query);
-    assert(op_name.has_value());
+    Q_ASSERT_X(op_name.has_value(), "OperationPayload",
+               "qtgql enforces operations to have names your query has no "
+               "operation name");
     operationName = op_name.value();
   };
   QJsonObject serialize() const override {
@@ -92,8 +94,13 @@ struct GqlWsTrnsMsgWithID : public BaseGqlWsTrnsMsg {
       : BaseGqlWsTrnsMsg(PROTOCOL::SUBSCRIBE, payload.serialize()),
         op_id{id} {};
 
+  void set_variables(const QJsonObject &vars) { payload["variables"] = vars; }
+
+  const auto get_variables() { return payload.value("variables").toObject(); }
+
   bool has_errors() const { return !this->errors.isEmpty(); }
-  QJsonObject serialize() const override {
+
+  [[nodiscard]] QJsonObject serialize() const override {
     QJsonObject ret = BaseGqlWsTrnsMsg::serialize();
     ret["id"] = op_id.toString();
     return ret;
@@ -130,7 +137,6 @@ class GqlWsTransportClient : public QObject, public QtGqlNetworkLayer {
  protected:
   QUrl m_url;
   bool m_auto_reconnect = true;
-  bool m_ping_is_valid = true;
   bool m_connection_ack = false;
   QTimer *m_reconnect_timer;
   QTimer *m_ping_timer;

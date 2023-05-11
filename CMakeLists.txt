@@ -14,6 +14,7 @@ find_package(Qt6 REQUIRED COMPONENTS Core Qml Quick WebSockets)
 qt_standard_project_setup()
 add_subdirectory(qtgql/gqlwstransport)
 add_subdirectory(qtgql/bases)
+add_subdirectory(qtgql/utils)
 
 # --options--
 option(QTGQL_VERBOSE "display helpful build information" true)
