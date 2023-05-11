@@ -202,10 +202,13 @@ bool qtgql::GqlWsTransportClient::gql_is_valid() const {
 }
 
 void qtgql::GqlWsTransportClient::execute(
-    std::shared_ptr<QtGqlHandlerABC> handler) {
+    const std::shared_ptr<QtGqlHandlerABC> &handler) {
   m_handlers.insert(handler->operation_id(), handler);
   if (m_ws.isValid()) {
     send_message(handler->message());
+    if (m_pending_handlers.contains(handler)) {
+      m_pending_handlers.remove(handler);
+    }
   } else if (!m_pending_handlers.contains(handler)) {
     m_pending_handlers << handler;  // refcount increased (copy constructor)
   }

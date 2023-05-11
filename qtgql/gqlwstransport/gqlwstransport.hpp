@@ -139,7 +139,7 @@ class GqlWsTransportClient : public QObject, public QtGqlNetworkLayer {
   QWebSocketHandshakeOptions m_ws_options;
 
   QMap<QUuid, std::shared_ptr<QtGqlHandlerABC>> m_handlers;
-  // handlers that theier execution was deferred due to connection issues.
+  // handlers that theirs execution was deferred due to connection issues.
   QSet<std::shared_ptr<QtGqlHandlerABC>> m_pending_handlers;
 
   // general protocol handlers:
@@ -167,7 +167,7 @@ class GqlWsTransportClient : public QObject, public QtGqlNetworkLayer {
   // whether received connection_ack message and ws is valid.
   bool gql_is_valid() const;
   // execute / pend a handler for execution.
-  void execute(std::shared_ptr<QtGqlHandlerABC> handler) override;
+  void execute(const std::shared_ptr<QtGqlHandlerABC> &handler) override;
   // reconnect with previous settings.
   void reconnect();
 };

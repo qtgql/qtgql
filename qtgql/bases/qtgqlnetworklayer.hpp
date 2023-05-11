@@ -23,7 +23,7 @@ class that should  support executing handlers
 */
 class QtGqlNetworkLayer {
  public:
-  virtual void execute(std::shared_ptr<QtGqlHandlerABC> handler) {
+  virtual void execute(const std::shared_ptr<QtGqlHandlerABC> &handler) {
     throw "not implemented";
   }
 };

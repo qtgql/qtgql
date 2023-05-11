@@ -23,7 +23,7 @@ class QtGqlEnvironment {
   typedef std::shared_ptr<QtGqlEnvironment> SharedQtGqlEnv;
   typedef std::unique_ptr<QtGqlNetworkLayer> UniqueNetworkLayer;
 
-  const UniqueNetworkLayer m_network_layer;
+  UniqueNetworkLayer m_network_layer;
   inline static QMap<QString, SharedQtGqlEnv> _ENV_MAP = {};
 
  public:
@@ -32,6 +32,9 @@ class QtGqlEnvironment {
                             UniqueNetworkLayer network_layer)
       : m_name(name), m_network_layer(std::move(network_layer)){};
 
+  void execute(const std::shared_ptr<QtGqlHandlerABC> &handler) {
+    m_network_layer->execute(handler);
+  }
   static void set_gql_env(SharedQtGqlEnv env);
   static SharedQtGqlEnv get_gql_env(const QString &name);
 };

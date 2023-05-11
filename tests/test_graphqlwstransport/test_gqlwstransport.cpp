@@ -1,6 +1,7 @@
 #include <QTest>
 #include <catch2/catch_test_macros.hpp>
 #include <gqlwstransport.hpp>
+#include <qtgqlenvironment.hpp>
 
 QString get_server_address() {
   auto env_addr = std::getenv("SCHEMAS_SERVER_ADDR");
@@ -158,12 +159,14 @@ TEST_CASE("Subscribe to data (next message)", "[gqlwstransport][ws-client]") {
       QTest::qWaitFor([&]() -> bool { return handler->count_eq_9(); }, 1500));
 }
 
-// TEST_CASE("execute via environment", "[gqlwstransport]"){
-//  std::unique_ptr<qtgql::QtGqlNetworkLayer> client =
-//  std::make_unique<DebugAbleClient>(); qtgql::QtGqlEnvironment("Sample env",
-//  std::move(client));
+TEST_CASE("execute via environment", "[gqlwstransport]") {
+  auto env = new qtgql::QtGqlEnvironment("Sample env",
+                                         std::make_unique<DebugAbleClient>());
+  auto handler = std::make_shared<DefaultHandler>();
+  env->execute(handler);
+  handler->wait_for_completed();
+}
 
-//}
 TEST_CASE("Subscribe get complete message on complete",
           "[gqlwstransport][ws-client]") {
   auto client = get_valid_client();
