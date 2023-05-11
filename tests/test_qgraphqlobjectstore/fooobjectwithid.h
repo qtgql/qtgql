@@ -1,7 +1,6 @@
 #pragma once
 #include <qtgqlobjecttype.hpp>
 
-class Foo;
 class Foo : public qtgql::QtGqlObjectTypeABCWithID {
   const QString m_id;
 
@@ -11,7 +10,10 @@ class Foo : public qtgql::QtGqlObjectTypeABCWithID {
         m_id(id_){};
 
   const QString &get_id() const override { return m_id; }
-  inline static qtgql::QGraphQLObjectStore<Foo> __store__ = {};
+  static auto &__store__() {
+    static qtgql::QGraphQLObjectStore<Foo> _store;
+    return _store;
+  }
 
   void update(const QJsonObject &data,
               const qtgql::SelectionsConfig &selections) override{};

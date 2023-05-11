@@ -41,8 +41,12 @@ class QtGqlObjectTypeABCWithID : public QtGqlObjectTypeABC {
   virtual void loose(const OperationMetadata &metadata) = 0;
 };
 
-// stores global node of graphql type and it's retainers.
 template <typename T>
+concept extendsQtGqlObjectTypeABCWithID =
+    std::is_base_of<QtGqlObjectTypeABCWithID, T>::value;
+
+// stores global node of graphql type and it's retainers.
+template <extendsQtGqlObjectTypeABCWithID T>
 class NodeRecord {
   QSet<QString> m_retainers;
   typedef std::shared_ptr<T> T_sharedQObject;
@@ -61,7 +65,7 @@ class NodeRecord {
   bool has_retainers() const { return m_retainers.isEmpty(); }
 };
 
-template <typename T>
+template <extendsQtGqlObjectTypeABCWithID T>
 class QGraphQLObjectStore {
   typedef std::shared_ptr<NodeRecord<T>> T_sharedRecord;
 
