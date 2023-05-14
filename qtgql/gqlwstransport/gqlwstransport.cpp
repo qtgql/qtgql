@@ -66,7 +66,7 @@ void qtgql::GqlWsTransportClient::on_gql_next(
   if (message.has_payload()) {
     if (m_handlers.contains(message.op_id)) {
       auto handler = m_handlers.value(message.op_id);
-      handler->onData(message.payload);
+      handler->on_next(message.payload);
     }
   }
 }
@@ -76,7 +76,7 @@ void qtgql::GqlWsTransportClient::on_gql_error(
   qWarning() << "GraphQL Error occurred on ID: " << message.op_id.toString();
   if (message.has_errors()) {
     if (m_handlers.contains(message.op_id)) {
-      m_handlers.value(message.op_id)->onError(message.errors);
+      m_handlers.value(message.op_id)->on_error(message.errors);
     }
   }
 }
@@ -85,7 +85,7 @@ void qtgql::GqlWsTransportClient::on_gql_complete(
     const GqlWsTrnsMsgWithID &message) {
   if (m_handlers.contains(message.op_id)) {
     auto handler = m_handlers.value(message.op_id);
-    handler->onCompleted();
+    handler->on_completed();
     m_handlers.remove(message.op_id);
   }
 }

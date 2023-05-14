@@ -10,14 +10,15 @@ struct HashAbleABC {
   };
 };
 
-// Replaces HandlerProto, To be extended by all consumers.
+// To be extended by all consumers (Replaced `HandlerProto` in Python).
 struct QtGqlHandlerABC {
   [[nodiscard]] virtual const QUuid &operation_id() const = 0;
-  virtual void onData(const QJsonObject &message) = 0;
+  // https://github.com/enisdenjo/graphql-ws/blob/master/PROTOCOL.md#next
+  virtual void on_next(const QJsonObject &message) = 0;
   // https://github.com/enisdenjo/graphql-ws/blob/master/PROTOCOL.md#error
-  virtual void onError(const QJsonArray &errors) = 0;
+  virtual void on_error(const QJsonArray &errors) = 0;
   // https://github.com/enisdenjo/graphql-ws/blob/master/PROTOCOL.md#complete
-  virtual void onCompleted() = 0;
+  virtual void on_completed() = 0;
   virtual const HashAbleABC &message() = 0;
 };
 

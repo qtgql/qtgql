@@ -72,8 +72,8 @@ class QtGqlOperationHandlerABC
     m_message_template.set_variables(m_variables);
     return m_message_template;
   };
-  void onCompleted() override { set_completed(true); };
-  void onError(const QJsonArray &errors) override {
+  void on_completed() override { set_completed(true); };
+  void on_error(const QJsonArray &errors) override {
     set_completed(true);
     emit error(errors);
   };

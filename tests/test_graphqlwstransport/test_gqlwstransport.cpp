@@ -82,14 +82,14 @@ struct DefaultHandler : public qtgql::QtGqlHandlerABC {
   QJsonObject m_data;
   bool m_completed = false;
   const QUuid &operation_id() const override { return m_message.op_id; }
-  void onData(const QJsonObject &message) override {
+  void on_next(const QJsonObject &message) override {
     // here we copy the message though generally user wouldn't do this as it
     // would just use the reference to initialize some data
     m_data = message["data"].toObject();
   }
 
-  void onError(const QJsonArray &errors) override { m_errors = errors; }
-  void onCompleted() override { m_completed = true; }
+  void on_error(const QJsonArray &errors) override { m_errors = errors; }
+  void on_completed() override { m_completed = true; }
 
   const qtgql::HashAbleABC &message() override { return m_message; }
   bool wait_for_completed() const {
