@@ -127,7 +127,8 @@ class ConfigContext:
     def selections(self) -> dict[str, str]:
         if self.p_field.selections:
             return {
-                selection.name: selection.as_conf_string() for selection in self.p_field.selections
+                selection.name: selection.as_conf_string()
+                for selection in self.p_field.selections.values()
             }
         else:
             return {}

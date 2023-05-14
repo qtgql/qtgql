@@ -4,10 +4,10 @@ namespace qtgql {
 
 struct SelectionsConfig {
   // describes selections of a graphql operation.
-  const QMap<QString, std::optional<SelectionsConfig>> selections;
+  const QMap<QString, const SelectionsConfig*> selections;
 
   // for unions and fragments.
-  const QMap<QString, SelectionsConfig> choices;
+  const QMap<QString, const SelectionsConfig*> choices;
 };
 
 struct OperationMetadata {

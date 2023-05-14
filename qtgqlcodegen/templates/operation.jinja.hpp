@@ -33,7 +33,20 @@ const QString &ENV_NAME() override{
     static const auto ret = QString("👉 context.config.env_name 👈");
     return ret;
     }
+public:
+const QUuid &operation_id() const override{
+return m_message_template.op_id;
+}
 
+const qtgql::OperationMetadata &OPERATION_METADATA() const override{
+static auto ret = qtgql::OperationMetadata{
+        "👉 context.operation.name 👈",
+        {
+                👉 context.operation.root_field.as_conf_string() 👈
+        }
+};
+return ret;
+}
 
 };
 

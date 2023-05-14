@@ -42,6 +42,29 @@ class MainQuery : qtgql::QtGqlOperationHandlerABC {
     static const auto ret = QString("ScalarsTestCase");
     return ret;
   }
+
+ public:
+  const QUuid &operation_id() const override {
+    return m_message_template.op_id;
+  }
+
+  const qtgql::OperationMetadata &OPERATION_METADATA() const override {
+    static auto ret = qtgql::OperationMetadata{"MainQuery",
+                                               {
+
+                                                   {
+
+                                                       {"age", {}},
+                                                       {"agePoint", {}},
+                                                       {"id", {}},
+                                                       {"male", {}},
+                                                       {"name", {}},
+                                                       {"uuid", {}},
+                                                   },
+
+                                               }};
+    return ret;
+  }
 };
 
 };  // namespace mainquery

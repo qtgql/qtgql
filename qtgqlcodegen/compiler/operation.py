@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from collections import defaultdict
 from functools import cached_property
-from textwrap import dedent
 from typing import Optional
 from typing import TYPE_CHECKING
 
@@ -221,10 +220,8 @@ class QtGqlQueriedField:
         )
 
     def as_conf_string(self) -> str:
-        return dedent(
-            config_template(
-                context=ConfigContext(self),
-            ),
+        return config_template(
+            context=ConfigContext(self),
         )
 
 

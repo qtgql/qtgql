@@ -52,7 +52,7 @@ class QtGqlOperationHandlerABC
 
   // abstract functions.
   virtual const QString &ENV_NAME() = 0;
-  virtual const OperationMetadata &OPERATION_METADATA() = 0;
+  virtual const OperationMetadata &OPERATION_METADATA() const = 0;
   // end abstract functions.
   void fetch() {
     if (!m_operation_on_the_fly && !m_completed) {
