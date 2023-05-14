@@ -3,7 +3,7 @@
 #include "qtgqloperationhandler.hpp"
 namespace mainquery {
 
-class User__id$name$age$agePoint$male$uuid {
+class User__age$agePoint$id$male$name$uuid {
   /*
   User {
     id
@@ -33,10 +33,10 @@ class User__id$name$age$agePoint$male$uuid {
 
 class MainQuery : qtgql::QtGqlOperationHandlerABC {
   Q_OBJECT
-  Q_PROPERTY(User__id$name$age$agePoint$male$uuid data MEMBER m_data NOTIFY
+  Q_PROPERTY(User__age$agePoint$id$male$name$uuid data MEMBER m_data NOTIFY
                  dataChanged);
 
-  User__id$name$age$agePoint$male$uuid m_data;
+  User__age$agePoint$id$male$name$uuid m_data;
 
   const QString &ENV_NAME() override {
     static const auto ret = QString("ScalarsTestCase");

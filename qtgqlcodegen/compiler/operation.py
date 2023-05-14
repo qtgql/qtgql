@@ -235,7 +235,7 @@ class QtGqlQueriedObjectType:
 
     @cached_property
     def name(self) -> str:
-        return f"{self.definition.name}__{'$'.join(self.fields.keys())}"
+        return f"{self.definition.name}__{'$'.join(sorted(self.fields.keys()))}"
 
     @cached_property
     def doc_fields(self) -> str:
