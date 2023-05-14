@@ -17,7 +17,6 @@ from graphql.type import definition as gql_def
 
 from qtgqlcodegen.compiler.builtin_scalars import BuiltinScalars
 from qtgqlcodegen.compiler.operation import QtGqlOperationDefinition
-from qtgqlcodegen.compiler.operation import QtGqlQueriedField
 from qtgqlcodegen.compiler.template import cmake_template
 from qtgqlcodegen.compiler.template import CmakeTemplateContext
 from qtgqlcodegen.compiler.template import operation_template
@@ -72,18 +71,6 @@ class QtGqlVisitor(visitor.Visitor):
         self.operations: dict[str, QtGqlOperationDefinition] = {}
         self.evaluator = evaluator
 
-    def _get_root_type_field(
-        self,
-        root_type: QtGqlObjectTypeDefinition,
-        gql_field: gql_lang.FieldNode,
-    ) -> QtGqlQueriedField:
-        return QtGqlQueriedField.from_field(
-            root_type.fields_dict[gql_field.name.value],
-            gql_field.selection_set,
-            self.evaluator,
-            parent_interface_field=None,
-        )
-
     def _parse_variable_definition(
         self,
         var: gql_lang.VariableDefinitionNode,
@@ -104,7 +91,6 @@ class QtGqlVisitor(visitor.Visitor):
                 OperationType.MUTATION,
                 OperationType.SUBSCRIPTION,
             ):
-                root_field: gql_lang.FieldNode = operation.selection_set.selections[0]  # type: ignore
                 assert operation.name, "QtGql enforces operations to have names."
                 op_name = operation.name.value
                 operation_vars: list[QtGqlVariableDefinition] = []
@@ -114,56 +100,13 @@ class QtGqlVisitor(visitor.Visitor):
                     for var in variables_def:
                         operation_vars.append(self._parse_variable_definition(var))
 
-                if operation.operation is OperationType.QUERY:
-                    assert self.evaluator._query_type
-                    root_qtgql_field = self._get_root_type_field(
-                        self.evaluator._query_type,
-                        root_field,
-                    )
-                    operation_definition = QtGqlOperationDefinition(
-                        query=graphql.print_ast(node),
-                        root_type=self.evaluator._query_type,
-                        operation_kind=operation.operation,
-                        name=op_name,
-                        field=root_qtgql_field,
-                        directives=node.directives,
-                        variables=operation_vars,
-                    )
-                elif operation.operation is OperationType.MUTATION:
-                    assert (
-                        self.evaluator._mutation_type
-                    ), "You don't have any mutations on your schema"
-                    root_qtgql_field = self._get_root_type_field(
-                        self.evaluator._mutation_type,
-                        root_field,
-                    )
-                    operation_definition = QtGqlOperationDefinition(
-                        query=graphql.print_ast(node),
-                        root_type=self.evaluator._mutation_type,
-                        operation_kind=operation.operation,
-                        name=op_name,
-                        field=root_qtgql_field,
-                        directives=node.directives,
-                        variables=operation_vars,
-                    )
-
-                else:
-                    assert operation.operation is OperationType.SUBSCRIPTION
-                    assert (
-                        self.evaluator._subscription_type
-                    ), "You don't have a subscription type on your schema"
-                    root_qtgql_field = self._get_root_type_field(
-                        self.evaluator._subscription_type,
-                        root_field,
-                    )
-                    operation_definition = QtGqlOperationDefinition(
-                        query=graphql.print_ast(node),
-                        operation_type=self.evaluator._subscription_type,
-                        name=op_name,
-                        field=root_qtgql_field,
-                        directives=node.directives,
-                        variables=operation_vars,
-                    )
+                operation_definition = QtGqlOperationDefinition.from_definition(
+                    operation_def=operation,
+                    query=graphql.print_ast(node),
+                    evaluator=self.evaluator,
+                    directives=node.directives,
+                    variables=operation_vars,
+                )
                 self.operations[operation_definition.name] = operation_definition
 
 
@@ -175,9 +118,7 @@ class SchemaEvaluator:
         self._input_objects_def_map: dict[str, QtGqlInputObjectTypeDefinition] = {}
         self._interfaces_map: dict[str, QtGqlInterfaceDefinition] = {}
         self._operations: dict[str, QtGqlOperationDefinition] = {}
-        self._query_type: Optional[QtGqlObjectTypeDefinition] = None
-        self._mutation_type: Optional[QtGqlObjectTypeDefinition] = None
-        self._subscription_type: Optional[QtGqlObjectTypeDefinition] = None
+        self.operation_types: dict[OperationType, QtGqlObjectTypeDefinition] = {}
 
     def get_interface_by_name(self, name: str) -> Optional[QtGqlInterfaceDefinition]:
         return self._interfaces_map.get(name, None)
@@ -415,11 +356,11 @@ class SchemaEvaluator:
             if object_definition := is_object_definition(type_):
                 if object_type := self._evaluate_object_type(object_definition):
                     if object_definition is self.schema_definition.query_type:
-                        self._query_type = object_type
+                        self.operation_types[OperationType.QUERY] = object_type
                     elif object_definition is self.schema_definition.mutation_type:
-                        self._mutation_type = object_type
+                        self.operation_types[OperationType.MUTATION] = object_type
                     elif object_definition is self.schema_definition.subscription_type:
-                        self._subscription_type = object_type
+                        self.operation_types[OperationType.SUBSCRIPTION] = object_type
 
             elif enum_def := is_enum_definition(type_):
                 if enum := self._evaluate_enum(enum_def):

@@ -1,6 +1,7 @@
 {% import "macros.jinja.hpp" as macros -%}
+#pragma once
 #include "./schema.hpp"
-
+#include "qtgqloperationhandler.hpp"
 namespace 👉context.ns👈{
 
 
@@ -19,9 +20,22 @@ const 👉 f.type.annotation 👈 & 👉 f.definition.getter_name 👈() const {
     return m_inst->👉 f.definition.getter_name 👈();
 };
 {% endfor -%}
+};
+{% endfor %}
+
+class 👉 context.operation.name 👈: qtgql::QtGqlOperationHandlerABC {
+    Q_OBJECT
+Q_PROPERTY(👉 context.operation.root_field.property_annotation 👈 data MEMBER m_data NOTIFY dataChanged);
+
+👉 context.operation.root_field.property_annotation 👈 m_data;
+
+const QString &ENV_NAME() override{
+    static const auto ret = QString("👉 context.config.env_name 👈");
+    return ret;
+    }
 
 
 };
-{% endfor %}
+
 };
 

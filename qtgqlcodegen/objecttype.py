@@ -15,6 +15,7 @@ from typingref import TypeHinter
 from typingref import UNSET
 
 from qtgqlcodegen.compiler.builtin_scalars import BuiltinScalar
+from qtgqlcodegen.compiler.operation import QtGqlQueriedObjectType
 from qtgqlcodegen.cppref import QtGqlTypes
 from qtgqlcodegen.runtime.custom_scalars import BaseCustomScalar
 from qtgqlcodegen.runtime.custom_scalars import CustomScalarMap
@@ -267,6 +268,12 @@ class GqlTypeHinter(TypeHinter):
                     return ret
 
     @cached_property
+    def is_queried_object_type(self) -> Optional[QtGqlQueriedObjectType]:
+        t_self = self.optional_maybe.type
+        if isinstance(t_self, QtGqlQueriedObjectType):
+            return t_self
+
+    @cached_property
     def is_input_object_type(self) -> Optional[QtGqlInputObjectTypeDefinition]:
         t_self = self.optional_maybe.type
         if isinstance(t_self, QtGqlInputObjectTypeDefinition):
@@ -327,6 +334,8 @@ class GqlTypeHinter(TypeHinter):
             return f"{QtGqlTypes.QGraphQLList.name}[{model_of.annotation}]"
         if object_def := t_self.is_object_type or t_self.is_interface:
             return f"{object_def.name}"
+        if q_object_def := t_self.is_queried_object_type:
+            return f"{q_object_def.name}"
         if t_self.is_union:
             return "std::variant<" + ", ".join(th.annotation for th in t_self.of_type) + ">"
         if input_obj := t_self.is_input_object_type:
