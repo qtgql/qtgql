@@ -74,9 +74,9 @@ class User : public qtgql::QtGqlObjectTypeABCWithID {
   User(QObject *parent = nullptr)
       : qtgql::QtGqlObjectTypeABCWithID::QtGqlObjectTypeABCWithID(parent){};
 
-  std::shared_ptr<User> from_json(QObject *parent, const QJsonObject &data,
-                                  const qtgql::SelectionsConfig &config,
-                                  const qtgql::OperationMetadata &metadata) {
+  static std::shared_ptr<User> from_json(
+      const QJsonObject &data, const qtgql::SelectionsConfig &config,
+      const qtgql::OperationMetadata &metadata) {
     auto inst = std::make_shared<User>();
 
     if (config.selections.contains("id") && data.contains("id")) {

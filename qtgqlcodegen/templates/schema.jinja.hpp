@@ -48,7 +48,7 @@ inline static const QString TYPE_NAME = "👉 type.name 👈";
 : qtgql::👉 base_class 👈::👉 base_class 👈(parent) {};
 
 
-std::shared_ptr<👉type.name👈> from_json(QObject * parent, const QJsonObject& data,
+static std::shared_ptr<👉type.name👈> from_json(const QJsonObject& data,
                                  const qtgql::SelectionsConfig& config,
                                  const qtgql::OperationMetadata& metadata){
 auto inst = std::make_shared<👉type.name👈>();

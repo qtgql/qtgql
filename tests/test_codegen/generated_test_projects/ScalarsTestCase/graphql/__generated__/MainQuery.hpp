@@ -3,6 +3,22 @@
 #include "qtgqloperationhandler.hpp"
 namespace mainquery {
 
+const qtgql::OperationMetadata OPERATION_METADATA =
+    qtgql::OperationMetadata{"MainQuery",
+                             {
+
+                                 {
+
+                                     {"age", {}},
+                                     {"agePoint", {}},
+                                     {"id", {}},
+                                     {"male", {}},
+                                     {"name", {}},
+                                     {"uuid", {}},
+                                 },
+
+                             }};
+
 class User__age$agePoint$id$male$name$uuid {
   /*
   User {
@@ -15,9 +31,13 @@ class User__age$agePoint$id$male$name$uuid {
   }
    */
   Q_GADGET
-  ScalarsTestCase::User *m_inst;
+  std::shared_ptr<ScalarsTestCase::User> m_inst;
 
  public:
+  User__age$agePoint$id$male$name$uuid(const QJsonObject &data,
+                                       const qtgql::SelectionsConfig &config) {
+    m_inst = ScalarsTestCase::User::from_json(data, config, OPERATION_METADATA);
+  }
   const QString &get_id() const { return m_inst->get_id(); };
 
   const QString &get_name() const { return m_inst->get_name(); };
@@ -36,7 +56,7 @@ class MainQuery : qtgql::QtGqlOperationHandlerABC {
   Q_PROPERTY(User__age$agePoint$id$male$name$uuid data MEMBER m_data NOTIFY
                  dataChanged);
 
-  User__age$agePoint$id$male$name$uuid m_data;
+  std::unique_ptr<User__age$agePoint$id$male$name$uuid> m_data;
 
   const QString &ENV_NAME() override {
     static const auto ret = QString("ScalarsTestCase");
@@ -48,22 +68,11 @@ class MainQuery : qtgql::QtGqlOperationHandlerABC {
     return m_message_template.op_id;
   }
 
-  const qtgql::OperationMetadata &OPERATION_METADATA() const override {
-    static auto ret = qtgql::OperationMetadata{"MainQuery",
-                                               {
-
-                                                   {
-
-                                                       {"age", {}},
-                                                       {"agePoint", {}},
-                                                       {"id", {}},
-                                                       {"male", {}},
-                                                       {"name", {}},
-                                                       {"uuid", {}},
-                                                   },
-
-                                               }};
-    return ret;
+  void on_next(const QJsonObject &message) override {
+    if (!m_data) {
+      m_data = std::make_unique<User__age$agePoint$id$male$name$uuid>(
+          message, OPERATION_METADATA.selections);
+    }
   }
 };
 
