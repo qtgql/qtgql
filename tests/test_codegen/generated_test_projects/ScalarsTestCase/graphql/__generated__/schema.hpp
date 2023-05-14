@@ -11,7 +11,7 @@ namespace ScalarsTestCase {
 // ----------- Object Types -----------
 class User : public qtgql::QtGqlObjectTypeABCWithID {
  protected:
-  static auto &__store__() {
+  static auto &INST_STORE() {
     static qtgql::QGraphQLObjectStore<User> _store;
     return _store;
   }
@@ -105,7 +105,7 @@ class User : public qtgql::QtGqlObjectTypeABCWithID {
 
     auto record = std::make_shared<qtgql::NodeRecord<User>>(inst);
     record->retain(metadata.operation_name);
-    __store__().add_record(record);
+    INST_STORE().add_record(record);
 
     return inst;
   };

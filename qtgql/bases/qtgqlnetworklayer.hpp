@@ -14,7 +14,9 @@ struct HashAbleABC {
 struct QtGqlHandlerABC {
   virtual const QUuid &operation_id() const = 0;
   virtual void onData(const QJsonObject &message) = 0;
+  // https://github.com/enisdenjo/graphql-ws/blob/master/PROTOCOL.md#error
   virtual void onError(const QJsonArray &errors) = 0;
+  // https://github.com/enisdenjo/graphql-ws/blob/master/PROTOCOL.md#complete
   virtual void onCompleted() = 0;
   virtual const HashAbleABC &message() = 0;
 };
