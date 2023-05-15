@@ -6,7 +6,7 @@
 
 
 TEST_CASE("👉 context.test_name 👈") {
-    auto addr = get_server_address("👉 context.url_sufix 👈);
+    auto addr = get_server_address("👉 context.url_suffix 👈");
     auto client = new DebugAbleClient({.prod_settings = {.url = addr}});
     client->wait_for_valid();
 
@@ -16,5 +16,7 @@ TEST_CASE("👉 context.test_name 👈") {
 
 	REQUIRE(false);
 
-    delete client;
+    if (client != nullptr){
+        delete client;
+    }
 }
