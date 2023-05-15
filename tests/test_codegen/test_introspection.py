@@ -13,36 +13,22 @@ TypeWithWrongIDTypeTestCase = QGQLObjectTestCase(
 )
 
 
-pytest.xfail()
-
-
+@pytest.mark.skip(reason="These tests are yet to be generated")
 def test_warns_if_no_id_on_type():
     with pytest.warns(match="QtGql enforces types to have ID field"):
         with TypeWithNoIDTestCase.compile():
             ...
 
 
-pytest.xfail()
-
-
+@pytest.mark.skip(reason="These tests are yet to be generated")
 def test_raises_on_nullable_id():
     with pytest.warns(match="id field of type ID!"):
         with TypeWithNullAbleIDTestCase.compile():
             ...
 
 
-pytest.xfail()
-
-
+@pytest.mark.skip(reason="These tests are yet to be generated")
 def test_raises_on_wrong_id_type():
     with pytest.raises(QtGqlException):
         with TypeWithWrongIDTypeTestCase.compile():
             ...
-
-
-class TestQtGqlQueriedObjectType:
-    def test_deterministic_name(self):
-        raise NotImplementedError
-
-    def test_deterministic_fields_order(self):
-        raise NotImplementedError

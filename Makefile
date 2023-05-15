@@ -1,7 +1,5 @@
 .PHONY : test generate_test_files serve_tests
 
-test:
-	pytest tests --cov=qtgql --cov-report=xml --cov-append
 
 
 serve_tests:
@@ -9,3 +7,6 @@ serve_tests:
 
 generate_test_files:
 	poetry run python -m tests.test_codegen.testcases
+test:
+	make generate_test_files
+	pytest tests --cov=qtgql --cov-report=xml --cov-append
