@@ -1,3 +1,8 @@
+/*
+ * Encapsulates the API which will be used by the codegen
+ * currently the only implementation is with graphql-ws-transport protocol
+ * at ../gqlwstransport dir.
+ */
 #pragma once
 #include <QJsonObject>
 #include <QUuid>

@@ -34,7 +34,7 @@ class _QtGqlOperationHandlerABCSignals : public QObject {
 class QtGqlOperationHandlerABC
     : public QtGqlHandlerABC,
       public _QtGqlOperationHandlerABCSignals,
-      protected std::enable_shared_from_this<QtGqlOperationHandlerABC> {
+      public std::enable_shared_from_this<QtGqlOperationHandlerABC> {
  protected:
   const std::shared_ptr<QtGqlEnvironment> &environment() {
     static auto m_env = QtGqlEnvironment::get_gql_env(ENV_NAME());
@@ -53,6 +53,7 @@ class QtGqlOperationHandlerABC
   // abstract functions.
   virtual const QString &ENV_NAME() = 0;
   // end abstract functions.
+
   void fetch() {
     if (!m_operation_on_the_fly && !m_completed) {
       set_operation_on_flight(true);

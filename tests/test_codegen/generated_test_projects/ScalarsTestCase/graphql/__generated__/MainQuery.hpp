@@ -51,7 +51,7 @@ class User__age$agePoint$id$male$name$uuid {
   const QUuid &get_uuid() const { return m_inst->get_uuid(); };
 };
 
-class MainQuery : qtgql::QtGqlOperationHandlerABC {
+class MainQuery : public qtgql::QtGqlOperationHandlerABC {
   Q_OBJECT
   Q_PROPERTY(User__age$agePoint$id$male$name$uuid data MEMBER m_data NOTIFY
                  dataChanged);

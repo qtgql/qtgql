@@ -37,9 +37,12 @@ if not GENERATED_TESTS_DIR.exists:
 template_env = jinja2.Environment(
     loader=jinja2.FileSystemLoader(Path(__file__).parent / "templates_for_tests"),
     autoescape=jinja2.select_autoescape(),
+    variable_start_string="👉",  # originally {{ variable }}, using 👉 variable 👈 because C++ uses curly brackets.
+    variable_end_string="👈",
 )
 
 TST_CONFIG_TEMPLATE = template_env.get_template("configtemplate.jinja.py")
+TST_CATCH2_TEMPLATE = template_env.get_template("testcase.jinja.hpp")
 CLI_RUNNER = CliRunner()
 TST_CMAKE = (Path(__file__).parent / "CMakeLists.txt").resolve(True)
 
@@ -110,13 +113,21 @@ class QGQLObjectTestCase:
             custom_scalars=self.custom_scalars,
         )
 
-    def generate(self, url: Optional[str] = "") -> None:
+    def generate(self, url: Optional[str] = "127.0.0.1:9000/graphql") -> None:
         url = url.replace("graphql", f"{hash_schema(self.schema)}")
         self.config.env_name = self.test_name
-        template_context = TstTemplateContext(config=self.config, url=url, test_name=self.test_name)
+        template_context = TstTemplateContext(
+            config=self.config,
+            url=url,
+            test_name=self.test_name,
+        )
         self.schema_dir.write_text(self.schema.as_str())
         self.operations_dir.write_text(self.query)
         self.config_dir.write_text(TST_CONFIG_TEMPLATE.render(context=template_context))
+        generated_test_case = self.test_dir / f"test_{self.test_name.lower()}.cpp"
+        if not generated_test_case.exists():
+            generated_test_case.write_text(TST_CATCH2_TEMPLATE.render(context=template_context))
+
         cwd = Path.cwd()
         os.chdir(self.config_dir.parent)
         if exc := CLI_RUNNER.invoke(app, "gen").exception:

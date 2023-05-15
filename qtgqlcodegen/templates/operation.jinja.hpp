@@ -35,7 +35,7 @@ const 👉 f.type.annotation 👈 & 👉 f.definition.getter_name 👈() const {
 };
 {% endfor %}
 
-class 👉 context.operation.name 👈: qtgql::QtGqlOperationHandlerABC {
+class 👉 context.operation.name 👈: public qtgql::QtGqlOperationHandlerABC {
     Q_OBJECT
 Q_PROPERTY(👉 context.operation.root_field.property_annotation 👈 data MEMBER m_data NOTIFY dataChanged);
 

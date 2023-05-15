@@ -21,6 +21,7 @@ by the generated handlers based on the configurations.
 
 class QtGqlEnvironment {
   typedef std::shared_ptr<QtGqlEnvironment> SharedQtGqlEnv;
+  //  using a ptr here since client is to be extended by implementors.
   typedef std::unique_ptr<QtGqlNetworkLayer> UniqueNetworkLayer;
 
   UniqueNetworkLayer m_network_layer;
