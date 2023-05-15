@@ -4,6 +4,7 @@
 
 #include "debugableclient.hpp"
 #include "graphql/__generated__/MainQuery.hpp"
+namespace ScalarsTestCase {
 
 TEST_CASE("ScalarsTestCase", "[generated-testcase]") {
   auto addr = get_server_address("97455992");
@@ -27,5 +28,6 @@ TEST_CASE("ScalarsTestCase", "[generated-testcase]") {
     REQUIRE(d->get_name() == "nir");
     REQUIRE(d->get_uuid() ==
             QUuid::fromString("06335e84-2872-4914-8c5d-3ed07d2a2f16\""));
-  }
-}
+  };
+};
+};  // namespace ScalarsTestCase

@@ -92,7 +92,6 @@ class QtGqlVisitor(visitor.Visitor):
                 OperationType.SUBSCRIPTION,
             ):
                 assert operation.name, "QtGql enforces operations to have names."
-                op_name = operation.name.value
                 operation_vars: list[QtGqlVariableDefinition] = []
 
                 # input variables
@@ -102,7 +101,6 @@ class QtGqlVisitor(visitor.Visitor):
 
                 operation_definition = QtGqlOperationDefinition.from_definition(
                     operation_def=operation,
-                    query=graphql.print_ast(node),
                     evaluator=self.evaluator,
                     directives=node.directives,
                     variables=operation_vars,

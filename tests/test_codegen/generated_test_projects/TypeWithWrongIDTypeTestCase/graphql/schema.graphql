@@ -1,9 +1,0 @@
-type Query {
-  users: [User!]!
-}
-
-type User {
-  id: Int!
-  name: String!
-  age: Int!
-}

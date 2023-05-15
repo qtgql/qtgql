@@ -6,7 +6,7 @@
 #include <qtgqlmetadata.hpp>
 #include <qtgqlobjecttype.hpp>
 
-namespace TypeWithWrongIDTypeTestCase {
+namespace NoIdOnQueryTestCase {
 
 // ----------- Object Types -----------
 class User : public qtgql::QtGqlObjectTypeABCWithID {
@@ -119,4 +119,4 @@ class User : public qtgql::QtGqlObjectTypeABCWithID {
   };
 };
 
-}  // namespace TypeWithWrongIDTypeTestCase
+}  // namespace NoIdOnQueryTestCase

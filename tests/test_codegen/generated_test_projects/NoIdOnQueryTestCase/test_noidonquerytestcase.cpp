@@ -4,19 +4,24 @@
 
 #include "debugableclient.hpp"
 #include "graphql/__generated__/MainQuery.hpp"
+namespace NoIdOnQueryTestCase {
 
-TEST_CASE("TypeWithWrongIDTypeTestCase") {
+TEST_CASE("NoIdOnQueryTestCase", "[generated-testcase]") {
   auto addr = get_server_address("97455992");
   auto client = new DebugAbleClient({.prod_settings = {.url = addr}});
   client->wait_for_valid();
 
   qtgql::QtGqlEnvironment::set_gql_env(
       std::make_shared<qtgql::QtGqlEnvironment>(
-          "TypeWithWrongIDTypeTestCase",
+          "NoIdOnQueryTestCase",
           std::unique_ptr<qtgql::GqlWsTransportClient>(client)));
-  auto mq = std::make_shared<mainquery::MainQuery>();
-  mq->fetch();
-  REQUIRE(QTest::qWaitFor([&]() -> bool { return mq->completed(); }, 1500));
 
-  REQUIRE(mq->get_data()->get_id() != qtgql::CONSTANTS::ID);
+  auto mq = std::make_shared<mainquery::MainQuery>();
+  SECTION("test appends id to query") {
+    mq->fetch();
+    REQUIRE(QTest::qWaitFor([&]() -> bool { return mq->completed(); }, 1500));
+    REQUIRE(mq->get_data()->get_id() != qtgql::CONSTANTS::ID);
+  }
 }
+
+};  // namespace NoIdOnQueryTestCase

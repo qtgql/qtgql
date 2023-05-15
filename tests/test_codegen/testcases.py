@@ -219,7 +219,19 @@ ScalarsTestCase = QGQLObjectTestCase(
         """,
     test_name="ScalarsTestCase",
 )
-
+NoIdOnQueryTestCase = QGQLObjectTestCase(  # should append id automatically.
+    schema=schemas.object_with_scalar.schema,
+    query="""
+    query MainQuery {
+          user {
+            name
+            age
+            agePoint
+            male
+          }
+        }""",
+    test_name="NoIdOnQueryTestCase",
+)
 OptionalScalarTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_optional_scalar.schema,
     query="""
@@ -699,7 +711,9 @@ custom_scalar_testcases = [
 
 
 def generate_testcases() -> None:
-    ScalarsTestCase.generate()
+    testcases = [ScalarsTestCase, NoIdOnQueryTestCase]
+    for testcase in testcases:
+        testcase.generate()
 
 
 if __name__ == "__main__":

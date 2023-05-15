@@ -6,6 +6,7 @@ from typing import Optional
 from typing import TYPE_CHECKING
 
 import attrs
+import graphql
 from attr import define
 from frozendict import frozendict
 from typingref import UNSET
@@ -244,7 +245,6 @@ class QtGqlQueriedObjectType:
 
 @define(slots=False)
 class QtGqlOperationDefinition:
-    query: str
     operation_def: gql_def.OperationDefinitionNode
     evaluator: SchemaEvaluator
     directives: list[str] = []
@@ -263,6 +263,10 @@ class QtGqlOperationDefinition:
     @property
     def name(self) -> str:
         return self.operation_def.name.value
+
+    @cached_property
+    def query(self) -> str:
+        return graphql.print_ast(self.operation_def)
 
     @cached_property
     def narrowed_types(self) -> tuple[QtGqlQueriedObjectType]:
@@ -288,13 +292,11 @@ class QtGqlOperationDefinition:
     def from_definition(
         cls,
         operation_def: gql_def.OperationDefinitionNode,
-        query: str,
         evaluator: SchemaEvaluator,
         directives: list[str],
         variables: list[QtGqlVariableDefinition],
     ):
         return cls(
-            query=query,
             operation_def=operation_def,
             evaluator=evaluator,
             directives=directives,

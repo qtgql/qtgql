@@ -1,6 +1,7 @@
 #pragma once
 #include "./schema.hpp"
 #include "qtgqloperationhandler.hpp"
+namespace NoIdOnQueryTestCase {
 namespace mainquery {
 
 const qtgql::OperationMetadata OPERATION_METADATA =
@@ -18,6 +19,39 @@ const qtgql::OperationMetadata OPERATION_METADATA =
 
                              }};
 
+class User__age$agePoint$id$male$name$uuid {
+  /*
+  User {
+    id
+     name
+     age
+     agePoint
+     male
+     uuid
+  }
+   */
+  Q_GADGET
+  std::shared_ptr<NoIdOnQueryTestCase::User> m_inst;
+
+ public:
+  User__age$agePoint$id$male$name$uuid(const QJsonObject &data,
+                                       const qtgql::SelectionsConfig &config) {
+    m_inst =
+        NoIdOnQueryTestCase::User::from_json(data, config, OPERATION_METADATA);
+  }
+  const QString &get_id() const { return m_inst->get_id(); };
+
+  const QString &get_name() const { return m_inst->get_name(); };
+
+  const int &get_age() const { return m_inst->get_age(); };
+
+  const float &get_agePoint() const { return m_inst->get_agePoint(); };
+
+  const bool &get_male() const { return m_inst->get_male(); };
+
+  const QUuid &get_uuid() const { return m_inst->get_uuid(); };
+};
+
 class User__age$agePoint$id$male$name {
   /*
   User {
@@ -29,13 +63,13 @@ class User__age$agePoint$id$male$name {
   }
    */
   Q_GADGET
-  std::shared_ptr<TypeWithWrongIDTypeTestCase::User> m_inst;
+  std::shared_ptr<NoIdOnQueryTestCase::User> m_inst;
 
  public:
   User__age$agePoint$id$male$name(const QJsonObject &data,
                                   const qtgql::SelectionsConfig &config) {
-    m_inst = TypeWithWrongIDTypeTestCase::User::from_json(data, config,
-                                                          OPERATION_METADATA);
+    m_inst =
+        NoIdOnQueryTestCase::User::from_json(data, config, OPERATION_METADATA);
   }
   const QString &get_name() const { return m_inst->get_name(); };
 
@@ -56,7 +90,7 @@ class MainQuery : public qtgql::QtGqlOperationHandlerABC {
   std::unique_ptr<User__age$agePoint$id$male$name> m_data;
 
   const QString &ENV_NAME() override {
-    static const auto ret = QString("TypeWithWrongIDTypeTestCase");
+    static const auto ret = QString("NoIdOnQueryTestCase");
     return ret;
   }
 
@@ -69,6 +103,7 @@ class MainQuery : public qtgql::QtGqlOperationHandlerABC {
                                     "    age"
                                     "    agePoint"
                                     "    male"
+                                    "    id"
                                     "  }"
                                     "}"))){};
 
@@ -90,5 +125,5 @@ class MainQuery : public qtgql::QtGqlOperationHandlerABC {
  signals:
   void dataChanged();
 };
-
 };  // namespace mainquery
+};  // namespace NoIdOnQueryTestCase

@@ -2,6 +2,7 @@
 #pragma once
 #include "./schema.hpp"
 #include "qtgqloperationhandler.hpp"
+namespace 👉 context.config.env_name 👈{
 namespace 👉context.ns👈{
 
 const qtgql::OperationMetadata OPERATION_METADATA = qtgql::OperationMetadata{
@@ -71,7 +72,6 @@ const 👉 context.operation.root_field.property_annotation 👈* get_data(){
 signals:
     void dataChanged();
 };
-
-
+};
 };
 

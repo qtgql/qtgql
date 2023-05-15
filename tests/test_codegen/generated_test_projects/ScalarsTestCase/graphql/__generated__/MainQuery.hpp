@@ -1,6 +1,7 @@
 #pragma once
 #include "./schema.hpp"
 #include "qtgqloperationhandler.hpp"
+namespace ScalarsTestCase {
 namespace mainquery {
 
 const qtgql::OperationMetadata OPERATION_METADATA =
@@ -98,5 +99,5 @@ class MainQuery : public qtgql::QtGqlOperationHandlerABC {
  signals:
   void dataChanged();
 };
-
 };  // namespace mainquery
+};  // namespace ScalarsTestCase
