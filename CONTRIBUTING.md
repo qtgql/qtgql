@@ -4,7 +4,12 @@ To contribute create a fork and clone your fork locally.
 ### Install dependencies
 We use Poetry for managing dependencies.
 ```console
-poetry install -E codegen
+poetry install
+```
+
+### Install pre-commit hooks
+```console
+pre-commit install
 ```
 
 ### Add a `RELEASE.md` file that describes your PR.

@@ -34,8 +34,10 @@ def _get_config() -> QtGqlConfig:
         typer.Abort()
     mod_path = Path(res[0]).resolve(True)
     spec = importlib.util.spec_from_file_location(QTGQL_CONFIG_FNAME, mod_path)
+    assert spec
     module = importlib.util.module_from_spec(spec)
     sys.modules[QTGQL_CONFIG_FNAME] = module
+    assert spec.loader
     spec.loader.exec_module(module)
     return module.config
 

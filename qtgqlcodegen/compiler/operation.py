@@ -75,7 +75,7 @@ class QtGqlQueriedField:
     @cached_property
     def property_annotation(self) -> str:
         if self.definition.type.is_object_type:
-            assert self.narrowed_type.name
+            assert self.narrowed_type
             return self.narrowed_type.name
         return self.type.annotation
 
@@ -123,7 +123,7 @@ class QtGqlQueriedField:
         narrowed_type: Optional[QtGqlQueriedObjectType] = None
         # inject parent interface selections.
         if (tp.is_object_type or tp.is_interface) and parent_interface_field:
-            selections.update({f.name: f for f in parent_interface_field.selections})
+            selections.update({f.name: f for f in parent_interface_field.selections.values()})
 
         if tp_is_union:
             for selection in selection_set.selections:
@@ -262,6 +262,7 @@ class QtGqlOperationDefinition:
 
     @property
     def name(self) -> str:
+        assert self.operation_def.name
         return self.operation_def.name.value
 
     @cached_property
@@ -269,7 +270,7 @@ class QtGqlOperationDefinition:
         return graphql.print_ast(self.operation_def)
 
     @cached_property
-    def narrowed_types(self) -> tuple[QtGqlQueriedObjectType]:
+    def narrowed_types(self) -> tuple[QtGqlQueriedObjectType, ...]:
         return tuple(self.narrowed_types_map.values())
 
     @cached_property
