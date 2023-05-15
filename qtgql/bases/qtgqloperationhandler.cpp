@@ -18,4 +18,10 @@ void _QtGqlOperationHandlerABCSignals::set_operation_on_flight(bool v) {
   }
 }
 
+bool _QtGqlOperationHandlerABCSignals::completed() { return m_completed; }
+
+bool _QtGqlOperationHandlerABCSignals::operation_on_flight() {
+  return m_operation_on_the_fly;
+}
+
 }  // namespace qtgql

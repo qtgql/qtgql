@@ -64,9 +64,20 @@ class MainQuery : public qtgql::QtGqlOperationHandlerABC {
   }
 
  public:
-  const User__age$agePoint$id$male$name$uuid *get_data() {
-    return m_data.get();
-  }
+  MainQuery()
+      : qtgql::QtGqlOperationHandlerABC(qtgql::GqlWsTrnsMsgWithID(
+            qtgql::OperationPayload("query MainQuery {"
+                                    "  user {"
+                                    "    id"
+                                    "    name"
+                                    "    age"
+                                    "    agePoint"
+                                    "    male"
+                                    "    id"
+                                    "    uuid"
+                                    "  }"
+                                    "}"))){};
+
   const QUuid &operation_id() const override {
     return m_message_template.op_id;
   }
@@ -77,6 +88,10 @@ class MainQuery : public qtgql::QtGqlOperationHandlerABC {
           message, OPERATION_METADATA.selections);
     }
   }
+  const User__age$agePoint$id$male$name$uuid *get_data() {
+    return m_data.get();
+  }
+
  signals:
   void dataChanged();
 };

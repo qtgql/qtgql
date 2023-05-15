@@ -46,6 +46,11 @@ const QString &ENV_NAME() override{
     return ret;
     }
 public:
+
+👉 context.operation.name 👈(): qtgql::QtGqlOperationHandlerABC(qtgql::GqlWsTrnsMsgWithID(qtgql::OperationPayload(
+        {%- for line in context.operation.query.splitlines() %}"👉 line 👈"{% endfor -%}
+        ))){};
+
 const QUuid &operation_id() const override{
 return m_message_template.op_id;
 }

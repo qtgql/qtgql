@@ -113,7 +113,7 @@ class QGQLObjectTestCase:
             custom_scalars=self.custom_scalars,
         )
 
-    def generate(self, url: Optional[str] = "127.0.0.1:9000/graphql") -> None:
+    def generate(self, url: Optional[str] = "ws://localhost:9000/graphql") -> None:
         url = url.replace("graphql", f"{hash_schema(self.schema)}")
         self.config.env_name = self.test_name
         template_context = TstTemplateContext(

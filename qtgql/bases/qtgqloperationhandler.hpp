@@ -9,9 +9,9 @@ namespace qtgql {
 
 class _QtGqlOperationHandlerABCSignals : public QObject {
   Q_OBJECT
-  Q_PROPERTY(bool completed MEMBER m_completed NOTIFY completedChanged)
-  Q_PROPERTY(
-      bool operationOnFlight MEMBER m_completed NOTIFY operationOnFlightChanged)
+  Q_PROPERTY(bool completed READ completed NOTIFY completedChanged)
+  Q_PROPERTY(bool operationOnFlight READ operation_on_flight NOTIFY
+                 operationOnFlightChanged)
 
  protected:
   bool m_completed = false;
@@ -28,6 +28,9 @@ class _QtGqlOperationHandlerABCSignals : public QObject {
 
  public:
   using QObject::QObject;
+
+  bool completed();
+  bool operation_on_flight();
 };
 
 // NOTE: This class should not be defined in the .cpp since it is abstract.
@@ -41,14 +44,12 @@ class QtGqlOperationHandlerABC
     return m_env;
   };
   QJsonObject m_variables;
-  GqlWsTrnsMsgWithID m_message_template;
+  GqlWsTrnsMsgWithID m_message_template = GqlWsTrnsMsgWithID{{}};
 
  public:
-  //    this should be protected since it should only be constructed with a
-  //    shared ptr
-  QtGqlOperationHandlerABC()
-      : _QtGqlOperationHandlerABCSignals::_QtGqlOperationHandlerABCSignals(),
-        m_message_template({}) {}
+  explicit QtGqlOperationHandlerABC(GqlWsTrnsMsgWithID message)
+      : _QtGqlOperationHandlerABCSignals(),
+        m_message_template(std::move(message)) {}
 
   // abstract functions.
   virtual const QString &ENV_NAME() = 0;
