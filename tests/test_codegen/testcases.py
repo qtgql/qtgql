@@ -42,7 +42,7 @@ template_env = jinja2.Environment(
 )
 
 TST_CONFIG_TEMPLATE = template_env.get_template("configtemplate.jinja.py")
-TST_CATCH2_TEMPLATE = template_env.get_template("testcase.jinja.hpp")
+TST_CATCH2_TEMPLATE = template_env.get_template("testcase.jinja.cpp")
 CLI_RUNNER = CliRunner()
 TST_CMAKE = (Path(__file__).parent / "CMakeLists.txt").resolve(True)
 
@@ -134,7 +134,7 @@ class QGQLObjectTestCase:
             raise exc
         os.chdir(cwd)
         prev = TST_CMAKE.read_text()
-        link_line = "target_link_libraries(${TESTS_TARGET} PRIVATE __generated__::%s)" % (
+        link_line = "target_link_libraries(${TESTS_TARGET} PRIVATE generated::%s)" % (
             self.config.env_name
         )
         if link_line not in prev:

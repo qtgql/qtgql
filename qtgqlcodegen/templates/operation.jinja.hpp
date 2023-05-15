@@ -37,7 +37,7 @@ const 👉 f.type.annotation 👈 & 👉 f.definition.getter_name 👈() const {
 
 class 👉 context.operation.name 👈: public qtgql::QtGqlOperationHandlerABC {
     Q_OBJECT
-Q_PROPERTY(👉 context.operation.root_field.property_annotation 👈 data MEMBER m_data NOTIFY dataChanged);
+Q_PROPERTY(const 👉 context.operation.root_field.property_annotation 👈* data READ get_data NOTIFY dataChanged);
 
 std::unique_ptr<👉 context.operation.root_field.property_annotation 👈> m_data;
 
@@ -56,6 +56,12 @@ void on_next(const QJsonObject &message) override{
         m_data = std::make_unique<👉 context.operation.root_field.property_annotation 👈>(message, OPERATION_METADATA.selections);
     }
 }
+const 👉 context.operation.root_field.property_annotation 👈* get_data(){
+    return m_data.get();
+}
+
+signals:
+    void dataChanged();
 };
 
 

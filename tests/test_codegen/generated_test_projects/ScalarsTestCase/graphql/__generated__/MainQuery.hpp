@@ -53,8 +53,8 @@ class User__age$agePoint$id$male$name$uuid {
 
 class MainQuery : public qtgql::QtGqlOperationHandlerABC {
   Q_OBJECT
-  Q_PROPERTY(User__age$agePoint$id$male$name$uuid data MEMBER m_data NOTIFY
-                 dataChanged);
+  Q_PROPERTY(const User__age$agePoint$id$male$name$uuid *data READ get_data
+                 NOTIFY dataChanged);
 
   std::unique_ptr<User__age$agePoint$id$male$name$uuid> m_data;
 
@@ -64,6 +64,9 @@ class MainQuery : public qtgql::QtGqlOperationHandlerABC {
   }
 
  public:
+  const User__age$agePoint$id$male$name$uuid *get_data() {
+    return m_data.get();
+  }
   const QUuid &operation_id() const override {
     return m_message_template.op_id;
   }
@@ -74,6 +77,8 @@ class MainQuery : public qtgql::QtGqlOperationHandlerABC {
           message, OPERATION_METADATA.selections);
     }
   }
+ signals:
+  void dataChanged();
 };
 
 };  // namespace mainquery

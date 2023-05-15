@@ -1,4 +1,3 @@
-#pragma once
 #include <QSignalSpy>
 #include <QTest>
 #include <catch2/catch_test_macros.hpp>

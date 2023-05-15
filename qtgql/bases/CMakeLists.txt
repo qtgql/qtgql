@@ -8,7 +8,8 @@ target_sources(
          qtgqlnetworklayer.hpp
          qtgqlconstants.hpp
          qtgqloperationhandler.hpp
-         qtgqloperationhandler.cpp)
+         qtgqlenvironment.hpp
+  PRIVATE qtgqloperationhandler.cpp qtgqlenvironment.cpp)
 target_link_libraries(qtgqlbases PUBLIC Qt6::Core
                                         ${PROJECT_NAME}::gqlwstransport)
 target_include_directories(qtgqlbases PUBLIC ${CMAKE_CURRENT_LIST_DIR})
