@@ -1,6 +1,6 @@
 
         query MainQuery {
-          user {
+          constUser {
             id
             name
             age

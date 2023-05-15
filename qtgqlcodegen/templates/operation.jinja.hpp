@@ -57,8 +57,11 @@ return m_message_template.op_id;
 
 
 void on_next(const QJsonObject &message) override{
-    if (!m_data){
-        m_data = std::make_unique<👉 context.operation.root_field.property_annotation 👈>(message, OPERATION_METADATA.selections);
+    if (!m_data && message.contains("data")){
+        auto data = message.value("data").toObject();
+        if (data.contains("👉 context.operation.root_field.name 👈")){
+            m_data = std::make_unique<👉 context.operation.root_field.property_annotation 👈>(data.value("👉 context.operation.root_field.name 👈").toObject(), OPERATION_METADATA.selections);
+        }
     }
 }
 const 👉 context.operation.root_field.property_annotation 👈* get_data(){

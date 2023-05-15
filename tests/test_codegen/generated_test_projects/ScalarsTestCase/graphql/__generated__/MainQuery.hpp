@@ -67,7 +67,7 @@ class MainQuery : public qtgql::QtGqlOperationHandlerABC {
   MainQuery()
       : qtgql::QtGqlOperationHandlerABC(qtgql::GqlWsTrnsMsgWithID(
             qtgql::OperationPayload("query MainQuery {"
-                                    "  user {"
+                                    "  constUser {"
                                     "    id"
                                     "    name"
                                     "    age"
@@ -83,9 +83,12 @@ class MainQuery : public qtgql::QtGqlOperationHandlerABC {
   }
 
   void on_next(const QJsonObject &message) override {
-    if (!m_data) {
-      m_data = std::make_unique<User__age$agePoint$id$male$name$uuid>(
-          message, OPERATION_METADATA.selections);
+    if (!m_data && message.contains("data")) {
+      auto data = message.value("data").toObject();
+      if (data.contains("constUser")) {
+        m_data = std::make_unique<User__age$agePoint$id$male$name$uuid>(
+            data.value("constUser").toObject(), OPERATION_METADATA.selections);
+      }
     }
   }
   const User__age$agePoint$id$male$name$uuid *get_data() {

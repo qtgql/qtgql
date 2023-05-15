@@ -208,7 +208,7 @@ ScalarsTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_scalar.schema,
     query="""
         query MainQuery {
-          user {
+          constUser {
             id
             name
             age

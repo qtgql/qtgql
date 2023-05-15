@@ -23,5 +23,16 @@ class Query:
     def user(self) -> User:
         return User()
 
+    @strawberry.field()
+    def constUser(self) -> User:
+        return User(
+            name="nir",
+            age=24,
+            age_point=24.0,
+            male=True,
+            id="FakeID",
+            uuid=UUID("06335e84-2872-4914-8c5d-3ed07d2a2f16"),
+        )
+
 
 schema = strawberry.Schema(query=Query)
