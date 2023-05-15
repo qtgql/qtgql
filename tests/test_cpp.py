@@ -57,11 +57,15 @@ class CtestTestCommand:
 
 
 def collect_tests() -> list[CtestTestCommand]:
-    subprocess.run(
+    res = subprocess.run(
         "cmake --build --preset=test".split(" "),
         cwd=PATHS.PROJECT_ROOT,
-    ).check_returncode()
-
+    )
+    if res.returncode != 0:
+        raise RuntimeError(
+            res.stderr,
+            res.stdout,
+        )
     ret: list[CtestTestCommand] = []
     res = subprocess.run(
         ["ctest", "--show-only=json-v1"],

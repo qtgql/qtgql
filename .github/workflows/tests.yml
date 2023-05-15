@@ -63,21 +63,19 @@ jobs:
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: poetry install --all-extras
 
-      - name: Install Qt Dependencies
-        shell: bash
-        run: |
-          if [ "$RUNNER_OS" == "macOS" ]; then
-            brew install ffmpeg
-          elif [ "$RUNNER_OS" == "Windows" ]; then
-            choco install ffmpeg
-          elif [ "$RUNNER_OS" == "Linux" ]; then
-          sudo apt update -y
-          sudo apt install libxcb-icccm4 libxcb-image0 libxcb-keysyms1 \
-                           libxkbcommon-x11-0 xvfb libxcb-randr0 \
-                           libxcb-render-util0 libxcb-xinerama0 libegl1 \
-                           libxcb-shape0
-          sudo apt-get install -y libgles2-mesa-dev
-          fi
+      - uses: actions/checkout@v3
+      - name: 📦️ Cache Qt
+        id: cache-qt
+        uses: actions/cache@v3
+        with:
+          path: ${{ github.workspace }}/Qt-${{ runner.os }}-${{ matrix.qt-version }}
+          key: ${{ runner.os }}-QtCache-${{ matrix.qt-version }}
+      - name: ⬆️ Install Qt
+        uses: jurplel/install-qt-action@v3
+        with:
+          version: ${{ matrix.qt-version }}
+          dir: ${{ github.workspace }}/Qt-${{ runner.os }}-${{ matrix.qt-version }}
+          cached: ${{ steps.cache-qt.outputs.cache-hit }}
 
       - name: Run tests
         shell: bash
