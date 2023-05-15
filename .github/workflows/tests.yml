@@ -22,7 +22,7 @@ jobs:
       matrix:
         os: [windows-latest, ubuntu-latest]
         python-version: ["3.11"]
-
+        qt-version: ['6.5.0']
 
     steps:
 
