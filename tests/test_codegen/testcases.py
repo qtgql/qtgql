@@ -30,7 +30,6 @@ if TYPE_CHECKING:
 
 BaseQueryHandler = None  # TODO: remove this when done migrating, this is just for readability.
 
-
 GENERATED_TESTS_DIR = Path(__file__).parent / "generated_test_projects"
 if not GENERATED_TESTS_DIR.exists:
     GENERATED_TESTS_DIR.mkdir()
@@ -50,7 +49,7 @@ TST_CMAKE = (Path(__file__).parent / "CMakeLists.txt").resolve(True)
 @define
 class TstTemplateContext:
     config: QtGqlConfig
-    url: str
+    url_suffix: str
     test_name: str
 
 
@@ -113,12 +112,11 @@ class QGQLObjectTestCase:
             custom_scalars=self.custom_scalars,
         )
 
-    def generate(self, url: Optional[str] = "ws://localhost:9000/graphql") -> None:
-        url = url.replace("graphql", f"{hash_schema(self.schema)}")
+    def generate(self) -> None:
         self.config.env_name = self.test_name
         template_context = TstTemplateContext(
             config=self.config,
-            url=url,
+            url_suffix=str(hash_schema(self.schema)),
             test_name=self.test_name,
         )
         self.schema_dir.write_text(self.schema.as_str())
@@ -221,10 +219,6 @@ ScalarsTestCase = QGQLObjectTestCase(
         """,
     test_name="ScalarsTestCase",
 )
-
-if __name__ == "__main__":
-    ScalarsTestCase.generate()
-
 
 OptionalScalarTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_optional_scalar.schema,
@@ -531,7 +525,6 @@ ListOfUnionTestCase = QGQLObjectTestCase(
     test_name="ListOfUnionTestCase",
 )
 
-
 OperationVariableTestCase = QGQLObjectTestCase(
     schema=schemas.variables_schema.schema,
     query="""
@@ -636,7 +629,6 @@ MutationOperationTestCase = QGQLObjectTestCase(
     test_name="MutationOperationTestCase",
 )
 
-
 SubscriptionTestCase = QGQLObjectTestCase(
     schema=schemas.subscription_schema.schema,
     query="""
@@ -646,7 +638,6 @@ SubscriptionTestCase = QGQLObjectTestCase(
     """,
     test_name="SubscriptionTestCase",
 )
-
 
 InterfaceFieldTestCase = QGQLObjectTestCase(
     schema=schemas.interface_field.schema,
@@ -705,3 +696,11 @@ custom_scalar_testcases = [
     (TimeTestCase, TimeScalar, "whatTimeIsIt"),
     (CustomUserScalarTestCase, CountryScalar, "country"),
 ]
+
+
+def generate_testcases() -> None:
+    ScalarsTestCase.generate()
+
+
+if __name__ == "__main__":
+    generate_testcases()

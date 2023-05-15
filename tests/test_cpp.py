@@ -12,7 +12,7 @@ from typing_extensions import TypedDict
 from tests.conftest import MiniServer
 from tests.conftest import PATHS
 
-build_dir = Path(__file__).parent.parent / "build"
+build_dir = Path(__file__).parent / "build"
 
 
 class CtestTestProperty(TypedDict):
@@ -57,7 +57,6 @@ class CtestTestCommand:
 
 
 def collect_tests() -> list[CtestTestCommand]:
-    subprocess.run("cmake --preset=test".split(" "), cwd=PATHS.PROJECT_ROOT).check_returncode()
     subprocess.run(
         "cmake --build --preset=test".split(" "),
         cwd=PATHS.PROJECT_ROOT,
@@ -77,7 +76,7 @@ def collect_tests() -> list[CtestTestCommand]:
 
 @pytest.mark.parametrize("command", collect_tests(), ids=lambda v: v.test_name)
 def test_cpp(command: CtestTestCommand, schemas_server: MiniServer):
-    os.environ.setdefault("SCHEMAS_SERVER_ADDR", schemas_server.address)
+    os.environ.setdefault("SCHEMAS_SERVER_ADDR", schemas_server.address.replace("graphql", ""))
     command.run()
     if log_file := command.failed_log:
         pytest.fail(  # noqa: PT016

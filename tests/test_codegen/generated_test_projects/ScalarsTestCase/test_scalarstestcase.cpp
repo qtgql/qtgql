@@ -6,9 +6,9 @@
 #include "graphql/__generated__/MainQuery.hpp"
 
 TEST_CASE("ScalarsTestCase", "[generated-testcase]") {
+  auto addr = get_server_address("97455992");
   auto client = new DebugAbleClient(
-      {.print_debug = true,
-       .prod_settings = {.url = {"ws://localhost:9000/97455992"}}});
+      {.print_debug = true, .prod_settings = {.url = addr}});
   client->wait_for_valid();
   qtgql::QtGqlEnvironment::set_gql_env(
       std::make_shared<qtgql::QtGqlEnvironment>(

@@ -1,11 +1,11 @@
 #include "debugableclient.hpp"
 
-QString get_server_address() {
+QString get_server_address(const QString &suffix) {
   auto env_addr = std::getenv("SCHEMAS_SERVER_ADDR");
   if (env_addr) {
     return QString::fromUtf8(env_addr);
   }
-  return "ws://localhost:9000/graphql";
+  return "ws://localhost:9000/" + suffix;
 }
 
 std::shared_ptr<DebugAbleClient> get_valid_client() {

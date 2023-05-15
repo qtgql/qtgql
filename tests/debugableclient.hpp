@@ -4,7 +4,7 @@
 #include <gqlwstransport.hpp>
 #include <qtgqlenvironment.hpp>
 
-QString get_server_address();
+QString get_server_address(const QString &suffix = "graphql");
 
 struct DebugClientSettings {
   bool handle_ack = true;
