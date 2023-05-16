@@ -40,7 +40,6 @@ mkdocstrings = {extras = ["python"], version = ">=0.19.1,<0.22.0"}
 pygments = "^2.14.0"
 mypy = "^1.0.1"
 strawberry-graphql = ">=0.158.2,<0.180.0"
-conan = "^2.0.4"
 
 
 

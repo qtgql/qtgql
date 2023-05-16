@@ -81,6 +81,7 @@ jobs:
         run: |
           cd tests && mkdir build
           cd ..
+          cmake --configure .
           cmake .
           cmake --build .  --preset=test
 
