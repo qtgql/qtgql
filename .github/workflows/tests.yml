@@ -77,7 +77,10 @@ jobs:
           dir: ${{ github.workspace }}/Qt-${{ runner.os }}-${{ matrix.qt-version }}
           cached: ${{ steps.cache-qt.outputs.cache-hit }}
           modules: "qtwebsockets"
-
+      - name: Build
+        run: |
+          cd tests && mkdir build
+          cd ..
       - name: Run tests
         shell: bash
         run: |
