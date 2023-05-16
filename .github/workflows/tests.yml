@@ -76,7 +76,8 @@ jobs:
           version: ${{ matrix.qt-version }}
           dir: ${{ github.workspace }}/Qt-${{ runner.os }}-${{ matrix.qt-version }}
           cached: ${{ steps.cache-qt.outputs.cache-hit }}
-
+      - name: Build
+        run: cmake --build --preset=test
       - name: Run tests
         shell: bash
         run: |
