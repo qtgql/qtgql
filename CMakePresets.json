@@ -44,7 +44,7 @@
         },
         {
             "name": "test",
-            "binaryDir": "./tests/build/",
+            "binaryDir": "tests/build/",
             "inherits": [
                 "Debug"
             ],
