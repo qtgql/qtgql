@@ -76,7 +76,7 @@ jobs:
           version: ${{ matrix.qt-version }}
           dir: ${{ github.workspace }}/Qt-${{ runner.os }}-${{ matrix.qt-version }}
           cached: ${{ steps.cache-qt.outputs.cache-hit }}
-          modules: "qtnetworkauth"
+          modules: "qtwebsockets"
       - name: Build
         run: |
           cd tests && mkdir build
