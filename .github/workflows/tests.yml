@@ -81,6 +81,9 @@ jobs:
         run: |
           cd tests && mkdir build
           cd ..
+          cmake .
+          cmake --build .  --preset=test
+
       - name: Run tests
         shell: bash
         run: |
