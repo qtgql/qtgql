@@ -9,7 +9,7 @@ generate_test_files:
 	poetry run python -m tests.test_codegen.testcases
 
 setup_repo:
-	cd 3rdParty && mkdir "Qt" -p
+	mkdir "3rdParty/Qt" -p
 	cd ..
 	poetry run aqt install-qt linux desktop 6.5.0 gcc_64 --outputdir ./3rdParty/Qt -m qtwebsockets
 
