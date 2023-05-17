@@ -1,6 +1,0 @@
-[requires]
-qt/6.5.0
-
-[generators]
-CMakeDeps
-CMakeToolchain

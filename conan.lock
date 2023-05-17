@@ -1,0 +1,8 @@
+{
+    "version": "0.5",
+    "requires": [],
+    "build_requires": [
+        "cmake/3.22.6#32cced101c6df0fab43e8d00bd2483eb%1678699428.472"
+    ],
+    "python_requires": []
+}
