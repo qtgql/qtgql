@@ -71,7 +71,7 @@ jobs:
       - name: Configure and Build
         run: |
           poetry run conan install . -s build_type=Debug
-          cmake --preset conan-debug
+          poetry run cmake --preset conan-debug
       - name: Run tests
         shell: bash
         run: |
