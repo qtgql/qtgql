@@ -59,28 +59,20 @@ jobs:
       #----------------------------------------------
       # install dependencies if cache does not exist
       #----------------------------------------------
-      - name: Install dependencies
+      - name: Install Python dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: poetry install --all-extras
 
-      - name: Install Qt
-        uses: jurplel/install-qt-action@v3
-        with:
-          version: ${{ matrix.qt-version }}
-          modules: "qtwebsockets"
-
-      - name: Install dependencies
+      - name: Install Qt dependencies
         run: |-
+          make setup_repo
           sudo apt-get update
           sudo apt-get install -y ffmpeg libmpv-dev libcurl4-openssl-dev libssl-dev libxkbcommon-x11-0
 
       - name: Build
         run: |
-          cd tests && mkdir build
-          cd ..
-          cmake configure .
-          cmake .
-          cmake --build .  --preset=test
+          cmake --build --preset="test" -DQt6_DIR=$PWD/3rdParty/Qt/6.5.0/gcc_64/lib/cmake/Qt6
+
 
       - name: Run tests
         shell: bash

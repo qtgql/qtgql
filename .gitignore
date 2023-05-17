@@ -142,3 +142,7 @@ dmypy.json
 __temp.py
 /tests/test_sample_ui/graphql/handlers.py
 /tests/test_sample_ui/graphql/objecttypes.py
+
+
+# C++ packages
+3rdParty/Qt/
