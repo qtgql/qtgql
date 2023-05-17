@@ -66,13 +66,10 @@ jobs:
       - name: Install Qt dependencies
         run: |-
           make setup_repo
-          sudo apt-get update
 
-
-      - name: Build
+      - name: Configure and Build
         run: |
-          cd tests && mkdir "build" -p
-          cd ..
+          cmake --preset="test"
           cmake --build --preset="test"
         env:
           Qt6_DIR: ${GITHUB_WORKSPACE}/3rdParty/Qt/6.5.0/gcc_64/lib/cmake/Qt6

@@ -12,6 +12,9 @@ setup_repo:
 	mkdir "3rdParty/Qt" -p
 	cd ..
 	poetry run aqt install-qt linux desktop 6.5.0 gcc_64 --outputdir ./3rdParty/Qt -m qtwebsockets
+	cd tests && mkdir build -p
+	cd ..
+
 
 test:
 	make generate_test_files
