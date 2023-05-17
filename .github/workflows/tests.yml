@@ -71,6 +71,8 @@ jobs:
 
       - name: Build
         run: |
+          cd tests && mkdir "build" -p
+          cd ..
           cmake --build --preset="test"
         env:
           Qt6_DIR: ${GITHUB_WORKSPACE}/3rdParty/Qt/6.5.0/gcc_64/lib/cmake/Qt6
