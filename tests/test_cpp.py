@@ -12,7 +12,9 @@ from typing_extensions import TypedDict
 from tests.conftest import MiniServer
 from tests.conftest import PATHS
 
-build_dir = Path(__file__).parent / "build"
+build_dir = PATHS.PROJECT_ROOT / "build" / "Debug"
+if not build_dir.exists():
+    build_dir.mkdir(parents=True)
 
 
 class CtestTestProperty(TypedDict):
@@ -58,7 +60,7 @@ class CtestTestCommand:
 
 def collect_tests() -> list[CtestTestCommand]:
     res = subprocess.run(
-        "cmake --build --preset=test".split(" "),
+        f"cmake --build {str(build_dir)} --preset=conan-debug --target test_qtgql".split(" "),
         cwd=PATHS.PROJECT_ROOT,
     )
     if res.returncode != 0:

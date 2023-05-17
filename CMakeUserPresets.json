@@ -1,0 +1,9 @@
+{
+    "version": 4,
+    "vendor": {
+        "conan": {}
+    },
+    "include": [
+        "/home/nir/Desktop/tzv5hob/qtgql/build/Debug/generators/CMakePresets.json"
+    ]
+}

@@ -5,6 +5,7 @@ from pathlib import Path
 from conan import ConanFile
 from conan.tools.cmake import CMake
 from conan.tools.cmake import cmake_layout
+from conan.tools.cmake import CMakeDeps
 from conan.tools.cmake import CMakeToolchain
 from conan.tools.scm import Git
 
@@ -25,11 +26,11 @@ class QtGqlRecipe(ConanFile):
     description = "GraphQL codegen client library for Qt"
     topics = ("GraphQL", "Qt", "codegen")
     version = get_version_from_poetry()
-
-    options = {"qt_version": ["6.5.0"], "verbose": ConanBool, "testing": ConanBool}
+    build_policy = "missing"
+    options = {"qt_version": ["6.5.0"], "verbose": ConanBool}
     default_options = {
         "verbose": False,
-        "testing": False,
+        "qt_version": "6.5.0",
     }
 
     def source(self) -> None:
@@ -38,10 +39,10 @@ class QtGqlRecipe(ConanFile):
         git.checkout("migrate_to_cpp")
 
     def requirements(self) -> None:
-        ...
+        self.test_requires("catch2/3.3.2")
 
     def build_requirements(self) -> None:
-        self.tool_requires("cmake/3.22.6")
+        self.tool_requires("cmake/3.26.3")
 
     def layout(self) -> None:
         cmake_layout(self)
@@ -65,6 +66,10 @@ class QtGqlRecipe(ConanFile):
         qt_version = "6.5.0"
         return self.aqt_install_dir / qt_version / self.qt_arch / "lib" / "cmake" / "Qt6"
 
+    @property
+    def should_test(self) -> bool:
+        return self.settings.get_safe("build_type", default="Debug") == "Debug"
+
     def generate(self) -> None:
         qt_version = "6.5.0"
         os_name = self.settings.os.value.lower()
@@ -74,7 +79,10 @@ class QtGqlRecipe(ConanFile):
                     " ",
                 ),
             )
+        deps = CMakeDeps(self)
+        deps.generate()
         tc = CMakeToolchain(self)
+        tc.variables["QTGQL_TESTING"] = self.should_test
         tc.cache_variables["Qt6_DIR"] = str(self.qt6_install_dir)
         tc.generate()
 
@@ -82,6 +90,8 @@ class QtGqlRecipe(ConanFile):
         cmake = CMake(self)
         cmake.configure()
         cmake.build()
+        if self.should_test:
+            cmake.test(build_type="Debug", target="test_qtgql")
 
     def package(self):
         cmake = CMake(self)

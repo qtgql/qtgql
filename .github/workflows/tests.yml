@@ -71,9 +71,8 @@ jobs:
 
       - name: Configure and Build
         run: |
-          export Qt6_DIR=$PWD/3rdParty/Qt/6.5.0/gcc_64/lib/cmake/Qt6
-          cmake --preset="test"
-          cmake --build --preset="test"
+          conan install . -s build_type=Debug
+          cmake --preset conan-debug
       - name: Run tests
         shell: bash
         run: |

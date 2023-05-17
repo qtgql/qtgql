@@ -15,6 +15,7 @@ CMakeLists.txt.user
 .Python
 **/.build
 **/build
+cmake-build*/
 .cmake_build/
 develop-eggs/
 dist/
@@ -142,6 +143,7 @@ dmypy.json
 __temp.py
 /tests/test_sample_ui/graphql/handlers.py
 /tests/test_sample_ui/graphql/objecttypes.py
+
 
 
 # C++ packages
