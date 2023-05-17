@@ -67,7 +67,7 @@ jobs:
         run: |-
           make setup_repo
           sudo apt-get update
-          sudo apt-get install -y ffmpeg libmpv-dev libcurl4-openssl-dev libssl-dev libxkbcommon-x11-0
+
 
       - name: Build
         run: |
