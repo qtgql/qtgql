@@ -64,16 +64,13 @@ jobs:
         run: poetry install --all-extras
 
       - name: Install Qt dependencies
-        run: |-
-          make setup_repo
+        run: make setup_repo
 
       - name: Configure and Build
         run: |
+          export $PWD/3rdParty/Qt/6.5.0/gcc_64/lib/cmake/Qt6
           cmake --preset="test"
           cmake --build --preset="test"
-        env:
-          Qt6_DIR: ${GITHUB_WORKSPACE}/3rdParty/Qt/6.5.0/gcc_64/lib/cmake/Qt6
-
       - name: Run tests
         shell: bash
         run: |
