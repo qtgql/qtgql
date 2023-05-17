@@ -71,8 +71,9 @@ jobs:
 
       - name: Build
         run: |
-          cmake --build --preset="test" -DQt6_DIR=${GITHUB_WORKSPACE}/3rdParty/Qt/6.5.0/gcc_64/lib/cmake/Qt6
-
+          cmake --build --preset="test"
+        env:
+          Qt6_DIR: ${GITHUB_WORKSPACE}/3rdParty/Qt/6.5.0/gcc_64/lib/cmake/Qt6
 
       - name: Run tests
         shell: bash
