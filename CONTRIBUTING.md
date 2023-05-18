@@ -3,12 +3,12 @@ To contribute create a fork and clone your fork locally.
 
 ### Install dependencies
 We use Poetry for managing dependencies.
-```console
+```bash
 poetry install
 ```
 
 ### Install pre-commit hooks
-```console
+```bash
 pre-commit install
 ```
 
@@ -20,7 +20,7 @@ Release type: <patch/minor/major>
 ```
 
 ### Running tests
-```console
+```bash
 make test
 ```
 

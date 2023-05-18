@@ -52,7 +52,7 @@ nav:
         - Index: ./codegen/scalars/index.md
         - Custom Scalars: ./codegen/scalars/custom_scalars.md
         - Create a Scalar: ./codegen/scalars/create_scalar.md
-
+      - Contributing: ./contributing.md
 
 
 markdown_extensions:
