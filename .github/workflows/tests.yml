@@ -75,7 +75,7 @@ jobs:
       - name: Configure and Build
         run: |
           make generate_test_files
-          poetry run conan install . -pr=profiles/windows -s build_type=Debug --build=missing
+          poetry run conan install . -pr=profiles/${{ runner.os }} -s build_type=Debug --build=missing
           poetry run conan build . -s build_type=Debug
 
       - name: Run tests
