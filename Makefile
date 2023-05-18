@@ -13,4 +13,4 @@ test:
 
 conan_install:
 	poetry run conan profile detect
-	poetry run conan install . -s build_type=Debug -pr profiles/linux  --build=missing
+	poetry run conan install . -s build_type=Debug --build=missing

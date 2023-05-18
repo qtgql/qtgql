@@ -34,13 +34,7 @@ theme:
 plugins:
   - search
   - mike
-  - mkdocstrings:
-      handlers:
-        python:
-          paths: [ qtgql ]
-          options:
-            annotations_path: source
-            docstring_style: google
+
 
 
 nav:
