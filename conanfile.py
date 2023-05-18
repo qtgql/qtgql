@@ -67,7 +67,7 @@ class QtGqlRecipe(ConanFile):
         if self.os_name == "linux":
             return "gcc_64"
         elif self.os_name == "windows":
-            return "win64_mingw"
+            return "win64_msvc2019_64"
 
     @property
     def qt6_install_dir(self) -> Path | None:
