@@ -4,4 +4,5 @@ build_type=Debug
 compiler=gcc
 compiler.cppstd=20
 compiler.version=12.2
+compiler.libcxx=libstdc++11
 os=Windows
