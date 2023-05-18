@@ -84,7 +84,9 @@ class QtGqlRecipe(ConanFile):
         deps = CMakeDeps(self)
         deps.generate()
         tc = CMakeToolchain(self)
-        tc.variables["binaryDir"] = str(PATHS.QTGQL_TEST_TARGET)
+        tc.variables[
+            "binaryDir"
+        ] = PATHS.QTGQL_TEST_TARGET.as_posix()  # cmake works with posix paths only
         tc.variables["QTGQL_TESTING"] = self.should_test
         tc.cache_variables["Qt6_DIR"] = str(self.qt6_install_dir)
         tc.generate()

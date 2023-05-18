@@ -76,8 +76,7 @@ jobs:
         run: |
           make generate_test_files
           make conan_install
-          poetry run cmake --preset conan-debug
-          poetry run cmake --build --preset=conan-debug --target test_qtgql
+          poetry run conan build . -s build_type=Debug
 
       - name: Run tests
         shell: bash
