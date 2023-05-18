@@ -1,8 +1,8 @@
 [settings]
 arch=x86_64
 build_type=Debug
-compiler=msvc
+compiler=gcc
 compiler.cppstd=20
-compiler.version=193
-compiler.runtime=static
+compiler.version=12.2
+compiler.libcxx=libstdc++11
 os=Windows
