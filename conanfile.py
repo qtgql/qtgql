@@ -1,3 +1,4 @@
+import glob
 import subprocess
 from functools import cached_property
 from pathlib import Path
@@ -68,9 +69,12 @@ class QtGqlRecipe(ConanFile):
             return "win64_mingw"
 
     @cached_property
-    def qt6_install_dir(self):
+    def qt6_install_dir(self) -> Path:
         qt_version = "6.5.0"
-        return self.aqt_install_dir / qt_version / self.qt_arch / "lib" / "cmake" / "Qt6"
+        relative_to = self.aqt_install_dir / qt_version
+        res = glob.glob("**/Qt6Config.cmake", root_dir=relative_to, recursive=True)
+        p = (relative_to / res[0]).resolve(True)
+        return p.parent
 
     @property
     def should_test(self) -> bool:
@@ -92,7 +96,7 @@ class QtGqlRecipe(ConanFile):
             "binaryDir"
         ] = PATHS.QTGQL_TEST_TARGET.as_posix()  # cmake works with posix paths only
         tc.variables["QTGQL_TESTING"] = self.should_test
-        tc.cache_variables["Qt6_DIR"] = self.qt6_install_dir.as_posix()
+        tc.cache_variables["Qt6_DIR"] = str(self.qt6_install_dir)
         tc.generate()
 
     def build(self):
