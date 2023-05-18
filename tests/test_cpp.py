@@ -59,15 +59,6 @@ class CtestTestCommand:
 
 
 def collect_tests() -> list[CtestTestCommand]:
-    res = subprocess.run(
-        f"cmake --build {str(build_dir)} --preset=conan-debug --target test_qtgql".split(" "),
-        cwd=PATHS.PROJECT_ROOT,
-    )
-    if res.returncode != 0:
-        raise RuntimeError(
-            res.stderr,
-            res.stdout,
-        )
     ret: list[CtestTestCommand] = []
     res = subprocess.run(
         ["ctest", "--show-only=json-v1"],
