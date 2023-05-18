@@ -80,7 +80,7 @@ class QtGqlRecipe(ConanFile):
 
     @property
     def should_test(self) -> bool:
-        return self.settings.get_safe("build_type", default="Debug") == "Debug"
+        return True
 
     def generate(self) -> None:
         qt_version = "6.5.0"
