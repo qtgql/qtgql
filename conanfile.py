@@ -1,3 +1,4 @@
+import contextlib
 import glob
 import subprocess
 from functools import cached_property
@@ -68,13 +69,14 @@ class QtGqlRecipe(ConanFile):
         elif self.os_name == "windows":
             return "win64_mingw"
 
-    @cached_property
-    def qt6_install_dir(self) -> Path:
+    @property
+    def qt6_install_dir(self) -> Path | None:
         qt_version = "6.5.0"
         relative_to = self.aqt_install_dir / qt_version
         res = glob.glob("**/Qt6Config.cmake", root_dir=relative_to, recursive=True)
-        p = (relative_to / res[0]).resolve(True)
-        return p.parent
+        with contextlib.suppress(IndexError):
+            p = (relative_to / res[0]).resolve(True)
+            return p.parent
 
     @property
     def should_test(self) -> bool:
@@ -82,13 +84,15 @@ class QtGqlRecipe(ConanFile):
 
     def generate(self) -> None:
         qt_version = "6.5.0"
-        if not self.qt6_install_dir.exists():
+        if not self.qt6_install_dir:
             subprocess.run(
                 f"poetry run aqt install-qt {self.os_name} "
                 f"desktop {qt_version} {self.qt_arch} "
                 f"--outputdir {str(self.aqt_install_dir)} "
                 f"-m qtwebsockets".split(" "),
             )
+        assert self.qt6_install_dir
+        assert self.qt6_install_dir.exists()
         deps = CMakeDeps(self)
         deps.generate()
         tc = CMakeToolchain(self)
