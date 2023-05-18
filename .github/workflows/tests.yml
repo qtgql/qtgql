@@ -61,7 +61,7 @@ jobs:
       #----------------------------------------------
       - name: Install Python dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-        run: poetry install --all-extras
+        run: poetry install
 
       - name: Install Qt dependencies
         shell: bash
