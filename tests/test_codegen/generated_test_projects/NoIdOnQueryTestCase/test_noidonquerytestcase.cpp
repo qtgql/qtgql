@@ -8,7 +8,8 @@ namespace NoIdOnQueryTestCase {
 
 TEST_CASE("NoIdOnQueryTestCase", "[generated-testcase]") {
   auto addr = get_server_address("97455992");
-  auto client = new DebugAbleClient({.prod_settings = {.url = addr}});
+  auto client =
+      new DebugAbleClient(DebugClientSettings{.prod_settings = {.url = addr}});
   client->wait_for_valid();
 
   qtgql::QtGqlEnvironment::set_gql_env(
