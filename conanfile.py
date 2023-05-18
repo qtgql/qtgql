@@ -9,6 +9,8 @@ from conan.tools.cmake import CMakeDeps
 from conan.tools.cmake import CMakeToolchain
 from conan.tools.scm import Git
 
+from tests.conftest import PATHS
+
 ConanBool = [True, False]
 
 
@@ -82,6 +84,7 @@ class QtGqlRecipe(ConanFile):
         deps = CMakeDeps(self)
         deps.generate()
         tc = CMakeToolchain(self)
+        tc.variables["binaryDir"] = str(PATHS.QTGQL_TEST_TARGET)
         tc.variables["QTGQL_TESTING"] = self.should_test
         tc.cache_variables["Qt6_DIR"] = str(self.qt6_install_dir)
         tc.generate()
@@ -90,8 +93,6 @@ class QtGqlRecipe(ConanFile):
         cmake = CMake(self)
         cmake.configure()
         cmake.build()
-        if self.should_test:
-            cmake.test(build_type="Debug", target="test_qtgql")
 
     def package(self):
         cmake = CMake(self)
