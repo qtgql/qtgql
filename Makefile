@@ -10,7 +10,3 @@ generate_test_files:
 
 test:
 	pytest tests --cov=qtgql --cov-report=xml --cov-append
-
-conan_install:
-	poetry run conan profile detect
-	poetry run conan install . -s build_type=Debug --build=missing
