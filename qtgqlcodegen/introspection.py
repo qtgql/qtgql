@@ -140,8 +140,9 @@ class SchemaEvaluator:
 
     @cached_property
     def schema_definition(self) -> graphql.GraphQLSchema:
-        with (self.config.graphql_dir / "schema.graphql").open() as f:
-            return graphql.build_schema(f.read())
+        return graphql.build_schema(
+            (self.config.graphql_dir / "schema.graphql").resolve(True).read_text(),
+        )
 
     @cached_property
     def root_types(self) -> List[Optional[gql_def.GraphQLObjectType]]:

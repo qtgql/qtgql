@@ -47,10 +47,6 @@ nav:
         - Custom Scalars: ./codegen/scalars/custom_scalars.md
         - Create a Scalar: ./codegen/scalars/create_scalar.md
 
-  - Helpers:
-    - Item-System: ./helpers/itemsystem.md
-    - Utils: ./helpers/utilities.md
-
 
 markdown_extensions:
   - def_list
