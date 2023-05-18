@@ -23,19 +23,3 @@ This library is an attempt to provide a high-level graphql client to the QT worl
 
 !!! success "Network layer"
     - [x] Native-Qt client implementation of "[graphql-transport-ws](https://github.com/enisdenjo/graphql-ws/blob/master/PROTOCOL.md)" protocol (supports subscriptions) - You can provide your own network layer though.
-
-
-## Installation
-
-<div class="termy">
-
-```console
-
-// This would install our codegen dependencies as well...
-
-$ pip install qtgql[codegen]
-
----> 100%
-```
-
-</div>

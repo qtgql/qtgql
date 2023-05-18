@@ -34,7 +34,13 @@ theme:
 plugins:
   - search
   - mike
-
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [ qtgqlcodegen ]
+          options:
+            annotations_path: source
+            docstring_style: google
 
 
 nav:
@@ -46,6 +52,7 @@ nav:
         - Index: ./codegen/scalars/index.md
         - Custom Scalars: ./codegen/scalars/custom_scalars.md
         - Create a Scalar: ./codegen/scalars/create_scalar.md
+
 
 
 markdown_extensions:
