@@ -43,7 +43,7 @@ class QtGqlRecipe(ConanFile):
         git.checkout("migrate_to_cpp")
 
     def requirements(self) -> None:
-        self.test_requires("catch2/3.3.2")
+        self.test_requires("catch2/3.1.0")
 
     def build_requirements(self) -> None:
         self.tool_requires("cmake/3.26.3")
