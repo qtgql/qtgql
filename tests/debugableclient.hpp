@@ -15,7 +15,7 @@ struct DebugClientSettings {
 };
 
 class DebugAbleClient : public qtgql::GqlWsTransportClient {
-  void onTextMessageReceived(const QString &message);
+  void onTextMessageReceived(const QString &raw_message);
 
  public:
   bool m_pong_received = false;

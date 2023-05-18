@@ -20,8 +20,8 @@ bool DebugAbleClient::has_handler(
   return m_handlers.contains(handler->operation_id());
 }
 
-void DebugAbleClient::onTextMessageReceived(const QString &message) {
-  auto raw_data = QJsonDocument::fromJson(message.toUtf8());
+void DebugAbleClient::onTextMessageReceived(const QString &raw_message) {
+  auto raw_data = QJsonDocument::fromJson(raw_message.toUtf8());
   if (raw_data.isObject()) {
     auto data = raw_data.object();
     if (m_settings.print_debug) {
@@ -44,5 +44,5 @@ void DebugAbleClient::onTextMessageReceived(const QString &message) {
       }
     }
   }
-  GqlWsTransportClient::onTextMessageReceived(message);
+  GqlWsTransportClient::onTextMessageReceived(raw_message);
 }

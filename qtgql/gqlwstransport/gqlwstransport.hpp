@@ -158,7 +158,7 @@ class GqlWsTransportClient : public QObject, public QtGqlNetworkLayer {
   void init_connection(const QNetworkRequest &request);
 
  protected Q_SLOTS:
-  virtual void onTextMessageReceived(const QString &message);
+  virtual void onTextMessageReceived(const QString &raw_message);
   void onConnected();
   void onDisconnected();
   void onError(const QAbstractSocket::SocketError &error);
