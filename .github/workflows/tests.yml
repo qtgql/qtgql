@@ -63,11 +63,6 @@ jobs:
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: poetry install
 
-      - name: Add clang path to $PATH env
-        shell: bash
-        if: runner.os == 'Windows'
-        run: echo "PATH=$PATH:C:\msys64\mingw64\bin" >> $GITHUB_ENV
-
       - name: Install Qt dependencies
         shell: bash
         if: runner.os == 'Linux'
