@@ -20,7 +20,7 @@ class DebugAbleClient : public qtgql::GqlWsTransportClient {
  public:
   bool m_pong_received = false;
   DebugClientSettings m_settings;
-  DebugAbleClient(const DebugClientSettings &settings = DebugClientSettings())
+  DebugAbleClient(const DebugClientSettings &settings = DebugClientSettings{})
       : GqlWsTransportClient(settings.prod_settings), m_settings{settings} {}
 
   void wait_for_valid() {

@@ -65,7 +65,7 @@ TEST_CASE("If ws not valid gql_valid=false", "[gqlwstransport][ws-client]") {
 
 TEST_CASE("If ack not received - gql is not valid",
           "[gqlwstransport][ws-client]") {
-  auto client = DebugAbleClient({.handle_ack = false});
+  auto client = DebugAbleClient(DebugClientSettings{.handle_ack = false});
   REQUIRE(QTest::qWaitFor([&]() { return client.is_valid(); }, 1000));
   std::ignore =
       QTest::qWaitFor([&]() -> bool { return client.gql_is_valid(); }, 200);
