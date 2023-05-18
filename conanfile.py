@@ -57,11 +57,15 @@ class QtGqlRecipe(ConanFile):
         return ret
 
     @property
+    def os_name(self):
+        return self.settings.os.value.lower()
+
+    @property
     def qt_arch(self) -> str:
-        os_name = self.settings.os.value.lower()
-        if os_name == "linux":
+        if self.os_name == "linux":
             return "gcc_64"
-        return self.settings.arch.value
+        elif self.os_name == "windows":
+            return "win64_mingw"
 
     @cached_property
     def qt6_install_dir(self):
@@ -74,12 +78,12 @@ class QtGqlRecipe(ConanFile):
 
     def generate(self) -> None:
         qt_version = "6.5.0"
-        os_name = self.settings.os.value.lower()
         if not self.qt6_install_dir.exists():
             subprocess.run(
-                f"aqt install-qt {os_name} desktop {qt_version} {self.qt_arch} --outputdir {str(self.aqt_install_dir)} -m qtwebsockets".split(
-                    " ",
-                ),
+                f"poetry run aqt install-qt {self.os_name} "
+                f"desktop {qt_version} {self.qt_arch} "
+                f"--outputdir {str(self.aqt_install_dir)} "
+                f"-m qtwebsockets".split(" "),
             )
         deps = CMakeDeps(self)
         deps.generate()
