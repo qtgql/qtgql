@@ -70,6 +70,10 @@ jobs:
           sudo apt update
           sudo apt install libgl1-mesa-dev libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-render-util0 libxcb-xinerama0 libzstd-dev libcurl4-openssl-dev
 
+      - name: install clang (Windows)
+        if: runner.os == 'Windows'
+        uses: egor-tensin/setup-clang@v1
+
 
       - name: Generate test files
         run: make generate_test_files
