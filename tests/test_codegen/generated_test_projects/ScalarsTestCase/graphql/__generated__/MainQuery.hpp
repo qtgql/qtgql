@@ -4,7 +4,7 @@
 namespace ScalarsTestCase {
 namespace mainquery {
 
-const qtgql::OperationMetadata OPERATION_METADATA =
+inline const qtgql::OperationMetadata OPERATION_METADATA =
     qtgql::OperationMetadata{"MainQuery",
                              {
 
@@ -39,17 +39,17 @@ public:
                                        const qtgql::SelectionsConfig &config) {
     m_inst = ScalarsTestCase::User::from_json(data, config, OPERATION_METADATA);
   }
-  const QString &get_id() const { return m_inst->get_id(); };
+  inline const QString &get_id() const { return m_inst->get_id(); };
 
-  const QString &get_name() const { return m_inst->get_name(); };
+  inline const QString &get_name() const { return m_inst->get_name(); };
 
-  const int &get_age() const { return m_inst->get_age(); };
+  inline const int &get_age() const { return m_inst->get_age(); };
 
-  const float &get_agePoint() const { return m_inst->get_agePoint(); };
+  inline const float &get_agePoint() const { return m_inst->get_agePoint(); };
 
-  const bool &get_male() const { return m_inst->get_male(); };
+  inline const bool &get_male() const { return m_inst->get_male(); };
 
-  const QUuid &get_uuid() const { return m_inst->get_uuid(); };
+  inline const QUuid &get_uuid() const { return m_inst->get_uuid(); };
 };
 
 class MainQuery : public qtgql::QtGqlOperationHandlerABC {
@@ -59,7 +59,7 @@ class MainQuery : public qtgql::QtGqlOperationHandlerABC {
 
   std::unique_ptr<User__age$agePoint$id$male$name$uuid> m_data;
 
-  const QString &ENV_NAME() override {
+  inline const QString &ENV_NAME() override {
     static const auto ret = QString("ScalarsTestCase");
     return ret;
   }
@@ -79,7 +79,7 @@ public:
                                     "  }"
                                     "}"))){};
 
-  const QUuid &operation_id() const override {
+  inline const QUuid &operation_id() const override {
     return m_message_template.op_id;
   }
 
@@ -92,7 +92,7 @@ public:
       }
     }
   }
-  const User__age$agePoint$id$male$name$uuid *get_data() {
+  inline const User__age$agePoint$id$male$name$uuid *get_data() {
     return m_data.get();
   }
 

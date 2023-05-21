@@ -19,11 +19,11 @@ namespace PROTOCOL {
 inline const QString CONNECTION_INIT = "connection_init";
 inline const QString CONNECTION_ACK = "connection_ack";
 inline const QString ERROR = "error";
-const QString COMPLETE = "complete";
-const QString NEXT = "next";
-const QString PING = "ping";
-const QString PONG = "pong";
-const QString SUBSCRIBE = "subscribe";  // for queries | mutations as well.
+inline const QString COMPLETE = "complete";
+inline const QString NEXT = "next";
+inline const QString PING = "ping";
+inline const QString PONG = "pong";
+inline const QString SUBSCRIBE = "subscribe";  // for queries | mutations as well.
 };                                      // namespace PROTOCOL
 
 std::optional<QString> get_operation_name(const QString &query);
@@ -120,7 +120,7 @@ struct GqlWsTransportClientSettings {
   int ping_timeout = 5000;
   int reconnect_timeout = 3000;
   bool auto_reconnect = false;
-  const QList<std::pair<QString, QString>> &headers = {};
+  const QList<std::pair<QString, QString>> headers = {};
 };
 
 class GqlWsTransportClient : public QObject, public QtGqlNetworkLayer {
