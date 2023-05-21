@@ -5,11 +5,10 @@
 #include <QWebSocket>
 #include <QWebSocketHandshakeOptions>
 #include <QtCore>
-#include <qtgqlnetworklayer.hpp>
-
 #include <deque>
 #include <memory>
 #include <optional>
+#include <qtgqlnetworklayer.hpp>
 
 namespace qtgql {
 
@@ -17,9 +16,9 @@ namespace qtgql {
 // ws.
 // https://github.com/enisdenjo/graphql-ws/blob/master/PROTOCOL.md
 namespace PROTOCOL {
-const QString CONNECTION_INIT = "connection_init";
-const QString CONNECTION_ACK = "connection_ack";
-const QString ERROR = "error";
+inline const QString CONNECTION_INIT = "connection_init";
+inline const QString CONNECTION_ACK = "connection_ack";
+inline const QString ERROR = "error";
 const QString COMPLETE = "complete";
 const QString NEXT = "next";
 const QString PING = "ping";
@@ -115,12 +114,12 @@ const auto PONG = BaseGqlWsTrnsMsg(PROTOCOL::PONG);
 }  // namespace DEF_MESSAGES
 
 struct GqlWsTransportClientSettings {
-    const QUrl url;
-    QObject* parent = nullptr;
-    int ping_interval = 50000;
-    int ping_timeout = 5000;
-    int reconnect_timeout = 3000;
-    bool auto_reconnect = false;
+  const QUrl url;
+  QObject *parent = nullptr;
+  int ping_interval = 50000;
+  int ping_timeout = 5000;
+  int reconnect_timeout = 3000;
+  bool auto_reconnect = false;
   const QList<std::pair<QString, QString>> &headers = {};
 };
 
