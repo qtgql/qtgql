@@ -44,8 +44,7 @@ class QtGqlRecipe(ConanFile):
 
     def requirements(self) -> None:
         ...
-    
-    
+
     def build_requirements(self) -> None:
         self.test_requires("catch2/3.1.0")
 
@@ -64,15 +63,16 @@ class QtGqlRecipe(ConanFile):
         return self.settings.os.value.lower()
 
     def is_windows(self) -> bool:
-        return self.os_name == "windows"  
+        return self.os_name == "windows"
+
     def is_linux(self) -> bool:
         return self.os_name == "linux"
-    
+
     @property
     def qt_arch(self) -> str:
-        if is_linux():
+        if self.is_linux():
             return "gcc_64"
-        elif is_windows():
+        elif self.is_windows():
             return "win64_mingw"
 
     @property
@@ -87,7 +87,6 @@ class QtGqlRecipe(ConanFile):
     @property
     def should_test(self) -> bool:
         return True
-    
 
     def generate(self) -> None:
         qt_version = self.options.qt_version
@@ -107,7 +106,7 @@ class QtGqlRecipe(ConanFile):
             "binaryDir"
         ] = PATHS.QTGQL_TEST_TARGET.as_posix()  # cmake works with posix paths only
         tc.variables["QTGQL_TESTING"] = self.should_test
-        tc.cache_variables["Qt6_DIR"] = str(self.qt6_install_dir)   
+        tc.cache_variables["Qt6_DIR"] = str(self.qt6_install_dir)
         tc.generate()
 
     def build(self):
