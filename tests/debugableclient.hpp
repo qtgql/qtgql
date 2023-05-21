@@ -14,17 +14,14 @@ struct DebugClientSettings {
       .url = get_server_address()};
 };
 
-
-
 class DebugAbleClient : public qtgql::GqlWsTransportClient {
   void onTextMessageReceived(const QString &raw_message);
 
  public:
   bool m_pong_received = false;
   DebugClientSettings m_settings;
-  DebugAbleClient(const DebugClientSettings &settings = DebugClientSettings{})
-      : GqlWsTransportClient(settings.prod_settings), m_settings{settings} {}
-
+  DebugAbleClient(DebugClientSettings settings = DebugClientSettings())
+      : GqlWsTransportClient(settings.prod_settings), m_settings{settings} {};
   void wait_for_valid() {
     if (!QTest::qWaitFor([&]() { return gql_is_valid(); }, 1000)) {
       throw "Client could not connect to the GraphQL server";
