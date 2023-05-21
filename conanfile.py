@@ -43,10 +43,11 @@ class QtGqlRecipe(ConanFile):
         git.checkout("migrate_to_cpp")
 
     def requirements(self) -> None:
-        self.test_requires("catch2/3.1.0")
-
+        ...
+    
+    
     def build_requirements(self) -> None:
-        self.tool_requires("cmake/3.26.3")
+        self.test_requires("catch2/3.1.0")
 
     def layout(self) -> None:
         cmake_layout(self)
@@ -62,11 +63,16 @@ class QtGqlRecipe(ConanFile):
     def os_name(self):
         return self.settings.os.value.lower()
 
+    def is_windows(self) -> bool:
+        return self.os_name == "windows"  
+    def is_linux(self) -> bool:
+        return self.os_name == "linux"
+    
     @property
     def qt_arch(self) -> str:
-        if self.os_name == "linux":
+        if is_linux():
             return "gcc_64"
-        elif self.os_name == "windows":
+        elif is_windows():
             return "win64_mingw"
 
     @property
@@ -81,9 +87,10 @@ class QtGqlRecipe(ConanFile):
     @property
     def should_test(self) -> bool:
         return True
+    
 
     def generate(self) -> None:
-        qt_version = "6.5.0"
+        qt_version = self.options.qt_version
         if not self.qt6_install_dir:
             subprocess.run(
                 f"poetry run aqt install-qt {self.os_name} "
@@ -100,7 +107,7 @@ class QtGqlRecipe(ConanFile):
             "binaryDir"
         ] = PATHS.QTGQL_TEST_TARGET.as_posix()  # cmake works with posix paths only
         tc.variables["QTGQL_TESTING"] = self.should_test
-        tc.cache_variables["Qt6_DIR"] = str(self.qt6_install_dir)
+        tc.cache_variables["Qt6_DIR"] = str(self.qt6_install_dir)   
         tc.generate()
 
     def build(self):

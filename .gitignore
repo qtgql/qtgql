@@ -7,6 +7,7 @@ __pycache__/
 .fleet
 .vscode
 .kdev4
+.vs
 CMakeLists.txt.user
 # C extensions
 *.so
@@ -148,3 +149,4 @@ __temp.py
 
 # C++ packages
 3rdParty/Qt/
+CMakeUserPresets.json

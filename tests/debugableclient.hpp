@@ -14,6 +14,8 @@ struct DebugClientSettings {
       .url = get_server_address()};
 };
 
+
+
 class DebugAbleClient : public qtgql::GqlWsTransportClient {
   void onTextMessageReceived(const QString &raw_message);
 

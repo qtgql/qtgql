@@ -33,7 +33,7 @@ class User__age$agePoint$id$male$name$uuid {
   Q_GADGET
   std::shared_ptr<NoIdOnQueryTestCase::User> m_inst;
 
- public:
+public:
   User__age$agePoint$id$male$name$uuid(const QJsonObject &data,
                                        const qtgql::SelectionsConfig &config) {
     m_inst =
@@ -65,7 +65,7 @@ class User__age$agePoint$id$male$name {
   Q_GADGET
   std::shared_ptr<NoIdOnQueryTestCase::User> m_inst;
 
- public:
+public:
   User__age$agePoint$id$male$name(const QJsonObject &data,
                                   const qtgql::SelectionsConfig &config) {
     m_inst =
@@ -94,7 +94,7 @@ class MainQuery : public qtgql::QtGqlOperationHandlerABC {
     return ret;
   }
 
- public:
+public:
   MainQuery()
       : qtgql::QtGqlOperationHandlerABC(qtgql::GqlWsTrnsMsgWithID(
             qtgql::OperationPayload("query MainQuery {"
@@ -122,8 +122,8 @@ class MainQuery : public qtgql::QtGqlOperationHandlerABC {
   }
   const User__age$agePoint$id$male$name *get_data() { return m_data.get(); }
 
- signals:
+signals:
   void dataChanged();
 };
-};  // namespace mainquery
-};  // namespace NoIdOnQueryTestCase
+}; // namespace mainquery
+}; // namespace NoIdOnQueryTestCase
