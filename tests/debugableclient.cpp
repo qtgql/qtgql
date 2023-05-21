@@ -46,5 +46,3 @@ void DebugAbleClient::onTextMessageReceived(const QString &raw_message) {
   }
   GqlWsTransportClient::onTextMessageReceived(raw_message);
 }
-
-

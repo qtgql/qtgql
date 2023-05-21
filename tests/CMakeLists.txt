@@ -1,6 +1,14 @@
-find_package(Qt6 REQUIRED COMPONENTS Test Core Network)
-find_package(Catch2 REQUIRED COMPONENTS Catch2)
+include(FetchContent)
+
+FetchContent_Declare(
+  Catch2
+  GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+  GIT_TAG v3.3.0 # or a later release
+)
+
+FetchContent_MakeAvailable(Catch2)
 include(Catch)
+find_package(Qt6 REQUIRED COMPONENTS Test Core Network)
 set(TESTS_TARGET "test_qtgql")
 file(GLOB_RECURSE TEST_SRCS ${PROJECT_SOURCE_DIR}/tests/test_*.cpp)
 
