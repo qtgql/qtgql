@@ -709,7 +709,7 @@ custom_scalar_testcases = [
     (CustomUserScalarTestCase, CountryScalar, "country"),
 ]
 
-implemented_testcases = [ScalarsTestCase, NoIdOnQueryTestCase]
+implemented_testcases = [ScalarsTestCase, NoIdOnQueryTestCase, OptionalScalarTestCase]
 
 
 def generate_testcases() -> None:
