@@ -36,7 +36,7 @@ if not GENERATED_TESTS_DIR.exists:
 template_env = jinja2.Environment(
     loader=jinja2.FileSystemLoader(Path(__file__).parent / "templates_for_tests"),
     autoescape=jinja2.select_autoescape(),
-    variable_start_string="👉",  # originally {{ variable }}, using 👉 variable 👈 because C++ uses curly brackets.
+    variable_start_string="👉",  # jinja uses {{ variable }}, using 👉 variable 👈 because C++ uses curly brackets.
     variable_end_string="👈",
 )
 
