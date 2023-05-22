@@ -46,3 +46,24 @@ jobs:
         if: ${{ steps.check_release.outputs.release!='' }}
         run: |
           exit 1
+
+  testcsae_status:
+    name: TestCases status
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+      - name: setup poetry
+        run: |
+          pip install poetry
+          poetry install
+
+      - name: upload comment
+        run:
+          cd .github && poetry run python -m workflows.scripts.testcase_impl_status
+        env:
+          PR_NUMBER: ${{ github.event.number }}
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}

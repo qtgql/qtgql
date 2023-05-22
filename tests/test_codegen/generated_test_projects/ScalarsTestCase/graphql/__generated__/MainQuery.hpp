@@ -34,7 +34,7 @@ class User__age$agePoint$id$male$name$uuid {
   Q_GADGET
   std::shared_ptr<ScalarsTestCase::User> m_inst;
 
-public:
+ public:
   User__age$agePoint$id$male$name$uuid(const QJsonObject &data,
                                        const qtgql::SelectionsConfig &config) {
     m_inst = ScalarsTestCase::User::from_json(data, config, OPERATION_METADATA);
@@ -64,7 +64,7 @@ class MainQuery : public qtgql::QtGqlOperationHandlerABC {
     return ret;
   }
 
-public:
+ public:
   MainQuery()
       : qtgql::QtGqlOperationHandlerABC(qtgql::GqlWsTrnsMsgWithID(
             qtgql::OperationPayload("query MainQuery {"
@@ -96,8 +96,8 @@ public:
     return m_data.get();
   }
 
-signals:
+ signals:
   void dataChanged();
 };
-}; // namespace mainquery
-}; // namespace ScalarsTestCase
+};  // namespace mainquery
+};  // namespace ScalarsTestCase

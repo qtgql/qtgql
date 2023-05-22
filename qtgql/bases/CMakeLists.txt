@@ -9,6 +9,7 @@ target_sources(
          qtgqlconstants.hpp
          qtgqloperationhandler.hpp
          qtgqlenvironment.hpp
+         qtgqlcustomscalar.hpp
   PRIVATE qtgqloperationhandler.cpp qtgqlenvironment.cpp)
 target_link_libraries(qtgqlbases PUBLIC Qt6::Core
                                         ${PROJECT_NAME}::gqlwstransport)
