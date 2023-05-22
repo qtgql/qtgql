@@ -74,7 +74,7 @@ class QtGqlRecipe(ConanFile):
     def is_linux(self) -> bool:
         return self.os_name == "linux"
 
-    @property
+    @cached_property
     def qt_version(self) -> str:
         op_version = self.options.qt_version.value
         if self.is_windows() and op_version == "6.5.0":
