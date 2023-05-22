@@ -39,7 +39,7 @@ class TstCaseImplementationStatusTemplateContext:
 
     @property
     def summery(self) -> str:
-        implemented_count = len(list(filter(lambda tc: tc.status == "✅", self.testcases)))
+        implemented_count = len(list(filter(lambda tc: tc.implemented, self.testcases)))
         return f"{implemented_count}/{len(self.testcases)} testcases implemented."
 
 
