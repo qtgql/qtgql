@@ -1,29 +1,24 @@
-from pathlib import Path
-
-import attrs
 from attrs import define
 
 
 @define
 class CustomScalarDefinition:
+    type_name: str
     graphql_name: str
     raw_type: str
     deserialized_type: str
     property_type: str
-    implementation_path: Path = attrs.field()
-
-    @implementation_path.validator
-    def validate_path(self, _, value: Path):
-        value.resolve(True)
+    include_path: str
 
 
 # An ISO-8601 encoded datetime.
 DateTimeScalar = CustomScalarDefinition(
+    type_name="DateTimeScalar",
     graphql_name="DateTime",
     raw_type="QString",
     deserialized_type="QDateTime",
     property_type="QString",
-    implementation_path=...,
+    include_path="<qtgqlcustomscalars.hpp>",
 )
 
 # An ISO-8601 encoded date.

@@ -6,6 +6,8 @@
 #include <qtgqlmetadata.hpp>
 #include <qtgqlobjecttype.hpp>
 
+#include "qtgqlcustomscalars.hpp"
+
 namespace DateTimeTestCase {
 
 // ----------- Object Types -----------
@@ -20,7 +22,7 @@ class User : public qtgql::QtGqlObjectTypeABCWithID {
   QString m_id = qtgql::CONSTANTS::ID;
   QString m_name = " - ";
   int m_age = 0;
-  SCALARS.DateTimeScalar m_birth = SCALARS.DateTimeScalar();
+  qtgql::DateTimeScalar m_birth = {};
 
  signals:
   void idChanged();
@@ -30,25 +32,29 @@ class User : public qtgql::QtGqlObjectTypeABCWithID {
 
  public:
   const QString &get_id() const { return m_id; }
+
   void id_setter(const QString &v) {
     m_id = v;
     emit idChanged();
   };
 
   const QString &get_name() const { return m_name; }
+
   void name_setter(const QString &v) {
     m_name = v;
     emit nameChanged();
   };
 
   const int &get_age() const { return m_age; }
+
   void age_setter(const int &v) {
     m_age = v;
     emit ageChanged();
   };
 
-  const SCALARS.DateTimeScalar &get_birth() const { return m_birth; }
-  void birth_setter(const SCALARS.DateTimeScalar &v) {
+  const QString &get_birth() const { return m_birth.to_qt(); }
+
+  void birth_setter(const DateTimeScalar &v) {
     m_birth = v;
     emit birthChanged();
   };
@@ -76,7 +82,7 @@ class User : public qtgql::QtGqlObjectTypeABCWithID {
     };
 
     if (config.selections.contains("birth") && data.contains("birth")) {
-      inst->m_birth = SCALARS.DateTimeScalar.deserialize(field_data);
+      inst->m_birth = SCALARS..deserialize(field_data);
     };
 
     auto record = std::make_shared<qtgql::NodeRecord<User>>(inst);

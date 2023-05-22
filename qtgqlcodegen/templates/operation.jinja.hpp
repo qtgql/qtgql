@@ -29,7 +29,7 @@ const qtgql::SelectionsConfig& config){
 
 }
 {%- for f in t.fields.values() %}
-inline const 👉 f.type.annotation 👈 & 👉 f.definition.getter_name 👈() const {
+inline const 👉 f.type.member_type 👈 & 👉 f.definition.getter_name 👈() const {
     return m_inst->👉 f.definition.getter_name 👈();
 };
 {% endfor -%}
@@ -38,9 +38,9 @@ inline const 👉 f.type.annotation 👈 & 👉 f.definition.getter_name 👈() 
 
 class 👉 context.operation.name 👈: public qtgql::QtGqlOperationHandlerABC {
     Q_OBJECT
-Q_PROPERTY(const 👉 context.operation.root_field.property_annotation 👈* data READ get_data NOTIFY dataChanged);
+Q_PROPERTY(const 👉 context.operation.root_field.property_member_type 👈* data READ get_data NOTIFY dataChanged);
 
-std::unique_ptr<👉 context.operation.root_field.property_annotation 👈> m_data;
+std::unique_ptr<👉 context.operation.root_field.property_member_type 👈> m_data;
 
 inline const QString &ENV_NAME() override{
     static const auto ret = QString("👉 context.config.env_name 👈");
@@ -61,11 +61,11 @@ void on_next(const QJsonObject &message) override{
     if (!m_data && message.contains("data")){
         auto data = message.value("data").toObject();
         if (data.contains("👉 context.operation.root_field.name 👈")){
-            m_data = std::make_unique<👉 context.operation.root_field.property_annotation 👈>(data.value("👉 context.operation.root_field.name 👈").toObject(), OPERATION_METADATA.selections);
+            m_data = std::make_unique<👉 context.operation.root_field.property_member_type 👈>(data.value("👉 context.operation.root_field.name 👈").toObject(), OPERATION_METADATA.selections);
         }
     }
 }
-inline const 👉 context.operation.root_field.property_annotation 👈* get_data(){
+inline const 👉 context.operation.root_field.property_member_type 👈* get_data(){
     return m_data.get();
 }
 

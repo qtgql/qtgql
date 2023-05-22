@@ -1,4 +1,4 @@
-name: 🆙 Release file check
+name: 🫸 Pull request checks
 
 on:
   pull_request:
@@ -12,8 +12,8 @@ on:
     - "pyproject.toml"
 
 jobs:
-  validate:
-    name: Validate
+  release_file:
+    name: Check RELEASE.md
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -21,7 +21,7 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: "3.x"
-      - name: Check release
+      - name: 🆙 Check release
         id: check_release
         run: |
           python -m pip install --upgrade pip
@@ -48,7 +48,7 @@ jobs:
           exit 1
 
   testcsae_status:
-    name: TestCases status
+    name: comment TestCases impl status
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3

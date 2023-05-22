@@ -77,7 +77,7 @@ class QtGqlQueriedField:
         if self.definition.type.is_object_type:
             assert self.narrowed_type
             return self.narrowed_type.name
-        return self.type.annotation
+        return self.type.member_type
 
     @property
     def proxy_of(self) -> GqlTypeHinter:

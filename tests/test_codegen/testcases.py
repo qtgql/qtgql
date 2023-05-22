@@ -16,11 +16,8 @@ from typer.testing import CliRunner
 from qtgqlcodegen.cli import app
 from qtgqlcodegen.config import QtGqlConfig
 from qtgqlcodegen.introspection import SchemaEvaluator
-from qtgqlcodegen.runtime.custom_scalars import BaseCustomScalar
-from qtgqlcodegen.runtime.custom_scalars import DateScalar
+from qtgqlcodegen.runtime.custom_scalars import CustomScalarDefinition
 from qtgqlcodegen.runtime.custom_scalars import DateTimeScalar
-from qtgqlcodegen.runtime.custom_scalars import DecimalScalar
-from qtgqlcodegen.runtime.custom_scalars import TimeScalar
 from tests.conftest import hash_schema
 from tests.test_codegen import schemas
 
@@ -466,24 +463,19 @@ ObjectsThatReferenceEachOtherTestCase = QGQLObjectTestCase(
 )
 
 
-class CountryScalar(BaseCustomScalar[Optional[str], str]):
-    countrymap = schemas.object_with_user_defined_scalar.countrymap
-    GRAPHQL_NAME = "Country"
-    DEFAULT_VALUE = "isr"
-
-    @classmethod
-    def deserialize(cls, v=None) -> BaseCustomScalar:
-        if v:
-            return cls(cls.countrymap[v])
-        return cls()
-
-    def to_qt(self) -> str:
-        return self._value
+CountryScalar = CustomScalarDefinition(
+    type_name="CountryScalar",
+    graphql_name="Country",
+    raw_type="QString",
+    property_type="QString",
+    deserialized_type="QString",
+    include_path="NOT IMPLEMENTED",
+)
 
 
 CustomUserScalarTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_user_defined_scalar.schema,
-    custom_scalars={CountryScalar.GRAPHQL_NAME: CountryScalar},
+    custom_scalars={CountryScalar.graphql_name: CountryScalar},
     test_name="CustomUserScalarTestCase",
     query="""
      query MainQuery {
@@ -705,9 +697,6 @@ all_test_cases = [
 ]
 custom_scalar_testcases = [
     (DateTimeTestCase, DateTimeScalar, "birth"),
-    (DateTestCase, DateScalar, "birth"),
-    (DecimalTestCase, DecimalScalar, "balance"),
-    (TimeTestCase, TimeScalar, "whatTimeIsIt"),
     (CustomUserScalarTestCase, CountryScalar, "country"),
 ]
 

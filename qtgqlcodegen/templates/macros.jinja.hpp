@@ -58,3 +58,32 @@ choice = inner_config.choices[type_name]
 {%- endmacro %}
 
 
+
+{% macro props(type) -%}
+protected:
+{% for f in type.fields -%}
+👉 f.member_type 👈 👉 f.private_name 👈 = 👉 f.default_value 👈;
+{% endfor %}
+signals:
+{%for f in type.fields -%}
+void 👉 f.signal_name 👈();
+{% endfor %}
+
+public:
+{%for f in type.fields %}
+{% if f.is_custom_scalar %}
+const 👉 f.is_custom_scalar.property_type 👈 & 👉 f.getter_name 👈() const {
+return 👉 f.private_name 👈.to_qt();
+}
+{% else %}
+const 👉 f.member_type 👈 & 👉 f.getter_name 👈() const {
+return 👉 f.private_name 👈;
+}
+{% endif %}
+void 👉 f.setter_name 👈(const 👉 f.member_type 👈 &v)
+{
+👉 f.private_name 👈 = v;
+emit 👉 f.signal_name 👈();
+};
+{% endfor %}
+{% endmacro -%}
