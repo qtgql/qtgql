@@ -680,6 +680,7 @@ ListOfInterfaceTestcase = QGQLObjectTestCase(
 )
 all_test_cases = [
     ScalarsTestCase,
+    NoIdOnQueryTestCase,
     DateTimeTestCase,
     DateTestCase,
     DecimalTestCase,
