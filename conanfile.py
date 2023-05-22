@@ -10,7 +10,6 @@ from conan.tools.cmake import CMake
 from conan.tools.cmake import cmake_layout
 from conan.tools.cmake import CMakeDeps
 from conan.tools.cmake import CMakeToolchain
-from conan.tools.scm import Git
 
 from tests.conftest import PATHS
 
@@ -41,11 +40,6 @@ class QtGqlRecipe(ConanFile):
         "verbose": False,
         "qt_version": "6.5.0",
     }
-
-    def source(self) -> None:
-        git = Git(self)
-        git.clone("https://github.com/qtgql/qtgql.git", target=".")
-        git.checkout("migrate_to_cpp")
 
     def requirements(self) -> None:
         ...
