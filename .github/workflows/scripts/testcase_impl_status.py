@@ -56,9 +56,19 @@ def tst_case_implementation_status() -> str:
     return template_env.get_template("implementation_status.jinja.md").render(context=context)
 
 
-if __name__ == "__main__":
+def comment_on_pr():
     pr = get_current_pr()
-    pr.create_comment(
+    for comment in pr.get_issue_comments():
+        if "### Status of codegen testcases implementation" in comment.body:
+            comment.body = tst_case_implementation_status()
+            comment.update()
+            return
+
+    pr.create_issue_comment(
         position=0,
         body=tst_case_implementation_status(),
     )
+
+
+if __name__ == "__main__":
+    comment_on_pr()

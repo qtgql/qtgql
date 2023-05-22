@@ -7,7 +7,7 @@ def get_env(name: str) -> str:
     return os.environ[name]
 
 
-g = Github(login_or_token=get_env("BOT_TOKEN"), base_url="https://github.com/api/v3")
+g = Github(get_env("BOT_TOKEN"))
 qtgql = g.get_repo("qtgql/qtgql")
 
 
