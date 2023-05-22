@@ -231,6 +231,20 @@ NoIdOnQueryTestCase = QGQLObjectTestCase(  # should append id automatically.
         }""",
     test_name="NoIdOnQueryTestCase",
 )
+DateTimeTestCase = QGQLObjectTestCase(
+    schema=schemas.object_with_datetime.schema,
+    query="""
+       query MainQuery {
+          user {
+            name
+            age
+            birth
+          }
+        }
+        """,
+    test_name="DateTimeTestCase",
+)
+
 OptionalScalarTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_optional_scalar.schema,
     query="""
@@ -395,19 +409,7 @@ RootEnumTestCase = QGQLObjectTestCase(
     test_name="RootEnumTestCase",
 )
 
-DateTimeTestCase = QGQLObjectTestCase(
-    schema=schemas.object_with_datetime.schema,
-    query="""
-       query MainQuery {
-          user {
-            name
-            age
-            birth
-          }
-        }
-        """,
-    test_name="DateTimeTestCase",
-)
+
 DecimalTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_decimal.schema,
     query="""
@@ -709,7 +711,7 @@ custom_scalar_testcases = [
     (CustomUserScalarTestCase, CountryScalar, "country"),
 ]
 
-implemented_testcases = [ScalarsTestCase, NoIdOnQueryTestCase]
+implemented_testcases = [ScalarsTestCase, NoIdOnQueryTestCase, DateTimeTestCase]
 
 
 def generate_testcases() -> None:
