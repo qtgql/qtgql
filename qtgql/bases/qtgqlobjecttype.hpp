@@ -13,7 +13,7 @@ class QtGqlObjectTypeABC : public QObject {
   Q_PROPERTY(QString typeName READ getTypeName CONSTANT)
 
  private:
-  inline const QString getTypeName() const { return  "__NOT_IMPLEMENTED__"; }
+  inline const QString getTypeName() const { return "__NOT_IMPLEMENTED__"; }
 
  public:
   using QObject::QObject;
