@@ -5,8 +5,8 @@ add_library(generated::${SCHEMA_TARGET} ALIAS ${SCHEMA_TARGET})
 target_sources(
   ${SCHEMA_TARGET}
   PUBLIC
-    C:/Users/temp/Desktop/clones/qtgql/tests/test_codegen/generated_test_projects/NoIdOnQueryTestCase/graphql/__generated__/schema.hpp
-    C:/Users/temp/Desktop/clones/qtgql/tests/test_codegen/generated_test_projects/NoIdOnQueryTestCase/graphql/__generated__/MainQuery.hpp
+    /home/nir/Desktop/tzv5hob/qtgql/tests/test_codegen/generated_test_projects/NoIdOnQueryTestCase/graphql/__generated__/schema.hpp
+    /home/nir/Desktop/tzv5hob/qtgql/tests/test_codegen/generated_test_projects/NoIdOnQueryTestCase/graphql/__generated__/MainQuery.hpp
 )
 target_link_libraries(${SCHEMA_TARGET} PUBLIC Qt6::Core qtgql::gqlwstransport
                                               qtgql::bases)
