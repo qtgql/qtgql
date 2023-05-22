@@ -59,7 +59,7 @@ def tst_case_implementation_status() -> str:
 def comment_on_pr():
     pr = get_current_pr()
     for comment in pr.get_issue_comments():
-        if "### Status of codegen testcases implementation" in comment.body:
+        if "878ae1db-766f-49c7-a1a8-59f7be1fee8f" in comment.body:
             comment.edit(tst_case_implementation_status())
             return
 
