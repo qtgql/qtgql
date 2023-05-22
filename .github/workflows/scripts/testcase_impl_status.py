@@ -64,10 +64,7 @@ def comment_on_pr():
             comment.update()
             return
 
-    pr.create_issue_comment(
-        position=0,
-        body=tst_case_implementation_status(),
-    )
+    pr.create_issue_comment(tst_case_implementation_status())
 
 
 if __name__ == "__main__":
