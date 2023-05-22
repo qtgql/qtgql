@@ -6,7 +6,8 @@ from typing import TYPE_CHECKING
 
 import jinja2
 from attr import define
-from ghub import get_current_pr
+
+from .ghub import get_current_pr
 
 if TYPE_CHECKING:
     from tests.test_codegen.testcases import QGQLObjectTestCase
