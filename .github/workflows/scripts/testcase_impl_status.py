@@ -26,11 +26,11 @@ TESTCASE_IMPLEMENTATION_STATUS = template_env.get_template("implementation_statu
 class TstCaseStatus:
     test: QGQLObjectTestCase
     implemented: bool
-    status: Literal["✅"] | Literal["❌"] = "❌"
+    status: Literal[":heavy_check_mark:"] | Literal["❌"] = "❌"
 
     def __attrs_post_init__(self):
         if self.implemented:
-            self.status = "✅"
+            self.status = ":heavy_check_mark:"
 
 
 @define
