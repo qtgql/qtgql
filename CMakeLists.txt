@@ -1,9 +1,13 @@
 cmake_minimum_required(VERSION 3.25.0)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+execute_process(COMMAND poetry version OUTPUT_VARIABLE RAW_VER)
+string(REPLACE "qtgql " "" RAW_VER ${RAW_VER})
+string(STRIP ${RAW_VER} POETRY_VERSION)
+
 project(
   qtgql
-  VERSION 0.116.1
+  VERSION ${POETRY_VERSION}
   LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
