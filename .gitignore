@@ -7,6 +7,7 @@ __pycache__/
 .fleet
 .vscode
 .kdev4
+*.kdev4
 .vs
 CMakeLists.txt.user
 # C extensions

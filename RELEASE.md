@@ -1,4 +1,4 @@
-Release type: preminor
+Release type: minor
 
 This release is the initial migration step to C++.
 
