@@ -18,8 +18,22 @@ Release type: <patch/minor/major>
 
 <description>
 ```
-
-### Running tests
+### Generate tests files
+This would generate boilerplate code for the testcases in `tests/tests_codegen/testcases.py`
+```bash
+make generate_test_files
+```
+### Build
+conan would generate cmake presets for IDE's usage as well.
+```bash
+poetry run conan build .
+```
+### Testing
+Run tests GraphQL server
+```bash
+make serve_tests
+```
+Run pytest, CTest is called from python and C++ tests are collected automatically.
 ```bash
 make test
 ```
