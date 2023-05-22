@@ -23,8 +23,9 @@ inline const QString COMPLETE = "complete";
 inline const QString NEXT = "next";
 inline const QString PING = "ping";
 inline const QString PONG = "pong";
-inline const QString SUBSCRIBE = "subscribe";  // for queries | mutations as well.
-};                                      // namespace PROTOCOL
+inline const QString SUBSCRIBE =
+    "subscribe";  // for queries | mutations as well.
+};                // namespace PROTOCOL
 
 std::optional<QString> get_operation_name(const QString &query);
 
