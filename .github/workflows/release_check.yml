@@ -62,3 +62,5 @@ jobs:
       - name: upload comment
         run:
           cd .github && poetry run python -m workflows.scripts.testcase_impl_status
+        env:
+          PR_NUMBER: ${{ github.event.number }}
