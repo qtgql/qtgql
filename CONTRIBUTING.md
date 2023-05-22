@@ -12,7 +12,7 @@ poetry install
 pre-commit install
 ```
 
-### Add a `RELEASE.md` file that describes your PR in the project root.
+### Add a `RELEASE.md` file that describes your PR  in the project root.
 ```md
 Release type: <patch/minor/major>
 
