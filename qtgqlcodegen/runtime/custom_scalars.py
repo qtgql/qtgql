@@ -1,6 +1,7 @@
+from pathlib import Path
+
 import attrs
 from attrs import define
-from github.Path import Path
 
 
 @define
@@ -9,7 +10,11 @@ class CustomScalarDefinition:
     raw_type: str
     deserialized_type: str
     property_type: str
-    implementation_path: Path = attrs.field(validator=lambda v: v.exists())
+    implementation_path: Path = attrs.field()
+
+    @implementation_path.validator
+    def validate_path(self, _, value: Path):
+        value.resolve(True)
 
 
 # An ISO-8601 encoded datetime.
