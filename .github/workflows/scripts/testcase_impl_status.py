@@ -6,8 +6,7 @@ from typing import TYPE_CHECKING
 
 import jinja2
 from attr import define
-
-from .ghub import get_current_pr
+from ghub import get_current_pr
 
 if TYPE_CHECKING:
     from tests.test_codegen.testcases import QGQLObjectTestCase
@@ -60,8 +59,7 @@ def comment_on_pr():
     pr = get_current_pr()
     for comment in pr.get_issue_comments():
         if "### Status of codegen testcases implementation" in comment.body:
-            comment.body = tst_case_implementation_status()
-            comment.update()
+            comment.edit(tst_case_implementation_status())
             return
 
     pr.create_issue_comment(tst_case_implementation_status())
