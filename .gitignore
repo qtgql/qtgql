@@ -6,13 +6,18 @@ __pycache__/
 .idea
 .fleet
 .vscode
-
+.kdev4
+.vs
+CMakeLists.txt.user
 # C extensions
 *.so
 
 # Distribution / packaging
 .Python
-build/
+**/.build
+**/build
+cmake-build*/
+.cmake_build/
 develop-eggs/
 dist/
 downloads/
@@ -139,3 +144,9 @@ dmypy.json
 __temp.py
 /tests/test_sample_ui/graphql/handlers.py
 /tests/test_sample_ui/graphql/objecttypes.py
+
+
+
+# C++ packages
+3rdParty/Qt/
+CMakeUserPresets.json

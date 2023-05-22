@@ -1,0 +1,12 @@
+
+        query MainQuery {
+          constUser {
+            id
+            name
+            age
+            agePoint
+            male
+            id
+            uuid
+          }
+        }

@@ -1,2 +1,2 @@
 # Configurations
-::: codegen.py.compiler.config
+::: config

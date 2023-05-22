@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "qtgql"
 version = "0.116.1"
-packages = [{ include = "qtgql" }]
+packages = [{ include = "qtgqlcodegen" }]
 description = "Qt framework for building graphql driven QML applications"
 authors = ["Nir <88795475+nrbnlulu@users.noreply.github.com>"]
 maintainers = ["Nir.J Benlulu <nrbnlulu@gmail.com>"]
@@ -15,37 +15,36 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.12"
-PySide6 = "^6.4.2"
 attrs = "^22.2.0"
 # codegen
-graphql-core = {version = "<3.3.0", optional=true}
+graphql-core = "^3.2.3"
 jinja2 = {version = "^3.1.2", optional=true}
-typer = {extras = ["all"], version = "^0.7.0", optional=true}
-toml = {version = "^0.10.2", optional=true}
 typingref = "^0.100.0"
+typer = "^0.9.0"
+rich = "^13.3.5"
+frozendict = "^2.3.8"
 
 
 
 [tool.poetry.group.dev.dependencies]
-pytest-qt = "^4.2.0"
 pytest-cov = "^4.0.0"
 aiohttp = {extras = ["speedups"], version = "^3.8.3"}
-
 faker = ">=15.3.4,<19.0.0"
-types-toml = "^0.10.8.1"
-# doc deps
+mypy = "^1.0.1"
+strawberry-graphql = ">=0.158.2,<0.180.0"
+aqtinstall = "^3.1.6"
+conan = "^2.0.4"
+cmake = "3.25.0"
+
+[tool.poetry.group.docs.dependencies]
 mkdocs-material = "^9.0.5"
 mike = "^1.1.2"
 markdown-include = "^0.8.0"
 mkdocstrings = {extras = ["python"], version = ">=0.19.1,<0.22.0"}
 pygments = "^2.14.0"
-mktestdocs = "^0.2.0"
-mypy = "^1.0.1"
-strawberry-graphql = ">=0.158.2,<0.180.0"
 
 
-[tool.poetry.extras]
-codegen = ["graphql-core", "jinja2", "typer", "toml"]
+
 
 
 
@@ -56,7 +55,6 @@ build-backend = "poetry.core.masonry.api"
 
 
 [tool.mypy]
-plugins = ['qtgql/ext/mypy_plugin.py']
 ignore_missing_imports = "True"
 exclude = "(?x)^(.*\\.jinja.py|)$"
 warn_no_return = "False"
@@ -248,4 +246,4 @@ project-name = "qtgql"
 append-github-contributor = true
 
 [tool.poetry.scripts]
-qtgql = "qtgql.codegen.cli:entrypoint"
+qtgql = "qtgql.cli:entrypoint"

@@ -2,9 +2,9 @@ name: 🔂 Unit tests
 
 on:
   push:
-    branches: [master, main]
+    branches: [cpp, main]
   pull_request:
-    branches: [master, main]
+    branches: [cpp, main]
     paths:
       - "qtgql/**"
       - "tests/**"
@@ -21,8 +21,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-latest, ubuntu-latest]
-        python-version: ["3.9", "3.10", "3.11"]
-
+        python-version: ["3.11"]
+        qt-version: ['6.5.0']
 
     steps:
 
@@ -59,25 +59,25 @@ jobs:
       #----------------------------------------------
       # install dependencies if cache does not exist
       #----------------------------------------------
-      - name: Install dependencies
+      - name: Install Python dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-        run: poetry install --all-extras
+        run: poetry install
 
-      - name: Install Qt Dependencies
+      - name: Install Qt dependencies
         shell: bash
+        if: runner.os == 'Linux'
         run: |
-          if [ "$RUNNER_OS" == "macOS" ]; then
-            brew install ffmpeg
-          elif [ "$RUNNER_OS" == "Windows" ]; then
-            choco install ffmpeg
-          elif [ "$RUNNER_OS" == "Linux" ]; then
-          sudo apt update -y
-          sudo apt install libxcb-icccm4 libxcb-image0 libxcb-keysyms1 \
-                           libxkbcommon-x11-0 xvfb libxcb-randr0 \
-                           libxcb-render-util0 libxcb-xinerama0 libegl1 \
-                           libxcb-shape0
-          sudo apt-get install -y libgles2-mesa-dev
-          fi
+          sudo apt update
+          sudo apt install libgl1-mesa-dev libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-render-util0 libxcb-xinerama0 libzstd-dev libcurl4-openssl-dev
+
+      - name: Generate test files
+        run: make generate_test_files
+
+      - name: Configure and Build
+        run: |
+          poetry run conan profile detect
+          poetry run conan install . -pr=profiles/${{ runner.os }} -s build_type=Debug --build=missing
+          poetry run conan build . -s build_type=Debug -pr=profiles/${{ runner.os }}
 
       - name: Run tests
         shell: bash

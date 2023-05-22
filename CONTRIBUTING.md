@@ -3,11 +3,16 @@ To contribute create a fork and clone your fork locally.
 
 ### Install dependencies
 We use Poetry for managing dependencies.
-```console
-poetry install -E codegen
+```bash
+poetry install
 ```
 
-### Add a `RELEASE.md` file that describes your PR.
+### Install pre-commit hooks
+```bash
+pre-commit install
+```
+
+### Add a `RELEASE.md` file that describes your PR in the project root.
 ```md
 Release type: <patch/minor/major>
 
@@ -15,7 +20,7 @@ Release type: <patch/minor/major>
 ```
 
 ### Running tests
-```console
+```bash
 make test
 ```
 

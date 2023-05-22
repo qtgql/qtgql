@@ -68,8 +68,8 @@ Contributed by [ניר](https://github.com/nrbnlulu) via [PR #164](https://githu
 This release adds support for operation errors hooks.
 i.e
 ```python
-from qtgql.codegen.py.runtime.queryhandler import BaseOperationHandler
-from qtgql.tools import slot
+from qtgqlcodegen.py.runtime.queryhandler import BaseOperationHandler
+from qtgqlcodegen.tools import slot
 
 from PySide6.QtCore import QObject
 

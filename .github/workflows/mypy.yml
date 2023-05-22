@@ -2,11 +2,12 @@ name: 🦺 MyPy
 
 on:
   push:
-    branches: [main]
+    branches: [main, cpp]
   pull_request:
-    branches: [main]
+    branches: [main, cpp]
     paths:
       - "qtgql/**"
+      - "qtgqlcodegen"
       - "tests/**"
       - ".github/workflows/mypy.yml"
 env:
@@ -66,4 +67,4 @@ jobs:
 
       - name: mypy checks
         run: |
-          poetry run mypy ./qtgql
+          poetry run mypy ./qtgqlcodegen
