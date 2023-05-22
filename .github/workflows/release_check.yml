@@ -66,3 +66,4 @@ jobs:
           cd .github && poetry run python -m workflows.scripts.testcase_impl_status
         env:
           PR_NUMBER: ${{ github.event.number }}
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
