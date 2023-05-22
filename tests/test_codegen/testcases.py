@@ -708,10 +708,11 @@ custom_scalar_testcases = [
     (CustomUserScalarTestCase, CountryScalar, "country"),
 ]
 
+implemented_testcases = [ScalarsTestCase, NoIdOnQueryTestCase]
+
 
 def generate_testcases() -> None:
-    testcases = [ScalarsTestCase, NoIdOnQueryTestCase]
-    for testcase in testcases:
+    for testcase in implemented_testcases:
         testcase.generate()
 
 
