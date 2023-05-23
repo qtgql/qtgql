@@ -18,7 +18,13 @@ DateTimeScalarDefinition = CustomScalarDefinition(
     property_type="QString",
     include_path="<qtgql/customscalars/customscalars.hpp>",
 )
-
+DateScalarDefinition = CustomScalarDefinition(
+    type_name="qtgql::DateScalar",
+    graphql_name="Date",
+    deserialized_type="QString",
+    property_type="QString",
+    include_path="<qtgql/customscalars/customscalars.hpp>",
+)
 DecimalScalarDefinition = CustomScalarDefinition(
     type_name="qtgql::DecimalScalar",
     graphql_name="Decimal",
@@ -26,8 +32,11 @@ DecimalScalarDefinition = CustomScalarDefinition(
     property_type="QString",
     include_path="<qtgql/customscalars/customscalars.hpp>",
 )
+
+
 CustomScalarMap = dict[str, CustomScalarDefinition]
 CUSTOM_SCALARS: CustomScalarMap = {
     DateTimeScalarDefinition.graphql_name: DateTimeScalarDefinition,
     DecimalScalarDefinition.graphql_name: DecimalScalarDefinition,
+    DateScalarDefinition.graphql_name: DateScalarDefinition,
 }

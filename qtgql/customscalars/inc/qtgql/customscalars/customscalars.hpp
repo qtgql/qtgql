@@ -16,6 +16,19 @@ class DateTimeScalar : public CustomScalarABC<QDateTime, QString> {
   const QString &to_qt() override;
 };
 
+class DateScalar : public CustomScalarABC<QDate, QString> {
+ private:
+  QString m_cached_to_qt;
+  bool m_should_update = true;
+
+ public:
+  void deserialize(const QJsonValue &raw_data) override;
+
+  const QString &GRAPHQL_NAME() override;
+
+  const QString &to_qt() override;
+};
+
 class DecimalScalar : public CustomScalarABC<QString, QString> {
  public:
   void deserialize(const QJsonValue &raw_data) override;

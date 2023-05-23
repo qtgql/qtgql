@@ -630,7 +630,13 @@ custom_scalar_testcases = [
     (CustomUserScalarTestCase, CountryScalar, "country"),
 ]
 
-implemented_testcases = [ScalarsTestCase, NoIdOnQueryTestCase, DateTimeTestCase, DecimalTestCase]
+implemented_testcases = [
+    ScalarsTestCase,
+    NoIdOnQueryTestCase,
+    DateTimeTestCase,
+    DecimalTestCase,
+    DateTestCase,
+]
 
 
 def generate_testcases() -> None:

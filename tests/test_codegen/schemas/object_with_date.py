@@ -1,9 +1,9 @@
 from datetime import date
+from datetime import datetime
 from datetime import timezone
 
 import strawberry
 
-from tests.conftest import fake
 from tests.test_codegen.schemas.node_interface import Node
 
 
@@ -18,7 +18,7 @@ class User(Node):
 class Query:
     @strawberry.field
     def user(self) -> User:
-        return User(name="Patrick", age=100, birth=fake.date_of_birth(tzinfo=timezone.utc))
+        return User(name="Patrick", age=100, birth=datetime.now(tz=timezone.utc).date())
 
 
 schema = strawberry.Schema(query=Query)
