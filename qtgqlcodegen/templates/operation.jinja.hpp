@@ -1,7 +1,7 @@
 {% import "macros.jinja.hpp" as macros -%}
 #pragma once
 #include "./schema.hpp"
-#include "qtgqloperationhandler.hpp"
+#include <qtgql/gqlwstransport/operationhandler.hpp>
 namespace 👉 context.config.env_name 👈{
 namespace 👉context.ns👈{
 
@@ -29,18 +29,18 @@ const qtgql::SelectionsConfig& config){
 
 }
 {%- for f in t.fields.values() %}
-inline const 👉 f.type.member_type 👈 & 👉 f.definition.getter_name 👈() const {
+inline const 👉 f.property_type 👈 & 👉 f.definition.getter_name 👈() const {
     return m_inst->👉 f.definition.getter_name 👈();
 };
 {% endfor -%}
 };
 {% endfor %}
 
-class 👉 context.operation.name 👈: public qtgql::QtGqlOperationHandlerABC {
+class 👉 context.operation.name 👈: public qtgql::OperationHandlerABC {
     Q_OBJECT
-Q_PROPERTY(const 👉 context.operation.root_field.property_member_type 👈* data READ get_data NOTIFY dataChanged);
+Q_PROPERTY(const 👉 context.operation.root_field.property_type 👈* data READ get_data NOTIFY dataChanged);
 
-std::unique_ptr<👉 context.operation.root_field.property_member_type 👈> m_data;
+std::unique_ptr<👉 context.operation.root_field.property_type 👈> m_data;
 
 inline const QString &ENV_NAME() override{
     static const auto ret = QString("👉 context.config.env_name 👈");
@@ -48,7 +48,7 @@ inline const QString &ENV_NAME() override{
     }
 public:
 
-👉 context.operation.name 👈(): qtgql::QtGqlOperationHandlerABC(qtgql::GqlWsTrnsMsgWithID(qtgql::OperationPayload(
+👉 context.operation.name 👈(): qtgql::OperationHandlerABC(qtgql::GqlWsTrnsMsgWithID(qtgql::OperationPayload(
         {%- for line in context.operation.query.splitlines() %}"👉 line 👈"{% endfor -%}
         ))){};
 
@@ -61,11 +61,11 @@ void on_next(const QJsonObject &message) override{
     if (!m_data && message.contains("data")){
         auto data = message.value("data").toObject();
         if (data.contains("👉 context.operation.root_field.name 👈")){
-            m_data = std::make_unique<👉 context.operation.root_field.property_member_type 👈>(data.value("👉 context.operation.root_field.name 👈").toObject(), OPERATION_METADATA.selections);
+            m_data = std::make_unique<👉 context.operation.root_field.property_type 👈>(data.value("👉 context.operation.root_field.name 👈").toObject(), OPERATION_METADATA.selections);
         }
     }
 }
-inline const 👉 context.operation.root_field.property_member_type 👈* get_data(){
+inline const 👉 context.operation.root_field.property_type 👈* get_data(){
     return m_data.get();
 }
 

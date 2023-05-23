@@ -1,12 +1,11 @@
 #pragma once
-#include <QAbstractListModel>
-#include <Qt>
-
-#include "qtgqlmetadata.hpp"
-#include "qtgqlobjecttype.hpp"
+#include "../../../../../../../../MyConnandeps/Qt/6.5.0/gcc_64/include/QtCore/QAbstractListModel"
+#include "../../../../../../../../MyConnandeps/Qt/6.5.0/gcc_64/include/QtCore/Qt"
+#include "metadata.hpp"
+#include "objecttype.hpp"
 
 namespace qtgql {
-class QTGqlListModelMixin : public QAbstractListModel {
+class ListModelMixin : public QAbstractListModel {
   Q_OBJECT
 
   Q_PROPERTY(int count MEMBER m_count NOTIFY countChanged)
@@ -31,9 +30,9 @@ class QTGqlListModelMixin : public QAbstractListModel {
   int m_current_index = 0;
 
  public:
-  explicit QTGqlListModelMixin(QObject* parent = nullptr)
+  explicit ListModelMixin(QObject* parent = nullptr)
       : QAbstractListModel(parent) {}
-  virtual ~QTGqlListModelMixin() = default;
+  virtual ~ListModelMixin() = default;
   int rowCount(const QModelIndex& parent = QModelIndex()) const override {
     return (!parent.isValid() ? m_count : 0);
   }
@@ -50,7 +49,7 @@ class QTGqlListModelMixin : public QAbstractListModel {
 };
 
 template <typename T_QObject>
-class QtGqlListModelABC : public QTGqlListModelMixin {
+class ListModelABC : public ListModelMixin {
   typedef std::shared_ptr<T_QObject> T_sharedQObject;
   typedef std::unique_ptr<QList<T_sharedQObject>> T_uniqueObjectQlist;
 
@@ -83,10 +82,10 @@ class QtGqlListModelABC : public QTGqlListModelMixin {
   }
 
  public:
-  explicit QtGqlListModelABC(
+  explicit ListModelABC(
       QObject* parent = nullptr,
       T_uniqueObjectQlist data = std::make_unique<QList<T_sharedQObject>>())
-      : QTGqlListModelMixin(parent), m_data{std::move(data)} {
+      : ListModelMixin(parent), m_data{std::move(data)} {
     m_count = m_data->length();
   };
 

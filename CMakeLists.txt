@@ -19,14 +19,9 @@ endif()
 find_package(Qt6 REQUIRED COMPONENTS Core Qml Quick WebSockets)
 qt_standard_project_setup()
 
-add_library(${PROJECT_NAME} "")
-set(PUBLIC_SOURCES)
-set(PRIVATE_SOURCES)
 add_subdirectory(qtgql/gqlwstransport)
 add_subdirectory(qtgql/bases)
-add_subdirectory(qtgql/utils)
 add_subdirectory(qtgql/customscalars)
-target_link_libraries(${PROJECT_NAME} PUBLIC Qt6::Core qtgqlcustomscalars)
 
 # --options--
 option(QTGQL_VERBOSE "display helpful build information" true)

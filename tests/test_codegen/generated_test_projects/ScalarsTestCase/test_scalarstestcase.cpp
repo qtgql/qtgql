@@ -11,10 +11,8 @@ TEST_CASE("ScalarsTestCase", "[generated-testcase]") {
   auto client = new DebugAbleClient(
       {.print_debug = false, .prod_settings = {.url = addr}});
   client->wait_for_valid();
-  qtgql::QtGqlEnvironment::set_gql_env(
-      std::make_shared<qtgql::QtGqlEnvironment>(
-          "ScalarsTestCase",
-          std::unique_ptr<qtgql::GqlWsTransportClient>(client)));
+  qtgql::Environment::set_gql_env(std::make_shared<qtgql::Environment>(
+      "ScalarsTestCase", std::unique_ptr<qtgql::GqlWsTransportClient>(client)));
 
   auto mq = std::make_shared<mainquery::MainQuery>();
   mq->fetch();

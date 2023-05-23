@@ -1,4 +1,4 @@
-#include "qtgqlcustomscalars.hpp"
+#include "inc/qtgql/customscalars/customscalars.hpp"
 
 namespace qtgql {
 
@@ -16,8 +16,9 @@ const QString &DateTimeScalar::GRAPHQL_NAME() {
   return ret;
 }
 
-void DateTimeScalar::deserialize(const QString &raw_data) {
-  m_value = QDateTime::fromString(raw_data, Qt::DateFormat(Qt::ISODate));
+void DateTimeScalar::deserialize(const QJsonValue &raw_data) {
+  m_value =
+      QDateTime::fromString(raw_data.toString(), Qt::DateFormat(Qt::ISODate));
   m_should_update = true;
 }
 

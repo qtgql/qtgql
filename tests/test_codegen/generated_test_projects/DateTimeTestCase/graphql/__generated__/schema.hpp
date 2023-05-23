@@ -2,19 +2,18 @@
 #include <QJsonObject>
 #include <QObject>
 #include <memory>
-#include <qtgqlconstants.hpp>
-#include <qtgqlmetadata.hpp>
-#include <qtgqlobjecttype.hpp>
-
-#include "qtgqlcustomscalars.hpp"
+#include <qtgql/bases/constants.hpp>
+#include <qtgql/bases/metadata.hpp>
+#include <qtgql/bases/objecttype.hpp>
+#include <qtgql/customscalars/customscalars.hpp>
 
 namespace DateTimeTestCase {
 
 // ----------- Object Types -----------
-class User : public qtgql::QtGqlObjectTypeABCWithID {
+class User : public qtgql::ObjectTypeABCWithID {
  protected:
   static auto &INST_STORE() {
-    static qtgql::QGraphQLObjectStore<User> _store;
+    static qtgql::ObjectStore<User> _store;
     return _store;
   }
 
@@ -52,9 +51,9 @@ class User : public qtgql::QtGqlObjectTypeABCWithID {
     emit ageChanged();
   };
 
-  const QString &get_birth() const { return m_birth.to_qt(); }
+  const QString &get_birth() { return m_birth.to_qt(); }
 
-  void birth_setter(const DateTimeScalar &v) {
+  void birth_setter(const qtgql::DateTimeScalar &v) {
     m_birth = v;
     emit birthChanged();
   };
@@ -62,7 +61,7 @@ class User : public qtgql::QtGqlObjectTypeABCWithID {
  public:
   inline static const QString TYPE_NAME = "User";
   User(QObject *parent = nullptr)
-      : qtgql::QtGqlObjectTypeABCWithID::QtGqlObjectTypeABCWithID(parent){};
+      : qtgql::ObjectTypeABCWithID::ObjectTypeABCWithID(parent){};
 
   static std::shared_ptr<User> from_json(
       const QJsonObject &data, const qtgql::SelectionsConfig &config,
@@ -82,7 +81,8 @@ class User : public qtgql::QtGqlObjectTypeABCWithID {
     };
 
     if (config.selections.contains("birth") && data.contains("birth")) {
-      inst->m_birth = SCALARS..deserialize(field_data);
+      inst->m_birth = qtgql::DateTimeScalar();
+      inst->m_birth.deserialize(data.value("birth"));
     };
 
     auto record = std::make_shared<qtgql::NodeRecord<User>>(inst);

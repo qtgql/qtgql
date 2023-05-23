@@ -3,19 +3,22 @@
 #include <QObject>
 #include <QJsonObject>
 #include <memory>
-#include <qtgqlobjecttype.hpp>
-#include <qtgqlmetadata.hpp>
-#include <qtgqlconstants.hpp>
+#include <qtgql/bases/objecttype.hpp>
+#include <qtgql/bases/metadata.hpp>
+#include <qtgql/bases/constants.hpp>
+{% for dep in context.dependencies %}
+👉 dep 👈
+{% endfor %}
 
 namespace 👉 context.config.env_name 👈{
 
 // ----------- Object Types -----------
 {% for type in context.types %}
-{%- set base_class -%}{% if type.has_id_field %}QtGqlObjectTypeABCWithID{% else %}QtGqlObjectTypeABC{% endif %}{%- endset -%}
+{%- set base_class -%}{% if type.has_id_field %}ObjectTypeABCWithID{% else %}ObjectTypeABC{% endif %}{%- endset -%}
 class 👉 type.name 👈 : public qtgql::👉 base_class 👈{
 protected:
 static auto & INST_STORE() {
-    static qtgql::QGraphQLObjectStore<👉 type.name 👈> _store;
+    static qtgql::ObjectStore<👉 type.name 👈> _store;
     return _store;
 }
 

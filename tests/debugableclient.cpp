@@ -16,7 +16,7 @@ std::shared_ptr<DebugAbleClient> get_valid_client() {
 }
 
 bool DebugAbleClient::has_handler(
-    const std::shared_ptr<qtgql::QtGqlHandlerABC> &handler) {
+    const std::shared_ptr<qtgql::HandlerABC> &handler) {
   return m_handlers.contains(handler->operation_id());
 }
 

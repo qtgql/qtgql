@@ -4,10 +4,9 @@
  * at ../gqlwstransport dir.
  */
 #pragma once
-#include <QJsonObject>
-#include <QUuid>
-
-#include "../utils/utils.hpp"
+#include "../../../../../../../../MyConnandeps/Qt/6.5.0/gcc_64/include/QtCore/QJsonObject"
+#include "../../../../../../../../MyConnandeps/Qt/6.5.0/gcc_64/include/QtCore/QUuid"
+#include "../../../../utils/utils.hpp"
 namespace qtgql {
 struct HashAbleABC {
   [[nodiscard]] virtual QJsonObject serialize() const {
@@ -16,7 +15,7 @@ struct HashAbleABC {
 };
 
 // To be extended by all consumers (Replaced `HandlerProto` in Python).
-struct QtGqlHandlerABC {
+struct HandlerABC {
   [[nodiscard]] virtual const QUuid &operation_id() const = 0;
   // https://github.com/enisdenjo/graphql-ws/blob/master/PROTOCOL.md#next
   virtual void on_next(const QJsonObject &message) = 0;
@@ -32,9 +31,9 @@ class that should  support executing handlers
  and expected to call the handler's `on_data` /
 `on_error` / 'on_completed' when the operation is completed.
 */
-class QtGqlNetworkLayer {
+class NetworkLayer {
  public:
-  virtual void execute(const std::shared_ptr<QtGqlHandlerABC> &handler) {
+  virtual void execute(const std::shared_ptr<HandlerABC> &handler) {
     throw NotImplementedError({});
   }
 };

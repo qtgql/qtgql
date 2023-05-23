@@ -10,7 +10,7 @@ TEST_CASE("👉 context.test_name 👈", "[generated-testcase]") {
     auto client = new DebugAbleClient(DebugClientSettings{.prod_settings = {.url = addr}});
     client->wait_for_valid();
 
-    qtgql::QtGqlEnvironment::set_gql_env(std::make_shared<qtgql::QtGqlEnvironment>(
+    qtgql::Environment::set_gql_env(std::make_shared<qtgql::Environment>(
             "👉 context.config.env_name 👈", std::unique_ptr<qtgql::GqlWsTransportClient>(client)
     ));
 

@@ -1,5 +1,5 @@
 #pragma once
-#include <QMap>
+#include "../../../../../../../../MyConnandeps/Qt/6.5.0/gcc_64/include/QtCore/QMap"
 namespace qtgql {
 
 struct SelectionsConfig {

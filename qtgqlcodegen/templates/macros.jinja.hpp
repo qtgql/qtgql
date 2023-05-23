@@ -21,13 +21,13 @@ if field_data:
     )
 {% elif f.type.is_model -%}
 {% if f.type.is_model.is_object_type -%}
-👉 assign_to 👈 = QGraphQListModel(
+👉 assign_to 👈 = qtgql::ListModel(
   parent=parent,
   data=[👉f.type.is_model.is_object_type.name👈.from_dict(parent, data=node, config=inner_config, metadata=metadata) for
         node in field_data],
 )
 {% elif f.type.is_model.is_interface -%}
-👉 assign_to 👈 = QGraphQListModel(
+👉 assign_to 👈 = qtgql::ListModel(
     parent=parent,
     data=[👉f.type.is_model.is_interface.name👈.from_dict(parent, data=node, config=inner_config, metadata=metadata) for
           node in field_data],
@@ -41,12 +41,13 @@ for node in field_data:
         __TYPE_MAP__[type_name].from_dict(self, node,
                                           choice, metadata)
     )
-👉 assign_to 👈 = QGraphQListModel(parent, data=model_data)
+👉 assign_to 👈 = qtgql::ListModel(parent, data=model_data)
 {% endif %}
 {% elif f.type.is_builtin_scalar -%}
 👉 assign_to 👈 = data.value("👉f.name👈").👉 f.type.type.from_json_convertor 👈;
 {% elif f.is_custom_scalar -%}
-👉 assign_to 👈 = SCALARS.👉f.is_custom_scalar.__name__👈.deserialize(field_data);
+👉 assign_to 👈 = 👉 f.is_custom_scalar.type_name 👈();
+👉 assign_to 👈.deserialize(data.value("👉f.name👈"));
 {% elif f.type.is_enum -%}
 👉 assign_to 👈 = 👉f.type.is_enum.name👈[field_data];
 {% elif f.type.is_union -%}
@@ -72,7 +73,7 @@ void 👉 f.signal_name 👈();
 public:
 {%for f in type.fields %}
 {% if f.is_custom_scalar %}
-const 👉 f.is_custom_scalar.property_type 👈 & 👉 f.getter_name 👈() const {
+const 👉 f.is_custom_scalar.property_type 👈 & 👉 f.getter_name 👈() {
 return 👉 f.private_name 👈.to_qt();
 }
 {% else %}

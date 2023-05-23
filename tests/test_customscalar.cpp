@@ -2,10 +2,9 @@
 #include <QTest>
 #include <catch2/catch_test_macros.hpp>
 
-#include "../qtgql/customscalars/qtgqlcustomscalar.hpp"
+#include "../qtgql/customscalars/inc/qtgql/customscalars/basecustomscalar.hpp"
 
-class CustomStringScalar
-    : public qtgql::CustomScalarABC<QString, QString, QString> {
+class CustomStringScalar : public qtgql::CustomScalarABC<QString, QString> {
   QString m_cached;
 
  public:
@@ -19,7 +18,10 @@ class CustomStringScalar
     static QString ret = "CustomStringScalar";
     return ret;
   }
-  void deserialize(const QString &raw_data) override { m_value = raw_data; }
+
+  void deserialize(const QJsonValue &raw_data) override {
+    m_value = raw_data.toString();
+  }
 };
 
 TEST_CASE("Test custom scalar by hand implementation") {

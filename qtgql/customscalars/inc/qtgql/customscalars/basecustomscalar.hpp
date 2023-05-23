@@ -1,15 +1,14 @@
 #pragma once
-#include <QString>
+#include "../../../../../../../../MyConnandeps/Qt/6.5.0/gcc_64/include/QtCore/QJsonValue"
+#include "../../../../../../../../MyConnandeps/Qt/6.5.0/gcc_64/include/QtCore/QString"
 
-#include "utils.hpp"
 namespace qtgql {
 /*
  * T - would be the deserialized type.
- * R_RAW - The Json type of this scalar.
  * T_QtType - the property type that would be exposed to QML, usually this would
  * be a string
  */
-template <typename T, typename T_Raw, typename T_QtType>
+template <typename T, typename T_QtType>
 class CustomScalarABC {
  protected:
   T m_value;
@@ -33,7 +32,7 @@ class CustomScalarABC {
    */
   virtual const T_QtType &to_qt() = 0;
 
-  virtual void deserialize(const T_Raw &raw_data) = 0;
+  virtual void deserialize(const QJsonValue &raw_data) = 0;
 
   bool operator==(const CustomScalarABC &other) const {
     return m_value == other.m_value;

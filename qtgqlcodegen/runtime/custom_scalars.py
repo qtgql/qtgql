@@ -13,12 +13,12 @@ class CustomScalarDefinition:
 
 # An ISO-8601 encoded datetime.
 DateTimeScalar = CustomScalarDefinition(
-    type_name="DateTimeScalar",
+    type_name="qtgql::DateTimeScalar",
     graphql_name="DateTime",
     raw_type="QString",
     deserialized_type="QDateTime",
     property_type="QString",
-    include_path="<qtgqlcustomscalars.hpp>",
+    include_path="<qtgql/customscalars/customscalars.hpp>",
 )
 
 # An ISO-8601 encoded date.

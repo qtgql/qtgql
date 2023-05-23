@@ -1,8 +1,9 @@
 #pragma once
 #include <QTest>
 #include <catch2/catch_test_macros.hpp>
-#include <gqlwstransport.hpp>
-#include <qtgqlenvironment.hpp>
+
+#include "qtgql/bases/environment.hpp"
+#include "qtgql/gqlwstransport/gqlwstransport.hpp"
 
 QString get_server_address(const QString &suffix = "graphql");
 
@@ -28,7 +29,7 @@ class DebugAbleClient : public qtgql::GqlWsTransportClient {
     }
   }
   bool is_reconnect_timer_active() { return m_reconnect_timer->isActive(); }
-  bool has_handler(const std::shared_ptr<qtgql::QtGqlHandlerABC> &handler);
+  bool has_handler(const std::shared_ptr<qtgql::HandlerABC> &handler);
 };
 
 std::shared_ptr<DebugAbleClient> get_valid_client();

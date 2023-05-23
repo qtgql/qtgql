@@ -1,6 +1,7 @@
 #pragma once
+#include <qtgql/gqlwstransport/operationhandler.hpp>
+
 #include "./schema.hpp"
-#include "qtgqloperationhandler.hpp"
 namespace ScalarsTestCase {
 namespace mainquery {
 
@@ -52,11 +53,12 @@ class User__age$agePoint$id$male$name$uuid {
   inline const QUuid &get_uuid() const { return m_inst->get_uuid(); };
 };
 
-class MainQuery : public qtgql::QtGqlOperationHandlerABC {
+class MainQuery : public qtgql::OperationHandlerABC {
   Q_OBJECT
-  Q_PROPERTY(const *data READ get_data NOTIFY dataChanged);
+  Q_PROPERTY(const User__age$agePoint$id$male$name$uuid *data READ get_data
+                 NOTIFY dataChanged);
 
-  std::unique_ptr<> m_data;
+  std::unique_ptr<User__age$agePoint$id$male$name$uuid> m_data;
 
   inline const QString &ENV_NAME() override {
     static const auto ret = QString("ScalarsTestCase");
@@ -65,7 +67,7 @@ class MainQuery : public qtgql::QtGqlOperationHandlerABC {
 
  public:
   MainQuery()
-      : qtgql::QtGqlOperationHandlerABC(qtgql::GqlWsTrnsMsgWithID(
+      : qtgql::OperationHandlerABC(qtgql::GqlWsTrnsMsgWithID(
             qtgql::OperationPayload("query MainQuery {"
                                     "  constUser {"
                                     "    id"
@@ -86,12 +88,14 @@ class MainQuery : public qtgql::QtGqlOperationHandlerABC {
     if (!m_data && message.contains("data")) {
       auto data = message.value("data").toObject();
       if (data.contains("constUser")) {
-        m_data = std::make_unique<>(data.value("constUser").toObject(),
-                                    OPERATION_METADATA.selections);
+        m_data = std::make_unique<User__age$agePoint$id$male$name$uuid>(
+            data.value("constUser").toObject(), OPERATION_METADATA.selections);
       }
     }
   }
-  inline const *get_data() { return m_data.get(); }
+  inline const User__age$agePoint$id$male$name$uuid *get_data() {
+    return m_data.get();
+  }
 
  signals:
   void dataChanged();

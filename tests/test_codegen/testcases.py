@@ -3,14 +3,10 @@ from __future__ import annotations
 import os
 from functools import cached_property
 from pathlib import Path
-from textwrap import dedent
-from typing import Optional
 from typing import TYPE_CHECKING
 
 import jinja2
-import strawberry.utils
 from attr import define
-from strawberry import Schema
 from typer.testing import CliRunner
 
 from qtgqlcodegen.cli import app
@@ -22,8 +18,8 @@ from tests.conftest import hash_schema
 from tests.test_codegen import schemas
 
 if TYPE_CHECKING:
-    from qtgqlcodegen.runtime.queryhandler import BaseMutationHandler
-    from qtgqlcodegen.objecttype import QtGqlObjectTypeDefinition
+    from strawberry import Schema
+
 
 BaseQueryHandler = None  # TODO: remove this when done migrating, this is just for readability.
 
@@ -133,69 +129,6 @@ class QGQLObjectTestCase:
         )
         if link_line not in prev:
             TST_CMAKE.write_text(prev + f"\n {link_line}")
-
-
-@define
-class CompiledTestCase(QGQLObjectTestCase):
-    config: QtGqlConfig
-    tested_type: QtGqlObjectTypeDefinition
-    evaluator: SchemaEvaluator
-
-    def __attrs_post_init__(self):
-        self.query = dedent(self.query)
-        if not self.qml_file:
-            self.qml_file = dedent(
-                """
-                    import QtQuick
-                    import generated.{} as Env
-
-                     Env.Consume{}{{
-                        objectName: "rootObject"
-                        autofetch: true
-                        anchors.fill: parent;
-                        Text{{
-                            text: `is autofetch? ${{autofetch}}`
-                        }}
-                    }}
-                """.format(
-                    self.config.env_name,
-                    self.query_operationName,
-                ),
-            )
-
-    @cached_property
-    def query_handler(self) -> BaseQueryHandler:
-        return getattr(self.handlers_mod, self.query_operationName)(self.parent_obj)
-
-    def get_attr(self, attr: str):
-        return getattr(self.handlers_mod, attr, None)
-
-    def get_query_handler(self, operation_name: str) -> BaseQueryHandler:
-        return self.get_attr(operation_name)(self.parent_obj)
-
-    def get_mutation_handler(self, operation_name: str) -> BaseMutationHandler:
-        return self.get_attr(operation_name)(self.parent_obj)
-
-    def get_field_by_type(self, t):
-        for field in self.tested_type.fields:
-            if field.type.type == t:
-                return field
-
-    def get_field_by_name(self, name: str):
-        for field in self.tested_type.fields:
-            if field.name == name:
-                return field
-
-        raise Exception(f"field {name} not found in {self.tested_type}")
-
-    def strawberry_field_by_name(self, field_name: str, klass_name: Optional[str] = None):
-        if not klass_name:
-            klass_name = self.gql_type.__name__
-
-        stawberry_definition = self.schema.get_type_by_name(klass_name)
-        for sf in stawberry_definition.fields:
-            if field_name == strawberry.utils.str_converters.to_camel_case(sf.name):
-                return sf
 
 
 ScalarsTestCase = QGQLObjectTestCase(

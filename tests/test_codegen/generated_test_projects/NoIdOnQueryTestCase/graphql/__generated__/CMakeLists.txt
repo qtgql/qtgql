@@ -9,5 +9,5 @@ target_sources(
     /home/nir/Desktop/tzv5hob/qtgql/tests/test_codegen/generated_test_projects/NoIdOnQueryTestCase/graphql/__generated__/MainQuery.hpp
 )
 target_link_libraries(${SCHEMA_TARGET} PUBLIC Qt6::Core qtgql::gqlwstransport
-                                              qtgql::bases)
+                                              qtgql::bases qtgql::customscalars)
 target_include_directories(${SCHEMA_TARGET} PUBLIC ${CMAKE_CURRENT_LIST_DIR})

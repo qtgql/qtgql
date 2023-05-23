@@ -2,17 +2,18 @@
 #include <QJsonObject>
 #include <QObject>
 #include <memory>
-#include <qtgqlconstants.hpp>
-#include <qtgqlmetadata.hpp>
-#include <qtgqlobjecttype.hpp>
+#include <qtgql/bases/constants.hpp>
+#include <qtgql/bases/metadata.hpp>
+#include <qtgql/bases/objecttype.hpp>
+#include <qtgql/customscalars/customscalars.hpp>
 
 namespace ScalarsTestCase {
 
 // ----------- Object Types -----------
-class User : public qtgql::QtGqlObjectTypeABCWithID {
+class User : public qtgql::ObjectTypeABCWithID {
  protected:
   static auto &INST_STORE() {
-    static qtgql::QGraphQLObjectStore<User> _store;
+    static qtgql::ObjectStore<User> _store;
     return _store;
   }
 
@@ -78,7 +79,7 @@ class User : public qtgql::QtGqlObjectTypeABCWithID {
  public:
   inline static const QString TYPE_NAME = "User";
   User(QObject *parent = nullptr)
-      : qtgql::QtGqlObjectTypeABCWithID::QtGqlObjectTypeABCWithID(parent){};
+      : qtgql::ObjectTypeABCWithID::ObjectTypeABCWithID(parent){};
 
   static std::shared_ptr<User> from_json(
       const QJsonObject &data, const qtgql::SelectionsConfig &config,

@@ -1,4 +1,4 @@
-#include "./gqlwstransport.hpp"
+#include "inc/qtgql/gqlwstransport/gqlwstransport.hpp"
 
 #include <QtGlobal>
 
@@ -201,7 +201,7 @@ bool qtgql::GqlWsTransportClient::gql_is_valid() const {
 }
 
 void qtgql::GqlWsTransportClient::execute(
-    const std::shared_ptr<QtGqlHandlerABC> &handler) {
+    const std::shared_ptr<HandlerABC> &handler) {
   m_handlers.insert(handler->operation_id(), handler);
   if (m_ws.isValid()) {
     send_message(handler->message());

@@ -102,8 +102,8 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
             # this would just generate the model without data.
             return "list()"
 
-        if custom_scalar := self.type.is_custom_scalar:
-            return f"SCALARS.{custom_scalar.__name__}()"
+        if self.type.is_custom_scalar:
+            return "{}"
 
         if enum_def := self.type.is_enum:
             return f"{enum_def.name}(1)"  # 1 is where auto() starts.
