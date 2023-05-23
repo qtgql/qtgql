@@ -1,0 +1,17 @@
+interface Node {
+  id: ID!
+}
+
+type Query {
+  user: User!
+}
+
+"""Time (isoformat)"""
+scalar Time
+
+type User implements Node {
+  id: ID!
+  name: String!
+  age: Int!
+  whatTimeIsIt: Time!
+}

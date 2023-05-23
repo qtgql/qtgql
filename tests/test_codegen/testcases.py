@@ -200,7 +200,7 @@ DateTestCase = QGQLObjectTestCase(
         """,
     test_name="DateTestCase",
 )
-TimeTestCase = QGQLObjectTestCase(
+TimeScalarTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_time_scalar.schema,
     query="""
       query MainQuery {
@@ -211,7 +211,7 @@ TimeTestCase = QGQLObjectTestCase(
           }
         }
         """,
-    test_name="TimeTestCase",
+    test_name="TimeScalarTestCase",
 )
 OptionalScalarTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_optional_scalar.schema,
@@ -607,6 +607,7 @@ all_test_cases = [
     NoIdOnQueryTestCase,
     DateTimeTestCase,
     DateTestCase,
+    TimeScalarTestCase,
     DecimalTestCase,
     OptionalScalarTestCase,
     NestedObjectTestCase,
@@ -615,7 +616,6 @@ all_test_cases = [
     InterfaceTestCase,
     UnionTestCase,
     ListOfObjectWithUnionTestCase,
-    TimeTestCase,
     EnumTestCase,
     CustomUserScalarTestCase,
     ObjectsThatReferenceEachOtherTestCase,
@@ -636,6 +636,7 @@ implemented_testcases = [
     DateTimeTestCase,
     DecimalTestCase,
     DateTestCase,
+    TimeScalarTestCase,
 ]
 
 

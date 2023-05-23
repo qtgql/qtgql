@@ -39,6 +39,24 @@ const QString &DateScalar::to_qt() {
   return m_cached_to_qt;
 }
 
+void TimeScalar::deserialize(const QJsonValue &raw_data) {
+  m_value = QTime::fromString(raw_data.toString(), Qt::DateFormat(Qt::ISODate));
+  m_should_update = true;
+}
+
+const QString &TimeScalar::GRAPHQL_NAME() {
+  static const QString ret = "Time";
+  return ret;
+}
+
+const QString &TimeScalar::to_qt() {
+  if (m_should_update) {
+    m_cached_to_qt = m_value.toString();
+    m_should_update = false;
+  }
+  return m_cached_to_qt;
+}
+
 void DecimalScalar::deserialize(const QJsonValue &raw_data) {
   m_value = raw_data.toString();
 }
