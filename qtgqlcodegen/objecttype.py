@@ -6,7 +6,7 @@ from functools import cached_property
 from typing import Any
 from typing import Generic
 from typing import Optional
-from typing import Type
+from typing import TYPE_CHECKING
 from typing import TypeVar
 
 import attrs
@@ -17,9 +17,11 @@ from typingref import UNSET
 from qtgqlcodegen.compiler.builtin_scalars import BuiltinScalar
 from qtgqlcodegen.compiler.operation import QtGqlQueriedObjectType
 from qtgqlcodegen.cppref import QtGqlTypes
-from qtgqlcodegen.runtime.custom_scalars import CustomScalarDefinition
-from qtgqlcodegen.runtime.custom_scalars import CustomScalarMap
 from qtgqlcodegen.utils import AntiForwardRef
+
+if TYPE_CHECKING:
+    from qtgqlcodegen.runtime.custom_scalars import CustomScalarDefinition
+    from qtgqlcodegen.runtime.custom_scalars import CustomScalarMap
 
 
 class Kinds(enum.Enum):
@@ -42,7 +44,7 @@ class QtGqlBaseTypedNode:
     scalars: CustomScalarMap
 
     @cached_property
-    def is_custom_scalar(self) -> Optional[Type[CustomScalarDefinition]]:
+    def is_custom_scalar(self) -> Optional[CustomScalarDefinition]:
         return self.type.is_custom_scalar
 
     @cached_property
@@ -72,7 +74,7 @@ class QtGqlVariableDefinition(Generic[T], QtGqlBaseTypedNode):
         elif self.type.is_enum:
             return f"{attr_name}.name"
         elif self.is_custom_scalar:
-            return f"{attr_name}.{CustomScalarDefinition.parse_value.__name__}()"
+            raise NotImplementedError
 
         raise NotImplementedError(f"{self.type} is not supported as an input type ATM")
 
@@ -115,7 +117,7 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
         """This annotates the value that is QML-compatible."""
         if custom_scalar := self.type.is_custom_scalar:
             return TypeHinter.from_annotations(
-                custom_scalar.to_qt.__annotations__["return"],
+                custom_scalar.property_type,
             ).stringify()
         if self.type.is_enum:
             return "int"
@@ -155,14 +157,6 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
     @cached_property
     def private_name(self) -> str:
         return f"m_{self.name}"
-
-    @property
-    def fget(self) -> str:
-        if self.type.is_custom_scalar:
-            return f"return self.{self.private_name}.{CustomScalarDefinition.to_qt.__name__}()"
-        if self.type.is_enum:
-            return f"return self.{self.private_name}.value"
-        return f"return self.{self.private_name}"
 
     @cached_property
     def can_select_id(self) -> Optional[QtGqlFieldDefinition]:

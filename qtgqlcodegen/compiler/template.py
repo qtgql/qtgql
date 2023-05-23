@@ -55,7 +55,7 @@ class SchemaTemplateContext:
 
     @property
     def custom_scalars(self) -> list[str]:
-        return [scalar.__name__ for scalar in self.config.custom_scalars.values()]
+        return [scalar.graphql_name for scalar in self.config.custom_scalars.values()]
 
 
 @define(slots=False)
