@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+0.118.0 - 2023-05-23
+--------------------
+
+This release adds support for custom scalars.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #211](https://github.com/qtgql/qtgql/pull/211/)
+
+
 0.117.0 - 2023-05-22
 --------------------
 
