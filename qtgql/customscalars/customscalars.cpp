@@ -21,4 +21,14 @@ void DateTimeScalar::deserialize(const QJsonValue &raw_data) {
   m_should_update = true;
 }
 
+void DecimalScalar::deserialize(const QJsonValue &raw_data) {
+  m_value = raw_data.toString();
+}
+
+const QString &DecimalScalar::GRAPHQL_NAME() {
+  static const QString ret = "Decimal";
+  return ret;
+}
+
+const QString &DecimalScalar::to_qt() { return m_value; }
 }  // namespace qtgql

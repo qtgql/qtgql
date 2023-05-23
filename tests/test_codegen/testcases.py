@@ -13,7 +13,7 @@ from qtgqlcodegen.cli import app
 from qtgqlcodegen.config import QtGqlConfig
 from qtgqlcodegen.introspection import SchemaEvaluator
 from qtgqlcodegen.runtime.custom_scalars import CustomScalarDefinition
-from qtgqlcodegen.runtime.custom_scalars import DateTimeScalar
+from qtgqlcodegen.runtime.custom_scalars import DateTimeScalarDefinition
 from tests.conftest import hash_schema
 from tests.test_codegen import schemas
 
@@ -174,7 +174,45 @@ DateTimeTestCase = QGQLObjectTestCase(
         """,
     test_name="DateTimeTestCase",
 )
-
+DecimalTestCase = QGQLObjectTestCase(
+    schema=schemas.object_with_decimal.schema,
+    query="""
+       query MainQuery {
+          user {
+            name
+            age
+            balance
+          }
+        }
+    """,
+    test_name="DecimalTestCase",
+)
+DateTestCase = QGQLObjectTestCase(
+    schema=schemas.object_with_date.schema,
+    query="""
+       query MainQuery {
+          user {
+            name
+            age
+            birth
+          }
+        }
+        """,
+    test_name="DateTestCase",
+)
+TimeTestCase = QGQLObjectTestCase(
+    schema=schemas.object_with_time_scalar.schema,
+    query="""
+      query MainQuery {
+          user {
+            name
+            age
+            whatTimeIsIt
+          }
+        }
+        """,
+    test_name="TimeTestCase",
+)
 OptionalScalarTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_optional_scalar.schema,
     query="""
@@ -339,46 +377,6 @@ RootEnumTestCase = QGQLObjectTestCase(
     test_name="RootEnumTestCase",
 )
 
-
-DecimalTestCase = QGQLObjectTestCase(
-    schema=schemas.object_with_decimal.schema,
-    query="""
-       query MainQuery {
-          user {
-            name
-            age
-            balance
-          }
-        }
-    """,
-    test_name="DecimalTestCase",
-)
-DateTestCase = QGQLObjectTestCase(
-    schema=schemas.object_with_date.schema,
-    query="""
-       query MainQuery {
-          user {
-            name
-            age
-            birth
-          }
-        }
-        """,
-    test_name="DateTestCase",
-)
-TimeTestCase = QGQLObjectTestCase(
-    schema=schemas.object_with_time_scalar.schema,
-    query="""
-      query MainQuery {
-          user {
-            name
-            age
-            whatTimeIsIt
-          }
-        }
-        """,
-    test_name="TimeTestCase",
-)
 ObjectsThatReferenceEachOtherTestCase = QGQLObjectTestCase(
     schema=schemas.object_reference_each_other.schema,
     test_name="ObjectsThatReferenceEachOtherTestCase",
@@ -628,11 +626,11 @@ all_test_cases = [
     RootTypeNoIDTestCase,
 ]
 custom_scalar_testcases = [
-    (DateTimeTestCase, DateTimeScalar, "birth"),
+    (DateTimeTestCase, DateTimeScalarDefinition, "birth"),
     (CustomUserScalarTestCase, CountryScalar, "country"),
 ]
 
-implemented_testcases = [ScalarsTestCase, NoIdOnQueryTestCase, DateTimeTestCase]
+implemented_testcases = [ScalarsTestCase, NoIdOnQueryTestCase, DateTimeTestCase, DecimalTestCase]
 
 
 def generate_testcases() -> None:

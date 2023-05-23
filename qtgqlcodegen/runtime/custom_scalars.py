@@ -11,7 +11,7 @@ class CustomScalarDefinition:
 
 
 # An ISO-8601 encoded datetime.
-DateTimeScalar = CustomScalarDefinition(
+DateTimeScalarDefinition = CustomScalarDefinition(
     type_name="qtgql::DateTimeScalar",
     graphql_name="DateTime",
     deserialized_type="QDateTime",
@@ -19,48 +19,15 @@ DateTimeScalar = CustomScalarDefinition(
     include_path="<qtgql/customscalars/customscalars.hpp>",
 )
 
-# An ISO-8601 encoded date.
-#
-# class DateScalar(BaseCustomScalar[date, str]):
-#     """An ISO-8601 encoded date."""
-#
-#
-#     def parse_value(self) -> str:
-#
-#     @classmethod
-#     def deserialize(cls, v=None) -> "DateScalar":
-#         if v:
-#
-#     def to_qt(self) -> str:
-#
-#
-# class TimeScalar(BaseCustomScalar[time, str]):
-#     """an ISO-8601 encoded time."""
-#
-#
-#     def parse_value(self) -> str:
-#
-#     @classmethod
-#     def deserialize(cls, v: Optional[str] = None) -> "TimeScalar":
-#         if v:
-#
-#     def to_qt(self) -> str:
-#
-#
-# class DecimalScalar(BaseCustomScalar[Decimal, str]):
-#     """A Decimal value serialized as a string."""
-#
-#
-#     def parse_value(self) -> str:
-#
-#     @classmethod
-#     def deserialize(cls, v: Optional[str] = None) -> "DecimalScalar":
-#         if v:
-#
-#     def to_qt(self) -> str:
-
-
+DecimalScalarDefinition = CustomScalarDefinition(
+    type_name="qtgql::DecimalScalar",
+    graphql_name="Decimal",
+    deserialized_type="QString",
+    property_type="QString",
+    include_path="<qtgql/customscalars/customscalars.hpp>",
+)
 CustomScalarMap = dict[str, CustomScalarDefinition]
 CUSTOM_SCALARS: CustomScalarMap = {
-    DateTimeScalar.graphql_name: DateTimeScalar,
+    DateTimeScalarDefinition.graphql_name: DateTimeScalarDefinition,
+    DecimalScalarDefinition.graphql_name: DecimalScalarDefinition,
 }

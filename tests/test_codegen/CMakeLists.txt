@@ -6,3 +6,5 @@ add_subdirectory(
 target_link_libraries(${TESTS_TARGET} PRIVATE generated::NoIdOnQueryTestCase)
 add_subdirectory(generated_test_projects/DateTimeTestCase/graphql/__generated__)
 target_link_libraries(${TESTS_TARGET} PRIVATE generated::DateTimeTestCase)
+add_subdirectory(generated_test_projects/DecimalTestCase/graphql/__generated__)
+target_link_libraries(${TESTS_TARGET} PRIVATE generated::DecimalTestCase)
