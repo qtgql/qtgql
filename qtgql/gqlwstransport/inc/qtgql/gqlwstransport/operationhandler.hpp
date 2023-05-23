@@ -1,13 +1,13 @@
 #pragma once
 #include <QObject>
 
-#include "../gqlwstransport/gqlwstransport.hpp"
-#include "qtgqlenvironment.hpp"
-#include "qtgqlmetadata.hpp"
+#include "gqlwstransport.hpp"
+#include "qtgql/bases/environment.hpp"
+#include "qtgql/bases/metadata.hpp"
 
 namespace qtgql {
 
-class _QtGqlOperationHandlerABCSignals : public QObject {
+class _OperationHandlerABCSignals : public QObject {
   Q_OBJECT
   Q_PROPERTY(bool completed READ completed NOTIFY completedChanged)
   Q_PROPERTY(bool operationOnFlight READ operation_on_flight NOTIFY
@@ -34,22 +34,21 @@ class _QtGqlOperationHandlerABCSignals : public QObject {
 };
 
 // NOTE: This class should not be defined in the .cpp since it is abstract.
-class QtGqlOperationHandlerABC
-    : public QtGqlHandlerABC,
-      public _QtGqlOperationHandlerABCSignals,
-      public std::enable_shared_from_this<QtGqlOperationHandlerABC> {
+class OperationHandlerABC
+    : public HandlerABC,
+      public _OperationHandlerABCSignals,
+      public std::enable_shared_from_this<OperationHandlerABC> {
  protected:
-  const std::shared_ptr<QtGqlEnvironment> &environment() {
-    static auto m_env = QtGqlEnvironment::get_gql_env(ENV_NAME());
+  const std::shared_ptr<Environment> &environment() {
+    static auto m_env = Environment::get_gql_env(ENV_NAME());
     return m_env;
   };
   QJsonObject m_variables;
   GqlWsTrnsMsgWithID m_message_template = GqlWsTrnsMsgWithID{{}};
 
  public:
-  explicit QtGqlOperationHandlerABC(GqlWsTrnsMsgWithID message)
-      : _QtGqlOperationHandlerABCSignals(),
-        m_message_template(std::move(message)) {}
+  explicit OperationHandlerABC(GqlWsTrnsMsgWithID message)
+      : _OperationHandlerABCSignals(), m_message_template(std::move(message)) {}
 
   // abstract functions.
   virtual const QString &ENV_NAME() = 0;

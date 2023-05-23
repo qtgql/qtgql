@@ -73,11 +73,13 @@ class QtGqlQueriedField:
         return self.definition.type
 
     @cached_property
-    def property_annotation(self) -> str:
+    def property_type(self) -> str:
         if self.definition.type.is_object_type:
             assert self.narrowed_type
             return self.narrowed_type.name
-        return self.type.annotation
+        if cs := self.definition.is_custom_scalar:
+            return cs.property_type
+        return self.type.member_type
 
     @property
     def proxy_of(self) -> GqlTypeHinter:
@@ -247,10 +249,10 @@ class QtGqlQueriedObjectType:
 class QtGqlOperationDefinition:
     operation_def: gql_def.OperationDefinitionNode
     evaluator: SchemaEvaluator
-    directives: list[str] = []
-    fragments: list[str] = []
-    variables: list[QtGqlVariableDefinition] = []
-    narrowed_types_map: dict[str, QtGqlQueriedObjectType] = {}
+    directives: list[str] = attrs.Factory(list)
+    fragments: list[str] = attrs.Factory(list)
+    variables: list[QtGqlVariableDefinition] = attrs.Factory(list)
+    narrowed_types_map: dict[str, QtGqlQueriedObjectType] = attrs.Factory(dict)
 
     def __attrs_post_init__(self) -> None:
         # instantiating the queried fields here, they build the narrowed types.

@@ -42,7 +42,7 @@ class QtGqlRecipe(ConanFile):
     }
 
     def requirements(self) -> None:
-        ...
+        self.requires("openssl/1.1.1t")
 
     def build_requirements(self) -> None:
         self.test_requires("catch2/3.1.0")

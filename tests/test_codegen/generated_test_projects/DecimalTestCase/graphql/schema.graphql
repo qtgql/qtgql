@@ -1,0 +1,17 @@
+"""Decimal (fixed-point)"""
+scalar Decimal
+
+interface Node {
+  id: ID!
+}
+
+type Query {
+  user: User!
+}
+
+type User implements Node {
+  id: ID!
+  name: String!
+  age: Int!
+  balance: Decimal!
+}

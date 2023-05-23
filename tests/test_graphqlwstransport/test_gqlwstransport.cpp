@@ -1,9 +1,9 @@
 #include <QTest>
 #include <catch2/catch_test_macros.hpp>
-#include <gqlwstransport.hpp>
-#include <qtgqlenvironment.hpp>
 
 #include "debugableclient.hpp"
+#include "qtgql/bases/environment.hpp"
+#include "qtgql/gqlwstransport/gqlwstransport.hpp"
 
 QString get_subscription_str(bool raiseOn5 = false,
                              QString op_name = "defaultOpName",
@@ -13,7 +13,7 @@ QString get_subscription_str(bool raiseOn5 = false,
       .arg(op_name, QString::number(target), ro5);
 }
 
-struct DefaultHandler : public qtgql::QtGqlHandlerABC {
+struct DefaultHandler : public qtgql::HandlerABC {
   qtgql::GqlWsTrnsMsgWithID m_message;
   DefaultHandler(const QString &query = get_subscription_str())
       : m_message{qtgql::GqlWsTrnsMsgWithID(qtgql::OperationPayload(query))} {};
@@ -97,8 +97,8 @@ TEST_CASE("Subscribe to data (next message)", "[gqlwstransport][ws-client]") {
 }
 
 TEST_CASE("execute via environment", "[gqlwstransport]") {
-  auto env = new qtgql::QtGqlEnvironment("Sample env",
-                                         std::make_unique<DebugAbleClient>());
+  auto env =
+      new qtgql::Environment("Sample env", std::make_unique<DebugAbleClient>());
   auto handler = std::make_shared<DefaultHandler>();
   env->execute(handler);
   handler->wait_for_completed();

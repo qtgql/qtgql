@@ -6,7 +6,6 @@ on:
   pull_request:
     branches: [main, cpp]
     paths:
-      - "qtgql/**"
       - "qtgqlcodegen"
       - "tests/**"
       - ".github/workflows/mypy.yml"

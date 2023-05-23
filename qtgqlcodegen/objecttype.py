@@ -6,7 +6,7 @@ from functools import cached_property
 from typing import Any
 from typing import Generic
 from typing import Optional
-from typing import Type
+from typing import TYPE_CHECKING
 from typing import TypeVar
 
 import attrs
@@ -17,9 +17,11 @@ from typingref import UNSET
 from qtgqlcodegen.compiler.builtin_scalars import BuiltinScalar
 from qtgqlcodegen.compiler.operation import QtGqlQueriedObjectType
 from qtgqlcodegen.cppref import QtGqlTypes
-from qtgqlcodegen.runtime.custom_scalars import BaseCustomScalar
-from qtgqlcodegen.runtime.custom_scalars import CustomScalarMap
 from qtgqlcodegen.utils import AntiForwardRef
+
+if TYPE_CHECKING:
+    from qtgqlcodegen.runtime.custom_scalars import CustomScalarDefinition
+    from qtgqlcodegen.runtime.custom_scalars import CustomScalarMap
 
 
 class Kinds(enum.Enum):
@@ -42,17 +44,17 @@ class QtGqlBaseTypedNode:
     scalars: CustomScalarMap
 
     @cached_property
-    def is_custom_scalar(self) -> Optional[Type[BaseCustomScalar]]:
+    def is_custom_scalar(self) -> Optional[CustomScalarDefinition]:
         return self.type.is_custom_scalar
 
     @cached_property
-    def annotation(self) -> str:
+    def member_type(self) -> str:
         """
         :returns: Annotation of the field based on the real type,
         meaning that the private attribute would be of that type.
         this goes for init and the property setter.
         """
-        return self.type.annotation
+        return self.type.member_type
 
 
 T = TypeVar("T")
@@ -72,7 +74,7 @@ class QtGqlVariableDefinition(Generic[T], QtGqlBaseTypedNode):
         elif self.type.is_enum:
             return f"{attr_name}.name"
         elif self.is_custom_scalar:
-            return f"{attr_name}.{BaseCustomScalar.parse_value.__name__}()"
+            raise NotImplementedError
 
         raise NotImplementedError(f"{self.type} is not supported as an input type ATM")
 
@@ -102,8 +104,8 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
             # this would just generate the model without data.
             return "list()"
 
-        if custom_scalar := self.type.is_custom_scalar:
-            return f"SCALARS.{custom_scalar.__name__}()"
+        if self.type.is_custom_scalar:
+            return "{}"
 
         if enum_def := self.type.is_enum:
             return f"{enum_def.name}(1)"  # 1 is where auto() starts.
@@ -115,12 +117,12 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
         """This annotates the value that is QML-compatible."""
         if custom_scalar := self.type.is_custom_scalar:
             return TypeHinter.from_annotations(
-                custom_scalar.to_qt.__annotations__["return"],
+                custom_scalar.property_type,
             ).stringify()
         if self.type.is_enum:
             return "int"
 
-        return self.annotation
+        return self.member_type
 
     @cached_property
     def property_type(self) -> str:
@@ -155,14 +157,6 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
     @cached_property
     def private_name(self) -> str:
         return f"m_{self.name}"
-
-    @property
-    def fget(self) -> str:
-        if self.type.is_custom_scalar:
-            return f"return self.{self.private_name}.{BaseCustomScalar.to_qt.__name__}()"
-        if self.type.is_enum:
-            return f"return self.{self.private_name}.value"
-        return f"return self.{self.private_name}"
 
     @cached_property
     def can_select_id(self) -> Optional[QtGqlFieldDefinition]:
@@ -307,13 +301,13 @@ class GqlTypeHinter(TypeHinter):
             return t_self
 
     @cached_property
-    def is_custom_scalar(self) -> Optional[Type[BaseCustomScalar]]:
+    def is_custom_scalar(self) -> Optional[CustomScalarDefinition]:
         t_self = self.optional_maybe.type
         if t_self in self.scalars.values():
             return t_self
 
     @cached_property
-    def annotation(self) -> str:
+    def member_type(self) -> str:
         """
         :returns: Annotation of the field based on the real type,
         meaning that the private attribute would be of that type.
@@ -327,17 +321,17 @@ class GqlTypeHinter(TypeHinter):
             return builtin_scalar.tp
 
         if scalar := t_self.is_custom_scalar:
-            return f"SCALARS.{scalar.__name__}"
+            return scalar.type_name
         if gql_enum := t_self.is_enum:
             return gql_enum.name
         if model_of := t_self.is_model:
-            return f"{QtGqlTypes.QGraphQLList.name}[{model_of.annotation}]"
+            return f"{QtGqlTypes.QGraphQLList.name}[{model_of.member_type}]"
         if object_def := t_self.is_object_type or t_self.is_interface:
             return f"{object_def.name}"
         if q_object_def := t_self.is_queried_object_type:
             return f"{q_object_def.name}"
         if t_self.is_union:
-            return "std::variant<" + ", ".join(th.annotation for th in t_self.of_type) + ">"
+            return "std::variant<" + ", ".join(th.member_type for th in t_self.of_type) + ">"
         if input_obj := t_self.is_input_object_type:
             return input_obj.name
 

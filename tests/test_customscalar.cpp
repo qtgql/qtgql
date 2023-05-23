@@ -1,10 +1,10 @@
 #include <QString>
 #include <QTest>
 #include <catch2/catch_test_macros.hpp>
-#include <qtgqlcustomscalar.hpp>
 
-class CustomStringScalar
-    : public qtgql::CustomScalarABC<QString, QString, QString> {
+#include "../qtgql/customscalars/inc/qtgql/customscalars/basecustomscalar.hpp"
+
+class CustomStringScalar : public qtgql::CustomScalarABC<QString, QString> {
   QString m_cached;
 
  public:
@@ -18,14 +18,18 @@ class CustomStringScalar
     static QString ret = "CustomStringScalar";
     return ret;
   }
-  explicit CustomStringScalar(const QString &raw) { m_value = raw; }
+
+  void deserialize(const QJsonValue &raw_data) override {
+    m_value = raw_data.toString();
+  }
 };
 
 TEST_CASE("Test custom scalar by hand implementation") {
-  auto a = CustomStringScalar("initial");
-
+  auto a = CustomStringScalar();
+  a.deserialize("initial");
   REQUIRE(a.to_qt() == "Decoration-initial");
   REQUIRE(a.GRAPHQL_NAME() == "CustomStringScalar");
-  auto b = CustomStringScalar("second");
+  auto b = CustomStringScalar();
+  b.deserialize("second");
   REQUIRE(a != b);
 }

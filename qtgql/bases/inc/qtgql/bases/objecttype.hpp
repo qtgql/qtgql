@@ -1,14 +1,13 @@
 #pragma once
-#include <QDebug>
-#include <QObject>
-#include <QSet>
-#include <type_traits>
-
-#include "qtgqlmetadata.hpp"
+#include "../../../../../../../../../../usr/include/c++/11/type_traits"
+#include "../../../../../../../../MyConnandeps/Qt/6.5.0/gcc_64/include/QtCore/QDebug"
+#include "../../../../../../../../MyConnandeps/Qt/6.5.0/gcc_64/include/QtCore/QObject"
+#include "../../../../../../../../MyConnandeps/Qt/6.5.0/gcc_64/include/QtCore/QSet"
+#include "metadata.hpp"
 
 namespace qtgql {
 
-class QtGqlObjectTypeABC : public QObject {
+class ObjectTypeABC : public QObject {
   Q_OBJECT
   Q_PROPERTY(QString typeName READ getTypeName CONSTANT)
 
@@ -19,9 +18,9 @@ class QtGqlObjectTypeABC : public QObject {
   using QObject::QObject;
 };
 
-class QtGqlObjectTypeABCWithID : public QtGqlObjectTypeABC {
+class ObjectTypeABCWithID : public ObjectTypeABC {
  public:
-  using QtGqlObjectTypeABC::QtGqlObjectTypeABC;
+  using ObjectTypeABC::ObjectTypeABC;
   virtual const QString &get_id() const = 0;
 
   // TODO: can't use constructor for this class since it is abstract.
@@ -41,11 +40,11 @@ class QtGqlObjectTypeABCWithID : public QtGqlObjectTypeABC {
 };
 
 template <typename T>
-concept extendsQtGqlObjectTypeABCWithID =
-    std::is_base_of<QtGqlObjectTypeABCWithID, T>::value;
+concept extendsObjectTypeABCWithID =
+    std::is_base_of<ObjectTypeABCWithID, T>::value;
 
 // stores global node of graphql type and it's retainers.
-template <extendsQtGqlObjectTypeABCWithID T>
+template <extendsObjectTypeABCWithID T>
 class NodeRecord {
   QSet<QString> m_retainers;
   typedef std::shared_ptr<T> T_sharedQObject;
@@ -64,8 +63,8 @@ class NodeRecord {
   bool has_retainers() const { return m_retainers.isEmpty(); }
 };
 
-template <extendsQtGqlObjectTypeABCWithID T>
-class QGraphQLObjectStore {
+template <extendsObjectTypeABCWithID T>
+class ObjectStore {
   typedef std::shared_ptr<NodeRecord<T>> T_sharedRecord;
 
  protected:

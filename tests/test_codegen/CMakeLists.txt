@@ -4,3 +4,12 @@ add_subdirectory(
   generated_test_projects/NoIdOnQueryTestCase/graphql/__generated__)
 
 target_link_libraries(${TESTS_TARGET} PRIVATE generated::NoIdOnQueryTestCase)
+add_subdirectory(generated_test_projects/DateTimeTestCase/graphql/__generated__)
+target_link_libraries(${TESTS_TARGET} PRIVATE generated::DateTimeTestCase)
+add_subdirectory(generated_test_projects/DecimalTestCase/graphql/__generated__)
+target_link_libraries(${TESTS_TARGET} PRIVATE generated::DecimalTestCase)
+add_subdirectory(generated_test_projects/DateTestCase/graphql/__generated__)
+target_link_libraries(${TESTS_TARGET} PRIVATE generated::DateTestCase)
+add_subdirectory(
+  generated_test_projects/TimeScalarTestCase/graphql/__generated__)
+target_link_libraries(${TESTS_TARGET} PRIVATE generated::TimeScalarTestCase)

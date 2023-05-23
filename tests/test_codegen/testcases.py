@@ -3,30 +3,23 @@ from __future__ import annotations
 import os
 from functools import cached_property
 from pathlib import Path
-from textwrap import dedent
-from typing import Optional
 from typing import TYPE_CHECKING
 
 import jinja2
-import strawberry.utils
 from attr import define
-from strawberry import Schema
 from typer.testing import CliRunner
 
 from qtgqlcodegen.cli import app
 from qtgqlcodegen.config import QtGqlConfig
 from qtgqlcodegen.introspection import SchemaEvaluator
-from qtgqlcodegen.runtime.custom_scalars import BaseCustomScalar
-from qtgqlcodegen.runtime.custom_scalars import DateScalar
-from qtgqlcodegen.runtime.custom_scalars import DateTimeScalar
-from qtgqlcodegen.runtime.custom_scalars import DecimalScalar
-from qtgqlcodegen.runtime.custom_scalars import TimeScalar
+from qtgqlcodegen.runtime.custom_scalars import CustomScalarDefinition
+from qtgqlcodegen.runtime.custom_scalars import DateTimeScalarDefinition
 from tests.conftest import hash_schema
 from tests.test_codegen import schemas
 
 if TYPE_CHECKING:
-    from qtgqlcodegen.runtime.queryhandler import BaseMutationHandler
-    from qtgqlcodegen.objecttype import QtGqlObjectTypeDefinition
+    from strawberry import Schema
+
 
 BaseQueryHandler = None  # TODO: remove this when done migrating, this is just for readability.
 
@@ -138,69 +131,6 @@ class QGQLObjectTestCase:
             TST_CMAKE.write_text(prev + f"\n {link_line}")
 
 
-@define
-class CompiledTestCase(QGQLObjectTestCase):
-    config: QtGqlConfig
-    tested_type: QtGqlObjectTypeDefinition
-    evaluator: SchemaEvaluator
-
-    def __attrs_post_init__(self):
-        self.query = dedent(self.query)
-        if not self.qml_file:
-            self.qml_file = dedent(
-                """
-                    import QtQuick
-                    import generated.{} as Env
-
-                     Env.Consume{}{{
-                        objectName: "rootObject"
-                        autofetch: true
-                        anchors.fill: parent;
-                        Text{{
-                            text: `is autofetch? ${{autofetch}}`
-                        }}
-                    }}
-                """.format(
-                    self.config.env_name,
-                    self.query_operationName,
-                ),
-            )
-
-    @cached_property
-    def query_handler(self) -> BaseQueryHandler:
-        return getattr(self.handlers_mod, self.query_operationName)(self.parent_obj)
-
-    def get_attr(self, attr: str):
-        return getattr(self.handlers_mod, attr, None)
-
-    def get_query_handler(self, operation_name: str) -> BaseQueryHandler:
-        return self.get_attr(operation_name)(self.parent_obj)
-
-    def get_mutation_handler(self, operation_name: str) -> BaseMutationHandler:
-        return self.get_attr(operation_name)(self.parent_obj)
-
-    def get_field_by_type(self, t):
-        for field in self.tested_type.fields:
-            if field.type.type == t:
-                return field
-
-    def get_field_by_name(self, name: str):
-        for field in self.tested_type.fields:
-            if field.name == name:
-                return field
-
-        raise Exception(f"field {name} not found in {self.tested_type}")
-
-    def strawberry_field_by_name(self, field_name: str, klass_name: Optional[str] = None):
-        if not klass_name:
-            klass_name = self.gql_type.__name__
-
-        stawberry_definition = self.schema.get_type_by_name(klass_name)
-        for sf in stawberry_definition.fields:
-            if field_name == strawberry.utils.str_converters.to_camel_case(sf.name):
-                return sf
-
-
 ScalarsTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_scalar.schema,
     query="""
@@ -230,6 +160,58 @@ NoIdOnQueryTestCase = QGQLObjectTestCase(  # should append id automatically.
           }
         }""",
     test_name="NoIdOnQueryTestCase",
+)
+DateTimeTestCase = QGQLObjectTestCase(
+    schema=schemas.object_with_datetime.schema,
+    query="""
+       query MainQuery {
+          user {
+            name
+            age
+            birth
+          }
+        }
+        """,
+    test_name="DateTimeTestCase",
+)
+DecimalTestCase = QGQLObjectTestCase(
+    schema=schemas.object_with_decimal.schema,
+    query="""
+       query MainQuery {
+          user {
+            name
+            age
+            balance
+          }
+        }
+    """,
+    test_name="DecimalTestCase",
+)
+DateTestCase = QGQLObjectTestCase(
+    schema=schemas.object_with_date.schema,
+    query="""
+       query MainQuery {
+          user {
+            name
+            age
+            birth
+          }
+        }
+        """,
+    test_name="DateTestCase",
+)
+TimeScalarTestCase = QGQLObjectTestCase(
+    schema=schemas.object_with_time_scalar.schema,
+    query="""
+      query MainQuery {
+          user {
+            name
+            age
+            whatTimeIsIt
+          }
+        }
+        """,
+    test_name="TimeScalarTestCase",
 )
 OptionalScalarTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_optional_scalar.schema,
@@ -395,58 +377,6 @@ RootEnumTestCase = QGQLObjectTestCase(
     test_name="RootEnumTestCase",
 )
 
-DateTimeTestCase = QGQLObjectTestCase(
-    schema=schemas.object_with_datetime.schema,
-    query="""
-       query MainQuery {
-          user {
-            name
-            age
-            birth
-          }
-        }
-        """,
-    test_name="DateTimeTestCase",
-)
-DecimalTestCase = QGQLObjectTestCase(
-    schema=schemas.object_with_decimal.schema,
-    query="""
-       query MainQuery {
-          user {
-            name
-            age
-            balance
-          }
-        }
-    """,
-    test_name="DecimalTestCase",
-)
-DateTestCase = QGQLObjectTestCase(
-    schema=schemas.object_with_date.schema,
-    query="""
-       query MainQuery {
-          user {
-            name
-            age
-            birth
-          }
-        }
-        """,
-    test_name="DateTestCase",
-)
-TimeTestCase = QGQLObjectTestCase(
-    schema=schemas.object_with_time_scalar.schema,
-    query="""
-      query MainQuery {
-          user {
-            name
-            age
-            whatTimeIsIt
-          }
-        }
-        """,
-    test_name="TimeTestCase",
-)
 ObjectsThatReferenceEachOtherTestCase = QGQLObjectTestCase(
     schema=schemas.object_reference_each_other.schema,
     test_name="ObjectsThatReferenceEachOtherTestCase",
@@ -464,24 +394,18 @@ ObjectsThatReferenceEachOtherTestCase = QGQLObjectTestCase(
 )
 
 
-class CountryScalar(BaseCustomScalar[Optional[str], str]):
-    countrymap = schemas.object_with_user_defined_scalar.countrymap
-    GRAPHQL_NAME = "Country"
-    DEFAULT_VALUE = "isr"
-
-    @classmethod
-    def deserialize(cls, v=None) -> BaseCustomScalar:
-        if v:
-            return cls(cls.countrymap[v])
-        return cls()
-
-    def to_qt(self) -> str:
-        return self._value
+CountryScalar = CustomScalarDefinition(
+    type_name="CountryScalar",
+    graphql_name="Country",
+    property_type="QString",
+    deserialized_type="QString",
+    include_path="NOT IMPLEMENTED",
+)
 
 
 CustomUserScalarTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_user_defined_scalar.schema,
-    custom_scalars={CountryScalar.GRAPHQL_NAME: CountryScalar},
+    custom_scalars={CountryScalar.graphql_name: CountryScalar},
     test_name="CustomUserScalarTestCase",
     query="""
      query MainQuery {
@@ -683,6 +607,7 @@ all_test_cases = [
     NoIdOnQueryTestCase,
     DateTimeTestCase,
     DateTestCase,
+    TimeScalarTestCase,
     DecimalTestCase,
     OptionalScalarTestCase,
     NestedObjectTestCase,
@@ -691,7 +616,6 @@ all_test_cases = [
     InterfaceTestCase,
     UnionTestCase,
     ListOfObjectWithUnionTestCase,
-    TimeTestCase,
     EnumTestCase,
     CustomUserScalarTestCase,
     ObjectsThatReferenceEachOtherTestCase,
@@ -702,14 +626,18 @@ all_test_cases = [
     RootTypeNoIDTestCase,
 ]
 custom_scalar_testcases = [
-    (DateTimeTestCase, DateTimeScalar, "birth"),
-    (DateTestCase, DateScalar, "birth"),
-    (DecimalTestCase, DecimalScalar, "balance"),
-    (TimeTestCase, TimeScalar, "whatTimeIsIt"),
+    (DateTimeTestCase, DateTimeScalarDefinition, "birth"),
     (CustomUserScalarTestCase, CountryScalar, "country"),
 ]
 
-implemented_testcases = [ScalarsTestCase, NoIdOnQueryTestCase]
+implemented_testcases = [
+    ScalarsTestCase,
+    NoIdOnQueryTestCase,
+    DateTimeTestCase,
+    DecimalTestCase,
+    DateTestCase,
+    TimeScalarTestCase,
+]
 
 
 def generate_testcases() -> None:

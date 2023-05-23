@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import inspect
-from typing import Any
 from typing import TYPE_CHECKING
 
 from attrs import define
@@ -53,17 +51,11 @@ class SchemaTemplateContext:
 
     @property
     def dependencies(self) -> list[str]:
-        def build_import_statement(t: type[Any]) -> str:
-            mod = inspect.getmodule(t)
-            assert mod
-            return f"from {mod.__name__} import {t.__name__}"
-
-        ret = [build_import_statement(scalar) for scalar in self.config.custom_scalars.values()]
-        return ret
+        return [f"#include {scalar.include_path}" for scalar in self.config.custom_scalars.values()]
 
     @property
     def custom_scalars(self) -> list[str]:
-        return [scalar.__name__ for scalar in self.config.custom_scalars.values()]
+        return [scalar.graphql_name for scalar in self.config.custom_scalars.values()]
 
 
 @define(slots=False)

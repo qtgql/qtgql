@@ -8,7 +8,7 @@
 #include <deque>
 #include <memory>
 #include <optional>
-#include <qtgqlnetworklayer.hpp>
+#include <qtgql/bases/networklayer.hpp>
 
 namespace qtgql {
 
@@ -124,7 +124,7 @@ struct GqlWsTransportClientSettings {
   const QList<std::pair<QString, QString>> headers = {};
 };
 
-class GqlWsTransportClient : public QObject, public QtGqlNetworkLayer {
+class GqlWsTransportClient : public QObject, public NetworkLayer {
   Q_OBJECT
  private:
   GqlWsTransportClient() = delete;
@@ -145,9 +145,9 @@ class GqlWsTransportClient : public QObject, public QtGqlNetworkLayer {
   QWebSocket m_ws;
   QWebSocketHandshakeOptions m_ws_options;
 
-  QMap<QUuid, std::shared_ptr<QtGqlHandlerABC>> m_handlers;
+  QMap<QUuid, std::shared_ptr<HandlerABC>> m_handlers;
   // handlers that theirs execution was deferred due to connection issues.
-  QSet<std::shared_ptr<QtGqlHandlerABC>> m_pending_handlers;
+  QSet<std::shared_ptr<HandlerABC>> m_pending_handlers;
 
   // general protocol handlers:
   void on_gql_ack();
@@ -174,7 +174,7 @@ class GqlWsTransportClient : public QObject, public QtGqlNetworkLayer {
   // whether received connection_ack message and ws is valid.
   bool gql_is_valid() const;
   // execute / pend a handler for execution.
-  void execute(const std::shared_ptr<QtGqlHandlerABC> &handler) override;
+  void execute(const std::shared_ptr<HandlerABC> &handler) override;
   // reconnect with previous settings.
   void reconnect();
 };

@@ -1,16 +1,11 @@
-add_library(qtgqlbases "")
-add_library(${PROJECT_NAME}::bases ALIAS qtgqlbases)
+set(COMPONENT_NAME qtgqlbases)
+add_library(${COMPONENT_NAME} "")
+add_library(${PROJECT_NAME}::bases ALIAS ${COMPONENT_NAME})
 target_sources(
-  qtgqlbases
-  PUBLIC qtgqlobjecttype.hpp
-         qtgqlmetadata.hpp
-         qtgqllistmodel.hpp
-         qtgqlnetworklayer.hpp
-         qtgqlconstants.hpp
-         qtgqloperationhandler.hpp
-         qtgqlenvironment.hpp
-         qtgqlcustomscalar.hpp
-  PRIVATE qtgqloperationhandler.cpp qtgqlenvironment.cpp)
-target_link_libraries(qtgqlbases PUBLIC Qt6::Core
-                                        ${PROJECT_NAME}::gqlwstransport)
-target_include_directories(qtgqlbases PUBLIC ${CMAKE_CURRENT_LIST_DIR})
+  ${COMPONENT_NAME}
+  PUBLIC inc/qtgql/bases/objecttype.hpp inc/qtgql/bases/metadata.hpp
+         inc/qtgql/bases/listmodel.hpp inc/qtgql/bases/networklayer.hpp
+         inc/qtgql/bases/constants.hpp inc/qtgql/bases/environment.hpp
+  PRIVATE environment.cpp)
+target_link_libraries(${COMPONENT_NAME} PUBLIC Qt6::Core)
+target_include_directories(${COMPONENT_NAME} PUBLIC inc)

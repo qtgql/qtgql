@@ -17,11 +17,11 @@ if(MSVC)
       "${CMAKE_CXX_FLAGS} /std:c++20 /Zc:__cplusplus /permissive-")
 endif()
 find_package(Qt6 REQUIRED COMPONENTS Core Qml Quick WebSockets)
-
 qt_standard_project_setup()
+
 add_subdirectory(qtgql/gqlwstransport)
 add_subdirectory(qtgql/bases)
-add_subdirectory(qtgql/utils)
+add_subdirectory(qtgql/customscalars)
 
 # --options--
 option(QTGQL_VERBOSE "display helpful build information" true)

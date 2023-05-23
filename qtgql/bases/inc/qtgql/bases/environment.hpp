@@ -1,8 +1,7 @@
 #pragma once
-#include <QMap>
-#include <QString>
-
-#include "./qtgqlnetworklayer.hpp"
+#include "../../../../../../../../MyConnandeps/Qt/6.5.0/gcc_64/include/QtCore/QMap"
+#include "../../../../../../../../MyConnandeps/Qt/6.5.0/gcc_64/include/QtCore/QString"
+#include "./networklayer.hpp"
 
 namespace qtgql {
 
@@ -19,21 +18,20 @@ all the generated handlers for this environment  would use this layer.
 by the generated handlers based on the configurations.
 */
 
-class QtGqlEnvironment {
-  typedef std::shared_ptr<QtGqlEnvironment> SharedQtGqlEnv;
+class Environment {
+  typedef std::shared_ptr<Environment> SharedQtGqlEnv;
   //  using a ptr here since client is to be extended by implementors.
-  typedef std::unique_ptr<QtGqlNetworkLayer> UniqueNetworkLayer;
+  typedef std::unique_ptr<NetworkLayer> UniqueNetworkLayer;
 
   UniqueNetworkLayer m_network_layer;
   inline static QMap<QString, SharedQtGqlEnv> _ENV_MAP = {};
 
  public:
   const QString m_name;
-  explicit QtGqlEnvironment(const QString &name,
-                            UniqueNetworkLayer network_layer)
+  explicit Environment(const QString &name, UniqueNetworkLayer network_layer)
       : m_name(name), m_network_layer(std::move(network_layer)){};
 
-  void execute(const std::shared_ptr<QtGqlHandlerABC> &handler) {
+  void execute(const std::shared_ptr<HandlerABC> &handler) {
     m_network_layer->execute(handler);
   }
   static void set_gql_env(SharedQtGqlEnv env);
