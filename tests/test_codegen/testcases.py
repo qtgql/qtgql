@@ -399,7 +399,6 @@ ObjectsThatReferenceEachOtherTestCase = QGQLObjectTestCase(
 CountryScalar = CustomScalarDefinition(
     type_name="CountryScalar",
     graphql_name="Country",
-    raw_type="QString",
     property_type="QString",
     deserialized_type="QString",
     include_path="NOT IMPLEMENTED",

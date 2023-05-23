@@ -21,6 +21,7 @@ TEST_CASE("NoIdOnQueryTestCase", "[generated-testcase]") {
     mq->fetch();
     REQUIRE(QTest::qWaitFor([&]() -> bool { return mq->completed(); }, 1500));
     REQUIRE(mq->get_data()->get_id() != qtgql::CONSTANTS::ID);
+    REQUIRE(true);
   }
 }
 

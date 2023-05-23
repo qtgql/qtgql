@@ -3,6 +3,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "debugableclient.hpp"
+#include "graphql/__generated__/MainQuery.hpp"
 namespace DateTimeTestCase {
 
 TEST_CASE("DateTimeTestCase", "[generated-testcase]") {
@@ -15,7 +16,14 @@ TEST_CASE("DateTimeTestCase", "[generated-testcase]") {
       "DateTimeTestCase",
       std::unique_ptr<qtgql::GqlWsTransportClient>(client)));
 
-  REQUIRE(false);
+  auto mq = std::make_shared<mainquery::MainQuery>();
+  mq->fetch();
+  REQUIRE(QTest::qWaitFor([&]() -> bool { return mq->completed(); }, 1500));
+  auto d = mq->get_data();
+  auto now =
+      QDateTime::currentDateTime(QTimeZone::utc()).toString("hh:mm (dd.mm.yy)");
+  qDebug() << now << "vs" << d->get_birth();
+  REQUIRE(d->get_birth() == now);
 }
 
 };  // namespace DateTimeTestCase

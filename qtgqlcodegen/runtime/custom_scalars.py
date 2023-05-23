@@ -5,7 +5,6 @@ from attrs import define
 class CustomScalarDefinition:
     type_name: str
     graphql_name: str
-    raw_type: str
     deserialized_type: str
     property_type: str
     include_path: str
@@ -15,7 +14,6 @@ class CustomScalarDefinition:
 DateTimeScalar = CustomScalarDefinition(
     type_name="qtgql::DateTimeScalar",
     graphql_name="DateTime",
-    raw_type="QString",
     deserialized_type="QDateTime",
     property_type="QString",
     include_path="<qtgql/customscalars/customscalars.hpp>",

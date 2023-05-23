@@ -3,9 +3,8 @@
 namespace qtgql {
 
 const QString &DateTimeScalar::to_qt() {
-  static const QString format_string = "%H:%M (%m/%d/%Y)";
   if (m_should_update) {
-    m_cached_to_qt = m_value.toString(format_string);
+    m_cached_to_qt = m_value.toString("hh:mm (dd.mm.yy)");
     m_should_update = false;
   }
   return m_cached_to_qt;
