@@ -1,4 +1,6 @@
+import uuid
 from datetime import datetime
+from datetime import timezone
 from typing import Optional
 from uuid import UUID
 
@@ -22,7 +24,13 @@ class Query:
     def user(self, ret_none: bool = False) -> User:
         if ret_none:
             return User()
-        return User(name="Patrick", age=100)
+        return User(
+            name="Patrick",
+            age=100,
+            age_point=100.0,
+            uuid=uuid.uuid4(),
+            birth=datetime.now(tz=timezone.utc),
+        )
 
 
 schema = strawberry.Schema(query=Query)

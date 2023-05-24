@@ -4,6 +4,7 @@
 
 #include "qtgql/bases/environment.hpp"
 #include "qtgql/gqlwstransport/gqlwstransport.hpp"
+#include "qtgql/gqlwstransport/operationhandler.hpp"
 
 QString get_server_address(const QString &suffix = "graphql");
 
@@ -33,3 +34,8 @@ class DebugAbleClient : public qtgql::GqlWsTransportClient {
 };
 
 std::shared_ptr<DebugAbleClient> get_valid_client();
+
+namespace test_utils {
+void wait_for_completion(
+    const std::shared_ptr<qtgql::OperationHandlerABC> handler);
+}

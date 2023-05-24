@@ -29,7 +29,7 @@ class _OperationHandlerABCSignals : public QObject {
  public:
   using QObject::QObject;
 
-  bool completed();
+  bool completed() const;
   bool operation_on_flight();
 };
 
