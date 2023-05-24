@@ -7,10 +7,8 @@ namespace 👉 context.config.env_name 👈{
 namespace 👉context.ns👈{
 
 inline const qtgql::bases::OperationMetadata OPERATION_METADATA = qtgql::bases::OperationMetadata{
-        "👉 context.operation.name 👈",
-        {
-                👉 context.operation.root_field.as_conf_string() 👈
-        }
+        .operation_name{"👉 context.operation.name 👈"},
+        .selections{👉 context.operation.root_field.as_conf_string() 👈}
 };
 
 

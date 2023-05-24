@@ -1,14 +1,21 @@
 #pragma once
+#include <utility>
+
 #include "QMap"
 namespace qtgql {
 namespace bases {
+struct SelectionConfig;
 
 struct SelectionsConfig {
   // describes selections of a graphql operation.
-  const QMap<QString, const SelectionsConfig *> selections;
+  typedef QMap<QString, const SelectionConfig *> SelectionsMap;
+  const SelectionsMap selections;
 
   // for unions and fragments.
-  const QMap<QString, const SelectionsConfig *> choices;
+  const SelectionsMap choices;
+  explicit SelectionsConfig(SelectionsMap selections = {},
+                            SelectionsMap choices_ = {})
+      : selections(std::move(selections)), choices(std::move(choices_)){};
 };
 
 struct OperationMetadata {

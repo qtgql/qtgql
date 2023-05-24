@@ -24,7 +24,7 @@ static auto & INST_STORE() {
 👉 macros.props(type) 👈
 public:
 inline static const QString TYPE_NAME = "👉 type.name 👈";
-👉 type.name 👈 (QObject* parent = nullptr)
+explicit 👉 type.name 👈 (QObject* parent = nullptr)
 : qtgql::bases::👉 base_class 👈::👉 base_class 👈(parent) {};
 
 
@@ -36,7 +36,6 @@ auto inst = std::make_shared<👉 type.name 👈>();
 {% set assign_to %} inst->👉 f.private_name 👈 {% endset %}
 👉macros.deserialize_field(f, assign_to)👈
 {% endfor %}
-
 {% if type.id_is_optional %}
 if (inst->id) {
   auto record = qtgql::bases::NodeRecord(node = inst, retainers = set())
@@ -49,13 +48,13 @@ record->retain(metadata.operation_name);
 INST_STORE().add_record(record);
 {% endif %}
 return inst;
-  };
-{% endfor %}
+};
 
 void loose(const qtgql::bases::OperationMetadata &metadata){throw "not implemented";};
 void update(const QJsonObject &data,
             const qtgql::bases::SelectionsConfig &selections){throw "not implemented";};
 
 };
+{% endfor %}
 
 }
