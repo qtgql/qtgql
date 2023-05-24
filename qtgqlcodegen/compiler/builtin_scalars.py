@@ -16,34 +16,39 @@ class BuiltinScalar:
 
 
 class _BuiltinScalars:
-    INT = BuiltinScalar(CType("int"), 0, graphql_name="Int", from_json_convertor="toInt()")
+    INT = BuiltinScalar(
+        CType("int"),
+        "qtgql::DEFAULTS::INT",
+        graphql_name="Int",
+        from_json_convertor="toInt()",
+    )
     FLOAT = BuiltinScalar(
         CType("float"),
-        0.0,
+        "qtgql::DEFAULTS::FLOAT",
         graphql_name="Float",
         from_json_convertor="toDouble()",
     )
     STRING = BuiltinScalar(
         CType("QString"),
-        '" - "',
+        "qtgql::DEFAULTS::STRING",
         graphql_name="String",
         from_json_convertor="toString()",
     )
     ID = BuiltinScalar(
         CType("QString"),
-        "qtgql::CONSTANTS::ID",
+        "qtgql::DEFAULTS::ID",
         graphql_name="ID",
         from_json_convertor="toString()",
     )
     BOOLEAN = BuiltinScalar(
         CType("bool"),
-        "false",
+        "qtgql::DEFAULTS::BOOL",
         graphql_name="Boolean",
         from_json_convertor="toBool()",
     )
     UUID = BuiltinScalar(
         CType("QUuid"),
-        "qtgql::CONSTANTS::UUID",
+        "qtgql::DEFAULTS::UUID",
         graphql_name="UUID",
         from_json_convertor="toVariant().toUuid()",
     )
