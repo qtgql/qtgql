@@ -30,16 +30,16 @@ void DebugAbleClient::onTextMessageReceived(const QString &raw_message) {
     }
     if (data.contains("id")) {
       // Any that contains ID is directed to a single handler.
-      auto message = qtgql::GqlWsTrnsMsgWithID(data);
+      auto message = gqlwstransport::GqlWsTrnsMsgWithID(data);
     } else {
-      auto message = qtgql::BaseGqlWsTrnsMsg(data);
+      auto message = gqlwstransport::BaseGqlWsTrnsMsg(data);
       auto message_type = message.type;
-      if (message_type == qtgql::PROTOCOL::PONG) {
+      if (message_type == gqlwstransport::PROTOCOL::PONG) {
         m_pong_received = true;
         if (!m_settings.handle_pong) {
           return;
         }
-      } else if (message_type == qtgql::PROTOCOL::CONNECTION_ACK &&
+      } else if (message_type == gqlwstransport::PROTOCOL::CONNECTION_ACK &&
                  !m_settings.handle_ack) {
         return;
       }
@@ -50,7 +50,7 @@ void DebugAbleClient::onTextMessageReceived(const QString &raw_message) {
 
 namespace test_utils {
 void wait_for_completion(
-    const std::shared_ptr<qtgql::OperationHandlerABC> handler) {
+    const std::shared_ptr<qtgql::gqlwstransport::OperationHandlerABC> handler) {
   REQUIRE(
       QTest::qWaitFor([&]() -> bool { return handler->completed(); }, 1500));
 }

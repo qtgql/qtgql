@@ -16,7 +16,7 @@ TEST_CASE("TimeScalarTestCase", "[generated-testcase]") {
 
   bases::Environment::set_gql_env(std::make_shared<bases::Environment>(
       "TimeScalarTestCase",
-      std::unique_ptr<qtgql::GqlWsTransportClient>(client)));
+      std::unique_ptr<gqlwstransport::GqlWsTransportClient>(client)));
   auto mq = std::make_shared<mainquery::MainQuery>();
   mq->fetch();
   REQUIRE(QTest::qWaitFor([&]() -> bool { return mq->completed(); }, 1500));

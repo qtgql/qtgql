@@ -2,8 +2,8 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "../../qtgql/bases/environment.hpp"
+#include "../../qtgql/gqlwstransport/gqlwstransport.hpp"
 #include "debugableclient.hpp"
-#include "qtgql/gqlwstransport/gqlwstransport.hpp"
 using namespace qtgql;
 
 QString get_subscription_str(bool raiseOn5 = false,
@@ -15,9 +15,10 @@ QString get_subscription_str(bool raiseOn5 = false,
 }
 
 struct DefaultHandler : public bases::HandlerABC {
-  qtgql::GqlWsTrnsMsgWithID m_message;
+  qtgql::gqlwstransport::GqlWsTrnsMsgWithID m_message;
   DefaultHandler(const QString &query = get_subscription_str())
-      : m_message{qtgql::GqlWsTrnsMsgWithID(qtgql::OperationPayload(query))} {};
+      : m_message{qtgql::gqlwstransport::GqlWsTrnsMsgWithID(
+            qtgql::gqlwstransport::OperationPayload(query))} {};
 
   QJsonArray m_errors;
   QJsonObject m_data;
@@ -49,7 +50,7 @@ struct DefaultHandler : public bases::HandlerABC {
 TEST_CASE("get operation name", "[gqlwstransport][ws-client]") {
   const QString operation_name = "SampleOperation";
   auto res_op_name =
-      qtgql::get_operation_name("query SampleOperation {field1 field2}");
+      utils::get_operation_name("query SampleOperation {field1 field2}");
   REQUIRE(res_op_name);
   REQUIRE(res_op_name.value() == operation_name);
 };

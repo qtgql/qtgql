@@ -12,7 +12,7 @@ namespace bases {
 
 struct HashAbleABC {
   [[nodiscard]] virtual QJsonObject serialize() const {
-    throw NotImplementedError({});
+    throw utils::NotImplementedError({});
   };
 };
 
@@ -40,7 +40,7 @@ class that should  support executing handlers
 class NetworkLayer {
  public:
   virtual void execute(const std::shared_ptr<HandlerABC> &handler) {
-    throw NotImplementedError({});
+    throw utils::NotImplementedError({});
   }
 };
 }  // namespace bases

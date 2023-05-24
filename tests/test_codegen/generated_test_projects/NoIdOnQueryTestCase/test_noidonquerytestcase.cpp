@@ -15,7 +15,7 @@ TEST_CASE("NoIdOnQueryTestCase", "[generated-testcase]") {
 
   bases::Environment::set_gql_env(std::make_shared<bases::Environment>(
       "NoIdOnQueryTestCase",
-      std::unique_ptr<qtgql::GqlWsTransportClient>(client)));
+      std::unique_ptr<qtgql::gqlwstransport::GqlWsTransportClient>(client)));
 
   auto mq = std::make_shared<mainquery::MainQuery>();
   SECTION("test appends id to query") {

@@ -14,7 +14,7 @@ TEST_CASE("DateTimeTestCase", "[generated-testcase]") {
 
   bases::Environment::set_gql_env(std::make_shared<bases::Environment>(
       "DateTimeTestCase",
-      std::unique_ptr<qtgql::GqlWsTransportClient>(client)));
+      std::unique_ptr<qtgql::gqlwstransport::GqlWsTransportClient>(client)));
 
   auto mq = std::make_shared<mainquery::MainQuery>();
   mq->fetch();

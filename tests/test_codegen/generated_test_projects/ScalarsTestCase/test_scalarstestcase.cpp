@@ -13,7 +13,8 @@ TEST_CASE("ScalarsTestCase", "[generated-testcase]") {
       {.print_debug = false, .prod_settings = {.url = addr}});
   client->wait_for_valid();
   bases::Environment::set_gql_env(std::make_shared<bases::Environment>(
-      "ScalarsTestCase", std::unique_ptr<qtgql::GqlWsTransportClient>(client)));
+      "ScalarsTestCase",
+      std::unique_ptr<gqlwstransport::GqlWsTransportClient>(client)));
 
   auto mq = std::make_shared<mainquery::MainQuery>();
   mq->fetch();

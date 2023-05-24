@@ -1,7 +1,8 @@
 {% import "macros.jinja.hpp" as macros -%}
 #pragma once
 #include "./schema.hpp"
-#include <qtgql/gqlwstransport/operationhandler.hpp>
+#include <qtgql/gqlwstransport/gqlwstransport.hpp>
+
 namespace 👉 context.config.env_name 👈{
 namespace 👉context.ns👈{
 
@@ -36,7 +37,7 @@ inline const 👉 f.property_type 👈 & 👉 f.definition.getter_name 👈() co
 };
 {% endfor %}
 
-class 👉 context.operation.name 👈: public qtgql::OperationHandlerABC {
+class 👉 context.operation.name 👈: public qtgql::gqlwstransport::OperationHandlerABC {
     Q_OBJECT
 Q_PROPERTY(const 👉 context.operation.root_field.property_type 👈* data READ get_data NOTIFY dataChanged);
 
@@ -48,7 +49,7 @@ inline const QString &ENV_NAME() override{
     }
 public:
 
-👉 context.operation.name 👈(): qtgql::OperationHandlerABC(qtgql::GqlWsTrnsMsgWithID(qtgql::OperationPayload(
+👉 context.operation.name 👈(): qtgql::gqlwstransport::OperationHandlerABC(qtgql::gqlwstransport::GqlWsTrnsMsgWithID(qtgql::gqlwstransport::OperationPayload(
         {%- for line in context.operation.query.splitlines() %}"👉 line 👈"{% endfor -%}
         ))){};
 

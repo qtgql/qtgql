@@ -4,7 +4,6 @@
 
 #include "qtgql/bases/bases.hpp"
 #include "qtgql/gqlwstransport/gqlwstransport.hpp"
-#include "qtgql/gqlwstransport/operationhandler.hpp"
 using namespace qtgql;
 
 QString get_server_address(const QString &suffix = "graphql");
@@ -13,10 +12,11 @@ struct DebugClientSettings {
   bool handle_ack = true;
   bool handle_pong = true;
   bool print_debug = false;
-  GqlWsTransportClientSettings prod_settings = {.url = get_server_address()};
+  gqlwstransport::GqlWsTransportClientSettings prod_settings = {
+      .url = get_server_address()};
 };
 
-class DebugAbleClient : public GqlWsTransportClient {
+class DebugAbleClient : public gqlwstransport::GqlWsTransportClient {
   void onTextMessageReceived(const QString &raw_message);
 
  public:
@@ -36,5 +36,6 @@ class DebugAbleClient : public GqlWsTransportClient {
 std::shared_ptr<DebugAbleClient> get_valid_client();
 
 namespace test_utils {
-void wait_for_completion(const std::shared_ptr<OperationHandlerABC> handler);
+void wait_for_completion(
+    const std::shared_ptr<gqlwstransport::OperationHandlerABC> handler);
 }

@@ -12,7 +12,7 @@ TEST_CASE("👉 context.test_name 👈", "[generated-testcase]") {
     client->wait_for_valid();
 
     bases::Environment::set_gql_env(std::make_shared<bases::Environment>(
-            "👉 context.config.env_name 👈", std::unique_ptr<qtgql::GqlWsTransportClient>(client)
+            "👉 context.config.env_name 👈", std::unique_ptr<qtgql::gqlwstransport::GqlWsTransportClient>(client)
     ));
 
     REQUIRE(false);
