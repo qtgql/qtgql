@@ -1,14 +1,16 @@
 #pragma once
-#include "../../../../../../../../../../usr/include/c++/11/type_traits"
-#include "../../../../../../../../MyConnandeps/Qt/6.5.0/gcc_64/include/QtCore/QDebug"
-#include "../../../../../../../../MyConnandeps/Qt/6.5.0/gcc_64/include/QtCore/QObject"
-#include "../../../../../../../../MyConnandeps/Qt/6.5.0/gcc_64/include/QtCore/QSet"
+#include "QDebug"
+#include "QObject"
+#include "QSet"
 #include "metadata.hpp"
+#include "type_traits"
 
 namespace qtgql {
+namespace bases {
 
 class ObjectTypeABC : public QObject {
   Q_OBJECT
+
   Q_PROPERTY(QString typeName READ getTypeName CONSTANT)
 
  private:
@@ -21,6 +23,7 @@ class ObjectTypeABC : public QObject {
 class ObjectTypeABCWithID : public ObjectTypeABC {
  public:
   using ObjectTypeABC::ObjectTypeABC;
+
   virtual const QString &get_id() const = 0;
 
   // TODO: can't use constructor for this class since it is abstract.
@@ -51,15 +54,19 @@ class NodeRecord {
 
  public:
   T_sharedQObject node;
+
   NodeRecord() { throw "tried to instantiate without arguments"; };
+
   NodeRecord(const T_sharedQObject &node_) { node = node_; };
 
   void retain(const QString &operation_name) {
     m_retainers.insert(operation_name);
   }
+
   void loose(const QString &operation_name) {
     m_retainers.remove(operation_name);
   }
+
   bool has_retainers() const { return m_retainers.isEmpty(); }
 };
 
@@ -98,4 +105,5 @@ class ObjectStore {
   }
 };
 
+}  // namespace bases
 }  // namespace qtgql

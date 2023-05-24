@@ -2,13 +2,14 @@
 #include <QObject>
 
 #include "gqlwstransport.hpp"
-#include "qtgql/bases/environment.hpp"
-#include "qtgql/bases/metadata.hpp"
+#include "qtgql/bases/bases.hpp"
 
 namespace qtgql {
+namespace gqlwstransport {
 
 class _OperationHandlerABCSignals : public QObject {
   Q_OBJECT
+
   Q_PROPERTY(bool completed READ completed NOTIFY completedChanged)
   Q_PROPERTY(bool operationOnFlight READ operation_on_flight NOTIFY
                  operationOnFlightChanged)
@@ -18,29 +19,35 @@ class _OperationHandlerABCSignals : public QObject {
   bool m_operation_on_the_fly = false;
 
  signals:
+
   void completedChanged();
+
   void operationOnFlightChanged();
+
   void error(const QJsonArray &);
 
  protected slots:
+
   void set_completed(bool v);
+
   void set_operation_on_flight(bool v);
 
  public:
   using QObject::QObject;
 
   bool completed() const;
+
   bool operation_on_flight();
 };
 
 // NOTE: This class should not be defined in the .cpp since it is abstract.
 class OperationHandlerABC
-    : public HandlerABC,
+    : public bases::HandlerABC,
       public _OperationHandlerABCSignals,
       public std::enable_shared_from_this<OperationHandlerABC> {
  protected:
-  const std::shared_ptr<Environment> &environment() {
-    static auto m_env = Environment::get_gql_env(ENV_NAME());
+  const std::shared_ptr<bases::Environment> &environment() {
+    static auto m_env = bases::Environment::get_gql_env(ENV_NAME());
     return m_env;
   };
   QJsonObject m_variables;
@@ -64,18 +71,23 @@ class OperationHandlerABC
       environment()->execute(a);
     }
   }
+
   void refetch() {
     set_completed(false);
     fetch();
   };
-  const HashAbleABC &message() override {
+
+  const bases::HashAbleABC &message() override {
     m_message_template.set_variables(m_variables);
     return m_message_template;
   };
+
   void on_completed() override { set_completed(true); };
+
   void on_error(const QJsonArray &errors) override {
     set_completed(true);
     emit error(errors);
   };
 };
-};  // namespace qtgql
+};  // namespace gqlwstransport
+}  // namespace qtgql

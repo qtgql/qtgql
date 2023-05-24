@@ -2,9 +2,10 @@
 #include <QTest>
 #include <catch2/catch_test_macros.hpp>
 
-#include "../qtgql/customscalars/inc/qtgql/customscalars/basecustomscalar.hpp"
+#include "qtgql/customscalars/customscalars.hpp"
 
-class CustomStringScalar : public qtgql::CustomScalarABC<QString, QString> {
+class CustomStringScalar
+    : public qtgql::customscalars::CustomScalarABC<QString, QString> {
   QString m_cached;
 
  public:

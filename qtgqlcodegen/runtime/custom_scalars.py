@@ -12,21 +12,21 @@ class CustomScalarDefinition:
 
 # An ISO-8601 encoded datetime.
 DateTimeScalarDefinition = CustomScalarDefinition(
-    type_name="qtgql::DateTimeScalar",
+    type_name="qtgql::customscalars::DateTimeScalar",
     graphql_name="DateTime",
     deserialized_type="QDateTime",
     property_type="QString",
     include_path="<qtgql/customscalars/customscalars.hpp>",
 )
 DateScalarDefinition = CustomScalarDefinition(
-    type_name="qtgql::DateScalar",
+    type_name="qtgql::customscalars::DateScalar",
     graphql_name="Date",
     deserialized_type="QDate",
     property_type="QString",
     include_path="<qtgql/customscalars/customscalars.hpp>",
 )
 TimeScalarDefinition = CustomScalarDefinition(
-    type_name="qtgql::TimeScalar",
+    type_name="qtgql::customscalars::TimeScalar",
     graphql_name="Time",
     deserialized_type="QTime",
     property_type="QString",
@@ -34,7 +34,7 @@ TimeScalarDefinition = CustomScalarDefinition(
 )
 
 DecimalScalarDefinition = CustomScalarDefinition(
-    type_name="qtgql::DecimalScalar",
+    type_name="qtgql::customscalars::DecimalScalar",
     graphql_name="Decimal",
     deserialized_type="QString",
     property_type="QString",

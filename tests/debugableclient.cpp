@@ -1,4 +1,5 @@
 #include "debugableclient.hpp"
+using namespace qtgql;
 
 QString get_server_address(const QString &suffix) {
   auto env_addr = std::getenv("SCHEMAS_SERVER_ADDR");
@@ -16,7 +17,7 @@ std::shared_ptr<DebugAbleClient> get_valid_client() {
 }
 
 bool DebugAbleClient::has_handler(
-    const std::shared_ptr<qtgql::HandlerABC> &handler) {
+    const std::shared_ptr<bases::HandlerABC> &handler) {
   return m_handlers.contains(handler->operation_id());
 }
 
@@ -29,16 +30,16 @@ void DebugAbleClient::onTextMessageReceived(const QString &raw_message) {
     }
     if (data.contains("id")) {
       // Any that contains ID is directed to a single handler.
-      auto message = qtgql::GqlWsTrnsMsgWithID(data);
+      auto message = gqlwstransport::GqlWsTrnsMsgWithID(data);
     } else {
-      auto message = qtgql::BaseGqlWsTrnsMsg(data);
+      auto message = gqlwstransport::BaseGqlWsTrnsMsg(data);
       auto message_type = message.type;
-      if (message_type == qtgql::PROTOCOL::PONG) {
+      if (message_type == gqlwstransport::PROTOCOL::PONG) {
         m_pong_received = true;
         if (!m_settings.handle_pong) {
           return;
         }
-      } else if (message_type == qtgql::PROTOCOL::CONNECTION_ACK &&
+      } else if (message_type == gqlwstransport::PROTOCOL::CONNECTION_ACK &&
                  !m_settings.handle_ack) {
         return;
       }
@@ -49,7 +50,7 @@ void DebugAbleClient::onTextMessageReceived(const QString &raw_message) {
 
 namespace test_utils {
 void wait_for_completion(
-    const std::shared_ptr<qtgql::OperationHandlerABC> handler) {
+    const std::shared_ptr<qtgql::gqlwstransport::OperationHandlerABC> handler) {
   REQUIRE(
       QTest::qWaitFor([&]() -> bool { return handler->completed(); }, 1500));
 }

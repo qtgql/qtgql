@@ -6,6 +6,7 @@
 #include "graphql/__generated__/MainQuery.hpp"
 
 namespace TimeScalarTestCase {
+using namespace qtgql;
 
 TEST_CASE("TimeScalarTestCase", "[generated-testcase]") {
   auto addr = get_server_address("18142566");
@@ -13,9 +14,9 @@ TEST_CASE("TimeScalarTestCase", "[generated-testcase]") {
       new DebugAbleClient(DebugClientSettings{.prod_settings = {.url = addr}});
   client->wait_for_valid();
 
-  qtgql::Environment::set_gql_env(std::make_shared<qtgql::Environment>(
+  bases::Environment::set_gql_env(std::make_shared<bases::Environment>(
       "TimeScalarTestCase",
-      std::unique_ptr<qtgql::GqlWsTransportClient>(client)));
+      std::unique_ptr<gqlwstransport::GqlWsTransportClient>(client)));
   auto mq = std::make_shared<mainquery::MainQuery>();
   mq->fetch();
   REQUIRE(QTest::qWaitFor([&]() -> bool { return mq->completed(); }, 1500));

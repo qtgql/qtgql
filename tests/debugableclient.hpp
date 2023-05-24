@@ -2,9 +2,9 @@
 #include <QTest>
 #include <catch2/catch_test_macros.hpp>
 
-#include "qtgql/bases/environment.hpp"
+#include "qtgql/bases/bases.hpp"
 #include "qtgql/gqlwstransport/gqlwstransport.hpp"
-#include "qtgql/gqlwstransport/operationhandler.hpp"
+using namespace qtgql;
 
 QString get_server_address(const QString &suffix = "graphql");
 
@@ -12,11 +12,11 @@ struct DebugClientSettings {
   bool handle_ack = true;
   bool handle_pong = true;
   bool print_debug = false;
-  qtgql::GqlWsTransportClientSettings prod_settings = {
+  gqlwstransport::GqlWsTransportClientSettings prod_settings = {
       .url = get_server_address()};
 };
 
-class DebugAbleClient : public qtgql::GqlWsTransportClient {
+class DebugAbleClient : public gqlwstransport::GqlWsTransportClient {
   void onTextMessageReceived(const QString &raw_message);
 
  public:
@@ -30,12 +30,12 @@ class DebugAbleClient : public qtgql::GqlWsTransportClient {
     }
   }
   bool is_reconnect_timer_active() { return m_reconnect_timer->isActive(); }
-  bool has_handler(const std::shared_ptr<qtgql::HandlerABC> &handler);
+  bool has_handler(const std::shared_ptr<bases::HandlerABC> &handler);
 };
 
 std::shared_ptr<DebugAbleClient> get_valid_client();
 
 namespace test_utils {
 void wait_for_completion(
-    const std::shared_ptr<qtgql::OperationHandlerABC> handler);
+    const std::shared_ptr<gqlwstransport::OperationHandlerABC> handler);
 }

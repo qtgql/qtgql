@@ -1,17 +1,10 @@
-#include "inc/qtgql/gqlwstransport/gqlwstransport.hpp"
+#include "gqlwstransport.hpp"
 
 #include <QtGlobal>
+using namespace qtgql;
+using namespace gqlwstransport;
 
-std::optional<QString> qtgql::get_operation_name(const QString &query) {
-  static QRegularExpression re("(subscription|mutation|query)( [0-9a-zA-Z]+)*");
-  auto match = re.match(query);
-  if (match.hasMatch()) {
-    return match.captured(2).trimmed();
-  }
-  return {};
-}
-
-qtgql::GqlWsTransportClient::GqlWsTransportClient(
+GqlWsTransportClient::GqlWsTransportClient(
     const GqlWsTransportClientSettings &settings)
     : m_url{settings.url}, QObject::QObject(settings.parent) {
   m_auto_reconnect = settings.auto_reconnect;
@@ -61,8 +54,7 @@ qtgql::GqlWsTransportClient::GqlWsTransportClient(
   init_connection(req);
 }
 
-void qtgql::GqlWsTransportClient::on_gql_next(
-    const GqlWsTrnsMsgWithID &message) {
+void GqlWsTransportClient::on_gql_next(const GqlWsTrnsMsgWithID &message) {
   if (message.has_payload()) {
     if (m_handlers.contains(message.op_id)) {
       auto handler = m_handlers.value(message.op_id);
@@ -71,8 +63,7 @@ void qtgql::GqlWsTransportClient::on_gql_next(
   }
 }
 
-void qtgql::GqlWsTransportClient::on_gql_error(
-    const GqlWsTrnsMsgWithID &message) {
+void GqlWsTransportClient::on_gql_error(const GqlWsTrnsMsgWithID &message) {
   qWarning() << "GraphQL Error occurred on ID: " << message.op_id.toString();
   if (message.has_errors()) {
     if (m_handlers.contains(message.op_id)) {
@@ -81,8 +72,7 @@ void qtgql::GqlWsTransportClient::on_gql_error(
   }
 }
 
-void qtgql::GqlWsTransportClient::on_gql_complete(
-    const GqlWsTrnsMsgWithID &message) {
+void GqlWsTransportClient::on_gql_complete(const GqlWsTrnsMsgWithID &message) {
   if (m_handlers.contains(message.op_id)) {
     auto handler = m_handlers.value(message.op_id);
     handler->on_completed();
@@ -90,7 +80,7 @@ void qtgql::GqlWsTransportClient::on_gql_complete(
   }
 }
 
-void qtgql::GqlWsTransportClient::on_gql_ack() {
+void GqlWsTransportClient::on_gql_ack() {
   send_message(DEF_MESSAGES::PING);
   m_ping_timer->start();
   m_ping_tester_timer->start();
@@ -100,36 +90,33 @@ void qtgql::GqlWsTransportClient::on_gql_ack() {
   }
 }
 
-void qtgql::GqlWsTransportClient::on_gql_pong() { m_ping_tester_timer->stop(); }
+void GqlWsTransportClient::on_gql_pong() { m_ping_tester_timer->stop(); }
 
-void qtgql::GqlWsTransportClient::on_gql_ping() {
-  send_message(DEF_MESSAGES::PONG);
-}
+void GqlWsTransportClient::on_gql_ping() { send_message(DEF_MESSAGES::PONG); }
 
-void qtgql::GqlWsTransportClient::onReconnectTimeout() {
+void GqlWsTransportClient::onReconnectTimeout() {
   if (!m_ws.isValid() || !m_connection_ack) {
     reconnect();
   }
 }
 
-void qtgql::GqlWsTransportClient::onPingTimeout() {
+void GqlWsTransportClient::onPingTimeout() {
   send_message(DEF_MESSAGES::PING);
   m_ping_tester_timer->start();
 }
 
-void qtgql::GqlWsTransportClient::onPingTesterTimeout() {
+void GqlWsTransportClient::onPingTesterTimeout() {
   qDebug() << "pong timeout reached, endpoint (" << m_url.toDisplayString()
            << ") did not send a pong the configured maximum delay";
   m_ws.close(QWebSocketProtocol::CloseCodeReserved1004);
   m_ping_tester_timer->stop();
 }
 
-void qtgql::GqlWsTransportClient::send_message(const HashAbleABC &message) {
+void GqlWsTransportClient::send_message(const bases::HashAbleABC &message) {
   m_ws.sendTextMessage(QJsonDocument(message.serialize()).toJson());
 }
 
-void qtgql::GqlWsTransportClient::onTextMessageReceived(
-    const QString &message) {
+void GqlWsTransportClient::onTextMessageReceived(const QString &message) {
   auto raw_data = QJsonDocument::fromJson(message.toUtf8());
   if (raw_data.isObject()) {
     auto data = raw_data.object();
@@ -158,7 +145,7 @@ void qtgql::GqlWsTransportClient::onTextMessageReceived(
   }
 }
 
-void qtgql::GqlWsTransportClient::onConnected() {
+void GqlWsTransportClient::onConnected() {
   qDebug() << "Connection established on url " << m_url.toDisplayString();
   send_message(DEF_MESSAGES::CONNECTION_INIT);
   if (m_reconnect_timer->isActive()) {
@@ -166,7 +153,7 @@ void qtgql::GqlWsTransportClient::onConnected() {
   }
 }
 
-void qtgql::GqlWsTransportClient::onDisconnected() {
+void GqlWsTransportClient::onDisconnected() {
   m_connection_ack = false;
   qDebug() << "disconnected from " << m_url.toDisplayString()
            << "close code: " << m_ws.closeCode() << " : " << m_ws.closeReason();
@@ -178,30 +165,28 @@ void qtgql::GqlWsTransportClient::onDisconnected() {
   }
 }
 
-void qtgql::GqlWsTransportClient::onError(
-    const QAbstractSocket::SocketError &error) {
+void GqlWsTransportClient::onError(const QAbstractSocket::SocketError &error) {
   qDebug() << "connection error occurred in " << typeid(this).name() << ": "
            << error;
 }
 
-void qtgql::GqlWsTransportClient::init_connection(
-    const QNetworkRequest &request) {
+void GqlWsTransportClient::init_connection(const QNetworkRequest &request) {
   this->m_ws.open(request, this->m_ws_options);
 }
 
-void qtgql::GqlWsTransportClient::close(QWebSocketProtocol::CloseCode closeCode,
-                                        const QString &reason) {
+void GqlWsTransportClient::close(QWebSocketProtocol::CloseCode closeCode,
+                                 const QString &reason) {
   m_ws.close(closeCode, reason);
 }
 
-bool qtgql::GqlWsTransportClient::is_valid() const { return m_ws.isValid(); }
+bool GqlWsTransportClient::is_valid() const { return m_ws.isValid(); }
 
-bool qtgql::GqlWsTransportClient::gql_is_valid() const {
+bool GqlWsTransportClient::gql_is_valid() const {
   return is_valid() && m_connection_ack;
 }
 
-void qtgql::GqlWsTransportClient::execute(
-    const std::shared_ptr<HandlerABC> &handler) {
+void GqlWsTransportClient::execute(
+    const std::shared_ptr<bases::HandlerABC> &handler) {
   m_handlers.insert(handler->operation_id(), handler);
   if (m_ws.isValid()) {
     send_message(handler->message());
@@ -213,6 +198,6 @@ void qtgql::GqlWsTransportClient::execute(
   }
 }
 
-void qtgql::GqlWsTransportClient::reconnect() {
+void GqlWsTransportClient::reconnect() {
   this->m_ws.open(m_ws.request(), m_ws_options);
 }

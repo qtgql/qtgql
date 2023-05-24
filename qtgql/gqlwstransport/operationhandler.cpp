@@ -1,7 +1,7 @@
-#include "qtgql/gqlwstransport/operationhandler.hpp"
+#include "operationhandler.hpp"
 
-namespace qtgql {
-
+using namespace qtgql;
+using namespace gqlwstransport;
 void _OperationHandlerABCSignals::set_completed(bool v) {
   if (m_completed != v) {
     m_completed = v;
@@ -23,5 +23,3 @@ bool _OperationHandlerABCSignals::completed() const { return m_completed; }
 bool _OperationHandlerABCSignals::operation_on_flight() {
   return m_operation_on_the_fly;
 }
-
-}  // namespace qtgql
