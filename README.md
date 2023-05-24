@@ -15,17 +15,17 @@ You can play-around and tell us what is wrong / missing / awesome :smile:.
 
 
 ### Features
-- [ ] object types, for each field there is a corresponding `Property`
+- [x] object types, for each field there is a corresponding `Q_PROPERTY`
 - [ ] enums
 - [ ] custom scalars
 - [ ] Unions
 - [ ] interfaces
 - [ ] Garbage collection
-- [ ] Type-safe Mutation handlers
-- [ ] Type-safe Query handlers: queries your server when a component uses this query (or imperatively fetched).
-- [ ] Query updates: fetch the same query multiple times would not instantiate everything from scratch
+- [ ] Type-safe operation handlers
+  - [x] Query.
+  - [ ] Mutations.
+  - [ ] Subscriptions.
+- [ ] updates: fetch the same query multiple times would not instantiate everything from scratch
 it would compare the current data with data received and emit __only__ the signals that are needed.
 - [x] Native-Qt client implementation of "[graphql-transport-ws](https://github.com/enisdenjo/graphql-ws/blob/master/PROTOCOL.md)" protocol (supports subscriptions) - You can provide your own network layer though.
-- [ ] Mutations.
-- [ ] Subscriptions.
 - [ ] Fully typed input variables.

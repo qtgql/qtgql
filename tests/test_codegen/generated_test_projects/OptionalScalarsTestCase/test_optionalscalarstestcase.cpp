@@ -26,8 +26,7 @@ TEST_CASE("OptionalScalarsTestCase", "[generated-testcase]") {
     REQUIRE(d->get_name() == qtgql::DEFAULTS::STRING);
     REQUIRE(d->get_agePoint() == qtgql::DEFAULTS::FLOAT);
     REQUIRE(d->get_uuid() == qtgql::DEFAULTS::UUID);
-    qDebug() << qtgql::DateTimeScalar().to_qt();
-    REQUIRE(d->get_birth() == qtgql::DateTimeScalar().to_qt());
+    REQUIRE(d->get_birth() == qtgql::customscalars::DateTimeScalar().to_qt());
   };
   SECTION("when not null") {
     mq->setVariables({false});
@@ -38,7 +37,7 @@ TEST_CASE("OptionalScalarsTestCase", "[generated-testcase]") {
     REQUIRE(d->get_name() != qtgql::DEFAULTS::STRING);
     REQUIRE(d->get_agePoint() != qtgql::DEFAULTS::FLOAT);
     REQUIRE(d->get_uuid() != qtgql::DEFAULTS::UUID);
-    REQUIRE(d->get_birth() != qtgql::DateTimeScalar().to_qt());
+    REQUIRE(d->get_birth() != qtgql::customscalars::DateTimeScalar().to_qt());
   }
 }
 

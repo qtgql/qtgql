@@ -51,7 +51,11 @@ class SchemaTemplateContext:
 
     @property
     def dependencies(self) -> list[str]:
-        return [f"#include {scalar.include_path}" for scalar in self.config.custom_scalars.values()]
+        ret: list[str] = []
+        for scalar in self.config.custom_scalars.values():
+            if scalar.include_path not in ret:
+                ret.append(scalar.include_path)
+        return [f"#include {inc}" for inc in ret]
 
     @property
     def custom_scalars(self) -> list[str]:
