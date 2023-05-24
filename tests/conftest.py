@@ -20,6 +20,7 @@ if TYPE_CHECKING:
 fake = Faker()
 
 IS_WINDOWS = platform.system() == "Windows"
+IS_GITHUB_ACTION = os.environ.get("CI", False)
 
 
 class PATHS:

@@ -17,6 +17,7 @@ from qtgqlcodegen.introspection import SchemaEvaluator
 from qtgqlcodegen.runtime.custom_scalars import CustomScalarDefinition
 from qtgqlcodegen.runtime.custom_scalars import DateTimeScalarDefinition
 from tests.conftest import hash_schema
+from tests.conftest import IS_GITHUB_ACTION
 from tests.test_codegen import schemas
 
 if TYPE_CHECKING:
@@ -662,9 +663,10 @@ implemented_testcases = [
 def generate_testcases() -> None:
     for testcase in implemented_testcases:
         testcase.generate()
-    # run pc hooks to reduce diffs
-    subprocess.run("pre-commit run -a".split(" "), check=False)
-    subprocess.run("pre-commit run -a".split(" "), check=False)
+    if not IS_GITHUB_ACTION:
+        # run pc hooks to reduce diffs
+        subprocess.run("pre-commit run -a".split(" "), check=False)
+        subprocess.run("pre-commit run -a".split(" "), check=False)
 
 
 if __name__ == "__main__":
