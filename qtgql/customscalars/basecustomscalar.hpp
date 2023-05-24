@@ -1,8 +1,9 @@
 #pragma once
-#include "../../../../../../../../MyConnandeps/Qt/6.5.0/gcc_64/include/QtCore/QJsonValue"
-#include "../../../../../../../../MyConnandeps/Qt/6.5.0/gcc_64/include/QtCore/QString"
+#include <QJsonValue>
+#include <QString>
 
 namespace qtgql {
+namespace customscalars {
 /*
  * T - would be the deserialized type.
  * T_QtType - the property type that would be exposed to QML, usually this would
@@ -37,8 +38,10 @@ class CustomScalarABC {
   bool operator==(const CustomScalarABC &other) const {
     return m_value == other.m_value;
   };
+
   bool operator!=(const CustomScalarABC &other) const {
     return !(operator==(other));
   }
 };
-}  // namespace qtgql
+};  // namespace customscalars
+};  // namespace qtgql

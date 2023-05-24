@@ -1,7 +1,6 @@
-#include "inc/qtgql/customscalars/customscalars.hpp"
-
+#include "implementations.hpp"
 namespace qtgql {
-
+namespace customscalars {
 const QString &DateTimeScalar::to_qt() {
   if (m_should_update) {
     m_cached_to_qt = m_value.toString("hh:mm (dd.mm.yyyy)");
@@ -67,5 +66,5 @@ const QString &DecimalScalar::GRAPHQL_NAME() {
 }
 
 const QString &DecimalScalar::to_qt() { return m_value; }
-
-}  // namespace qtgql
+};  // namespace customscalars
+};  // namespace qtgql
