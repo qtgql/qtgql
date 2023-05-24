@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+0.119.1 - 2023-05-24
+--------------------
+
+This release moves qtgql subcomponents into namespaces.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #221](https://github.com/qtgql/qtgql/pull/221/)
+
+
 0.119.0 - 2023-05-24
 --------------------
 
