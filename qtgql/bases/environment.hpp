@@ -1,9 +1,10 @@
 #pragma once
-#include "../../../../../../../../MyConnandeps/Qt/6.5.0/gcc_64/include/QtCore/QMap"
-#include "../../../../../../../../MyConnandeps/Qt/6.5.0/gcc_64/include/QtCore/QString"
 #include "./networklayer.hpp"
+#include "QMap"
+#include "QString"
 
 namespace qtgql {
+namespace bases {
 
 /*Encapsulates a schema interaction.
 
@@ -28,14 +29,18 @@ class Environment {
 
  public:
   const QString m_name;
+
   explicit Environment(const QString &name, UniqueNetworkLayer network_layer)
       : m_name(name), m_network_layer(std::move(network_layer)){};
 
   void execute(const std::shared_ptr<HandlerABC> &handler) {
     m_network_layer->execute(handler);
   }
+
   static void set_gql_env(SharedQtGqlEnv env);
+
   static SharedQtGqlEnv get_gql_env(const QString &name);
 };
 
+}  // namespace bases
 }  // namespace qtgql

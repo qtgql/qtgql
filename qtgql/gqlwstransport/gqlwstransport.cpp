@@ -124,7 +124,8 @@ void qtgql::GqlWsTransportClient::onPingTesterTimeout() {
   m_ping_tester_timer->stop();
 }
 
-void qtgql::GqlWsTransportClient::send_message(const HashAbleABC &message) {
+void qtgql::GqlWsTransportClient::send_message(
+    const bases::HashAbleABC &message) {
   m_ws.sendTextMessage(QJsonDocument(message.serialize()).toJson());
 }
 
@@ -201,7 +202,7 @@ bool qtgql::GqlWsTransportClient::gql_is_valid() const {
 }
 
 void qtgql::GqlWsTransportClient::execute(
-    const std::shared_ptr<HandlerABC> &handler) {
+    const std::shared_ptr<bases::HandlerABC> &handler) {
   m_handlers.insert(handler->operation_id(), handler);
   if (m_ws.isValid()) {
     send_message(handler->message());

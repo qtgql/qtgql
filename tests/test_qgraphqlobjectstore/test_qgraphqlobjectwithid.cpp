@@ -2,10 +2,11 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "fooobjectwithid.h"
+using namespace qtgql;
 
 TEST_CASE("Test QGraphQLObjectStore", "[templates]") {
   auto tested_obj = std::make_shared<Foo>("fooid");
-  auto obj_record = std::make_shared<qtgql::NodeRecord<Foo>>(tested_obj);
+  auto obj_record = std::make_shared<bases::NodeRecord<Foo>>(tested_obj);
   SECTION("can add to store") {
     Foo::INST_STORE().add_record(obj_record);
     REQUIRE(Foo::INST_STORE()

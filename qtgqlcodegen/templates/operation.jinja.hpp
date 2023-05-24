@@ -5,7 +5,7 @@
 namespace 👉 context.config.env_name 👈{
 namespace 👉context.ns👈{
 
-inline const qtgql::OperationMetadata OPERATION_METADATA = qtgql::OperationMetadata{
+inline const qtgql::bases::OperationMetadata OPERATION_METADATA = qtgql::bases::OperationMetadata{
         "👉 context.operation.name 👈",
         {
                 👉 context.operation.root_field.as_conf_string() 👈
@@ -24,7 +24,7 @@ std::shared_ptr<👉context.schema_ns👈::👉 t.definition.name 👈> m_inst;
 public:
 
 👉 t.name 👈(const QJsonObject& data,
-const qtgql::SelectionsConfig& config){
+const qtgql::bases::SelectionsConfig& config){
     m_inst = 👉context.schema_ns👈::👉 t.definition.name 👈::from_json(data, config, OPERATION_METADATA);
 
 }

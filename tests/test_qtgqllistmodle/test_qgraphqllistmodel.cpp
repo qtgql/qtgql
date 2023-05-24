@@ -3,17 +3,18 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "fooqobject.hpp"
-#include "qtgql/bases/listmodel.hpp"
+#include "qtgql/bases/bases.hpp"
 
 typedef std::shared_ptr<FooQObject> SharedFoo;
+using namespace qtgql;
 
-class SampleQGraphQLListModel : public qtgql::ListModelABC<FooQObject> {
+class SampleQGraphQLListModel : public bases::ListModelABC<FooQObject> {
   void update(const QList<QJsonObject>& data,
-              const qtgql::SelectionsConfig& selections) override {
+              const bases::SelectionsConfig& selections) override {
     std::ignore = data;
     std::ignore = selections;
   }
-  using qtgql::ListModelABC<FooQObject>::ListModelABC;
+  using bases::ListModelABC<FooQObject>::ListModelABC;
 };
 
 struct CompleteSpy {
@@ -44,16 +45,16 @@ TEST_CASE("default QGraphQLListModelABC modifications and operations",
   }
   auto model_with_data =
       SampleQGraphQLListModel{nullptr, std::move(__init_list)};
-  QSignalSpy __pre_remove(&model_with_data,
+  QSignalSpy p_pre_remove(&model_with_data,
                           &SampleQGraphQLListModel::rowsAboutToBeRemoved);
-  QSignalSpy __after_remove(&model_with_data,
+  QSignalSpy p_after_remove(&model_with_data,
                             &SampleQGraphQLListModel::rowsRemoved);
-  CompleteSpy remove_spy(&__pre_remove, &__after_remove);
-  QSignalSpy __pre_insert(&model_with_data,
+  CompleteSpy remove_spy(&p_pre_remove, &p_after_remove);
+  QSignalSpy p_pre_insert(&model_with_data,
                           &SampleQGraphQLListModel::rowsAboutToBeInserted);
-  QSignalSpy __after_insert(&model_with_data,
+  QSignalSpy p_after_insert(&model_with_data,
                             &SampleQGraphQLListModel::rowsInserted);
-  CompleteSpy insert_spy(&__pre_insert, &__after_insert);
+  CompleteSpy insert_spy(&p_pre_insert, &p_after_insert);
 
   SECTION("object role is USER_ROLE + 1") {
     int expected = Qt::UserRole + 1;

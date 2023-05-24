@@ -1,4 +1,5 @@
 #include "debugableclient.hpp"
+using namespace qtgql;
 
 QString get_server_address(const QString &suffix) {
   auto env_addr = std::getenv("SCHEMAS_SERVER_ADDR");
@@ -16,7 +17,7 @@ std::shared_ptr<DebugAbleClient> get_valid_client() {
 }
 
 bool DebugAbleClient::has_handler(
-    const std::shared_ptr<qtgql::HandlerABC> &handler) {
+    const std::shared_ptr<bases::HandlerABC> &handler) {
   return m_handlers.contains(handler->operation_id());
 }
 

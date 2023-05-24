@@ -8,7 +8,8 @@
 #include <deque>
 #include <memory>
 #include <optional>
-#include <qtgql/bases/networklayer.hpp>
+
+#include "../../../../bases/networklayer.hpp"
 
 namespace qtgql {
 
@@ -29,7 +30,7 @@ inline const QString SUBSCRIBE =
 
 std::optional<QString> get_operation_name(const QString &query);
 
-struct BaseGqlWsTrnsMsg : public HashAbleABC {
+struct BaseGqlWsTrnsMsg : public bases::HashAbleABC {
   QString type;
   QJsonObject payload;
 
@@ -64,7 +65,7 @@ struct BaseGqlWsTrnsMsg : public HashAbleABC {
   }
 };
 
-struct OperationPayload : public HashAbleABC {
+struct OperationPayload : public bases::HashAbleABC {
   QString query;
   QString operationName;
   explicit OperationPayload(const QString &_query) : query{_query} {
@@ -124,11 +125,11 @@ struct GqlWsTransportClientSettings {
   const QList<std::pair<QString, QString>> headers = {};
 };
 
-class GqlWsTransportClient : public QObject, public NetworkLayer {
+class GqlWsTransportClient : public QObject, public bases::NetworkLayer {
   Q_OBJECT
  private:
   GqlWsTransportClient() = delete;
-  void send_message(const HashAbleABC &message);
+  void send_message(const bases::HashAbleABC &message);
 
  private Q_SLOTS:
   void onReconnectTimeout();
@@ -145,9 +146,9 @@ class GqlWsTransportClient : public QObject, public NetworkLayer {
   QWebSocket m_ws;
   QWebSocketHandshakeOptions m_ws_options;
 
-  QMap<QUuid, std::shared_ptr<HandlerABC>> m_handlers;
+  QMap<QUuid, std::shared_ptr<bases::HandlerABC>> m_handlers;
   // handlers that theirs execution was deferred due to connection issues.
-  QSet<std::shared_ptr<HandlerABC>> m_pending_handlers;
+  QSet<std::shared_ptr<bases::HandlerABC>> m_pending_handlers;
 
   // general protocol handlers:
   void on_gql_ack();
@@ -174,7 +175,7 @@ class GqlWsTransportClient : public QObject, public NetworkLayer {
   // whether received connection_ack message and ws is valid.
   bool gql_is_valid() const;
   // execute / pend a handler for execution.
-  void execute(const std::shared_ptr<HandlerABC> &handler) override;
+  void execute(const std::shared_ptr<bases::HandlerABC> &handler) override;
   // reconnect with previous settings.
   void reconnect();
 };

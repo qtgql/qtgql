@@ -1,9 +1,9 @@
 #pragma once
 #include <QObject>
 
+#include "../../../../bases/environment.hpp"
+#include "../../../../bases/metadata.hpp"
 #include "gqlwstransport.hpp"
-#include "qtgql/bases/environment.hpp"
-#include "qtgql/bases/metadata.hpp"
 
 namespace qtgql {
 
@@ -35,12 +35,12 @@ class _OperationHandlerABCSignals : public QObject {
 
 // NOTE: This class should not be defined in the .cpp since it is abstract.
 class OperationHandlerABC
-    : public HandlerABC,
+    : public bases::HandlerABC,
       public _OperationHandlerABCSignals,
       public std::enable_shared_from_this<OperationHandlerABC> {
  protected:
-  const std::shared_ptr<Environment> &environment() {
-    static auto m_env = Environment::get_gql_env(ENV_NAME());
+  const std::shared_ptr<bases::Environment> &environment() {
+    static auto m_env = bases::Environment::get_gql_env(ENV_NAME());
     return m_env;
   };
   QJsonObject m_variables;
@@ -68,7 +68,7 @@ class OperationHandlerABC
     set_completed(false);
     fetch();
   };
-  const HashAbleABC &message() override {
+  const bases::HashAbleABC &message() override {
     m_message_template.set_variables(m_variables);
     return m_message_template;
   };

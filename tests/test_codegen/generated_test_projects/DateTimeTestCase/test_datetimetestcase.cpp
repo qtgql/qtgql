@@ -5,14 +5,14 @@
 #include "debugableclient.hpp"
 #include "graphql/__generated__/MainQuery.hpp"
 namespace DateTimeTestCase {
-
+using namespace qtgql;
 TEST_CASE("DateTimeTestCase", "[generated-testcase]") {
   auto addr = get_server_address("24025234");
   auto client =
       new DebugAbleClient(DebugClientSettings{.prod_settings = {.url = addr}});
   client->wait_for_valid();
 
-  qtgql::Environment::set_gql_env(std::make_shared<qtgql::Environment>(
+  bases::Environment::set_gql_env(std::make_shared<bases::Environment>(
       "DateTimeTestCase",
       std::unique_ptr<qtgql::GqlWsTransportClient>(client)));
 
