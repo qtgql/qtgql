@@ -69,8 +69,22 @@ inline const 👉 context.operation.root_field.property_type 👈* get_data(){
     return m_data.get();
 }
 
+{% if context.operation.variables %}
+void setVariables(
+{% for var in context.operation.variables -%}
+const std::optional<👉 var.type.member_type 👈>  👉 var.name 👈 {% if not loop.last %},{% endif %}
+{% endfor -%}){
+{% for var in context.operation.variables %}
+if (👉 var.name 👈.has_value()){
+    m_variables.insert("👉 var.name 👈",  👉 var.json_repr() 👈);
+}
+{% endfor %}
+}
+{% endif %}
+
 signals:
-    void dataChanged();
+void dataChanged();
+
 };
 };
 };

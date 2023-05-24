@@ -140,7 +140,7 @@ class QGQLObjectTestCase:
         link_line = "target_link_libraries(${TESTS_TARGET} PRIVATE generated::%s)" % (
             self.config.env_name
         )
-        if link_line not in prev:
+        if self.config.env_name not in prev:
             TST_CMAKE.write_text(prev + f"\n {link_line}")
 
 
@@ -164,11 +164,14 @@ ScalarsTestCase = QGQLObjectTestCase(
 OptionalScalarsTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_optional_scalar.schema,
     query="""
-    query MainQuery {
-        user{
-            name
-            age
-        }
+    query MainQuery($returnNone: Boolean! = false) {
+      user(retNone: $returnNone) {
+        name
+        age
+        agePoint
+        uuid
+        birth
+      }
     }
     """,
     test_name="OptionalScalarsTestCase",
@@ -618,15 +621,16 @@ ListOfInterfaceTestcase = QGQLObjectTestCase(
 )
 all_test_cases = [
     ScalarsTestCase,
+    OptionalScalarsTestCase,
     NoIdOnQueryTestCase,
     DateTimeTestCase,
     DateTestCase,
     TimeScalarTestCase,
     DecimalTestCase,
-    OptionalScalarsTestCase,
     NestedObjectTestCase,
     OptionalNestedObjectTestCase,
     ObjectWithListOfObjectTestCase,
+    OperationVariableTestCase,
     InterfaceTestCase,
     UnionTestCase,
     ListOfObjectWithUnionTestCase,

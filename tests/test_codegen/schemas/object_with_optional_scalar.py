@@ -1,4 +1,6 @@
+from datetime import datetime
 from typing import Optional
+from uuid import UUID
 
 import strawberry
 
@@ -10,6 +12,8 @@ class User(Node):
     name: Optional[str] = None
     age: Optional[int] = None
     age_point: Optional[float] = None
+    uuid: UUID | None = None
+    birth: datetime | None = None
 
 
 @strawberry.type

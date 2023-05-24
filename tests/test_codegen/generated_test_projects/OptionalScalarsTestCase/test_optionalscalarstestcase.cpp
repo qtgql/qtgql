@@ -7,7 +7,7 @@
 namespace OptionalScalarsTestCase {
 
 TEST_CASE("OptionalScalarsTestCase", "[generated-testcase]") {
-  auto addr = get_server_address("56413013");
+  auto addr = get_server_address("15332448");
   auto client =
       new DebugAbleClient(DebugClientSettings{.prod_settings = {.url = addr}});
   client->wait_for_valid();
@@ -16,13 +16,17 @@ TEST_CASE("OptionalScalarsTestCase", "[generated-testcase]") {
       "OptionalScalarsTestCase",
       std::unique_ptr<qtgql::GqlWsTransportClient>(client)));
   auto mq = std::make_shared<mainquery::MainQuery>();
-  mq->fetch();
-  SECTION("test scalar types and deserialization") {
+
+  SECTION("when null returns default values") {
+    mq->setVariables({true});
+    mq->fetch();
     REQUIRE(QTest::qWaitFor([&]() -> bool { return mq->completed(); }, 1500));
     auto d = mq->get_data();
     REQUIRE(d->get_age() == qtgql::DEFAULTS::INT);
-    REQUIRE(d->get_id() == "FakeID");
     REQUIRE(d->get_name() == qtgql::DEFAULTS::STRING);
+    REQUIRE(d->get_agePoint() == qtgql::DEFAULTS::FLOAT);
+    REQUIRE(d->get_uuid() == qtgql::DEFAULTS::UUID);
+    REQUIRE(d->get_birth() == qtgql::DateTimeScalar().to_qt());
   };
 }
 

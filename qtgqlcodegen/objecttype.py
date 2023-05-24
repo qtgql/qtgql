@@ -68,11 +68,11 @@ class QtGqlVariableDefinition(Generic[T], QtGqlBaseTypedNode):
         if not attr_name:
             attr_name = self.name
         if self.type.is_input_object_type:
-            return f"{attr_name}.asdict()"
+            raise NotImplementedError
         elif self.type.is_builtin_scalar:
-            return attr_name
+            return f"{attr_name}.value()"
         elif self.type.is_enum:
-            return f"{attr_name}.name"
+            raise NotImplementedError
         elif self.is_custom_scalar:
             raise NotImplementedError
 
