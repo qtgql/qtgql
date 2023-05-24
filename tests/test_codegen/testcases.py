@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import os
+import re
+import subprocess
 from functools import cached_property
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -15,6 +17,7 @@ from qtgqlcodegen.introspection import SchemaEvaluator
 from qtgqlcodegen.runtime.custom_scalars import CustomScalarDefinition
 from qtgqlcodegen.runtime.custom_scalars import DateTimeScalarDefinition
 from tests.conftest import hash_schema
+from tests.conftest import IS_GITHUB_ACTION
 from tests.test_codegen import schemas
 
 if TYPE_CHECKING:
@@ -105,11 +108,15 @@ class QGQLObjectTestCase:
             custom_scalars=self.custom_scalars,
         )
 
+    @cached_property
+    def url_suffix(self):
+        return str(hash_schema(self.schema))
+
     def generate(self) -> None:
         self.config.env_name = self.test_name
         template_context = TstTemplateContext(
             config=self.config,
-            url_suffix=str(hash_schema(self.schema)),
+            url_suffix=self.url_suffix,
             test_name=self.test_name,
         )
         self.schema_dir.write_text(self.schema.as_str())
@@ -118,6 +125,13 @@ class QGQLObjectTestCase:
         generated_test_case = self.test_dir / f"test_{self.test_name.lower()}.cpp"
         if not generated_test_case.exists():
             generated_test_case.write_text(TST_CATCH2_TEMPLATE.render(context=template_context))
+        else:
+            updated = re.sub(
+                'get_server_address\\("([0-9])*"\\)',
+                f'get_server_address("{self.url_suffix}")',
+                generated_test_case.read_text(),
+            )
+            generated_test_case.write_text(updated)
 
         cwd = Path.cwd()
         os.chdir(self.config_dir.parent)
@@ -127,7 +141,7 @@ class QGQLObjectTestCase:
         link_line = "target_link_libraries(${TESTS_TARGET} PRIVATE generated::%s)" % (
             self.config.env_name
         )
-        if link_line not in prev:
+        if self.config.env_name not in prev:
             TST_CMAKE.write_text(prev + f"\n {link_line}")
 
 
@@ -147,6 +161,21 @@ ScalarsTestCase = QGQLObjectTestCase(
         }
         """,
     test_name="ScalarsTestCase",
+)
+OptionalScalarsTestCase = QGQLObjectTestCase(
+    schema=schemas.object_with_optional_scalar.schema,
+    query="""
+    query MainQuery($returnNone: Boolean! = false) {
+      user(retNone: $returnNone) {
+        name
+        age
+        agePoint
+        uuid
+        birth
+      }
+    }
+    """,
+    test_name="OptionalScalarsTestCase",
 )
 NoIdOnQueryTestCase = QGQLObjectTestCase(  # should append id automatically.
     schema=schemas.object_with_scalar.schema,
@@ -213,18 +242,7 @@ TimeScalarTestCase = QGQLObjectTestCase(
         """,
     test_name="TimeScalarTestCase",
 )
-OptionalScalarTestCase = QGQLObjectTestCase(
-    schema=schemas.object_with_optional_scalar.schema,
-    query="""
-    query MainQuery {
-        user{
-            name
-            age
-        }
-    }
-    """,
-    test_name="OptionalScalarTestCase",
-)
+
 
 OperationErrorTestCase = QGQLObjectTestCase(
     schema=schemas.operation_error.schema,
@@ -604,15 +622,16 @@ ListOfInterfaceTestcase = QGQLObjectTestCase(
 )
 all_test_cases = [
     ScalarsTestCase,
+    OptionalScalarsTestCase,
     NoIdOnQueryTestCase,
     DateTimeTestCase,
     DateTestCase,
     TimeScalarTestCase,
     DecimalTestCase,
-    OptionalScalarTestCase,
     NestedObjectTestCase,
     OptionalNestedObjectTestCase,
     ObjectWithListOfObjectTestCase,
+    OperationVariableTestCase,
     InterfaceTestCase,
     UnionTestCase,
     ListOfObjectWithUnionTestCase,
@@ -637,12 +656,17 @@ implemented_testcases = [
     DecimalTestCase,
     DateTestCase,
     TimeScalarTestCase,
+    OptionalScalarsTestCase,
 ]
 
 
 def generate_testcases() -> None:
     for testcase in implemented_testcases:
         testcase.generate()
+    if not IS_GITHUB_ACTION:
+        # run pc hooks to reduce diffs
+        subprocess.run("pre-commit run -a".split(" "), check=False)
+        subprocess.run("pre-commit run -a".split(" "), check=False)
 
 
 if __name__ == "__main__":

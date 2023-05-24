@@ -13,3 +13,7 @@ target_link_libraries(${TESTS_TARGET} PRIVATE generated::DateTestCase)
 add_subdirectory(
   generated_test_projects/TimeScalarTestCase/graphql/__generated__)
 target_link_libraries(${TESTS_TARGET} PRIVATE generated::TimeScalarTestCase)
+add_subdirectory(
+  generated_test_projects/OptionalScalarsTestCase/graphql/__generated__)
+target_link_libraries(${TESTS_TARGET}
+                      PRIVATE generated::OptionalScalarsTestCase)

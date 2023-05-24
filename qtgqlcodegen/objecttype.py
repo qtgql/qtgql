@@ -68,11 +68,11 @@ class QtGqlVariableDefinition(Generic[T], QtGqlBaseTypedNode):
         if not attr_name:
             attr_name = self.name
         if self.type.is_input_object_type:
-            return f"{attr_name}.asdict()"
+            raise NotImplementedError
         elif self.type.is_builtin_scalar:
-            return attr_name
+            return f"{attr_name}.value()"
         elif self.type.is_enum:
-            return f"{attr_name}.name"
+            raise NotImplementedError
         elif self.is_custom_scalar:
             raise NotImplementedError
 
@@ -94,23 +94,21 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
     @cached_property
     def default_value(self):
         if builtin_scalar := self.type.is_builtin_scalar:
-            if builtin_scalar.tp is str:
-                return f"'{builtin_scalar.default_value}'"
-            return f"{builtin_scalar.default_value}"
+            return builtin_scalar.default_value
         if self.type.is_object_type:
-            return "None"
+            raise NotImplementedError
 
         if self.type.is_model:
             # this would just generate the model without data.
-            return "list()"
+            raise NotImplementedError
 
         if self.type.is_custom_scalar:
             return "{}"
 
         if enum_def := self.type.is_enum:
-            return f"{enum_def.name}(1)"  # 1 is where auto() starts.
+            raise NotImplementedError
 
-        return "None"  # Unions are not supported yet.
+        raise NotImplementedError
 
     @cached_property
     def fget_annotation(self) -> str:

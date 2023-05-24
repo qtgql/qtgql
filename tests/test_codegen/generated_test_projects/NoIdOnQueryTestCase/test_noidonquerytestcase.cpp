@@ -20,7 +20,7 @@ TEST_CASE("NoIdOnQueryTestCase", "[generated-testcase]") {
   SECTION("test appends id to query") {
     mq->fetch();
     REQUIRE(QTest::qWaitFor([&]() -> bool { return mq->completed(); }, 1500));
-    REQUIRE(mq->get_data()->get_id() != qtgql::CONSTANTS::ID);
+    REQUIRE(mq->get_data()->get_id() != qtgql::DEFAULTS::ID);
     REQUIRE(true);
   }
 }

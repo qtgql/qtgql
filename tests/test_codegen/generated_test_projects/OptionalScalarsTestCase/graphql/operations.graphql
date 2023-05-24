@@ -1,0 +1,10 @@
+
+    query MainQuery($returnNone: Boolean! = false) {
+      user(retNone: $returnNone) {
+        name
+        age
+        agePoint
+        uuid
+        birth
+      }
+    }

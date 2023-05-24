@@ -1,6 +1,6 @@
 {% macro deserialize_field(f, assign_to, include_selection_check = True) -%}
 
-if ({% if include_selection_check %}config.selections.contains("👉f.name👈") && {% endif %} data.contains("👉f.name👈")){
+if ({% if include_selection_check %}config.selections.contains("👉f.name👈") && {% endif %} !data.value("👉f.name👈").isNull()){
 {% if f.type.is_object_type -%}
 
   👉 assign_to 👈 = 👉f.type.is_object_type.name👈.from_dict(
@@ -44,7 +44,7 @@ for node in field_data:
 👉 assign_to 👈 = qtgql::ListModel(parent, data=model_data)
 {% endif %}
 {% elif f.type.is_builtin_scalar -%}
-👉 assign_to 👈 = data.value("👉f.name👈").👉 f.type.type.from_json_convertor 👈;
+👉 assign_to 👈 = data.value("👉f.name👈").👉 f.type.is_builtin_scalar.from_json_convertor 👈;
 {% elif f.is_custom_scalar -%}
 👉 assign_to 👈 = 👉 f.is_custom_scalar.type_name 👈();
 👉 assign_to 👈.deserialize(data.value("👉f.name👈"));

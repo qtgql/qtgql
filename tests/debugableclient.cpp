@@ -46,3 +46,11 @@ void DebugAbleClient::onTextMessageReceived(const QString &raw_message) {
   }
   GqlWsTransportClient::onTextMessageReceived(raw_message);
 }
+
+namespace test_utils {
+void wait_for_completion(
+    const std::shared_ptr<qtgql::OperationHandlerABC> handler) {
+  REQUIRE(
+      QTest::qWaitFor([&]() -> bool { return handler->completed(); }, 1500));
+}
+}  // namespace test_utils
