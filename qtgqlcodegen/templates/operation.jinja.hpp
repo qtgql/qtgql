@@ -8,9 +8,7 @@ namespace 👉context.ns👈{
 
 inline const qtgql::bases::OperationMetadata OPERATION_METADATA = qtgql::bases::OperationMetadata{
         "👉 context.operation.name 👈",
-        {
-                👉 context.operation.root_field.as_conf_string() 👈
-        }
+        {👉 context.operation.root_field.as_conf_string() 👈}
 };
 
 
@@ -21,17 +19,23 @@ class 👉 t.name 👈{
  */
     Q_GADGET
 std::shared_ptr<👉context.schema_ns👈::👉 t.definition.name 👈> m_inst;
+{% for ref in t.references -%}
+std::unique_ptr<👉ref.narrowed_type.name👈> m_👉ref.name👈;
+{% endfor %}
 
 public:
-
-👉 t.name 👈(const QJsonObject& data,
-const qtgql::bases::SelectionsConfig& config){
-    m_inst = 👉context.schema_ns👈::👉 t.definition.name 👈::from_json(data, config, OPERATION_METADATA);
-
+👉 t.name 👈(const std::shared_ptr<👉 t.definition.name 👈> inst ): m_inst{inst}{
+{% for ref in t.references -%}
+m_👉ref.name👈 = std::make_unique<👉ref.narrowed_type.name👈>(m_inst->👉ref.definition.getter_name 👈());
+{% endfor %}
 }
 {%- for f in t.fields.values() %}
-inline const 👉 f.property_type 👈 & 👉 f.definition.getter_name 👈() const {
+[[nodiscard]] inline const 👉 f.property_type 👈 & 👉 f.definition.getter_name 👈() const {
+    {% if f.type.is_object_type %}
+    return *m_👉f.name👈;
+    {% else %}
     return m_inst->👉 f.definition.getter_name 👈();
+    {% endif %}
 };
 {% endfor -%}
 };
@@ -62,7 +66,10 @@ void on_next(const QJsonObject &message) override{
     if (!m_data && message.contains("data")){
         auto data = message.value("data").toObject();
         if (data.contains("👉 context.operation.root_field.name 👈")){
-            m_data = std::make_unique<👉 context.operation.root_field.property_type 👈>(data.value("👉 context.operation.root_field.name 👈").toObject(), OPERATION_METADATA.selections);
+            m_data = std::make_unique<👉 context.operation.root_field.property_type 👈>(
+👉context.schema_ns👈::👉 context.operation.root_field.definition.type.is_object_type.name 👈::from_json(
+        data.value("👉 context.operation.root_field.name 👈").toObject(), OPERATION_METADATA.selections, OPERATION_METADATA)
+);
         }
     }
 }

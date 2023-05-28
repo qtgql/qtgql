@@ -657,6 +657,7 @@ implemented_testcases = [
     DateTestCase,
     TimeScalarTestCase,
     OptionalScalarsTestCase,
+    NestedObjectTestCase,
 ]
 
 

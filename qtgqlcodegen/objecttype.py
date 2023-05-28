@@ -96,7 +96,7 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
         if builtin_scalar := self.type.is_builtin_scalar:
             return builtin_scalar.default_value
         if self.type.is_object_type:
-            raise NotImplementedError
+            return "{}"
 
         if self.type.is_model:
             # this would just generate the model without data.
@@ -325,7 +325,7 @@ class GqlTypeHinter(TypeHinter):
         if model_of := t_self.is_model:
             return f"{QtGqlTypes.QGraphQLList.name}[{model_of.member_type}]"
         if object_def := t_self.is_object_type or t_self.is_interface:
-            return f"{object_def.name}"
+            return f"std::shared_ptr<{object_def.name}>"
         if q_object_def := t_self.is_queried_object_type:
             return f"{q_object_def.name}"
         if t_self.is_union:

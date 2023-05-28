@@ -98,6 +98,7 @@ class QtGqlQueriedField:
         selection_set: Optional[gql_lang.SelectionSetNode],
         operation: QtGqlOperationDefinition,
         parent_interface_field: Optional[QtGqlQueriedField] = UNSET,
+        is_root: bool = False,
     ) -> QtGqlQueriedField:
         """Main purpose here is to find inner selections of fields, this could
         be an object type, interface, union or a list.
@@ -232,6 +233,7 @@ class QtGqlQueriedField:
 class QtGqlQueriedObjectType:
     definition: QtGqlObjectTypeDefinition = attrs.field(on_setattr=attrs.setters.frozen)
     fields: dict[str, QtGqlQueriedField] = attrs.Factory(dict)
+    is_root_field: bool = False
 
     @cached_property
     def name(self) -> str:
@@ -243,6 +245,10 @@ class QtGqlQueriedObjectType:
             self.definition.name,
             "\n   ".join(self.fields.keys()),
         )
+
+    @cached_property
+    def references(self) -> list[QtGqlQueriedField]:
+        return [f for f in self.fields.values() if f.type.is_object_type]
 
 
 @define(slots=False)
@@ -289,6 +295,7 @@ class QtGqlOperationDefinition:
             root_field_def.selection_set,
             self,
             parent_interface_field=None,
+            is_root=True,
         )
 
     @classmethod

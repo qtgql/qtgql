@@ -17,3 +17,6 @@ add_subdirectory(
   generated_test_projects/OptionalScalarsTestCase/graphql/__generated__)
 target_link_libraries(${TESTS_TARGET}
                       PRIVATE generated::OptionalScalarsTestCase)
+add_subdirectory(
+  generated_test_projects/NestedObjectTestCase/graphql/__generated__)
+target_link_libraries(${TESTS_TARGET} PRIVATE generated::NestedObjectTestCase)
