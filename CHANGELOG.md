@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+0.119.2 - 2023-05-28
+--------------------
+
+This release adds support for nested object types.
+operation proxies does not refer to the concrete instance directly
+rather they are pointing to an instantiated
+proxy of the concrete.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #222](https://github.com/qtgql/qtgql/pull/222/)
+
+
 0.119.1 - 2023-05-24
 --------------------
 
