@@ -1,0 +1,9 @@
+
+    query MainQuery($return_null: Boolean!) {
+      user(returnNull: $return_null) {
+        person {
+          name
+          age
+        }
+      }
+    }

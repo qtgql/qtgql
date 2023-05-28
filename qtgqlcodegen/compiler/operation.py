@@ -77,6 +77,7 @@ class QtGqlQueriedField:
         if self.definition.type.is_object_type:
             assert self.narrowed_type
             return self.narrowed_type.name
+
         if cs := self.definition.is_custom_scalar:
             return cs.property_type
         return self.type.member_type
