@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+0.119.3 - 2023-05-28
+--------------------
+
+Adding support for optional object inside an object.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #224](https://github.com/qtgql/qtgql/pull/224/)
+
+
 0.119.2 - 2023-05-28
 --------------------
 
