@@ -17,7 +17,11 @@ TEST_CASE("NestedObjectTestCase", "[generated-testcase]") {
       "NestedObjectTestCase",
       std::unique_ptr<qtgql::gqlwstransport::GqlWsTransportClient>(client)));
 
-  REQUIRE(false);
+  auto mq = std::make_shared<mainquery::MainQuery>();
+  mq->fetch();
+  test_utils::wait_for_completion(mq);
+  auto name = mq->get_data()->get_person().get_name();
+  REQUIRE((!name.isEmpty() && name != bases::DEFAULTS::STRING));
 }
 
 };  // namespace NestedObjectTestCase
