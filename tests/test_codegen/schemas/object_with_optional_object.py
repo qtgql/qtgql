@@ -21,8 +21,11 @@ class Person(Node):
 @strawberry.type
 class Query:
     @strawberry.field
-    def user(self) -> User:
-        return User(person=None)
+    def user(self, return_null: bool = False) -> User:
+        if return_null:
+            return User(person=None)
+        else:
+            return User(person=Person(name="nir", age=24))
 
 
 schema = strawberry.Schema(query=Query)

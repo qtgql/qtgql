@@ -24,18 +24,32 @@ std::unique_ptr<👉ref.narrowed_type.name👈> m_👉ref.name👈;
 {% endfor %}
 
 public:
-👉 t.name 👈(const std::shared_ptr<👉 t.definition.name 👈> inst ): m_inst{inst}{
+👉 t.name 👈(const std::shared_ptr<👉 t.definition.name 👈> &inst ): m_inst{inst}{
 {% for ref in t.references -%}
+{% if ref.type.is_optional() %}
+if (m_inst->👉ref.definition.getter_name 👈()){
 m_👉ref.name👈 = std::make_unique<👉ref.narrowed_type.name👈>(m_inst->👉ref.definition.getter_name 👈());
+}
+else{
+m_👉ref.name👈 = std::unique_ptr<👉ref.narrowed_type.name👈>();
+}
+{% else %}
+m_👉ref.name👈 = std::make_unique<👉ref.narrowed_type.name👈>(m_inst->👉ref.definition.getter_name 👈());
+{% endif %}
 {% endfor %}
 }
 {%- for f in t.fields.values() %}
+{% if f.type.is_optional() and f.type.is_object_type %}
+[[nodiscard]] inline const 👉 f.property_type 👈 * 👉 f.definition.getter_name 👈() const {
+    return m_👉f.name👈.get();
+{% else %}
 [[nodiscard]] inline const 👉 f.property_type 👈 & 👉 f.definition.getter_name 👈() const {
     {% if f.type.is_object_type %}
     return *m_👉f.name👈;
     {% else %}
     return m_inst->👉 f.definition.getter_name 👈();
     {% endif %}
+{% endif %}
 };
 {% endfor -%}
 };

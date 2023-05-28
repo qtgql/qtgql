@@ -274,13 +274,13 @@ NestedObjectTestCase = QGQLObjectTestCase(
 OptionalNestedObjectTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_optional_object.schema,
     query="""
-    query MainQuery {
-        user{
-            person{
-                name
-                age
-            }
+    query MainQuery($return_null: Boolean!) {
+      user(returnNull: $return_null) {
+        person {
+          name
+          age
         }
+      }
     }
     """,
     test_name="OptionalNestedObjectTestCase",

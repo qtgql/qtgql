@@ -20,3 +20,7 @@ target_link_libraries(${TESTS_TARGET}
 add_subdirectory(
   generated_test_projects/NestedObjectTestCase/graphql/__generated__)
 target_link_libraries(${TESTS_TARGET} PRIVATE generated::NestedObjectTestCase)
+add_subdirectory(
+  generated_test_projects/OptionalNestedObjectTestCase/graphql/__generated__)
+target_link_libraries(${TESTS_TARGET}
+                      PRIVATE generated::OptionalNestedObjectTestCase)

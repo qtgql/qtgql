@@ -31,6 +31,9 @@ explicit 👉 type.name 👈 (QObject* parent = nullptr)
 static std::shared_ptr<👉 type.name 👈> from_json(const QJsonObject& data,
                                  const qtgql::bases::SelectionsConfig &config,
                                  const qtgql::bases::OperationMetadata& metadata){
+if (data.isEmpty()){
+    return {};
+}
 auto inst = std::make_shared<👉 type.name 👈>();
 {% for f in type.fields -%}
 {% set assign_to %} inst->👉 f.private_name 👈 {% endset %}
