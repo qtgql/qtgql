@@ -19,6 +19,11 @@ TEST_CASE("ObjectWithListOfObjectTestCase", "[generated-testcase]") {
 
   auto mq = std::make_shared<mainquery::MainQuery>();
   mq->fetch();
+  test_utils::wait_for_completion(mq);
+  auto persons = mq->get_data()->get_persons();
+  auto p = persons->first();
+  qDebug() << p->get_name();
+  REQUIRE(p->get_name() != bases::DEFAULTS::STRING);
 }
 
 };  // namespace ObjectWithListOfObjectTestCase

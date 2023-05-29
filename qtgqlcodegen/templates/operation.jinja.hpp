@@ -17,10 +17,10 @@ class 👉 t.name 👈: public QObject{
 {# members #}
 std::shared_ptr<👉context.schema_ns👈::👉 t.definition.name 👈> m_inst;
 {% for ref in t.references -%}
-std::unique_ptr<👉ref.narrowed_type.name👈> m_👉ref.name👈;
+👉ref.narrowed_type.name👈> * m_👉ref.name👈;
 {% endfor %}
 {%- for model_field in t.models -%}
-std::unique_ptr<👉 model_field.property_type 👈> m_👉model_field.name👈;
+👉 model_field.property_type 👈* m_👉model_field.name👈;
 {% endfor %}
 
 public:
@@ -28,13 +28,13 @@ public:
 {% for ref in t.references -%}
 {% if ref.type.is_optional() %}
 if (m_inst->👉ref.definition.getter_name 👈()){
-m_👉ref.name👈 = std::make_unique<👉ref.narrowed_type.name👈>(m_inst->👉ref.definition.getter_name 👈());
+m_👉ref.name👈 = 👉ref.narrowed_type.name👈(m_inst->👉ref.definition.getter_name 👈());
 }
 else{
-m_👉ref.name👈 = std::unique_ptr<👉ref.narrowed_type.name👈>();
+m_👉ref.name👈 = nullptr;
 }
 {% else %}
-m_👉ref.name👈 = std::make_unique<👉ref.narrowed_type.name👈>(m_inst->👉ref.definition.getter_name 👈());
+m_👉ref.name👈 = 👉ref.narrowed_type.name👈(m_inst->👉ref.definition.getter_name 👈());
 {% endif %}
 {% endfor %}
 {%- for model_field in t.models -%}
@@ -42,16 +42,16 @@ auto init_vec_👉 model_field.name 👈 =  std::make_unique<std::vector<std::un
 for (const auto & node: m_inst->👉model_field.definition.getter_name 👈().value(OPERATION_ID)){
     init_vec_👉 model_field.name 👈->push_back(std::move(std::make_unique<👉model_field.narrowed_type.name👈>(node)));
 }
-m_👉model_field.name👈 = std::make_unique<👉 model_field.property_type 👈>(nullptr, std::move(init_vec_👉 model_field.name 👈));
+m_👉model_field.name👈 = new 👉 model_field.property_type 👈(this, std::move(init_vec_👉 model_field.name 👈));
 {% endfor -%}
 }
 {%- for f in t.fields.values() %}
-{% if f.type.is_optional() and f.type.is_object_type %}
+{% if f.type.is_object_type or f.type.is_model %}
 [[nodiscard]] inline const 👉 f.property_type 👈 * 👉 f.definition.getter_name 👈() const {
-    return m_👉f.name👈.get();
+    return m_👉f.name👈;
 {% else %}
 [[nodiscard]] inline const 👉 f.property_type 👈 & 👉 f.definition.getter_name 👈() const {
-    {% if f.type.is_object_type or f.type.is_model %}
+    {% if f.type.is_object_type %}
     return *m_👉f.name👈;
     {% else %}
     return m_inst->👉 f.definition.getter_name 👈();
@@ -83,7 +83,7 @@ return ret;
 public:
 👉 context.operation.name 👈(): qtgql::gqlwstransport::OperationHandlerABC(qtgql::gqlwstransport::GqlWsTrnsMsgWithID(qtgql::gqlwstransport::OperationPayload(
         {%- for line in context.operation.query.splitlines() %}"👉 line 👈"{% endfor -%}
-        ))){};
+        ), OPERATION_ID)){};
 
 inline const QUuid &operation_id() const override{
 return OPERATION_ID;

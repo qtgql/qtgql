@@ -95,7 +95,7 @@ class ListModelABC : public ListModelMixin {
 
  public:
   explicit ListModelABC(
-      QObject *parent = nullptr,
+      QObject *parent,
       T_uniqueObjectQlist data = std::make_unique<QList<T_QObject>>())
       : ListModelMixin(parent), m_data{std::move(data)} {
     m_count = m_data->size();
@@ -112,11 +112,11 @@ class ListModelABC : public ListModelMixin {
     return {};
   }
 
-  T_QObject &get(int index) const { return m_data->value(index); }
+  T_QObject *get(int index) const { return m_data->value(index).get(); }
 
-  T_QObject &first() const { return m_data->first(); }
+  T_QObject *first() const { return m_data->front().get(); }
 
-  T_QObject &last() const { return m_data->last(); }
+  T_QObject *last() const { return m_data->back().get(); }
 
   int rowCount(const QModelIndex &parent = QModelIndex()) const override final {
     return m_count;

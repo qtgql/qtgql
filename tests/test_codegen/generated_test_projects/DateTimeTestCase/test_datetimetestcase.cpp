@@ -1,5 +1,4 @@
 #include <QSignalSpy>
-#include <QTest>
 #include <catch2/catch_test_macros.hpp>
 
 #include "debugableclient.hpp"
@@ -18,7 +17,7 @@ TEST_CASE("DateTimeTestCase", "[generated-testcase]") {
 
   auto mq = std::make_shared<mainquery::MainQuery>();
   mq->fetch();
-  REQUIRE(QTest::qWaitFor([&]() -> bool { return mq->completed(); }, 1500));
+  test_utils::wait_for_completion(mq);
   auto d = mq->get_data();
   auto now = QDateTime::currentDateTime(QTimeZone::utc())
                  .toString("hh:mm (dd.mm.yyyy)");
