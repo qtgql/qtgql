@@ -3,7 +3,7 @@
 {% if context.release_context.success -%}
 {{context.release_context.content}}
 {% else %}
-![error](http://killer-angel123.tumblr.com/post/125825232636)
+![error](https://media.giphy.com/media/mq5y2jHRCAqMo/giphy.gif)
 **Please provide a RELEASE.md file in the project root.**  
 Here is an example format:
 ```md
