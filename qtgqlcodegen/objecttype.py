@@ -114,7 +114,7 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
         """This annotates the value that is QML-compatible."""
         if custom_scalar := self.type.is_custom_scalar:
             return TypeHinter.from_annotations(
-                custom_scalar.property_type,
+                custom_scalar.type_for_proxy,
             ).stringify()
         if self.type.is_enum:
             return "int"
@@ -122,7 +122,7 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
         return self.member_type
 
     @cached_property
-    def property_type(self) -> str:
+    def type_for_proxy(self) -> str:
         if self.type.is_builtin_scalar or self.type.is_custom_scalar:
             return self.fget_annotation
         else:

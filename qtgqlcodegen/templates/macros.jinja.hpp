@@ -68,7 +68,7 @@ void 👉 f.signal_name 👈();
 public:
 {%for f in type.fields %}
 {% if f.is_custom_scalar %}
-const 👉 f.is_custom_scalar.property_type 👈 & 👉 f.getter_name 👈() {
+const 👉 f.is_custom_scalar.type_for_proxy 👈 & 👉 f.getter_name 👈() {
 return 👉 f.private_name 👈.to_qt();
 }
 {% else %}
@@ -83,3 +83,4 @@ emit 👉 f.signal_name 👈();
 };
 {% endfor %}
 {% endmacro -%}
+
