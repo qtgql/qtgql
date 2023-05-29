@@ -6,10 +6,7 @@
 namespace 👉 context.config.env_name 👈{
 namespace 👉context.ns👈{
 
-inline const qtgql::bases::OperationMetadata OPERATION_METADATA = qtgql::bases::OperationMetadata{
-        "👉 context.operation.name 👈",
-        {👉 context.operation.root_field.as_conf_string() 👈}
-};
+
 
 
 {% for t in context.operation.narrowed_types %}
@@ -65,6 +62,14 @@ inline const QString &ENV_NAME() override{
     static const auto ret = QString("👉 context.config.env_name 👈");
     return ret;
     }
+
+inline const qtgql::bases::OperationMetadata & OPERATION_METADATA() override{
+auto static ret = qtgql::bases::OperationMetadata{
+        operation_id(),
+        {👉 context.operation.root_field.as_conf_string() 👈}
+};
+return ret;
+};
 public:
 
 👉 context.operation.name 👈(): qtgql::gqlwstransport::OperationHandlerABC(qtgql::gqlwstransport::GqlWsTrnsMsgWithID(qtgql::gqlwstransport::OperationPayload(
@@ -82,7 +87,7 @@ void on_next(const QJsonObject &message) override{
         if (data.contains("👉 context.operation.root_field.name 👈")){
             m_data = std::make_unique<👉 context.operation.root_field.property_type 👈>(
 👉context.schema_ns👈::👉 context.operation.root_field.definition.type.is_object_type.name 👈::from_json(
-        data.value("👉 context.operation.root_field.name 👈").toObject(), OPERATION_METADATA.selections, OPERATION_METADATA)
+        data.value("👉 context.operation.root_field.name 👈").toObject(), OPERATION_METADATA().selections, OPERATION_METADATA())
 );
         }
     }

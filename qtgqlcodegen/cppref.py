@@ -14,8 +14,8 @@ class CppNamedType:
 
 
 class QtGqlNamedType(CppNamedType):
-    namespace = "qtgql::"
+    namespace = "qtgql::bases::"
 
 
 class QtGqlTypes:
-    QGraphQLList = QtGqlNamedType("QGraphQLList")
+    QGraphQLList = QtGqlNamedType("ListModelABC")

@@ -3,7 +3,7 @@
 if ({% if include_selection_check %}config.selections.contains("👉f.name👈") && {% endif %} !data.value("👉f.name👈").isNull()){
 {% if f.type.is_object_type -%}
 
-👉 assign_to 👈 = 👉f.type.is_object_type.name👈::from_json(data.value("👉f.name👈").toObject(), config.selections.value("person"), metadata);
+👉 assign_to 👈 = 👉f.type.is_object_type.name👈::from_json(data.value("👉f.name👈").toObject(), config.selections.value("👉f.name👈"), metadata);
 
 {% elif f.type.is_interface -%}
 if field_data:
@@ -15,11 +15,12 @@ if field_data:
     )
 {% elif f.type.is_model -%}
 {% if f.type.is_model.is_object_type -%}
-👉 assign_to 👈 = qtgql::ListModel(
-  parent=parent,
-  data=[👉f.type.is_model.is_object_type.name👈.from_dict(parent, data=node, config=inner_config, metadata=metadata) for
-        node in field_data],
-)
+QList<👉f.type.is_model.member_type👈> obj_list;
+for (const auto& node: data.value("👉f.name👈").toArray()){
+    obj_list.append(👉 f.type.is_model.is_object_type.name 👈::from_json(node.toObject(), config.selections.value("👉f.name👈"), metadata));
+};
+👉 assign_to 👈.insert(metadata.operation_id, obj_list);
+
 {% elif f.type.is_model.is_interface -%}
 👉 assign_to 👈 = qtgql::ListModel(
     parent=parent,
@@ -54,7 +55,7 @@ choice = inner_config.choices[type_name]
 
 
 
-{% macro props(type) -%}
+{% macro concrete_type_fields(type) -%}
 protected:
 {% for f in type.fields -%}
 👉 f.member_type 👈 👉 f.private_name 👈 = 👉 f.default_value 👈;

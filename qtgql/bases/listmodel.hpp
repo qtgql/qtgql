@@ -172,10 +172,6 @@ class ListModelABC : public ListModelMixin {
     }
     return false;
   }
-
-  // implemented in the jinja2 template.
-  virtual void update(const QList<QJsonObject> &data,
-                      const SelectionsConfig &selections) = 0;
 };
 
 }  // namespace bases

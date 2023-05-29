@@ -59,6 +59,7 @@ class OperationHandlerABC
 
   // abstract functions.
   virtual const QString &ENV_NAME() = 0;
+  virtual const bases::OperationMetadata &OPERATION_METADATA() = 0;
   // end abstract functions.
 
   void fetch() {

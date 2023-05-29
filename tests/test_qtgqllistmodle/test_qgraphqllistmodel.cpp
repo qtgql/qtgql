@@ -8,14 +8,7 @@
 typedef std::shared_ptr<FooQObject> SharedFoo;
 using namespace qtgql;
 
-class SampleQGraphQLListModel : public bases::ListModelABC<FooQObject> {
-  void update(const QList<QJsonObject>& data,
-              const bases::SelectionsConfig& selections) override {
-    std::ignore = data;
-    std::ignore = selections;
-  }
-  using bases::ListModelABC<FooQObject>::ListModelABC;
-};
+typedef bases::ListModelABC<FooQObject> SampleGraphQLListModel;
 
 struct CompleteSpy {
   QSignalSpy* about_to;
@@ -32,7 +25,7 @@ struct CompleteSpy {
   }
 };
 
-TEST_CASE("default QGraphQLListModelABC modifications and operations",
+TEST_CASE("default GraphQLListModelABC modifications and operations",
           "[qgraphqllistmodle-raw]") {
   std::unique_ptr<std::vector<int>> a = std::make_unique<std::vector<int>>();
   std::unique_ptr<QList<SharedFoo>> __init_list =
@@ -44,16 +37,16 @@ TEST_CASE("default QGraphQLListModelABC modifications and operations",
     init_list_copy.append(obj);
   }
   auto model_with_data =
-      SampleQGraphQLListModel{nullptr, std::move(__init_list)};
+      SampleGraphQLListModel{nullptr, std::move(__init_list)};
   QSignalSpy p_pre_remove(&model_with_data,
-                          &SampleQGraphQLListModel::rowsAboutToBeRemoved);
+                          &SampleGraphQLListModel::rowsAboutToBeRemoved);
   QSignalSpy p_after_remove(&model_with_data,
-                            &SampleQGraphQLListModel::rowsRemoved);
+                            &SampleGraphQLListModel::rowsRemoved);
   CompleteSpy remove_spy(&p_pre_remove, &p_after_remove);
   QSignalSpy p_pre_insert(&model_with_data,
-                          &SampleQGraphQLListModel::rowsAboutToBeInserted);
+                          &SampleGraphQLListModel::rowsAboutToBeInserted);
   QSignalSpy p_after_insert(&model_with_data,
-                            &SampleQGraphQLListModel::rowsInserted);
+                            &SampleGraphQLListModel::rowsInserted);
   CompleteSpy insert_spy(&p_pre_insert, &p_after_insert);
 
   SECTION("object role is USER_ROLE + 1") {
@@ -67,7 +60,7 @@ TEST_CASE("default QGraphQLListModelABC modifications and operations",
 
   SECTION("test returns data") {
     auto res = model_with_data.data(model_with_data.index(0),
-                                    SampleQGraphQLListModel::QOBJECT_ROLE);
+                                    SampleGraphQLListModel::QOBJECT_ROLE);
     REQUIRE(res.canConvert<FooQObject>());
     auto v = res.value<FooQObject*>();
     REQUIRE(v->val == init_list_copy.value(0)->val);
@@ -122,7 +115,7 @@ TEST_CASE("default QGraphQLListModelABC modifications and operations",
   }
   SECTION("test insert after max index") {
     QSignalSpy spy(&model_with_data,
-                   &SampleQGraphQLListModel::rowsAboutToBeInserted);
+                   &SampleGraphQLListModel::rowsAboutToBeInserted);
     auto new_obj = std::make_shared<FooQObject>("zib");
     auto before_count = model_with_data.rowCount();
     model_with_data.insert(20000, new_obj);
@@ -140,7 +133,7 @@ TEST_CASE("default QGraphQLListModelABC modifications and operations",
 
   SECTION("test current index emits on set") {
     QSignalSpy spy(&model_with_data,
-                   &SampleQGraphQLListModel::currentIndexChanged);
+                   &SampleGraphQLListModel::currentIndexChanged);
     model_with_data.set_current_index(2);
     REQUIRE(!spy.isEmpty());
     bool ok = false;

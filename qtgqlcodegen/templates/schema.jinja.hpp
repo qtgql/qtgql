@@ -21,9 +21,10 @@ static auto & INST_STORE() {
     return _store;
 }
 
-👉 macros.props(type) 👈
+👉 macros.concrete_type_fields(type) 👈
 public:
 inline static const QString TYPE_NAME = "👉 type.name 👈";
+
 explicit 👉 type.name 👈 (QObject* parent = nullptr)
 : qtgql::bases::👉 base_class 👈::👉 base_class 👈(parent) {};
 
@@ -47,7 +48,7 @@ if (inst->id) {
 }
 {% elif type.has_id_field and not type.id_is_optional %}
 auto record = std::make_shared<qtgql::bases::NodeRecord<👉 type.name 👈>>(inst);
-record->retain(metadata.operation_name);
+record->retain(metadata.operation_id);
 INST_STORE().add_record(record);
 {% endif %}
 return inst;

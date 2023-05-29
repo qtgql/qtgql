@@ -1,0 +1,9 @@
+
+    query MainQuery {
+        user{
+            persons{
+                name
+                age
+            }
+        }
+    }

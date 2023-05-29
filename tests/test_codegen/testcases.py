@@ -659,6 +659,7 @@ implemented_testcases = [
     OptionalScalarsTestCase,
     NestedObjectTestCase,
     OptionalNestedObjectTestCase,
+    ObjectWithListOfObjectTestCase,
 ]
 
 
