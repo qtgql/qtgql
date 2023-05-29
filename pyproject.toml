@@ -36,6 +36,9 @@ aqtinstall = "^3.1.6"
 conan = "^2.0.4"
 cmake = "3.25.0"
 pygithub = "^1.58.2"
+githubrelease = "^1.5.9"
+httpx = "0.18.2"
+autopub = "^0.2.2"
 
 [tool.poetry.group.docs.dependencies]
 mkdocs-material = "^9.0.5"
