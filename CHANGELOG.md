@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+0.119.4 - 2023-05-30
+--------------------
+
+Add support list of objects.
+When a list is deserialized the instances are mapped based on operation ID
+since lists are not part of the [field stability](https://graphql.org/learn/global-object-identification/#field-stability) spec.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #225](https://github.com/qtgql/qtgql/pull/225/)
+
+
 0.119.3 - 2023-05-28
 --------------------
 
