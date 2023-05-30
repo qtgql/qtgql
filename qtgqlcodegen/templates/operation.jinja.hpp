@@ -17,10 +17,10 @@ class 👉 t.name 👈: public QObject{
 {# members #}
 std::shared_ptr<👉context.schema_ns👈::👉 t.definition.name 👈> m_inst;
 {% for ref in t.references -%}
-👉ref.narrowed_type.name👈 * m_👉ref.name👈;
+👉ref.narrowed_type.name👈 *m_👉ref.name👈 = nullptr;
 {% endfor %}
 {%- for model_field in t.models -%}
-👉 model_field.property_type 👈* m_👉model_field.name👈;
+👉 model_field.property_type 👈 *m_👉model_field.name👈 = nullptr;
 {% endfor %}
 
 public:
@@ -66,7 +66,7 @@ class 👉 context.operation.name 👈: public qtgql::gqlwstransport::OperationH
     Q_OBJECT
 Q_PROPERTY(const 👉 context.operation.root_field.property_type 👈* data READ get_data NOTIFY dataChanged);
 
-👉 context.operation.root_field.property_type 👈 *m_data;
+👉 context.operation.root_field.property_type 👈 *m_data = nullptr;
 
 inline const QString &ENV_NAME() override{
     static const auto ret = QString("👉 context.config.env_name 👈");
