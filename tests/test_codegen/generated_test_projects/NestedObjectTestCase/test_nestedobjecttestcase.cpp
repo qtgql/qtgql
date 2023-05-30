@@ -20,7 +20,7 @@ TEST_CASE("NestedObjectTestCase", "[generated-testcase]") {
   auto mq = std::make_shared<mainquery::MainQuery>();
   mq->fetch();
   test_utils::wait_for_completion(mq);
-  auto name = mq->get_data()->get_person().get_name();
+  auto name = mq->get_data()->get_person()->get_name();
   REQUIRE((!name.isEmpty() && name != bases::DEFAULTS::STRING));
 }
 

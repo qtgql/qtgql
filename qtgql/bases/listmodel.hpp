@@ -60,12 +60,11 @@ class ListModelMixin : public QAbstractListModel {
 
 template <typename T_QObject>
 class ListModelABC : public ListModelMixin {
-  typedef std::unique_ptr<std::vector<std::unique_ptr<T_QObject>>>
-      T_uniqueObjectQlist;
+  typedef std::unique_ptr<QList<T_QObject *>> T_QObjectList;
 
  private:
   void update_count() {
-    auto cur_count = m_data->size();
+    auto cur_count = m_data->count();
     if (m_count != cur_count) {
       m_count = cur_count;
       emit countChanged();
@@ -73,7 +72,7 @@ class ListModelABC : public ListModelMixin {
   };
 
  protected:
-  T_uniqueObjectQlist m_data;
+  T_QObjectList m_data;
 
   void insert_common(const int from, const int to) {
     beginInsertRows(invalid_index(), from, to);
@@ -94,29 +93,27 @@ class ListModelABC : public ListModelMixin {
   }
 
  public:
-  explicit ListModelABC(
-      QObject *parent,
-      T_uniqueObjectQlist data = std::make_unique<QList<T_QObject>>())
+  explicit ListModelABC(QObject *parent, T_QObjectList data = {})
       : ListModelMixin(parent), m_data{std::move(data)} {
-    m_count = m_data->size();
+    m_count = m_data->length();
   };
 
-  QVariant data(const QModelIndex &index, int role) const override {
+  [[nodiscard]] QVariant data(const QModelIndex &index,
+                              int role) const override {
     auto row = index.row();
     if (row < m_count && index.isValid()) {
       if (role == QOBJECT_ROLE) {
-        return QVariant::fromValue(
-            static_cast<QObject *>(m_data->at(row).get()));
+        return QVariant::fromValue(static_cast<QObject *>(m_data->value(row)));
       }
     }
     return {};
   }
 
-  T_QObject *get(int index) const { return m_data->value(index).get(); }
+  T_QObject *get(int index) const { return m_data->value(index); }
 
-  T_QObject *first() const { return m_data->front().get(); }
+  T_QObject *first() const { return m_data->first(); }
 
-  T_QObject *last() const { return m_data->back().get(); }
+  T_QObject *last() const { return m_data->last(); }
 
   int rowCount(const QModelIndex &parent = QModelIndex()) const override final {
     return m_count;
@@ -138,9 +135,9 @@ class ListModelABC : public ListModelMixin {
     end_insert_common();
   }
 
-  void append(const T_QObject &shared_obj_ref) {
+  void append(T_QObject *object) {
     insert_common(m_count, m_count);
-    m_data->append(shared_obj_ref);
+    m_data->append(object);
     end_insert_common();
   }
 
@@ -166,7 +163,7 @@ class ListModelABC : public ListModelMixin {
                   const QModelIndex &parent = QModelIndex()) override {
     if ((row + count) <= m_count) {
       remove_common(row, count);
-      m_data->erase(m_data->begin() + row, m_data->begin() + count);
+      m_data->remove(row, count);
       end_remove_common();
       return true;
     }
