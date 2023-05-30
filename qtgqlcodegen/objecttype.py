@@ -16,7 +16,6 @@ from typingref import UNSET
 
 from qtgqlcodegen.compiler.builtin_scalars import BuiltinScalar
 from qtgqlcodegen.compiler.operation import QtGqlQueriedObjectType
-from qtgqlcodegen.cppref import QtGqlTypes
 from qtgqlcodegen.utils import AntiForwardRef
 
 if TYPE_CHECKING:
@@ -100,7 +99,7 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
 
         if self.type.is_model:
             # this would just generate the model without data.
-            raise NotImplementedError
+            return "{}"
 
         if self.type.is_custom_scalar:
             return "{}"
@@ -115,7 +114,7 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
         """This annotates the value that is QML-compatible."""
         if custom_scalar := self.type.is_custom_scalar:
             return TypeHinter.from_annotations(
-                custom_scalar.property_type,
+                custom_scalar.type_for_proxy,
             ).stringify()
         if self.type.is_enum:
             return "int"
@@ -123,7 +122,7 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
         return self.member_type
 
     @cached_property
-    def property_type(self) -> str:
+    def type_for_proxy(self) -> str:
         if self.type.is_builtin_scalar or self.type.is_custom_scalar:
             return self.fget_annotation
         else:
@@ -146,7 +145,7 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
 
     @cached_property
     def setter_name(self) -> str:
-        return f"{self.name}_setter"
+        return f"set_{self.name}"
 
     @cached_property
     def signal_name(self) -> str:
@@ -307,10 +306,7 @@ class GqlTypeHinter(TypeHinter):
     @cached_property
     def member_type(self) -> str:
         """
-        :returns: Annotation of the field based on the real type,
-        meaning that the private attribute would be of that type.
-        this goes for init and the property setter. They are optional by default,
-        (at the template) so unwrap optional first
+        :returns: Annotation of the field at the concrete type (for the type of the proxy use property type)
         """
         t_self = self.optional_maybe
 
@@ -323,7 +319,8 @@ class GqlTypeHinter(TypeHinter):
         if gql_enum := t_self.is_enum:
             return gql_enum.name
         if model_of := t_self.is_model:
-            return f"{QtGqlTypes.QGraphQLList.name}[{model_of.member_type}]"
+            # map of instances based on operation hash.
+            return f"QMap<QUuid, QList<{model_of.member_type}>>"
         if object_def := t_self.is_object_type or t_self.is_interface:
             return f"std::shared_ptr<{object_def.name}>"
         if q_object_def := t_self.is_queried_object_type:

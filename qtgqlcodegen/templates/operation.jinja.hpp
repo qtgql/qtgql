@@ -2,46 +2,56 @@
 #pragma once
 #include "./schema.hpp"
 #include <qtgql/gqlwstransport/gqlwstransport.hpp>
+#include <QObject>
 
 namespace 👉 context.config.env_name 👈{
 namespace 👉context.ns👈{
-
-inline const qtgql::bases::OperationMetadata OPERATION_METADATA = qtgql::bases::OperationMetadata{
-        "👉 context.operation.name 👈",
-        {👉 context.operation.root_field.as_conf_string() 👈}
-};
-
+const auto OPERATION_ID = QUuid::fromString("👉 context.operation.operation_id👈");
 
 {% for t in context.operation.narrowed_types %}
-class 👉 t.name 👈{
+class 👉 t.name 👈: public QObject{
 /*
 👉 t.doc_fields 👈
  */
-    Q_GADGET
+    Q_OBJECT
+{# members #}
+{% if context.debug -%}
+public: // WARNING: members are public because you have debug=True in your config file.
+{% endif %}
 std::shared_ptr<👉context.schema_ns👈::👉 t.definition.name 👈> m_inst;
 {% for ref in t.references -%}
-std::unique_ptr<👉ref.narrowed_type.name👈> m_👉ref.name👈;
+👉ref.narrowed_type.name👈 *m_👉ref.name👈 = nullptr;
+{% endfor %}
+{%- for model_field in t.models -%}
+👉 model_field.property_type 👈 *m_👉model_field.name👈 = nullptr;
 {% endfor %}
 
 public:
-👉 t.name 👈(const std::shared_ptr<👉 t.definition.name 👈> &inst ): m_inst{inst}{
+👉 t.name 👈(QObject* parent, const std::shared_ptr<👉 t.definition.name 👈> &inst ): m_inst{inst}, QObject::QObject(parent){
 {% for ref in t.references -%}
 {% if ref.type.is_optional() %}
 if (m_inst->👉ref.definition.getter_name 👈()){
-m_👉ref.name👈 = std::make_unique<👉ref.narrowed_type.name👈>(m_inst->👉ref.definition.getter_name 👈());
+m_👉ref.name👈 = new 👉ref.narrowed_type.name👈(this, m_inst->👉ref.definition.getter_name 👈());
 }
 else{
-m_👉ref.name👈 = std::unique_ptr<👉ref.narrowed_type.name👈>();
+m_👉ref.name👈 = nullptr;
 }
 {% else %}
-m_👉ref.name👈 = std::make_unique<👉ref.narrowed_type.name👈>(m_inst->👉ref.definition.getter_name 👈());
+m_👉ref.name👈 = new 👉ref.narrowed_type.name👈(this, m_inst->👉ref.definition.getter_name 👈());
 {% endif %}
 {% endfor %}
+{%- for model_field in t.models -%}
+auto init_list_👉 model_field.name 👈 =  std::make_unique<QList<👉model_field.narrowed_type.name👈*>>();
+for (const auto & node: m_inst->👉model_field.definition.getter_name 👈().value(OPERATION_ID)){
+    init_list_👉 model_field.name 👈->append(new 👉model_field.narrowed_type.name👈(this, node));
+}
+m_👉model_field.name👈 = new 👉 model_field.property_type 👈(this, std::move(init_list_👉 model_field.name 👈));
+{% endfor -%}
 }
 {%- for f in t.fields.values() %}
-{% if f.type.is_optional() and f.type.is_object_type %}
+{% if f.type.is_object_type or f.type.is_model %}
 [[nodiscard]] inline const 👉 f.property_type 👈 * 👉 f.definition.getter_name 👈() const {
-    return m_👉f.name👈.get();
+    return m_👉f.name👈;
 {% else %}
 [[nodiscard]] inline const 👉 f.property_type 👈 & 👉 f.definition.getter_name 👈() const {
     {% if f.type.is_object_type %}
@@ -59,20 +69,27 @@ class 👉 context.operation.name 👈: public qtgql::gqlwstransport::OperationH
     Q_OBJECT
 Q_PROPERTY(const 👉 context.operation.root_field.property_type 👈* data READ get_data NOTIFY dataChanged);
 
-std::unique_ptr<👉 context.operation.root_field.property_type 👈> m_data;
+👉 context.operation.root_field.property_type 👈 *m_data = nullptr;
 
 inline const QString &ENV_NAME() override{
     static const auto ret = QString("👉 context.config.env_name 👈");
     return ret;
     }
-public:
 
+inline const qtgql::bases::OperationMetadata & OPERATION_METADATA() override{
+auto static ret = qtgql::bases::OperationMetadata{
+        OPERATION_ID,
+        {👉 context.operation.root_field.as_conf_string() 👈}
+};
+return ret;
+};
+public:
 👉 context.operation.name 👈(): qtgql::gqlwstransport::OperationHandlerABC(qtgql::gqlwstransport::GqlWsTrnsMsgWithID(qtgql::gqlwstransport::OperationPayload(
         {%- for line in context.operation.query.splitlines() %}"👉 line 👈"{% endfor -%}
-        ))){};
+        ), OPERATION_ID)){};
 
 inline const QUuid &operation_id() const override{
-return m_message_template.op_id;
+return OPERATION_ID;
 }
 
 
@@ -80,15 +97,15 @@ void on_next(const QJsonObject &message) override{
     if (!m_data && message.contains("data")){
         auto data = message.value("data").toObject();
         if (data.contains("👉 context.operation.root_field.name 👈")){
-            m_data = std::make_unique<👉 context.operation.root_field.property_type 👈>(
+            m_data = new 👉 context.operation.root_field.property_type 👈(this,
 👉context.schema_ns👈::👉 context.operation.root_field.definition.type.is_object_type.name 👈::from_json(
-        data.value("👉 context.operation.root_field.name 👈").toObject(), OPERATION_METADATA.selections, OPERATION_METADATA)
+        data.value("👉 context.operation.root_field.name 👈").toObject(), OPERATION_METADATA().selections, OPERATION_METADATA())
 );
         }
     }
 }
 inline const 👉 context.operation.root_field.property_type 👈* get_data(){
-    return m_data.get();
+    return m_data;
 }
 
 {% if context.operation.variables %}

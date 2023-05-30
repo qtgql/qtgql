@@ -31,6 +31,9 @@ void DebugAbleClient::onTextMessageReceived(const QString &raw_message) {
     if (data.contains("id")) {
       // Any that contains ID is directed to a single handler.
       auto message = gqlwstransport::GqlWsTrnsMsgWithID(data);
+      if (message.type == qtgql::gqlwstransport::PROTOCOL::NEXT) {
+        m_current_message = message.payload;
+      }
     } else {
       auto message = gqlwstransport::BaseGqlWsTrnsMsg(data);
       auto message_type = message.type;
@@ -54,4 +57,17 @@ void wait_for_completion(
   REQUIRE(
       QTest::qWaitFor([&]() -> bool { return handler->completed(); }, 1500));
 }
+std::shared_ptr<qtgql::bases::Environment> get_or_create_env(
+    const QString &env_name, const DebugClientSettings &settings) {
+  auto env = bases::Environment::get_gql_env(env_name);
+  if (!env.has_value()) {
+    auto env_ = std::make_shared<bases::Environment>(
+        env_name, std::unique_ptr<qtgql::gqlwstransport::GqlWsTransportClient>(
+                      new DebugAbleClient(settings)));
+    bases::Environment::set_gql_env(env_);
+    DebugAbleClient::from_environment(env_)->wait_for_valid();
+    env = bases::Environment::get_gql_env(env_name);
+  }
+  return env.value();
+};
 }  // namespace test_utils

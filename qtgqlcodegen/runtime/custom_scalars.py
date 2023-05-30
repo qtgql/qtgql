@@ -6,7 +6,7 @@ class CustomScalarDefinition:
     type_name: str
     graphql_name: str
     deserialized_type: str
-    property_type: str
+    type_for_proxy: str
     include_path: str
 
 
@@ -15,21 +15,21 @@ DateTimeScalarDefinition = CustomScalarDefinition(
     type_name="qtgql::customscalars::DateTimeScalar",
     graphql_name="DateTime",
     deserialized_type="QDateTime",
-    property_type="QString",
+    type_for_proxy="QString",
     include_path="<qtgql/customscalars/customscalars.hpp>",
 )
 DateScalarDefinition = CustomScalarDefinition(
     type_name="qtgql::customscalars::DateScalar",
     graphql_name="Date",
     deserialized_type="QDate",
-    property_type="QString",
+    type_for_proxy="QString",
     include_path="<qtgql/customscalars/customscalars.hpp>",
 )
 TimeScalarDefinition = CustomScalarDefinition(
     type_name="qtgql::customscalars::TimeScalar",
     graphql_name="Time",
     deserialized_type="QTime",
-    property_type="QString",
+    type_for_proxy="QString",
     include_path="<qtgql/customscalars/customscalars.hpp>",
 )
 
@@ -37,7 +37,7 @@ DecimalScalarDefinition = CustomScalarDefinition(
     type_name="qtgql::customscalars::DecimalScalar",
     graphql_name="Decimal",
     deserialized_type="QString",
-    property_type="QString",
+    type_for_proxy="QString",
     include_path="<qtgql/customscalars/customscalars.hpp>",
 )
 

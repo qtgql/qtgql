@@ -401,6 +401,7 @@ class SchemaEvaluator:
                         OperationTemplateContext(
                             operation=op,
                             config=self.config,
+                            debug=self.config.debug,
                         ),
                     ),
                     path=self.config.generated_dir / f"{op_name}.hpp",

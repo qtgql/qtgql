@@ -7,16 +7,12 @@
 
 namespace TimeScalarTestCase {
 using namespace qtgql;
+auto ENV_NAME = QString("TimeScalarTestCase");
+auto SCHEMA_ADDR = get_server_address("18142566");
 
 TEST_CASE("TimeScalarTestCase", "[generated-testcase]") {
-  auto addr = get_server_address("18142566");
-  auto client =
-      new DebugAbleClient(DebugClientSettings{.prod_settings = {.url = addr}});
-  client->wait_for_valid();
-
-  bases::Environment::set_gql_env(std::make_shared<bases::Environment>(
-      "TimeScalarTestCase",
-      std::unique_ptr<gqlwstransport::GqlWsTransportClient>(client)));
+  auto env = test_utils::get_or_create_env(
+      ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = std::make_shared<mainquery::MainQuery>();
   mq->fetch();
   REQUIRE(QTest::qWaitFor([&]() -> bool { return mq->completed(); }, 1500));

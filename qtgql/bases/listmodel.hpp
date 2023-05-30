@@ -60,8 +60,7 @@ class ListModelMixin : public QAbstractListModel {
 
 template <typename T_QObject>
 class ListModelABC : public ListModelMixin {
-  typedef std::shared_ptr<T_QObject> T_sharedQObject;
-  typedef std::unique_ptr<QList<T_sharedQObject>> T_uniqueObjectQlist;
+  typedef std::unique_ptr<QList<T_QObject *>> T_QObjectList;
 
  private:
   void update_count() {
@@ -73,7 +72,7 @@ class ListModelABC : public ListModelMixin {
   };
 
  protected:
-  T_uniqueObjectQlist m_data;
+  T_QObjectList m_data;
 
   void insert_common(const int from, const int to) {
     beginInsertRows(invalid_index(), from, to);
@@ -94,35 +93,33 @@ class ListModelABC : public ListModelMixin {
   }
 
  public:
-  explicit ListModelABC(
-      QObject *parent = nullptr,
-      T_uniqueObjectQlist data = std::make_unique<QList<T_sharedQObject>>())
+  explicit ListModelABC(QObject *parent, T_QObjectList data = {})
       : ListModelMixin(parent), m_data{std::move(data)} {
     m_count = m_data->length();
   };
 
-  QVariant data(const QModelIndex &index, int role) const override {
+  [[nodiscard]] QVariant data(const QModelIndex &index,
+                              int role) const override {
     auto row = index.row();
     if (row < m_count && index.isValid()) {
       if (role == QOBJECT_ROLE) {
-        return QVariant::fromValue(
-            static_cast<QObject *>(m_data->at(row).get()));
+        return QVariant::fromValue(static_cast<QObject *>(m_data->value(row)));
       }
     }
     return {};
   }
 
-  T_sharedQObject get(int index) const { return m_data->value(index); }
+  T_QObject *get(int index) const { return m_data->value(index); }
 
-  T_sharedQObject &first() const { return m_data->first(); }
+  T_QObject *first() const { return m_data->first(); }
 
-  T_sharedQObject &last() const { return m_data->last(); }
+  T_QObject *last() const { return m_data->last(); }
 
   int rowCount(const QModelIndex &parent = QModelIndex()) const override final {
     return m_count;
   }
 
-  void insert(int index, const T_sharedQObject &shared_obj_ref) {
+  void insert(int index, T_QObject *object) {
     if (index > m_count) {
       qWarning() << "index " << index << " is greater than count " << m_count
                  << ". "
@@ -134,13 +131,13 @@ class ListModelABC : public ListModelMixin {
       index = 0;
     }
     insert_common(index, index);
-    m_data->insert(index, shared_obj_ref);
+    m_data->insert(index, object);
     end_insert_common();
   }
 
-  void append(const T_sharedQObject &shared_obj_ref) {
+  void append(T_QObject *object) {
     insert_common(m_count, m_count);
-    m_data->append(shared_obj_ref);
+    m_data->append(object);
     end_insert_common();
   }
 
@@ -172,10 +169,6 @@ class ListModelABC : public ListModelMixin {
     }
     return false;
   }
-
-  // implemented in the jinja2 template.
-  virtual void update(const QList<QJsonObject> &data,
-                      const SelectionsConfig &selections) = 0;
 };
 
 }  // namespace bases

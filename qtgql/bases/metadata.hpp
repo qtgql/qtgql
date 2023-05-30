@@ -1,7 +1,8 @@
 #pragma once
+#include <QMap>
+#include <QUuid>
 #include <utility>
 
-#include "QMap"
 namespace qtgql {
 namespace bases {
 
@@ -15,7 +16,7 @@ struct SelectionsConfig {
 };
 
 struct OperationMetadata {
-  const QString operation_name;
+  const QUuid operation_id;
   SelectionsConfig selections;
 };
 }  // namespace bases

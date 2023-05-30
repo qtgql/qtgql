@@ -1,5 +1,4 @@
 #include <QSignalSpy>
-#include <QTest>
 #include <catch2/catch_test_macros.hpp>
 #include "debugableclient.hpp"
 #include "graphql/__generated__/MainQuery.hpp"
@@ -7,15 +6,12 @@
 namespace 👉 context.config.env_name 👈{
 using namespace qtgql;
 
+auto ENV_NAME = QString("👉 context.config.env_name 👈");
+auto SCHEMA_ADDR = get_server_address("👉 context.url_suffix 👈");
 
 TEST_CASE("👉 context.test_name 👈", "[generated-testcase]") {
-    auto addr = get_server_address("👉 context.url_suffix 👈");
-    auto client = new DebugAbleClient(DebugClientSettings{.prod_settings = {.url = addr}});
-    client->wait_for_valid();
-
-    bases::Environment::set_gql_env(std::make_shared<bases::Environment>(
-            "👉 context.config.env_name 👈", std::unique_ptr<qtgql::gqlwstransport::GqlWsTransportClient>(client)
-    ));
+    auto env = test_utils::get_or_create_env(
+            ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
 
     REQUIRE(false);
 

@@ -48,7 +48,7 @@ class OperationHandlerABC
  protected:
   const std::shared_ptr<bases::Environment> &environment() {
     static auto m_env = bases::Environment::get_gql_env(ENV_NAME());
-    return m_env;
+    return m_env.value();
   };
   QJsonObject m_variables;
   GqlWsTrnsMsgWithID m_message_template = GqlWsTrnsMsgWithID{{}};
@@ -59,6 +59,7 @@ class OperationHandlerABC
 
   // abstract functions.
   virtual const QString &ENV_NAME() = 0;
+  virtual const bases::OperationMetadata &OPERATION_METADATA() = 0;
   // end abstract functions.
 
   void fetch() {

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import uuid
 from collections import defaultdict
 from functools import cached_property
 from typing import Optional
@@ -74,13 +75,19 @@ class QtGqlQueriedField:
 
     @cached_property
     def property_type(self) -> str:
-        if self.definition.type.is_object_type:
+        tp = self.definition.type
+        if tp.is_object_type:
             assert self.narrowed_type
             return self.narrowed_type.name
 
-        if cs := self.definition.is_custom_scalar:
-            return cs.property_type
-        return self.type.member_type
+        if cs := tp.is_custom_scalar:
+            return cs.type_for_proxy
+        if model_of := tp.is_model:
+            if model_of.is_object_type:
+                assert self.narrowed_type
+                return f"qtgql::bases::ListModelABC<{self.narrowed_type.name}>"
+
+        return tp.member_type
 
     @property
     def proxy_of(self) -> GqlTypeHinter:
@@ -251,6 +258,10 @@ class QtGqlQueriedObjectType:
     def references(self) -> list[QtGqlQueriedField]:
         return [f for f in self.fields.values() if f.type.is_object_type]
 
+    @cached_property
+    def models(self) -> list[QtGqlQueriedField]:
+        return [f for f in self.fields.values() if f.type.is_model]
+
 
 @define(slots=False)
 class QtGqlOperationDefinition:
@@ -260,6 +271,10 @@ class QtGqlOperationDefinition:
     fragments: list[str] = attrs.Factory(list)
     variables: list[QtGqlVariableDefinition] = attrs.Factory(list)
     narrowed_types_map: dict[str, QtGqlQueriedObjectType] = attrs.Factory(dict)
+
+    @cached_property
+    def operation_id(self) -> str:
+        return uuid.uuid4().hex
 
     def __attrs_post_init__(self) -> None:
         # instantiating the queried fields here, they build the narrowed types.

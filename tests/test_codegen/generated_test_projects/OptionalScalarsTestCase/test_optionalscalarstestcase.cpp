@@ -6,15 +6,12 @@
 #include "graphql/__generated__/MainQuery.hpp"
 namespace OptionalScalarsTestCase {
 using namespace qtgql;
-TEST_CASE("OptionalScalarsTestCase", "[generated-testcase]") {
-  auto addr = get_server_address("15332448");
-  auto client =
-      new DebugAbleClient(DebugClientSettings{.prod_settings = {.url = addr}});
-  client->wait_for_valid();
+auto ENV_NAME = QString("OptionalScalarsTestCase");
+auto SCHEMA_ADDR = get_server_address("15332448");
 
-  bases::Environment::set_gql_env(std::make_shared<bases::Environment>(
-      "OptionalScalarsTestCase",
-      std::unique_ptr<gqlwstransport::GqlWsTransportClient>(client)));
+TEST_CASE("OptionalScalarsTestCase", "[generated-testcase]") {
+  auto env = test_utils::get_or_create_env(
+      ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = std::make_shared<mainquery::MainQuery>();
 
   SECTION("when null returns default values") {

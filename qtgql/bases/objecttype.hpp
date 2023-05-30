@@ -1,9 +1,10 @@
 #pragma once
+#include <type_traits>
+
 #include "QDebug"
 #include "QObject"
 #include "QSet"
 #include "metadata.hpp"
-#include "type_traits"
 
 namespace qtgql {
 namespace bases {
@@ -49,7 +50,7 @@ concept extendsObjectTypeABCWithID =
 // stores global node of graphql type and it's retainers.
 template <extendsObjectTypeABCWithID T>
 class NodeRecord {
-  QSet<QString> m_retainers;
+  QSet<QUuid> m_retainers;
   typedef std::shared_ptr<T> T_sharedQObject;
 
  public:
@@ -59,13 +60,9 @@ class NodeRecord {
 
   NodeRecord(const T_sharedQObject &node_) { node = node_; };
 
-  void retain(const QString &operation_name) {
-    m_retainers.insert(operation_name);
-  }
+  void retain(const QUuid &operation_id) { m_retainers.insert(operation_id); }
 
-  void loose(const QString &operation_name) {
-    m_retainers.remove(operation_name);
-  }
+  void loose(const QUuid &operation_id) { m_retainers.remove(operation_id); }
 
   bool has_retainers() const { return m_retainers.isEmpty(); }
 };
