@@ -66,6 +66,7 @@ class SchemaTemplateContext:
 class OperationTemplateContext:
     operation: QtGqlOperationDefinition
     config: QtGqlConfig
+    debug: bool = False
 
     @property
     def ns(self) -> str:

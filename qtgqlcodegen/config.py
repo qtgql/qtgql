@@ -34,6 +34,8 @@ class QtGqlConfig:
     """mapping of custom scalars, respected by the schema evaluator."""
     template_class: Callable[[SchemaTemplateContext], str] = schema_types_template
     """jinja template."""
+    debug: bool = False
+    """Templates would render some additional helpers for testing."""
 
     @cached_property
     def schema_path(self) -> Path:

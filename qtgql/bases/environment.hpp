@@ -36,6 +36,11 @@ class Environment {
   void execute(const std::shared_ptr<HandlerABC> &handler) {
     m_network_layer->execute(handler);
   }
+  /*
+   * You would generally not be needed for this method.
+   * Though it might be of use for testing purposes.
+   */
+  NetworkLayer *get_network_layer() const { return m_network_layer.get(); };
 
   static void set_gql_env(SharedQtGqlEnv env);
 

@@ -30,7 +30,7 @@ void DebugAbleClient::onTextMessageReceived(const QString &raw_message) {
     }
     if (data.contains("id")) {
       // Any that contains ID is directed to a single handler.
-      auto message = gqlwstransport::GqlWsTrnsMsgWithID(data);
+      m_current_message = gqlwstransport::GqlWsTrnsMsgWithID(data);
     } else {
       auto message = gqlwstransport::BaseGqlWsTrnsMsg(data);
       auto message_type = message.type;
@@ -54,4 +54,5 @@ void wait_for_completion(
   REQUIRE(
       QTest::qWaitFor([&]() -> bool { return handler->completed(); }, 1500));
 }
+
 }  // namespace test_utils

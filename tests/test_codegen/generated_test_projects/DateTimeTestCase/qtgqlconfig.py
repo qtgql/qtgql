@@ -7,4 +7,5 @@ config = QtGqlConfig(
         r"/home/nir/Desktop/tzv5hob/qtgql/tests/test_codegen/generated_test_projects/DateTimeTestCase/graphql",
     ),
     env_name="DateTimeTestCase",
+    debug=True,
 )

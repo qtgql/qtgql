@@ -119,7 +119,7 @@ class ListModelABC : public ListModelMixin {
     return m_count;
   }
 
-  void insert(int index, const T_QObject &shared_obj_ref) {
+  void insert(int index, T_QObject *object) {
     if (index > m_count) {
       qWarning() << "index " << index << " is greater than count " << m_count
                  << ". "
@@ -131,7 +131,7 @@ class ListModelABC : public ListModelMixin {
       index = 0;
     }
     insert_common(index, index);
-    m_data->insert(index, shared_obj_ref);
+    m_data->insert(index, object);
     end_insert_common();
   }
 

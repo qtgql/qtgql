@@ -15,6 +15,9 @@ class 👉 t.name 👈: public QObject{
  */
     Q_OBJECT
 {# members #}
+{% if context.debug -%}
+public: // WARNING: members are public because you have debug=True in your config file.
+{% endif %}
 std::shared_ptr<👉context.schema_ns👈::👉 t.definition.name 👈> m_inst;
 {% for ref in t.references -%}
 👉ref.narrowed_type.name👈 *m_👉ref.name👈 = nullptr;

@@ -145,7 +145,7 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
 
     @cached_property
     def setter_name(self) -> str:
-        return f"{self.name}_setter"
+        return f"set_{self.name}"
 
     @cached_property
     def signal_name(self) -> str:
