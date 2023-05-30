@@ -6,17 +6,12 @@
 #include "graphql/__generated__/MainQuery.hpp"
 namespace NoIdOnQueryTestCase {
 using namespace qtgql;
+auto ENV_NAME = QString("NoIdOnQueryTestCase");
+auto SCHEMA_ADDR = get_server_address("97455992");
 
 TEST_CASE("NoIdOnQueryTestCase", "[generated-testcase]") {
-  auto addr = get_server_address("97455992");
-  auto client =
-      new DebugAbleClient(DebugClientSettings{.prod_settings = {.url = addr}});
-  client->wait_for_valid();
-
-  bases::Environment::set_gql_env(std::make_shared<bases::Environment>(
-      "NoIdOnQueryTestCase",
-      std::unique_ptr<qtgql::gqlwstransport::GqlWsTransportClient>(client)));
-
+  auto env = test_utils::get_or_create_env(
+      ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = std::make_shared<mainquery::MainQuery>();
   SECTION("test appends id to query") {
     mq->fetch();

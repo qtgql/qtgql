@@ -38,10 +38,12 @@ TEST_CASE(
 
   auto model_with_data = mq->get_data()->m_persons;
   auto raw_message = DebugAbleClient::from_environment(env)->m_current_message;
-  qDebug() << raw_message;
-  auto raw_persons_list =
-      raw_message.value("data").toObject().value("persons").toArray();
-
+  auto raw_persons_list = raw_message.value("data")
+                              .toObject()
+                              .value("user")
+                              .toObject()
+                              .value("persons")
+                              .toArray();
   QSignalSpy p_pre_remove(model_with_data, &ModelType::rowsAboutToBeRemoved);
   QSignalSpy p_after_remove(model_with_data, &ModelType::rowsRemoved);
   test_utils::CompleteSpy remove_spy(&p_pre_remove, &p_after_remove);
@@ -92,7 +94,7 @@ TEST_CASE(
     remove_spy.validate();
   }
   SECTION("test remove rows inside") {
-    REQUIRE(model_with_data->rowCount() == 3);
+    REQUIRE(model_with_data->rowCount() == 5);
     auto first_item = model_with_data->first();
     REQUIRE(model_with_data->removeRows(1, model_with_data->rowCount() - 1));
     remove_spy.validate();

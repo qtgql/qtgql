@@ -6,16 +6,12 @@
 #include "graphql/__generated__/MainQuery.hpp"
 namespace ScalarsTestCase {
 using namespace qtgql;
+auto ENV_NAME = QString("ScalarsTestCase");
+auto SCHEMA_ADDR = get_server_address("97455992");
 
 TEST_CASE("ScalarsTestCase", "[generated-testcase]") {
-  auto addr = get_server_address("97455992");
-  auto client = new DebugAbleClient(
-      {.print_debug = false, .prod_settings = {.url = addr}});
-  client->wait_for_valid();
-  bases::Environment::set_gql_env(std::make_shared<bases::Environment>(
-      "ScalarsTestCase",
-      std::unique_ptr<gqlwstransport::GqlWsTransportClient>(client)));
-
+  auto env = test_utils::get_or_create_env(
+      ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = std::make_shared<mainquery::MainQuery>();
   mq->fetch();
   SECTION("test scalar types and deserialization") {
