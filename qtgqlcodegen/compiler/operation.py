@@ -83,7 +83,8 @@ class QtGqlQueriedField:
         if cs := tp.is_custom_scalar:
             return cs.type_for_proxy
         if model_of := tp.is_model:
-            if obj_type := model_of.is_object_type:
+            if model_of.is_object_type:
+                assert self.narrowed_type
                 return f"qtgql::bases::ListModelABC<{self.narrowed_type.name}>"
 
         return tp.member_type
