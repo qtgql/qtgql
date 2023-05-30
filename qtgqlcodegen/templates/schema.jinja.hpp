@@ -61,4 +61,52 @@ void update(const QJsonObject &data,
 };
 {% endfor %}
 
+// ----------------------------------------- INPUT OBJECTS -----------------------------------------
+
+{% for type in context.input_objects %}
+/*
+ * 👉 type.docstring 👈
+ */
+
+struct 👉type.name👈: QObject{
+{% for f in type.fields %}
+👉f.annotation👈 m_👉f.name👈;
+{% endfor -%}
+
+👉type.name👈(QObject* parent, {% for f in type.fields %} 👉f.name👈: 👉f.annotation👈 {% endfor %}): QObject::QObject(parent){
+    {% for f in type.fields %}
+    m_👉f.name👈 = 👉f.name👈;
+    {% endfor -%}
+};
+QJsonObject to_json(){
+    ret = {}
+    {% for f in type.fields %}{% set attr_name %}self.👉f.name👈{% endset %}
+    if 👉attr_name👈:
+    ret['👉f.name👈'] = 👉f.json_repr(attr_name)👈
+    {% endfor %}
+    return ret
+};
+}
+{% endfor %}
+// ----------------------------------------- Enums -----------------------------------------
+{% for enum in context.enums %}
+const auto 👉enum.name👈 = QMap<QString, int>{
+{% for member in enum.members %}
+{👉member.name👈,  👉member.index👈},
+{% endfor %}
+};
+{% endfor %}
+
+{% if context.enums %}
+@QmlElement
+class Enums(QObject):
+{% for enum in context.enums %}
+enum 👉enum.name👈{
+{% for member in enum.members %}
+👉member.name👈 = 👉member.index👈,
+{% endfor %}
+};
+QEnum(👉enum.name👈)
+{% endfor %}
+{% endif %}
 }

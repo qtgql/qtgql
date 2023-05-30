@@ -28,3 +28,7 @@ add_subdirectory(
   generated_test_projects/ObjectWithListOfObjectTestCase/graphql/__generated__)
 target_link_libraries(${TESTS_TARGET}
                       PRIVATE generated::ObjectWithListOfObjectTestCase)
+add_subdirectory(
+  generated_test_projects/OperationVariableTestCase/graphql/__generated__)
+target_link_libraries(${TESTS_TARGET}
+                      PRIVATE generated::OperationVariableTestCase)

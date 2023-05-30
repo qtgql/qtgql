@@ -67,11 +67,11 @@ class QtGqlVariableDefinition(Generic[T], QtGqlBaseTypedNode):
         if not attr_name:
             attr_name = self.name
         if self.type.is_input_object_type:
-            raise NotImplementedError
+            return f"{attr_name}.to_json()"
         elif self.type.is_builtin_scalar:
             return f"{attr_name}.value()"
         elif self.type.is_enum:
-            raise NotImplementedError
+            return f"{attr_name}.name"
         elif self.is_custom_scalar:
             raise NotImplementedError
 
@@ -211,6 +211,7 @@ class EnumValue:
     """encapsulates enumValues from introspection, maps to an Enum member."""
 
     name: str
+    index: int
     description: str = ""
 
 

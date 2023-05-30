@@ -1,0 +1,48 @@
+
+    query MainQuery {
+      post {
+        header
+        comments {
+          content
+          commenter
+        }
+        createdAt
+      }
+    }
+
+    mutation changePostHeaderMutation($postID: ID!, $newHeader: String!) {
+      changePostHeader(newHeader: $newHeader, postId: $postID) {
+        header
+      }
+    }
+
+    mutation CreatePost($input: CreatePostInput!) {
+      createPost(input: $input) {
+        content
+        header
+        createdAt
+        id
+        comments {
+          id
+          commenter
+          content
+        }
+      }
+    }
+
+    query GetPostById($id: ID!) {
+      getPostById(id: $id) {
+        content
+        header
+        createdAt
+        id
+        comments {
+          id
+          commenter
+          content
+        }
+      }
+    }
+    query EnumNameQuery ($enumVar: SampleEnum! ){
+      getEnumName(enumInput: $enumVar)
+    }
