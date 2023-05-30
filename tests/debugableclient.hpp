@@ -23,7 +23,7 @@ class DebugAbleClient : public gqlwstransport::GqlWsTransportClient {
  public:
   bool m_pong_received = false;
   DebugClientSettings m_settings;
-  std::optional<gqlwstransport::GqlWsTrnsMsgWithID> m_current_message;
+  QJsonObject m_current_message;
 
   DebugAbleClient(DebugClientSettings settings = DebugClientSettings())
       : GqlWsTransportClient(settings.prod_settings), m_settings{settings} {};
@@ -63,4 +63,7 @@ struct CompleteSpy {
   }
 };
 
-}  // namespace test_utils
+std::shared_ptr<qtgql::bases::Environment> get_or_create_env(
+    const QString& env_name, const DebugClientSettings& settings);
+
+};  // namespace test_utils

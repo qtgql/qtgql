@@ -44,7 +44,8 @@ class Environment {
 
   static void set_gql_env(SharedQtGqlEnv env);
 
-  static SharedQtGqlEnv get_gql_env(const QString &name);
+  static std::optional<Environment::SharedQtGqlEnv> get_gql_env(
+      const QString &name);
 };
 
 }  // namespace bases
