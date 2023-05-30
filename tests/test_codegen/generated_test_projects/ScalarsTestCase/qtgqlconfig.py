@@ -7,5 +7,5 @@ config = QtGqlConfig(
         r"/home/nir/Desktop/tzv5hob/qtgql/tests/test_codegen/generated_test_projects/ScalarsTestCase/graphql",
     ),
     env_name="ScalarsTestCase",
-    debug=True,
+    debug=False,
 )

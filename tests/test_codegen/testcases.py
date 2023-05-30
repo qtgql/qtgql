@@ -59,6 +59,7 @@ class QGQLObjectTestCase:
     query_operationName: str = "MainQuery"
     first_field: str = "user"
     qml_file: str = ""
+    needs_debug: bool = False
 
     @cached_property
     def evaluator(self) -> SchemaEvaluator:
@@ -106,6 +107,7 @@ class QGQLObjectTestCase:
             graphql_dir=self.graphql_dir,
             env_name="default_env",
             custom_scalars=self.custom_scalars,
+            debug=self.needs_debug,
         )
 
     @cached_property
@@ -298,6 +300,7 @@ ObjectWithListOfObjectTestCase = QGQLObjectTestCase(
     }
     """,
     test_name="ObjectWithListOfObjectTestCase",
+    needs_debug=True,
 )
 
 RootListOfTestCase = QGQLObjectTestCase(
