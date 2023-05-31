@@ -16,7 +16,7 @@ You can play-around and tell us what is wrong / missing / awesome :smile:.
 
 ### Features
 - [x] object types, for each field there is a corresponding `Q_PROPERTY`
-- [ ] enums
+- [x] enums
 - [ ] custom scalars
 - [ ] Unions
 - [ ] interfaces

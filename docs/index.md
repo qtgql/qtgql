@@ -10,7 +10,7 @@ This library is an attempt to provide a high-level graphql client to the QT worl
 ## Features - TBD
 !!! success "[Codegen (introspection compiler)](./codegen/tutorial.md)"
     - [x] Object types, for each field there is a corresponding `Q_PROPERTY`
-    - [ ] Enums
+    - [x] Enums
     - [ ] Custom scalars
     - [ ] Unions
     - [ ] interfaces
