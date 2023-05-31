@@ -209,7 +209,7 @@ ignore = [
     "DJ008",
 ]
 fix = true
-src = ["qtgql", "tests"]
+src = ["qtgqlcodegen", "tests"]
 [tool.ruff.flake8-annotations]
 suppress-none-returning = true
 
@@ -218,12 +218,12 @@ keep-runtime-typing = true
 
 
 [tool.pytest.ini_options]
-addopts = "--cov-config=pyproject.toml --ignore=qtgql/codegen/py/templates/"
+addopts = "--cov-config=pyproject.toml --ignore=qtgqlcodegen/codegen/py/templates/"
 markers = [
     "no_captcha: This test requires that `LOGIN_REQUIRE_CAPTCHA=False` on the server",
 ]
 [tool.coverage.run]
-omit = ['test_*', 'tests/*', 'qtgql/ext/*', '**/*.jinja.py']
+omit = ['test_*', 'tests/*', '**/*.jinja.py']
 relative_files = true
 
 [tool.coverage.report]
