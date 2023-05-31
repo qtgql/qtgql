@@ -44,7 +44,7 @@ for node in field_data:
 👉 assign_to 👈 = 👉 f.is_custom_scalar.type_name 👈();
 👉 assign_to 👈.deserialize(data.value("👉f.name👈"));
 {% elif f.type.is_enum -%}
-👉 assign_to 👈 = 👉f.type.is_enum.name👈[field_data];
+👉 assign_to 👈 = Enums::👉f.type.is_enum.map_name👈::by_name(data.value("👉f.name👈").toString());
 {% elif f.type.is_union -%}
 type_name = field_data['__typename']
 choice = inner_config.choices[type_name]

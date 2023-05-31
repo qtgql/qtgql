@@ -1,0 +1,20 @@
+interface Node {
+  id: ID!
+}
+
+type Query {
+  user: User!
+}
+
+enum Status {
+  Connected
+  Stale
+  Disconnected
+}
+
+type User implements Node {
+  id: ID!
+  name: String!
+  age: Int!
+  status: Status!
+}

@@ -70,8 +70,8 @@ class QtGqlVariableDefinition(Generic[T], QtGqlBaseTypedNode):
             return f"{attr_name}.to_json()"
         elif self.type.is_builtin_scalar:
             return f"{attr_name}.value()"
-        elif self.type.is_enum:
-            return f"{attr_name}.name"
+        elif enum_def := self.type.is_enum:
+            return f"Enums::{enum_def.map_name}[{attr_name}]"
         elif self.is_custom_scalar:
             raise NotImplementedError
 
@@ -105,7 +105,7 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
             return "{}"
 
         if enum_def := self.type.is_enum:
-            raise NotImplementedError
+            return f"{enum_def.namespaced_name}(0)"
 
         raise NotImplementedError
 
@@ -215,10 +215,18 @@ class EnumValue:
     description: str = ""
 
 
-@define
+@define(slots=False)
 class QtGqlEnumDefinition:
     name: str
     members: list[EnumValue]
+
+    @cached_property
+    def map_name(self) -> str:
+        return f"{self.name}EnumMap"
+
+    @cached_property
+    def namespaced_name(self) -> str:
+        return f"Enums::{self.name}"
 
 
 EnumMap = dict[str, "QtGqlEnumDefinition"]
@@ -317,8 +325,8 @@ class GqlTypeHinter(TypeHinter):
 
         if scalar := t_self.is_custom_scalar:
             return scalar.type_name
-        if gql_enum := t_self.is_enum:
-            return gql_enum.name
+        if enum_def := t_self.is_enum:
+            return enum_def.namespaced_name
         if model_of := t_self.is_model:
             # map of instances based on operation hash.
             return f"QMap<QUuid, QList<{model_of.member_type}>>"

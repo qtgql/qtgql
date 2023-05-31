@@ -10,11 +10,49 @@
 {% endfor %}
 
 namespace 👉 context.config.env_name 👈{
+{% if context.enums %}
+// ---------- Enums ----------
 
-// ----------- Object Types -----------
+class Enums{
+    Q_GADGET
+
+public:
+{% for enum in context.enums %}
+enum 👉enum.name👈{
+{% for member in enum.members -%}
+👉member.name👈 = 👉member.index👈,
+{% endfor %}
+};
+Q_ENUM(👉enum.name👈)
+struct 👉enum.map_name👈{
+Q_GADGET
+public:
+inline static const std::vector<std::pair<QString, 👉enum.name👈>> members = {
+        {% for member in enum.members -%}
+        {"👉member.name👈", 👉enum.name👈::👉member.name👈},
+        {% endfor %}
+};
+inline static const QString name_by_value(👉enum.name👈 v) {
+    for (const auto &member: members) {
+        if (member.second == v) { return member.first; }
+    }
+};
+inline static 👉enum.name👈 by_name(const QString &name) {
+    for (const auto &member: members) {
+        if (member.first == name) { return member.second; }
+    }
+};
+};
+
+{% endfor %}
+};
+{% endif %}
+
+// ---------- Object Types ----------
 {% for type in context.types %}
 {%- set base_class -%}{% if type.has_id_field %}ObjectTypeABCWithID{% else %}ObjectTypeABC{% endif %}{%- endset -%}
 class 👉 type.name 👈 : public qtgql::bases::👉 base_class 👈{
+Q_OBJECT
 protected:
 static auto & INST_STORE() {
     static qtgql::bases::ObjectStore<👉 type.name 👈> _store;
@@ -88,25 +126,5 @@ QJsonObject to_json(){
 };
 }
 {% endfor %}
-// ----------------------------------------- Enums -----------------------------------------
-{% for enum in context.enums %}
-const auto 👉enum.name👈 = QMap<QString, int>{
-{% for member in enum.members %}
-{👉member.name👈,  👉member.index👈},
-{% endfor %}
-};
-{% endfor %}
 
-{% if context.enums %}
-@QmlElement
-class Enums(QObject):
-{% for enum in context.enums %}
-enum 👉enum.name👈{
-{% for member in enum.members %}
-👉member.name👈 = 👉member.index👈,
-{% endfor %}
-};
-QEnum(👉enum.name👈)
-{% endfor %}
-{% endif %}
 }
