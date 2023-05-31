@@ -10,11 +10,40 @@
 {% endfor %}
 
 namespace 👉 context.config.env_name 👈{
+{% if context.enums %}
+// ---------- Enums ----------
 
-// ----------- Object Types -----------
+class Enums{
+    Q_GADGET
+
+public:
+{% for enum in context.enums %}
+enum 👉enum.name👈{
+{% for member in enum.members -%}
+👉member.name👈 = 👉member.index👈,
+{% endfor %}
+};
+Q_ENUM(👉enum.name👈)
+struct 👉enum.map_name👈{
+Q_GADGET
+public:
+inline static const std::vector<std::pair<QString, 👉enum.name👈>> members = {
+        {% for member in enum.members -%}
+        {"👉member.name👈", 👉enum.name👈::👉member.name👈},
+        {% endfor %}
+};
+    GraphQLEnum_MACRO(👉enum.name👈)
+};
+
+{% endfor %}
+};
+{% endif %}
+
+// ---------- Object Types ----------
 {% for type in context.types %}
 {%- set base_class -%}{% if type.has_id_field %}ObjectTypeABCWithID{% else %}ObjectTypeABC{% endif %}{%- endset -%}
 class 👉 type.name 👈 : public qtgql::bases::👉 base_class 👈{
+Q_OBJECT
 protected:
 static auto & INST_STORE() {
     static qtgql::bases::ObjectStore<👉 type.name 👈> _store;
@@ -59,6 +88,34 @@ void update(const QJsonObject &data,
             const qtgql::bases::SelectionsConfig &selections){throw "not implemented";};
 
 };
+{% endfor %}
+
+// ----------------------------------------- INPUT OBJECTS -----------------------------------------
+
+{% for type in context.input_objects %}
+/*
+ * 👉 type.docstring 👈
+ */
+
+struct 👉type.name👈: QObject{
+{% for f in type.fields %}
+👉f.annotation👈 m_👉f.name👈;
+{% endfor -%}
+
+👉type.name👈(QObject* parent, {% for f in type.fields %} 👉f.name👈: 👉f.annotation👈 {% endfor %}): QObject::QObject(parent){
+    {% for f in type.fields %}
+    m_👉f.name👈 = 👉f.name👈;
+    {% endfor -%}
+};
+QJsonObject to_json(){
+    ret = {}
+    {% for f in type.fields %}{% set attr_name %}self.👉f.name👈{% endset %}
+    if 👉attr_name👈:
+    ret['👉f.name👈'] = 👉f.json_repr(attr_name)👈
+    {% endfor %}
+    return ret
+};
+}
 {% endfor %}
 
 }

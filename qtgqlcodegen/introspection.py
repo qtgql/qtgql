@@ -340,8 +340,8 @@ class SchemaEvaluator:
         ret = QtGqlEnumDefinition(
             name=name,
             members=[
-                EnumValue(name=name, description=val.description or "")
-                for name, val in enum.values.items()
+                EnumValue(name=enum.value, index=index, description=enum.description or "")
+                for index, enum in enumerate(enum.values.values())
             ],
         )
 

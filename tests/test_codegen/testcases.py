@@ -663,6 +663,7 @@ implemented_testcases = [
     NestedObjectTestCase,
     OptionalNestedObjectTestCase,
     ObjectWithListOfObjectTestCase,
+    EnumTestCase,
 ]
 
 

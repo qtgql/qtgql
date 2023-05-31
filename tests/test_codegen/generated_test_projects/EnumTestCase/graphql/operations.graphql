@@ -1,0 +1,8 @@
+
+        query MainQuery {
+          user {
+            name
+            age
+            status
+          }
+        }
