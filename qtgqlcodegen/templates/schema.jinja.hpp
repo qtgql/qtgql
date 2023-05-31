@@ -32,18 +32,7 @@ inline static const std::vector<std::pair<QString, 👉enum.name👈>> members =
         {"👉member.name👈", 👉enum.name👈::👉member.name👈},
         {% endfor %}
 };
-inline static const QString name_by_value(👉enum.name👈 v) {
-    for (const auto &member: members) {
-        if (member.second == v) { return member.first; }
-    }
-    throw std::runtime_error("Couldn't find enum member");
-};
-inline static 👉enum.name👈 by_name(const QString &name) {
-    for (const auto &member: members) {
-        if (member.first == name) { return member.second; }
-    }
-    throw std::runtime_error("Couldn't find enum member");
-    };
+    GraphQLEnum_MACRO(👉enum.name👈)
 };
 
 {% endfor %}
