@@ -4,10 +4,12 @@
 
 #include "debugableclient.hpp"
 #include "graphql/__generated__/MainQuery.hpp"
+#include "graphql/__generated__/RandomizeConstUserMutation.hpp"
+
 namespace ScalarsTestCase {
 using namespace qtgql;
 auto ENV_NAME = QString("ScalarsTestCase");
-auto SCHEMA_ADDR = get_server_address("97455992");
+auto SCHEMA_ADDR = get_server_address("18594663");
 
 TEST_CASE("ScalarsTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
@@ -25,8 +27,18 @@ TEST_CASE("ScalarsTestCase", "[generated-testcase]") {
     REQUIRE(d->get_uuid() ==
             QUuid::fromString("06335e84-2872-4914-8c5d-3ed07d2a2f16"));
   };
-  SECTION("test update"){
-
+  SECTION("test update") {
+    auto previous_name = mq->get_data()->get_name();
+    auto mutation = std::make_shared<
+        randomizeconstusermutation::RandomizeConstUserMutation>();
+    mutation->fetch();
+    mq->refetch();
+    test_utils::wait_for_completion(mutation);
+    test_utils::wait_for_completion(mq);
+    auto res = mutation->get_data();
+    REQUIRE(mq->get_data()->get_id() == res->get_id());
+    REQUIRE(mq->get_data()->get_name() == res->get_name());
+    REQUIRE(res->get_name() != previous_name);
   };
   SECTION("test garbage collection") { REQUIRE(false); };
 };

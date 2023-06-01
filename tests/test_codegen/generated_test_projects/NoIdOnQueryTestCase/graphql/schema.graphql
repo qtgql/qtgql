@@ -1,3 +1,8 @@
+type Mutation {
+  """randomizes the current const user"""
+  randomizeConstUser: User!
+}
+
 interface Node {
   id: ID!
 }

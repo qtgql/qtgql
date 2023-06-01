@@ -9,15 +9,25 @@ import time
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+import mimesis
 import pytest
 from attrs import define
 from faker import Faker
+from mimesis.locales import Locale
 
 
 if TYPE_CHECKING:
     from strawberry import Schema
 
 fake = Faker()
+
+
+class factory:
+    person = mimesis.Person(locale=Locale.DEFAULT)
+    develop = mimesis.Development()
+    numeric = mimesis.Numeric()
+    text = mimesis.Text()
+
 
 IS_WINDOWS = platform.system() == "Windows"
 IS_GITHUB_ACTION = os.environ.get("CI", False)

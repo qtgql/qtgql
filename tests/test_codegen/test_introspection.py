@@ -8,7 +8,7 @@ from tests.test_codegen.testcases import TypeWithNullAbleIDTestCase
 
 TypeWithWrongIDTypeTestCase = QGQLObjectTestCase(
     schema=schemas.wrogn_id_type.schema,
-    query="""query MainQuery {users{name}}""",
+    operations="""query MainQuery {users{name}}""",
     test_name="TypeWithWrongIDTypeTestCase",
 )
 

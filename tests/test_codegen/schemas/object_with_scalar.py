@@ -1,19 +1,21 @@
+from __future__ import annotations
+
 import uuid
 from uuid import UUID
 
 import strawberry
 
-from tests.conftest import fake
+from tests.conftest import factory
 from tests.test_codegen.schemas.node_interface import Node
 
 
 @strawberry.type
 class User(Node):
-    name: str = strawberry.field(default_factory=fake.name)
-    age: int = strawberry.field(default_factory=fake.pyint)
-    age_point: float = strawberry.field(default_factory=fake.pyfloat)
-    male: bool = strawberry.field(default_factory=fake.pybool)
-    id: strawberry.ID = strawberry.field(default_factory=lambda: strawberry.ID(fake.pystr()))
+    name: str = strawberry.field(default_factory=factory.person.name)
+    age: int = strawberry.field(default_factory=factory.person.age)
+    age_point: float = strawberry.field(default_factory=factory.numeric.float_number)
+    male: bool = strawberry.field(default_factory=factory.develop.boolean)
+    id: strawberry.ID = strawberry.field(default_factory=lambda: strawberry.ID(uuid.uuid4().hex))
     uuid: UUID = strawberry.field(default_factory=uuid.uuid4)
 
 
@@ -40,9 +42,12 @@ class Query:
 
 @strawberry.type()
 class Mutation:
-    @strawberry.field()
+    @strawberry.field(description="randomizes the current const user")
     def randomize_const_user(self) -> User:
-        CONST_USER.name = fake.name()
+        new_user = User()
+        CONST_USER.name = new_user.name
+        CONST_USER.age = new_user.age
+        CONST_USER.male = new_user.male
 
 
-schema = strawberry.Schema(query=Query)
+schema = strawberry.Schema(query=Query, mutation=Mutation)

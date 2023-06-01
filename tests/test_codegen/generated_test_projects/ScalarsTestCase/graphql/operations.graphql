@@ -10,3 +10,14 @@
             uuid
           }
         }
+
+        mutation RandomizeConstUserMutation {
+          randomizeConstUser{
+            name
+            id
+            age
+            male
+            uuid
+            agePoint
+          }
+        }
