@@ -64,6 +64,17 @@ static std::shared_ptr<👉 type.name 👈> from_json(const QJsonObject& data,
 if (data.isEmpty()){
     return {};
 }
+{% if type.has_id_field %}
+if (config.selections.contains("id") && !data.value("id").isNull()) {
+    auto cached_maybe = INST_STORE().get_record(data.value("id").toString());
+    if(cached_maybe.has_value()){
+        auto node = cached_maybe.value()->node;
+        node->update(data, config);
+        return node;
+    }
+};
+{% endif %}
+
 auto inst = std::make_shared<👉 type.name 👈>();
 {% for f in type.fields -%}
 {% set assign_to %} inst->👉 f.private_name 👈 {% endset %}

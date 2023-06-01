@@ -4,12 +4,12 @@
 
 #include "debugableclient.hpp"
 #include "graphql/__generated__/MainQuery.hpp"
-#include "graphql/__generated__/RandomizeConstUserMutation.hpp"
+#include "graphql/__generated__/UserWithSameIDAndDifferentFieldsQuery.hpp"
 
 namespace ScalarsTestCase {
 using namespace qtgql;
 auto ENV_NAME = QString("ScalarsTestCase");
-auto SCHEMA_ADDR = get_server_address("18594663");
+auto SCHEMA_ADDR = get_server_address("39238999");
 
 TEST_CASE("ScalarsTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
@@ -29,16 +29,15 @@ TEST_CASE("ScalarsTestCase", "[generated-testcase]") {
   };
   SECTION("test update") {
     auto previous_name = mq->get_data()->get_name();
-    auto mutation = std::make_shared<
-        randomizeconstusermutation::RandomizeConstUserMutation>();
-    mutation->fetch();
-    mq->refetch();
-    test_utils::wait_for_completion(mutation);
-    test_utils::wait_for_completion(mq);
-    auto res = mutation->get_data();
-    REQUIRE(mq->get_data()->get_id() == res->get_id());
-    REQUIRE(mq->get_data()->get_name() == res->get_name());
-    REQUIRE(res->get_name() != previous_name);
+    auto modified_user_op =
+        std::make_shared<userwithsameidanddifferentfieldsquery::
+                             UserWithSameIDAndDifferentFieldsQuery>();
+    modified_user_op->fetch();
+    test_utils::wait_for_completion(modified_user_op);
+    REQUIRE(mq->get_data()->get_id() == modified_user_op->get_data()->get_id());
+    auto new_name = modified_user_op->get_data()->get_name();
+    REQUIRE(mq->get_data()->get_name() == new_name);
+    REQUIRE(new_name != previous_name);
   };
   SECTION("test garbage collection") { REQUIRE(false); };
 };

@@ -161,15 +161,14 @@ ScalarsTestCase = QGQLObjectTestCase(
             uuid
           }
         }
-
-        mutation RandomizeConstUserMutation {
-          randomizeConstUser{
-            name
-            id
+        query UserWithSameIDAndDifferentFieldsQuery {
+          constUserWithModifiedFields {
             age
-            male
-            uuid
             agePoint
+            id
+            male
+            name
+            uuid
           }
         }
         """,

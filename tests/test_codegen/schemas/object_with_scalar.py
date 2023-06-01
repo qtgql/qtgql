@@ -39,15 +39,11 @@ class Query:
     def constUser(self) -> User:
         return CONST_USER
 
-
-@strawberry.type()
-class Mutation:
-    @strawberry.field(description="randomizes the current const user")
-    def randomize_const_user(self) -> User:
+    @strawberry.field()
+    def const_user_with_modified_fields(self) -> User:
         new_user = User()
-        CONST_USER.name = new_user.name
-        CONST_USER.age = new_user.age
-        CONST_USER.male = new_user.male
+        new_user.id = CONST_USER.id
+        return new_user
 
 
-schema = strawberry.Schema(query=Query, mutation=Mutation)
+schema = strawberry.Schema(query=Query)

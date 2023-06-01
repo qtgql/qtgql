@@ -59,8 +59,12 @@ namespace test_utils {
 void wait_for_completion(
     const std::shared_ptr<qtgql::gqlwstransport::OperationHandlerABC>
         operation) {
-  REQUIRE(
-      QTest::qWaitFor([&]() -> bool { return operation->completed(); }, 1500));
+  if (!QTest::qWaitFor([&]() -> bool { return operation->completed(); },
+                       1500)) {
+    auto error_message =
+        operation->ENV_NAME().toStdString() + " Failed to complete!";
+    throw std::runtime_error(error_message);
+  }
 }
 std::shared_ptr<qtgql::bases::Environment> get_or_create_env(
     const QString &env_name, const DebugClientSettings &settings) {
