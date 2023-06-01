@@ -91,7 +91,7 @@ emit 👉 f.signal_name 👈();
 
 
 {% macro initialize_proxy_field(field) %}
-{%set instance_from_concrete -%}
+{%set instance_of_concrete -%}
 {% if field.is_root %}
 concrete
 {% else %}
@@ -99,17 +99,17 @@ m_inst->👉field.definition.getter_name 👈()
 {% endif %}{% endset -%}
 
 {% if field.type.is_object_type  and field.type.is_optional() %}
-if (👉 instance_from_concrete 👈){
-👉field.private_name👈 = new 👉field.type_name👈(this, 👉 instance_from_concrete 👈);
+if (👉 instance_of_concrete 👈){
+👉field.private_name👈 = new 👉field.type_name👈(this, 👉 instance_of_concrete 👈);
 }
 else{
 👉field.private_name👈 = nullptr;
 }
 {% elif field.type.is_object_type %}
-👉field.private_name👈 = new 👉field.type_name👈(this, 👉 instance_from_concrete 👈);
-{% elif field.type.is_model.is_object %}
+👉field.private_name👈 = new 👉field.type_name👈(this, 👉 instance_of_concrete 👈);
+{% elif field.type.is_model.is_object_type %}
 auto init_list_👉 field.name 👈 =  std::make_unique<QList<👉field.narrowed_type.name👈*>>();
-for (const auto & node: 👉 instance_from_concrete 👈.value(OPERATION_ID)){
+for (const auto & node: 👉 instance_of_concrete 👈.value(OPERATION_ID)){
 init_list_👉 field.name 👈->append(new 👉field.narrowed_type.name👈(this, node));
 }
 👉field.private_name👈 = new 👉 field.type_name 👈(this, std::move(init_list_👉 field.name 👈));
