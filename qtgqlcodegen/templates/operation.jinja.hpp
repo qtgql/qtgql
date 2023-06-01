@@ -14,9 +14,19 @@ class 👉 t.name 👈: public QObject{
 👉 t.doc_fields 👈
  */
     Q_OBJECT
+{% for f in t.fields -%}
+Q_PROPERTY(const 👉 f.property_type 👈 👉 f.name 👈 READ 👉 f.definition.getter_name 👈 NOTIFY 👉 f.definition.signal_name 👈);
+{% endfor %}
+signals:
+{%for f in t.fields -%}
+void 👉 f.definition.signal_name 👈();
+{% endfor %}
+
 {# members #}
 {% if context.debug -%}
 public: // WARNING: members are public because you have debug=True in your config file.
+{% else %}
+protected:
 {% endif %}
 std::shared_ptr<👉context.schema_ns👈::👉 t.definition.name 👈> m_inst;
 {% for ref_field in t.references -%}
@@ -30,6 +40,9 @@ public:
 👉 t.name 👈(QObject* parent, const std::shared_ptr<👉 t.definition.name 👈> &inst ): m_inst{inst}, QObject::QObject(parent){
 {% for field in t.fields -%}
 👉 macros.initialize_proxy_field(field) 👈
+{# updates logic -#}
+connect(m_inst.get(), &👉context.schema_ns👈::👉t.definition.name👈::👉 field.definition.signal_name 👈, this,
+        [&](){emit 👉 field.definition.signal_name 👈();});
 {% endfor %}
 }
 {%- for f in t.fields %}

@@ -13,8 +13,15 @@ TEST_CASE("👉 context.test_name 👈", "[generated-testcase]") {
     auto env = test_utils::get_or_create_env(
             ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
 
-    REQUIRE(false);
-
+    SECTION("test deserialize"){
+        REQUIRE(false);
+    };
+    SECTION("test update"){
+        REQUIRE(false);
+    };
+    SECTION("test garbage collection"){
+        REQUIRE(false);
+    };
 }
 
 };

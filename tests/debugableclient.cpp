@@ -57,9 +57,10 @@ void DebugAbleClient::onTextMessageReceived(const QString &raw_message) {
 
 namespace test_utils {
 void wait_for_completion(
-    const std::shared_ptr<qtgql::gqlwstransport::OperationHandlerABC> handler) {
+    const std::shared_ptr<qtgql::gqlwstransport::OperationHandlerABC>
+        operation) {
   REQUIRE(
-      QTest::qWaitFor([&]() -> bool { return handler->completed(); }, 1500));
+      QTest::qWaitFor([&]() -> bool { return operation->completed(); }, 1500));
 }
 std::shared_ptr<qtgql::bases::Environment> get_or_create_env(
     const QString &env_name, const DebugClientSettings &settings) {

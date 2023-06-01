@@ -85,7 +85,12 @@ return inst;
 
 void loose(const qtgql::bases::OperationMetadata &metadata){throw "not implemented";};
 void update(const QJsonObject &data,
-            const qtgql::bases::SelectionsConfig &selections){throw "not implemented";};
+            const qtgql::bases::SelectionsConfig &config){
+            {%for f in type.fields -%}
+            {% set fset %}👉f.setter_name👈{% endset %}{% set private_name %}👉f.private_name👈{% endset -%}
+            👉 macros.update_concrete_field(f, fset_name=fset, private_name=private_name) 👈
+            {% endfor %}
+};
 
 };
 {% endfor %}

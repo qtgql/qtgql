@@ -14,8 +14,8 @@ TEST_CASE("ScalarsTestCase", "[generated-testcase]") {
       ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = std::make_shared<mainquery::MainQuery>();
   mq->fetch();
-  SECTION("test scalar types and deserialization") {
-    REQUIRE(QTest::qWaitFor([&]() -> bool { return mq->completed(); }, 1500));
+  test_utils::wait_for_completion(mq);
+  SECTION("test  deserialize") {
     auto d = mq->get_data();
     REQUIRE(d->get_age() == 24);
     REQUIRE(d->get_agePoint() == 24.0f);
@@ -23,7 +23,13 @@ TEST_CASE("ScalarsTestCase", "[generated-testcase]") {
     REQUIRE(d->get_male() == true);
     REQUIRE(d->get_name() == "nir");
     REQUIRE(d->get_uuid() ==
-            QUuid::fromString("06335e84-2872-4914-8c5d-3ed07d2a2f16\""));
+            QUuid::fromString("06335e84-2872-4914-8c5d-3ed07d2a2f16"));
+  };
+  SECTION("test update"){
+
+  };
+  SECTION("test garbage collection"){
+
   };
 };
 };  // namespace ScalarsTestCase

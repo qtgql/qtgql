@@ -1,3 +1,34 @@
+
+{% macro concrete_type_fields(type) -%}
+protected:
+{% for f in type.fields -%}
+👉 f.member_type 👈 👉 f.private_name 👈 = 👉 f.default_value 👈;
+{% endfor %}
+signals:
+{%for f in type.fields -%}
+void 👉 f.signal_name 👈();
+{% endfor %}
+
+public:
+{%for f in type.fields %}
+{% if f.is_custom_scalar %}
+const 👉 f.is_custom_scalar.type_for_proxy 👈 & 👉 f.getter_name 👈() {
+return 👉 f.private_name 👈.to_qt();
+}
+{% else %}
+const 👉 f.member_type 👈 & 👉 f.getter_name 👈() const {
+return 👉 f.private_name 👈;
+}
+{% endif %}
+void 👉 f.setter_name 👈(const 👉 f.member_type 👈 &v)
+{
+👉 f.private_name 👈 = v;
+emit 👉 f.signal_name 👈();
+};
+{% endfor %}
+{% endmacro -%}
+
+
 {% macro deserialize_field(f, assign_to, include_selection_check = True, config_name = "config", metadata_name = "metadata",
                            do_after_deserialized = "") -%}
 
@@ -60,35 +91,19 @@ choice = inner_👉config_name👈.choices[type_name]
 {%- endmacro %}
 
 
+{% macro update_concrete_field(f, fset_name, private_name, config_name= "config", include_selection_check=True) -%}
 
-{% macro concrete_type_fields(type) -%}
-protected:
-{% for f in type.fields -%}
-👉 f.member_type 👈 👉 f.private_name 👈 = 👉 f.default_value 👈;
-{% endfor %}
-signals:
-{%for f in type.fields -%}
-void 👉 f.signal_name 👈();
-{% endfor %}
-
-public:
-{%for f in type.fields %}
-{% if f.is_custom_scalar %}
-const 👉 f.is_custom_scalar.type_for_proxy 👈 & 👉 f.getter_name 👈() {
-return 👉 f.private_name 👈.to_qt();
+if ({% if include_selection_check %}👉config_name👈.selections.contains("👉f.name👈") && {% endif %} !data.value("👉f.name👈").isNull()){
+{% if f.type.is_builtin_scalar %}
+auto new_👉f.name👈 = data.value("👉f.name👈").👉 f.type.is_builtin_scalar.from_json_convertor 👈;
+if (👉private_name👈 != new_👉f.name👈){
+    👉fset_name👈(new_👉f.name👈);
 }
 {% else %}
-const 👉 f.member_type 👈 & 👉 f.getter_name 👈() const {
-return 👉 f.private_name 👈;
-}
+throw "not implemented";
 {% endif %}
-void 👉 f.setter_name 👈(const 👉 f.member_type 👈 &v)
-{
-👉 f.private_name 👈 = v;
-emit 👉 f.signal_name 👈();
-};
-{% endfor %}
-{% endmacro -%}
+}
+{%- endmacro %}
 
 
 {% macro initialize_proxy_field(field) %}
