@@ -1,9 +1,9 @@
-{% macro deserialize_field(f, assign_to, include_selection_check = True) -%}
+{% macro deserialize_field(f, assign_to, include_selection_check = True, config_name = "config", metadata_name = "metadata") -%}
 
-if ({% if include_selection_check %}config.selections.contains("👉f.name👈") && {% endif %} !data.value("👉f.name👈").isNull()){
+if ({% if include_selection_check %}👉config_name👈.selections.contains("👉f.name👈") && {% endif %} !data.value("👉f.name👈").isNull()){
 {% if f.type.is_object_type -%}
 
-👉 assign_to 👈 = 👉f.type.is_object_type.name👈::from_json(data.value("👉f.name👈").toObject(), config.selections.value("👉f.name👈"), metadata);
+👉 assign_to 👈 = 👉f.type.is_object_type.name👈::from_json(data.value("👉f.name👈").toObject(), 👉config_name👈.selections.value("👉f.name👈"), 👉metadata_name👈);
 
 {% elif f.type.is_interface -%}
 if field_data:
@@ -11,30 +11,30 @@ if field_data:
         parent,
         field_data,
         inner_config,
-        metadata,
+        👉metadata_name👈,
     )
 {% elif f.type.is_model -%}
 {% if f.type.is_model.is_object_type -%}
 QList<👉f.type.is_model.member_type👈> obj_list;
 for (const auto& node: data.value("👉f.name👈").toArray()){
-    obj_list.append(👉 f.type.is_model.is_object_type.name 👈::from_json(node.toObject(), config.selections.value("👉f.name👈"), metadata));
+    obj_list.append(👉 f.type.is_model.is_object_type.name 👈::from_json(node.toObject(), 👉config_name👈.selections.value("👉f.name👈"), 👉metadata_name👈));
 };
-👉 assign_to 👈.insert(metadata.operation_id, obj_list);
+👉 assign_to 👈.insert(👉metadata_name👈.operation_id, obj_list);
 
 {% elif f.type.is_model.is_interface -%}
 👉 assign_to 👈 = qtgql::ListModel(
     parent=parent,
-    data=[👉f.type.is_model.is_interface.name👈.from_dict(parent, data=node, config=inner_config, metadata=metadata) for
+    data=[👉f.type.is_model.is_interface.name👈.from_dict(parent, data=node, config=inner_config, metadata=👉metadata_name👈) for
           node in field_data],
 )
 {% elif f.type.is_model.is_union -%}
 model_data = []
 for node in field_data:
     type_name = node['__typename']
-    choice = inner_config.choices[type_name]
+    choice = inner_👉config_name👈.choices[type_name]
     model_data.append(
         __TYPE_MAP__[type_name].from_dict(self, node,
-                                          choice, metadata)
+                                          choice, 👉metadata_name👈)
     )
 👉 assign_to 👈 = qtgql::ListModel(parent, data=model_data)
 {% endif %}
@@ -47,8 +47,8 @@ for node in field_data:
 👉 assign_to 👈 = Enums::👉f.type.is_enum.map_name👈::by_name(data.value("👉f.name👈").toString());
 {% elif f.type.is_union -%}
 type_name = field_data['__typename']
-choice = inner_config.choices[type_name]
-👉 assign_to 👈 = __TYPE_MAP__[type_name].from_dict(parent, field_data, choice, metadata);
+choice = inner_👉config_name👈.choices[type_name]
+👉 assign_to 👈 = __TYPE_MAP__[type_name].from_dict(parent, field_data, choice, 👉metadata_name👈);
 {% endif -%}
 };
 {%- endmacro %}
@@ -84,3 +84,29 @@ emit 👉 f.signal_name 👈();
 {% endfor %}
 {% endmacro -%}
 
+
+{% macro initialize_proxy_field(field) %}
+{%set instance_from_concrete -%}
+{% if field.is_root %}
+concrete
+{% else %}
+m_inst->👉field.definition.getter_name 👈()
+{% endif %}{% endset -%}
+
+{% if field.type.is_object_type  and field.type.is_optional() %}
+if (👉 instance_from_concrete 👈){
+👉field.private_name👈 = new 👉field.type_name👈(this, 👉 instance_from_concrete 👈);
+}
+else{
+👉field.private_name👈 = nullptr;
+}
+{% elif field.type.is_object_type %}
+👉field.private_name👈 = new 👉field.type_name👈(this, 👉 instance_from_concrete 👈);
+{% elif field.type.is_model.is_object %}
+auto init_list_👉 field.name 👈 =  std::make_unique<QList<👉field.narrowed_type.name👈*>>();
+for (const auto & node: 👉 instance_from_concrete 👈.value(OPERATION_ID)){
+init_list_👉 field.name 👈->append(new 👉field.narrowed_type.name👈(this, node));
+}
+👉field.private_name👈 = new 👉 field.type_name 👈(this, std::move(init_list_👉 field.name 👈));
+{% endif %}
+{% endmacro %}

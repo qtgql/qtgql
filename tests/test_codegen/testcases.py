@@ -535,6 +535,8 @@ OperationVariableTestCase = QGQLObjectTestCase(
     test_name="OperationVariableTestCase",
     type_name="Post",
 )
+
+
 OptionalInputTestCase = QGQLObjectTestCase(
     schema=schemas.optional_input_schema.schema,
     query="""

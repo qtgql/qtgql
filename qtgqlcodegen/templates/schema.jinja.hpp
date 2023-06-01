@@ -90,32 +90,34 @@ void update(const QJsonObject &data,
 };
 {% endfor %}
 
-// ----------------------------------------- INPUT OBJECTS -----------------------------------------
+// ---------- INPUT OBJECTS ----------
 
 {% for type in context.input_objects %}
 /*
  * 👉 type.docstring 👈
  */
-
 struct 👉type.name👈: QObject{
-{% for f in type.fields %}
-👉f.annotation👈 m_👉f.name👈;
-{% endfor -%}
+Q_OBJECT
 
-👉type.name👈(QObject* parent, {% for f in type.fields %} 👉f.name👈: 👉f.annotation👈 {% endfor %}): QObject::QObject(parent){
-    {% for f in type.fields %}
-    m_👉f.name👈 = 👉f.name👈;
-    {% endfor -%}
-};
-QJsonObject to_json(){
-    ret = {}
-    {% for f in type.fields %}{% set attr_name %}self.👉f.name👈{% endset %}
-    if 👉attr_name👈:
-    ret['👉f.name👈'] = 👉f.json_repr(attr_name)👈
+public:
+{% for f in type.fields %}
+std::optional<👉f.member_type👈> 👉f.name👈 = {};
+{% endfor -%}
+👉type.name👈(QObject* parent, {% for f in type.fields %} std::optional<👉f.member_type👈> &👉f.name👈{% if not loop.last %},{% endif %} {% endfor %}): QObject::QObject(parent){
+    {% for f in type.fields -%}
+    👉f.name👈 = 👉f.name👈;
     {% endfor %}
-    return ret
 };
+QJsonObject to_json() const{
+    auto ret = QJsonObject();
+    {% for f in type.fields %}{% set attr_name %}👉f.name👈{% endset %}
+    if (👉attr_name👈.has_value()){
+    ret.insert("👉f.name👈", 👉f.json_repr(attr_name)👈);
+    }
+    {% endfor %}
+    return ret;
 }
+};
 {% endfor %}
 
 }

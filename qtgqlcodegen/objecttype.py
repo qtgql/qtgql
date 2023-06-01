@@ -67,11 +67,11 @@ class QtGqlVariableDefinition(Generic[T], QtGqlBaseTypedNode):
         if not attr_name:
             attr_name = self.name
         if self.type.is_input_object_type:
-            return f"{attr_name}.to_json()"
+            return f"{attr_name}.value().to_json()"
         elif self.type.is_builtin_scalar:
             return f"{attr_name}.value()"
         elif enum_def := self.type.is_enum:
-            return f"Enums::{enum_def.map_name}[{attr_name}]"
+            return f"Enums::{enum_def.map_name}::name_by_value({attr_name}.value())"
         elif self.is_custom_scalar:
             raise NotImplementedError
 
@@ -313,33 +313,48 @@ class GqlTypeHinter(TypeHinter):
             return t_self
 
     @cached_property
+    def type_name(self) -> str:
+        t_self = self.optional_maybe
+        if builtin_scalar := t_self.is_builtin_scalar:
+            return builtin_scalar.tp
+
+        if scalar := t_self.is_custom_scalar:
+            return scalar.type_name
+
+        if enum_def := t_self.is_enum:
+            return enum_def.namespaced_name
+
+        if t_self.is_model:
+            # map of instances based on operation hash.
+            raise NotImplementedError(
+                "models have no valid type for schema concretes, call member_type()",
+            )
+
+        if object_def := t_self.is_object_type or t_self.is_interface:
+            return object_def.name
+        if q_object_def := t_self.is_queried_object_type:
+            return q_object_def.name
+        if t_self.is_union:
+            raise NotImplementedError
+        if input_obj := t_self.is_input_object_type:
+            return input_obj.name
+        raise NotImplementedError  # pragma no cover
+
+    @cached_property
     def member_type(self) -> str:
         """
         :returns: Annotation of the field at the concrete type (for the type of the proxy use property type)
         """
         t_self = self.optional_maybe
 
-        # int, str, float etc...
-        if builtin_scalar := t_self.is_builtin_scalar:
-            return builtin_scalar.tp
-
-        if scalar := t_self.is_custom_scalar:
-            return scalar.type_name
-        if enum_def := t_self.is_enum:
-            return enum_def.namespaced_name
         if model_of := t_self.is_model:
             # map of instances based on operation hash.
             return f"QMap<QUuid, QList<{model_of.member_type}>>"
-        if object_def := t_self.is_object_type or t_self.is_interface:
-            return f"std::shared_ptr<{object_def.name}>"
+        if t_self.is_object_type or t_self.is_interface:
+            return f"std::shared_ptr<{self.type_name}>"
         if q_object_def := t_self.is_queried_object_type:
             return f"{q_object_def.name}"
-        if t_self.is_union:
-            return "std::variant<" + ", ".join(th.member_type for th in t_self.of_type) + ">"
-        if input_obj := t_self.is_input_object_type:
-            return input_obj.name
-
-        raise NotImplementedError  # pragma no cover
+        return self.type_name
 
     def as_annotation(self, object_map=None):  # pragma: no cover
         raise NotImplementedError("not safe to call on this type")

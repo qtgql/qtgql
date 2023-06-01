@@ -61,6 +61,7 @@ class QtGqlQueriedField:
     choices: frozendict[str, dict[str, QtGqlQueriedField]] = attrs.Factory(frozendict)
     selections: dict[str, QtGqlQueriedField] = attrs.Factory(dict)
     narrowed_type: Optional[QtGqlQueriedObjectType] = None
+    is_root: bool = False
 
     def __repr__(self):
         return (
@@ -74,30 +75,45 @@ class QtGqlQueriedField:
         return self.definition.type
 
     @cached_property
-    def property_type(self) -> str:
-        tp = self.definition.type
-        if tp.is_object_type:
+    def type_name(self) -> str:
+        if self.type.is_object_type:
             assert self.narrowed_type
             return self.narrowed_type.name
 
-        if cs := tp.is_custom_scalar:
-            return cs.type_for_proxy
-        if model_of := tp.is_model:
+        if model_of := self.type.is_model:
             if model_of.is_object_type:
                 assert self.narrowed_type
                 return f"qtgql::bases::ListModelABC<{self.narrowed_type.name}>"
 
-        return tp.member_type
+        return self.type.member_type
 
-    @property
-    def proxy_of(self) -> GqlTypeHinter:
-        ret = self.definition.type
-        assert ret
-        return ret
+    @cached_property
+    def property_type(self) -> str:
+        tp = self.definition.type
+        if tp.is_object_type:
+            assert self.narrowed_type
+            return f"{self.type_name} *"
 
-    @property
+        if cs := tp.is_custom_scalar:
+            return cs.type_for_proxy
+
+        if model_of := tp.is_model:
+            if model_of.is_object_type:
+                return f"{self.type_name} *"
+
+        return self.type_name
+
+    @cached_property
     def name(self) -> str:
+        if self.is_root:
+            return "data"
         return self.definition.name
+
+    @cached_property
+    def private_name(self):
+        if self.is_root:
+            return f"m_{self.name}"
+        return self.definition.private_name
 
     @classmethod
     def from_field(
@@ -115,7 +131,7 @@ class QtGqlQueriedField:
         """
         assert parent_interface_field is not UNSET
         if not hasattr(selection_set, "selections"):
-            return cls(definition=field_definition, operation=operation)
+            return cls(definition=field_definition, operation=operation, is_root=is_root)
         assert selection_set
         tp = field_definition.type
         if (
@@ -213,7 +229,7 @@ class QtGqlQueriedField:
                     selections[__f.name] = __f
             queried_obj = QtGqlQueriedObjectType(
                 definition=obj_def,
-                fields=selections,
+                fields_dict=selections,
             )
             operation.narrowed_types_map[queried_obj.name] = queried_obj
             narrowed_type = queried_obj
@@ -229,6 +245,7 @@ class QtGqlQueriedField:
             choices=frozendict({k: sorted_distinct_fields(v) for k, v in choices.items()}),
             operation=operation,
             narrowed_type=narrowed_type,
+            is_root=is_root,
         )
 
     def as_conf_string(self) -> str:
@@ -240,27 +257,35 @@ class QtGqlQueriedField:
 @define(slots=False)
 class QtGqlQueriedObjectType:
     definition: QtGqlObjectTypeDefinition = attrs.field(on_setattr=attrs.setters.frozen)
-    fields: dict[str, QtGqlQueriedField] = attrs.Factory(dict)
+    fields_dict: dict[str, QtGqlQueriedField] = attrs.Factory(dict)
     is_root_field: bool = False
 
     @cached_property
+    def fields(self) -> tuple[QtGqlQueriedField]:
+        return tuple(self.fields_dict.values())
+
+    @cached_property
     def name(self) -> str:
-        return f"{self.definition.name}__{'$'.join(sorted(self.fields.keys()))}"
+        return f"{self.definition.name}__{'$'.join(sorted(self.fields_dict.keys()))}"
 
     @cached_property
     def doc_fields(self) -> str:
         return "{} {{\n  {}\n}}".format(
             self.definition.name,
-            "\n   ".join(self.fields.keys()),
+            "\n   ".join(self.fields_dict.keys()),
         )
 
     @cached_property
     def references(self) -> list[QtGqlQueriedField]:
-        return [f for f in self.fields.values() if f.type.is_object_type]
+        return [f for f in self.fields if f.type.is_object_type]
 
     @cached_property
     def models(self) -> list[QtGqlQueriedField]:
-        return [f for f in self.fields.values() if f.type.is_model]
+        return [f for f in self.fields if f.type.is_model]
+
+    @cached_property
+    def private_name(self) -> str:
+        return f"m_{self.name}"
 
 
 @define(slots=False)

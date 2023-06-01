@@ -15,7 +15,7 @@ TEST_CASE("OptionalScalarsTestCase", "[generated-testcase]") {
   auto mq = std::make_shared<mainquery::MainQuery>();
 
   SECTION("when null returns default values") {
-    mq->setVariables({true});
+    mq->set_variables({true});
     mq->fetch();
     test_utils::wait_for_completion(mq);
     auto d = mq->get_data();
@@ -26,7 +26,7 @@ TEST_CASE("OptionalScalarsTestCase", "[generated-testcase]") {
     REQUIRE(d->get_birth() == qtgql::customscalars::DateTimeScalar().to_qt());
   };
   SECTION("when not null") {
-    mq->setVariables({false});
+    mq->set_variables({false});
     mq->fetch();
     test_utils::wait_for_completion(mq);
     auto d = mq->get_data();

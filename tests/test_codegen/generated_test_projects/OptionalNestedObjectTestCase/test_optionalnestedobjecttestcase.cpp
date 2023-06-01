@@ -14,7 +14,7 @@ TEST_CASE("OptionalNestedObjectTestCase", "[generated-testcase]") {
       ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = std::make_shared<mainquery::MainQuery>();
   SECTION("returned null") {
-    mq->setVariables({true});
+    mq->set_variables({true});
     mq->fetch();
     test_utils::wait_for_completion(mq);
     auto p = mq->get_data()->get_person();
@@ -23,7 +23,7 @@ TEST_CASE("OptionalNestedObjectTestCase", "[generated-testcase]") {
     REQUIRE(p == nullptr);
   };
   SECTION("returned value") {
-    mq->setVariables({false});
+    mq->set_variables({false});
     mq->fetch();
     test_utils::wait_for_completion(mq);
     auto p = mq->get_data()->get_person();
