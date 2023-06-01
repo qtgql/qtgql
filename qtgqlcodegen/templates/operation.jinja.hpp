@@ -83,10 +83,15 @@ void on_next(const QJsonObject &message) override{
     if (!m_data && message.contains("data")){
         auto data = message.value("data").toObject();
         if (data.contains("👉 context.operation.root_field.definition.name 👈")){
-        👉 context.operation.root_field.definition.member_type 👈 concrete;
-        👉 macros.deserialize_field(context.operation.root_field.definition, "concrete", False, "OPERATION_METADATA().selections", "OPERATION_METADATA()") 👈
+{%- set do_after_deserialized -%} 👉 macros.initialize_proxy_field(context.operation.root_field) 👈 {% endset -%}
+            👉 macros.deserialize_field(context.operation.root_field.definition,
+                                    "auto concrete", False,
+                                    "OPERATION_METADATA().selections",
+                                    "OPERATION_METADATA()",
+                                    do_after_deserialized,
+                                    ) 👈
         // initialize proxy
-        👉 macros.initialize_proxy_field(context.operation.root_field) 👈
+
         }
     }
 }

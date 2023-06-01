@@ -1,4 +1,5 @@
-{% macro deserialize_field(f, assign_to, include_selection_check = True, config_name = "config", metadata_name = "metadata") -%}
+{% macro deserialize_field(f, assign_to, include_selection_check = True, config_name = "config", metadata_name = "metadata",
+                           do_after_deserialized = "") -%}
 
 if ({% if include_selection_check %}👉config_name👈.selections.contains("👉f.name👈") && {% endif %} !data.value("👉f.name👈").isNull()){
 {% if f.type.is_object_type -%}
@@ -54,7 +55,7 @@ for node in field_data:
 type_name = field_data['__typename']
 choice = inner_👉config_name👈.choices[type_name]
 👉 assign_to 👈 = __TYPE_MAP__[type_name].from_dict(parent, field_data, choice, 👉metadata_name👈);
-{% endif -%}
+{% endif -%} 👉 do_after_deserialized 👈
 };
 {%- endmacro %}
 

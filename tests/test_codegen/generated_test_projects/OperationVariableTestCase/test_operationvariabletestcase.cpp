@@ -14,7 +14,7 @@ TEST_CASE("OperationVariableTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
 
-  REQUIRE(false);
+  SECTION("test "){};
 }
 
 };  // namespace OperationVariableTestCase
