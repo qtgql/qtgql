@@ -28,8 +28,6 @@ TEST_CASE("ScalarsTestCase", "[generated-testcase]") {
   SECTION("test update"){
 
   };
-  SECTION("test garbage collection"){
-
-  };
+  SECTION("test garbage collection") { REQUIRE(false); };
 };
 };  // namespace ScalarsTestCase

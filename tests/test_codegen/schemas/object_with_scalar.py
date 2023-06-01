@@ -17,6 +17,16 @@ class User(Node):
     uuid: UUID = strawberry.field(default_factory=uuid.uuid4)
 
 
+CONST_USER = User(
+    name="nir",
+    age=24,
+    age_point=24.0,
+    male=True,
+    id="FakeID",
+    uuid=UUID("06335e84-2872-4914-8c5d-3ed07d2a2f16"),
+)
+
+
 @strawberry.type
 class Query:
     @strawberry.field
@@ -25,14 +35,14 @@ class Query:
 
     @strawberry.field()
     def constUser(self) -> User:
-        return User(
-            name="nir",
-            age=24,
-            age_point=24.0,
-            male=True,
-            id="FakeID",
-            uuid=UUID("06335e84-2872-4914-8c5d-3ed07d2a2f16"),
-        )
+        return CONST_USER
+
+
+@strawberry.type()
+class Mutation:
+    @strawberry.field()
+    def randomize_const_user(self) -> User:
+        CONST_USER.name = fake.name()
 
 
 schema = strawberry.Schema(query=Query)
