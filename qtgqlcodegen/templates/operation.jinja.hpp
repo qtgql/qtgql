@@ -82,7 +82,7 @@ return OPERATION_ID;
 void on_next(const QJsonObject &message) override{
     if (!m_data && message.contains("data")){
         auto data = message.value("data").toObject();
-        if (data.contains("👉 context.operation.root_field.name 👈")){
+        if (data.contains("👉 context.operation.root_field.definition.name 👈")){
         👉 context.operation.root_field.definition.member_type 👈 concrete;
         👉 macros.deserialize_field(context.operation.root_field.definition, "concrete", False, "OPERATION_METADATA().selections", "OPERATION_METADATA()") 👈
         // initialize proxy

@@ -33,6 +33,10 @@ void DebugAbleClient::onTextMessageReceived(const QString &raw_message) {
       auto message = gqlwstransport::GqlWsTrnsMsgWithID(data);
       if (message.type == qtgql::gqlwstransport::PROTOCOL::NEXT) {
         m_current_message = message.payload;
+      } else if (message.type == qtgql::gqlwstransport::PROTOCOL::COMPLETE) {
+        if (m_settings.print_debug) {
+          qDebug() << "Completed";
+        }
       }
     } else {
       auto message = gqlwstransport::BaseGqlWsTrnsMsg(data);

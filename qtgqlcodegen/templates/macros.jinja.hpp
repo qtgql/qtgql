@@ -3,7 +3,12 @@
 if ({% if include_selection_check %}👉config_name👈.selections.contains("👉f.name👈") && {% endif %} !data.value("👉f.name👈").isNull()){
 {% if f.type.is_object_type -%}
 
-👉 assign_to 👈 = 👉f.type.is_object_type.name👈::from_json(data.value("👉f.name👈").toObject(), 👉config_name👈.selections.value("👉f.name👈"), 👉metadata_name👈);
+👉 assign_to 👈 = 👉f.type.is_object_type.name👈::from_json(data.value("👉f.name👈").toObject(),
+{% if include_selection_check -%}
+👉config_name👈.selections.value("👉f.name👈")
+{% else -%}
+👉config_name👈
+{% endif -%}, 👉metadata_name👈);
 
 {% elif f.type.is_interface -%}
 if field_data:
