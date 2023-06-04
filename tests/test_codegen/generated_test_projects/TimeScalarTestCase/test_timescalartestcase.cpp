@@ -15,10 +15,12 @@ TEST_CASE("TimeScalarTestCase", "[generated-testcase]") {
       ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = std::make_shared<mainquery::MainQuery>();
   mq->fetch();
-  REQUIRE(QTest::qWaitFor([&]() -> bool { return mq->completed(); }, 1500));
-  auto d = mq->get_data();
-  auto now = QDateTime::currentDateTime(QTimeZone::utc()).time().toString();
-  REQUIRE(d->get_whatTimeIsIt() == now);
+  test_utils::wait_for_completion(mq);
+  SECTION("test deserialize") {
+    auto d = mq->get_data();
+    auto now = QDateTime::currentDateTime(QTimeZone::utc()).time().toString();
+    REQUIRE(d->get_whatTimeIsIt() == now);
+  }
 }
 
 };  // namespace TimeScalarTestCase

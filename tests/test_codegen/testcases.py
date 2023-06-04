@@ -51,7 +51,7 @@ class TstTemplateContext:
 
 @define(slots=False, kw_only=True)
 class QGQLObjectTestCase:
-    query: str
+    operations: str
     schema: Schema
     test_name: str
     type_name: str = "User"
@@ -102,6 +102,10 @@ class QGQLObjectTestCase:
         return self.graphql_dir / "operations.graphql"
 
     @cached_property
+    def testcase_file(self) -> Path:
+        return self.test_dir / f"test_{self.test_name.lower()}.cpp"
+
+    @cached_property
     def config(self) -> QtGqlConfig:
         return QtGqlConfig(
             graphql_dir=self.graphql_dir,
@@ -122,18 +126,17 @@ class QGQLObjectTestCase:
             test_name=self.test_name,
         )
         self.schema_dir.write_text(self.schema.as_str())
-        self.operations_dir.write_text(self.query)
+        self.operations_dir.write_text(self.operations)
         self.config_dir.write_text(TST_CONFIG_TEMPLATE.render(context=template_context))
-        generated_test_case = self.test_dir / f"test_{self.test_name.lower()}.cpp"
-        if not generated_test_case.exists():
-            generated_test_case.write_text(TST_CATCH2_TEMPLATE.render(context=template_context))
+        if not self.testcase_file.exists():
+            self.testcase_file.write_text(TST_CATCH2_TEMPLATE.render(context=template_context))
         else:
             updated = re.sub(
                 'get_server_address\\("([0-9])*"\\)',
                 f'get_server_address("{self.url_suffix}")',
-                generated_test_case.read_text(),
+                self.testcase_file.read_text(),
             )
-            generated_test_case.write_text(updated)
+            self.testcase_file.write_text(updated)
 
         cwd = Path.cwd()
         os.chdir(self.config_dir.parent)
@@ -149,7 +152,7 @@ class QGQLObjectTestCase:
 
 ScalarsTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_scalar.schema,
-    query="""
+    operations="""
         query MainQuery {
           constUser {
             id
@@ -161,12 +164,22 @@ ScalarsTestCase = QGQLObjectTestCase(
             uuid
           }
         }
+        query UserWithSameIDAndDifferentFieldsQuery {
+          constUserWithModifiedFields {
+            age
+            agePoint
+            id
+            male
+            name
+            uuid
+          }
+        }
         """,
     test_name="ScalarsTestCase",
 )
 OptionalScalarsTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_optional_scalar.schema,
-    query="""
+    operations="""
     query MainQuery($returnNone: Boolean! = false) {
       user(retNone: $returnNone) {
         name
@@ -181,7 +194,7 @@ OptionalScalarsTestCase = QGQLObjectTestCase(
 )
 NoIdOnQueryTestCase = QGQLObjectTestCase(  # should append id automatically.
     schema=schemas.object_with_scalar.schema,
-    query="""
+    operations="""
     query MainQuery {
           user {
             name
@@ -194,7 +207,7 @@ NoIdOnQueryTestCase = QGQLObjectTestCase(  # should append id automatically.
 )
 DateTimeTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_datetime.schema,
-    query="""
+    operations="""
        query MainQuery {
           user {
             name
@@ -207,7 +220,7 @@ DateTimeTestCase = QGQLObjectTestCase(
 )
 DecimalTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_decimal.schema,
-    query="""
+    operations="""
        query MainQuery {
           user {
             name
@@ -220,7 +233,7 @@ DecimalTestCase = QGQLObjectTestCase(
 )
 DateTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_date.schema,
-    query="""
+    operations="""
        query MainQuery {
           user {
             name
@@ -233,7 +246,7 @@ DateTestCase = QGQLObjectTestCase(
 )
 TimeScalarTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_time_scalar.schema,
-    query="""
+    operations="""
       query MainQuery {
           user {
             name
@@ -248,7 +261,7 @@ TimeScalarTestCase = QGQLObjectTestCase(
 
 OperationErrorTestCase = QGQLObjectTestCase(
     schema=schemas.operation_error.schema,
-    query="""
+    operations="""
     query MainQuery {
         user{
             name
@@ -261,7 +274,7 @@ OperationErrorTestCase = QGQLObjectTestCase(
 
 NestedObjectTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_object.schema,
-    query="""
+    operations="""
     query MainQuery {
         user{
             person{
@@ -275,7 +288,7 @@ NestedObjectTestCase = QGQLObjectTestCase(
 )
 OptionalNestedObjectTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_optional_object.schema,
-    query="""
+    operations="""
     query MainQuery($return_null: Boolean!) {
       user(returnNull: $return_null) {
         person {
@@ -289,7 +302,7 @@ OptionalNestedObjectTestCase = QGQLObjectTestCase(
 )
 ObjectWithListOfObjectTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_list_of_object.schema,
-    query="""
+    operations="""
     query MainQuery {
         user{
             persons{
@@ -305,7 +318,7 @@ ObjectWithListOfObjectTestCase = QGQLObjectTestCase(
 
 RootListOfTestCase = QGQLObjectTestCase(
     schema=schemas.root_list_of_object.schema,
-    query="""
+    operations="""
     query MainQuery {
         users{
             name
@@ -318,7 +331,7 @@ RootListOfTestCase = QGQLObjectTestCase(
 
 InterfaceTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_interface.schema,
-    query="""
+    operations="""
     query MainQuery {
         user{
             name
@@ -330,7 +343,7 @@ InterfaceTestCase = QGQLObjectTestCase(
 )
 UnionTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_union.schema,
-    query="""
+    operations="""
         query MainQuery {
           user (choice: FROG){
             whoAmI {
@@ -352,7 +365,7 @@ UnionTestCase = QGQLObjectTestCase(
 )
 ListOfObjectWithUnionTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_list_of_type_with_union.schema,
-    query="""
+    operations="""
         query MainQuery {
           userManager {
             users {
@@ -377,7 +390,7 @@ ListOfObjectWithUnionTestCase = QGQLObjectTestCase(
 )
 EnumTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_enum.schema,
-    query="""
+    operations="""
         query MainQuery {
           user {
             name
@@ -390,7 +403,7 @@ EnumTestCase = QGQLObjectTestCase(
 )
 RootEnumTestCase = QGQLObjectTestCase(
     schema=schemas.root_enum_schema.schema,
-    query="""
+    operations="""
         query MainQuery {
           status
         }
@@ -401,7 +414,7 @@ RootEnumTestCase = QGQLObjectTestCase(
 ObjectsThatReferenceEachOtherTestCase = QGQLObjectTestCase(
     schema=schemas.object_reference_each_other.schema,
     test_name="ObjectsThatReferenceEachOtherTestCase",
-    query="""
+    operations="""
   query MainQuery {
       user {
         password
@@ -428,7 +441,7 @@ CustomUserScalarTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_user_defined_scalar.schema,
     custom_scalars={CountryScalar.graphql_name: CountryScalar},
     test_name="CustomUserScalarTestCase",
-    query="""
+    operations="""
      query MainQuery {
           user {
             name
@@ -441,13 +454,13 @@ CustomUserScalarTestCase = QGQLObjectTestCase(
 
 TypeWithNoIDTestCase = QGQLObjectTestCase(
     schema=schemas.type_with_no_id.schema,
-    query="""query MainQuery {users{name}}""",
+    operations="""query MainQuery {users{name}}""",
     test_name="TypeWithNoIDTestCase",
 )
 
 RootTypeNoIDTestCase = QGQLObjectTestCase(
     schema=schemas.root_type_no_id.schema,
-    query="""
+    operations="""
     query MainQuery {
         user{
             name
@@ -459,13 +472,13 @@ RootTypeNoIDTestCase = QGQLObjectTestCase(
 
 TypeWithNullAbleIDTestCase = QGQLObjectTestCase(
     schema=schemas.type_with_nullable_id.schema,
-    query="""query MainQuery {users{name}}""",
+    operations="""query MainQuery {users{name}}""",
     test_name="TypeWithNullAbleIDTestCase",
 )
 
 ListOfUnionTestCase = QGQLObjectTestCase(
     schema=schemas.list_of_union.schema,
-    query="""
+    operations="""
        query MainQuery {
           usersAndFrogs {
             ... on User {
@@ -483,7 +496,7 @@ ListOfUnionTestCase = QGQLObjectTestCase(
 
 OperationVariableTestCase = QGQLObjectTestCase(
     schema=schemas.variables_schema.schema,
-    query="""
+    operations="""
     query MainQuery {
       post {
         header
@@ -535,9 +548,11 @@ OperationVariableTestCase = QGQLObjectTestCase(
     test_name="OperationVariableTestCase",
     type_name="Post",
 )
+
+
 OptionalInputTestCase = QGQLObjectTestCase(
     schema=schemas.optional_input_schema.schema,
-    query="""
+    operations="""
     query HelloOrEchoQuery($echo: String){
       echoOrHello(echo: $echo)
     }
@@ -547,7 +562,7 @@ OptionalInputTestCase = QGQLObjectTestCase(
 
 CustomScalarInputTestCase = QGQLObjectTestCase(
     schema=schemas.custom_scalar_input_schema.schema,
-    query="""
+    operations="""
         query ArgsQuery($decimal: Decimal!, $dt: DateTime!, $time: Time!, $date: Date!) {
           echoCustomScalar(decimal: $decimal, dt: $dt, time_: $time, date_: $date) {
             date_
@@ -571,7 +586,7 @@ CustomScalarInputTestCase = QGQLObjectTestCase(
 
 MutationOperationTestCase = QGQLObjectTestCase(
     schema=schemas.mutation_schema.schema,
-    query="""        query MainQuery {
+    operations="""        query MainQuery {
           user {
             id
             name
@@ -587,7 +602,7 @@ MutationOperationTestCase = QGQLObjectTestCase(
 
 SubscriptionTestCase = QGQLObjectTestCase(
     schema=schemas.subscription_schema.schema,
-    query="""
+    operations="""
     subscription CountSubscription ($target: Int = 5){
         count(target: $target)
 }
@@ -597,7 +612,7 @@ SubscriptionTestCase = QGQLObjectTestCase(
 
 InterfaceFieldTestCase = QGQLObjectTestCase(
     schema=schemas.interface_field.schema,
-    query="""
+    operations="""
     query MainQuery ($ret: TypesEnum! = Dog) {
       node(ret: $ret) {
         id
@@ -620,7 +635,7 @@ InterfaceFieldTestCase = QGQLObjectTestCase(
 
 ListOfInterfaceTestcase = QGQLObjectTestCase(
     schema=schemas.list_of_interface.schema,
-    query=InterfaceFieldTestCase.query,
+    operations=InterfaceFieldTestCase.operations,
     test_name="ListOfInterfaceTestcase",
 )
 all_test_cases = [

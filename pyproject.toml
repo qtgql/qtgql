@@ -30,15 +30,16 @@ frozendict = "^2.3.8"
 pytest-cov = "^4.0.0"
 aiohttp = {extras = ["speedups"], version = "^3.8.3"}
 faker = ">=15.3.4,<19.0.0"
-mypy = "^1.0.1"
-strawberry-graphql = ">=0.158.2,<0.180.0"
-aqtinstall = "^3.1.6"
-conan = "^2.0.4"
-cmake = "3.25.0"
-pygithub = "^1.58.2"
-githubrelease = "^1.5.9"
-httpx = "0.18.2"
-autopub = "^0.2.2"
+mypy = ">=1.0.1"
+strawberry-graphql = ">=0.158.2"
+aqtinstall = ">=3.1.6"
+conan = ">=2.0.4"
+cmake = ">=3.25.0"
+pygithub = ">=1.58.2"
+githubrelease = ">=1.5.9"
+httpx = ">=0.18.2"
+autopub = ">=0.2.2"
+mimesis = ">=10.1.0"
 
 [tool.poetry.group.docs.dependencies]
 mkdocs-material = "^9.0.5"
@@ -209,7 +210,7 @@ ignore = [
     "DJ008",
 ]
 fix = true
-src = ["qtgql", "tests"]
+src = ["qtgqlcodegen", "tests"]
 [tool.ruff.flake8-annotations]
 suppress-none-returning = true
 
@@ -218,12 +219,12 @@ keep-runtime-typing = true
 
 
 [tool.pytest.ini_options]
-addopts = "--cov-config=pyproject.toml --ignore=qtgql/codegen/py/templates/"
+addopts = "--cov-config=pyproject.toml --ignore=qtgqlcodegen/codegen/py/templates/"
 markers = [
     "no_captcha: This test requires that `LOGIN_REQUIRE_CAPTCHA=False` on the server",
 ]
 [tool.coverage.run]
-omit = ['test_*', 'tests/*', 'qtgql/ext/*', '**/*.jinja.py']
+omit = ['test_*', 'tests/*', '**/*.jinja.py']
 relative_files = true
 
 [tool.coverage.report]

@@ -16,8 +16,10 @@ TEST_CASE("EnumTestCase", "[generated-testcase]") {
 
   auto mq = std::make_shared<mainquery::MainQuery>();
   mq->fetch();
-  test_utils::wait_for_completion(mq);
-  REQUIRE(mq->get_data()->get_status() == EnumTestCase::Enums::Connected);
+  SECTION("test deserialize") {
+    test_utils::wait_for_completion(mq);
+    REQUIRE(mq->get_data()->get_status() == EnumTestCase::Enums::Connected);
+  }
 }
 
 };  // namespace EnumTestCase

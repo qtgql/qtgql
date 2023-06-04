@@ -14,10 +14,12 @@ TEST_CASE("DateTimeTestCase", "[generated-testcase]") {
   auto mq = std::make_shared<mainquery::MainQuery>();
   mq->fetch();
   test_utils::wait_for_completion(mq);
-  auto d = mq->get_data();
-  auto now = QDateTime::currentDateTime(QTimeZone::utc())
-                 .toString("hh:mm (dd.mm.yyyy)");
-  REQUIRE(d->get_birth() == now);
+  SECTION("test deserialize") {
+    auto d = mq->get_data();
+    auto now = QDateTime::currentDateTime(QTimeZone::utc())
+                   .toString("hh:mm (dd.mm.yyyy)");
+    REQUIRE(d->get_birth() == now);
+  }
 }
 
 };  // namespace DateTimeTestCase

@@ -5,6 +5,7 @@ interface Node {
 type Query {
   user: User!
   constUser: User!
+  constUserWithModifiedFields: User!
 }
 
 scalar UUID

@@ -13,22 +13,24 @@ TEST_CASE("OptionalNestedObjectTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = std::make_shared<mainquery::MainQuery>();
-  SECTION("returned null") {
-    mq->setVariables({true});
-    mq->fetch();
-    test_utils::wait_for_completion(mq);
-    auto p = mq->get_data()->get_person();
-    qDebug() << p;
-    qDebug() << &p;
-    REQUIRE(p == nullptr);
-  };
-  SECTION("returned value") {
-    mq->setVariables({false});
-    mq->fetch();
-    test_utils::wait_for_completion(mq);
-    auto p = mq->get_data()->get_person();
-    REQUIRE(p->get_name() == "nir");
-  };
+  SECTION("test deserialize") {
+    SECTION("returned null") {
+      mq->set_variables({true});
+      mq->fetch();
+      test_utils::wait_for_completion(mq);
+      auto p = mq->get_data()->get_person();
+      qDebug() << p;
+      qDebug() << &p;
+      REQUIRE(p == nullptr);
+    };
+    SECTION("returned value") {
+      mq->set_variables({false});
+      mq->fetch();
+      test_utils::wait_for_completion(mq);
+      auto p = mq->get_data()->get_person();
+      REQUIRE(p->get_name() == "nir");
+    };
+  }
 }
 
 };  // namespace OptionalNestedObjectTestCase

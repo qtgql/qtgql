@@ -10,3 +10,13 @@
             uuid
           }
         }
+        query UserWithSameIDAndDifferentFieldsQuery {
+          constUserWithModifiedFields {
+            age
+            agePoint
+            id
+            male
+            name
+            uuid
+          }
+        }

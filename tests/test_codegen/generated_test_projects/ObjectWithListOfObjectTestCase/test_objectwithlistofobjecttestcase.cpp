@@ -15,7 +15,7 @@ TEST_CASE("ObjectWithListOfObjectTestCase", "[generated-testcase]") {
   auto mq = std::make_shared<mainquery::MainQuery>();
   mq->fetch();
   test_utils::wait_for_completion(mq);
-  SECTION("test gets data") {
+  SECTION("test deserialize") {
     auto persons = mq->get_data()->get_persons();
     auto p = persons->first();
     qDebug() << p->get_name();
@@ -27,7 +27,7 @@ TEST_CASE(
     "default ListModelABC modifications and operations (not specific to this "
     "testcase)",
     "") {
-  //    test_utils::CompleteSpy
+  //    test_utils::ModelSignalSpy
   auto env = test_utils::get_or_create_env(
       ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = std::make_shared<mainquery::MainQuery>();
@@ -46,10 +46,10 @@ TEST_CASE(
                               .toArray();
   QSignalSpy p_pre_remove(model_with_data, &ModelType::rowsAboutToBeRemoved);
   QSignalSpy p_after_remove(model_with_data, &ModelType::rowsRemoved);
-  test_utils::CompleteSpy remove_spy(&p_pre_remove, &p_after_remove);
+  test_utils::ModelSignalSpy remove_spy(&p_pre_remove, &p_after_remove);
   QSignalSpy p_pre_insert(model_with_data, &ModelType::rowsAboutToBeInserted);
   QSignalSpy p_after_insert(model_with_data, &ModelType::rowsInserted);
-  test_utils::CompleteSpy insert_spy(&p_pre_insert, &p_after_insert);
+  test_utils::ModelSignalSpy insert_spy(&p_pre_insert, &p_after_insert);
 
   SECTION("object role is USER_ROLE + 1") {
     int expected = Qt::UserRole + 1;

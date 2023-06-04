@@ -14,15 +14,15 @@
 Here is an example format:
 ```md
 Release type: <patch/minor/major>
-
-<describe your changes here...>
+[//]: # (describe your changes here...)
 ```
 {% endif %}
+
 ### Status of codegen testcases implementation
-| TestCase         | Has implementation? |
-| -----------------|---------------------|
+| TestCase         | Has implementation? | Deserialization? | Update? | Garbage collection?|
+| -----------------|---------------------|------------------|---------|--------------------|
 {%for tc in context.testcases_context.testcases-%}
-|  {{ tc.test.test_name }} | {{ tc.status }} |
+|  {{ tc.test.test_name }} | {{ tc.implemented }} | {{ tc.deserialization }} | {{ tc.update }} | {{ tc.garbage_collection }}|
 {% endfor -%}
 
 ### Summary 

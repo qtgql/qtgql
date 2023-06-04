@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from typing import Any
 from typing import TYPE_CHECKING
 
 from attrs import define
@@ -64,6 +65,9 @@ class SchemaTemplateContext:
 
 @define(slots=False)
 class OperationTemplateContext:
+    def print(self, v: Any) -> None:
+        print(v)
+
     operation: QtGqlOperationDefinition
     config: QtGqlConfig
     debug: bool = False

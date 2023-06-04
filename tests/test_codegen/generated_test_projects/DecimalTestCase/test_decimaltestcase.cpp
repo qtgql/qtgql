@@ -14,8 +14,10 @@ TEST_CASE("DecimalTestCase", "[generated-testcase]") {
       ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = std::make_shared<mainquery::MainQuery>();
   mq->fetch();
-  REQUIRE(QTest::qWaitFor([&]() -> bool { return mq->completed(); }, 1500));
-  REQUIRE(!mq->get_data()->get_balance().isEmpty());
+  SECTION("test deserialize") {
+    REQUIRE(QTest::qWaitFor([&]() -> bool { return mq->completed(); }, 1500));
+    REQUIRE(!mq->get_data()->get_balance().isEmpty());
+  }
 }
 
 };  // namespace DecimalTestCase

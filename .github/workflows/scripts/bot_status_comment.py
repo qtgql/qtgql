@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Literal
+from typing import NamedTuple
 from typing import TYPE_CHECKING
 
 import jinja2
@@ -29,15 +29,28 @@ class BotCommentContext:
     release_context: ReleaseContext
 
 
+class Status(NamedTuple):
+    success: bool
+
+    def __str__(self):
+        if self.success:
+            return ":heavy_check_mark:"
+        return "❌"
+
+    def __repr__(self):
+        return str(self)
+
+    def __bool__(self):
+        return self.success
+
+
 @define
 class TstCaseStatus:
     test: QGQLObjectTestCase
-    implemented: bool
-    status: Literal[":heavy_check_mark:"] | Literal["❌"] = "❌"
-
-    def __attrs_post_init__(self):
-        if self.implemented:
-            self.status = ":heavy_check_mark:"
+    implemented: Status
+    deserialization: Status
+    update: Status
+    garbage_collection: Status
 
 
 @define
@@ -57,14 +70,22 @@ class TstCaseImplementationStatusTemplateContext:
 
 
 def get_testcases_context() -> TstCaseImplementationStatusTemplateContext:
-    return TstCaseImplementationStatusTemplateContext(
-        testcases=[
+    test_cases: list[TstCaseStatus] = []
+    for tc in all_test_cases:
+        implemented = Status(tc in implemented_testcases)
+        tst_content = tc.testcase_file.read_text() if implemented else ""
+        test_cases.append(
             TstCaseStatus(
                 test=tc,
-                implemented=tc in implemented_testcases,
-            )
-            for tc in all_test_cases
-        ],
+                implemented=implemented,
+                deserialization=Status("test deserialize" in tst_content),
+                update=Status("test update" in tst_content),
+                garbage_collection=Status("test garbage collection" in tst_content),
+            ),
+        )
+
+    return TstCaseImplementationStatusTemplateContext(
+        testcases=test_cases,
     )
 
 

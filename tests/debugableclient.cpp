@@ -1,4 +1,6 @@
 #include "debugableclient.hpp"
+
+#include <memory>
 using namespace qtgql;
 
 QString get_server_address(const QString &suffix) {
@@ -33,6 +35,10 @@ void DebugAbleClient::onTextMessageReceived(const QString &raw_message) {
       auto message = gqlwstransport::GqlWsTrnsMsgWithID(data);
       if (message.type == qtgql::gqlwstransport::PROTOCOL::NEXT) {
         m_current_message = message.payload;
+      } else if (message.type == qtgql::gqlwstransport::PROTOCOL::COMPLETE) {
+        if (m_settings.print_debug) {
+          qDebug() << "Completed";
+        }
       }
     } else {
       auto message = gqlwstransport::BaseGqlWsTrnsMsg(data);
@@ -52,10 +58,16 @@ void DebugAbleClient::onTextMessageReceived(const QString &raw_message) {
 }
 
 namespace test_utils {
+
 void wait_for_completion(
-    const std::shared_ptr<qtgql::gqlwstransport::OperationHandlerABC> handler) {
-  REQUIRE(
-      QTest::qWaitFor([&]() -> bool { return handler->completed(); }, 1500));
+    const std::shared_ptr<qtgql::gqlwstransport::OperationHandlerABC>
+        operation) {
+  if (!QTest::qWaitFor([&]() -> bool { return operation->completed(); },
+                       1500)) {
+    auto error_message =
+        operation->ENV_NAME().toStdString() + " Failed to complete!";
+    throw std::runtime_error(error_message);
+  }
 }
 std::shared_ptr<qtgql::bases::Environment> get_or_create_env(
     const QString &env_name, const DebugClientSettings &settings) {
@@ -70,4 +82,37 @@ std::shared_ptr<qtgql::bases::Environment> get_or_create_env(
   }
   return env.value();
 };
-}  // namespace test_utils
+
+SignalCatcher::SignalCatcher(const QObject *source_obj,
+                             const QSet<QString> &excludes, bool exclude_id) {
+  m_excludes = excludes;
+  m_source_obj = source_obj;
+  if (exclude_id) {
+    m_excludes.insert("id");
+  }
+  auto mo = source_obj->metaObject();
+  for (int i = mo->propertyOffset(); i < mo->propertyCount(); ++i) {
+    auto property = mo->property(i);
+    QString sig_name = property.name();
+    if (!m_excludes.contains(sig_name)) {
+      assert_m(property.hasNotifySignal(),
+               sig_name + " property has no signal");
+      m_spys.emplace_front(
+          std::make_unique<QSignalSpy>(source_obj, property.notifySignal()),
+          sig_name);
+    }
+  }
+};
+
+bool SignalCatcher::wait(int timeout) {
+  for (const auto &spy_pair : m_spys) {
+    if (!QTest::qWaitFor([&]() -> bool { return spy_pair.first->isEmpty(); },
+                         timeout)) {
+      qDebug() << "Signal " << spy_pair.second << " wasn't caught.";
+      return false;
+    }
+  };
+  return true;
+}
+
+};  // namespace test_utils
