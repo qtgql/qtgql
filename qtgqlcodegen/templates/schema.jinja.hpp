@@ -93,7 +93,7 @@ return inst;
 };
 
 void loose(const qtgql::bases::OperationMetadata &metadata){
-    {% if type.is_object_type %}
+    {% if type.has_id_field %}
     INST_STORE().loose(m_id, metadata.operation_id);
     {% else %}
     throw "not implemented";
