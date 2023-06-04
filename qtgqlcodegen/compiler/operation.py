@@ -261,7 +261,7 @@ class QtGqlQueriedObjectType:
     is_root_field: bool = False
 
     @cached_property
-    def fields(self) -> tuple[QtGqlQueriedField]:
+    def fields(self) -> tuple[QtGqlQueriedField, ...]:
         return tuple(self.fields_dict.values())
 
     @cached_property
