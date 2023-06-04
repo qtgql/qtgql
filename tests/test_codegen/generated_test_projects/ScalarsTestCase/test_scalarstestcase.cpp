@@ -17,7 +17,7 @@ TEST_CASE("ScalarsTestCase", "[generated-testcase]") {
   auto mq = std::make_shared<mainquery::MainQuery>();
   mq->fetch();
   test_utils::wait_for_completion(mq);
-  SECTION("test  deserialize") {
+  SECTION("test deserialize") {
     auto d = mq->get_data();
     REQUIRE(d->get_age() == 24);
     REQUIRE(d->get_agePoint() == 24.0f);

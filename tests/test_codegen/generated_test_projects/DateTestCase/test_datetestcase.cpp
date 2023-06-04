@@ -16,9 +16,11 @@ TEST_CASE("DateTestCase", "[generated-testcase]") {
   auto mq = std::make_shared<mainquery::MainQuery>();
   mq->fetch();
   test_utils::wait_for_completion(mq);
-  auto d = mq->get_data();
-  auto now = QDate::currentDate().toString("dd.MM.yyyy");
-  REQUIRE(d->get_birth() == now);
+  SECTION("test deserialize") {
+    auto d = mq->get_data();
+    auto now = QDate::currentDate().toString("dd.MM.yyyy");
+    REQUIRE(d->get_birth() == now);
+  }
 }
 
 };  // namespace DateTestCase

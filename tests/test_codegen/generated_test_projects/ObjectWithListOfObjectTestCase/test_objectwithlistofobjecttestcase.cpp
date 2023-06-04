@@ -15,7 +15,7 @@ TEST_CASE("ObjectWithListOfObjectTestCase", "[generated-testcase]") {
   auto mq = std::make_shared<mainquery::MainQuery>();
   mq->fetch();
   test_utils::wait_for_completion(mq);
-  SECTION("test gets data") {
+  SECTION("test deserialize") {
     auto persons = mq->get_data()->get_persons();
     auto p = persons->first();
     qDebug() << p->get_name();
