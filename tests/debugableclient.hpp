@@ -7,6 +7,12 @@
 #include "qtgql/gqlwstransport/gqlwstransport.hpp"
 using namespace qtgql;
 
+#define assert_m(cond, msg) \
+  if (!cond) {              \
+    qDebug() << msg;        \
+  }                         \
+  assert(cond);
+
 QString get_server_address(const QString& suffix = "graphql");
 
 struct DebugClientSettings {
@@ -48,10 +54,10 @@ void wait_for_completion(
     const std::shared_ptr<gqlwstransport::OperationHandlerABC> handler);
 class QCleanerObject : public QObject {};
 
-struct CompleteSpy {
+struct ModelSignalSpy {
   QSignalSpy* about_to;
   QSignalSpy* after;
-  explicit CompleteSpy(QSignalSpy* about, QSignalSpy* _after)
+  explicit ModelSignalSpy(QSignalSpy* about, QSignalSpy* _after)
       : about_to{about}, after{_after} {
     REQUIRE(about->isEmpty());
     REQUIRE(after->isEmpty());
@@ -65,5 +71,17 @@ struct CompleteSpy {
 
 std::shared_ptr<qtgql::bases::Environment> get_or_create_env(
     const QString& env_name, const DebugClientSettings& settings);
+
+class SignalCatcher {
+  std::list<std::pair<std::unique_ptr<QSignalSpy>, QString>> m_spys = {};
+  QSet<QString> m_excludes = {};
+  const QObject* m_source_obj;
+
+ public:
+  SignalCatcher(const QObject* source_obj, const QSet<QString>& excludes = {},
+                bool exclude_id = true);
+
+  [[nodiscard]] bool wait(int timeout = 1000);
+};
 
 };  // namespace test_utils

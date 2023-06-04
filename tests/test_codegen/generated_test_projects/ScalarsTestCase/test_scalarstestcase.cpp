@@ -28,11 +28,14 @@ TEST_CASE("ScalarsTestCase", "[generated-testcase]") {
             QUuid::fromString("06335e84-2872-4914-8c5d-3ed07d2a2f16"));
   };
   SECTION("test update") {
+    auto user = mq->get_data();
     auto previous_name = mq->get_data()->get_name();
     auto modified_user_op =
         std::make_shared<userwithsameidanddifferentfieldsquery::
                              UserWithSameIDAndDifferentFieldsQuery>();
+    auto catcher = test_utils::SignalCatcher(mq->get_data());
     modified_user_op->fetch();
+    REQUIRE(catcher.wait());
     test_utils::wait_for_completion(modified_user_op);
     REQUIRE(mq->get_data()->get_id() == modified_user_op->get_data()->get_id());
     auto new_name = modified_user_op->get_data()->get_name();
