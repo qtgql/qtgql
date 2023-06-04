@@ -102,6 +102,10 @@ class QGQLObjectTestCase:
         return self.graphql_dir / "operations.graphql"
 
     @cached_property
+    def testcase_file(self) -> Path:
+        return self.test_dir / f"test_{self.test_name.lower()}.cpp"
+
+    @cached_property
     def config(self) -> QtGqlConfig:
         return QtGqlConfig(
             graphql_dir=self.graphql_dir,
@@ -124,16 +128,15 @@ class QGQLObjectTestCase:
         self.schema_dir.write_text(self.schema.as_str())
         self.operations_dir.write_text(self.operations)
         self.config_dir.write_text(TST_CONFIG_TEMPLATE.render(context=template_context))
-        generated_test_case = self.test_dir / f"test_{self.test_name.lower()}.cpp"
-        if not generated_test_case.exists():
-            generated_test_case.write_text(TST_CATCH2_TEMPLATE.render(context=template_context))
+        if not self.testcase_file.exists():
+            self.testcase_file.write_text(TST_CATCH2_TEMPLATE.render(context=template_context))
         else:
             updated = re.sub(
                 'get_server_address\\("([0-9])*"\\)',
                 f'get_server_address("{self.url_suffix}")',
-                generated_test_case.read_text(),
+                self.testcase_file.read_text(),
             )
-            generated_test_case.write_text(updated)
+            self.testcase_file.write_text(updated)
 
         cwd = Path.cwd()
         os.chdir(self.config_dir.parent)
