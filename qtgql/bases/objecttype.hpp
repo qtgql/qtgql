@@ -27,7 +27,6 @@ class ObjectTypeABCWithID : public ObjectTypeABC {
 
   virtual const QString &get_id() const = 0;
 
-  // TODO: can't use constructor for this class since it is abstract.
   // updates a node based on new GraphQL data.
   virtual void update(const QJsonObject &data,
                       const SelectionsConfig &selections) = 0;
@@ -58,46 +57,48 @@ class NodeRecord {
 
   NodeRecord() { throw "tried to instantiate without arguments"; };
 
-  NodeRecord(const T_sharedQObject &node_) { node = node_; };
+  explicit NodeRecord(const T_sharedQObject &node_) { node = node_; };
 
   void retain(const QUuid &operation_id) { m_retainers.insert(operation_id); }
 
-  void loose(const QUuid &operation_id) { m_retainers.remove(operation_id); }
+  void loose(const QUuid &operation_id) {
+    qDebug() << "removing: " << operation_id << "from: " << m_retainers;
+    m_retainers.remove(operation_id);
+  }
 
-  bool has_retainers() const { return m_retainers.isEmpty(); }
+  [[nodiscard]] bool has_retainers() const { return m_retainers.isEmpty(); }
 };
 
 template <extendsObjectTypeABCWithID T>
 class ObjectStore {
-  typedef std::shared_ptr<NodeRecord<T>> T_sharedRecord;
+  typedef std::shared_ptr<T> T_sharedQObject;
+  typedef std::unique_ptr<NodeRecord<T>> UniqueRecord;
 
  protected:
-  QMap<QString, T_sharedRecord> m_data;
+  std::map<QString, UniqueRecord> m_records;
 
  public:
-  std::optional<T_sharedRecord> get_record(const QString &id) const {
-    if (m_data.contains(id)) {
-      return {m_data.value(id)};
+  std::optional<T_sharedQObject> get_node(const QString &id) const {
+    if (m_records.contains(id)) {
+      return {m_records.at(id)->node};
     }
     return {};
   }
 
-  void add_record(const T_sharedRecord &record) {
-    if (record) {
-      auto node = record->node;
-      if (node) {
-        m_data.insert(node->get_id(), record);
-      }
+  void add_node(T_sharedQObject node, const QUuid &operation_id) {
+    if (node.get()) {
+      auto record = std::make_unique<qtgql::bases::NodeRecord<T>>(node);
+      record->retain(operation_id);
+      m_records[node->get_id()] = std::move(record);
     }
   };
 
-  void loose(const std::shared_ptr<T> &node, const QString &operation_name) {
-    auto record = m_data.value(node->get_id());
-    record->loose(operation_name);
-    if (!record->has_retainers()) {
-      m_data.remove(node->get_id());
-      qDebug() << "Node with ID: " << node->get_id() << "has ref count of "
-               << node.use_count();
+  void loose(const QString &node_id, const QUuid &operation_id) {
+    m_records.at(node_id)->loose(operation_id);
+    if (!m_records.at(node_id)->has_retainers()) {
+      m_records.erase(node_id);
+      qDebug() << "Node with ID: " << node_id << "has ref count of "
+               << m_records.at(node_id)->node.use_count();
     }
   }
 };

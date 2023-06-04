@@ -111,6 +111,13 @@ void on_next(const QJsonObject &message) override{
 inline const 👉 context.operation.root_field.property_type 👈 get_data(){
     return m_data.value();
 }
+inline void loose(){
+    {% if context.operation.root_field.type.is_object_type %}
+    👉 context.operation.root_field.type.is_object_type.name 👈::INST_STORE().get_node(m_data.value()->get_id()).value()->loose(OPERATION_METADATA());
+    {% else %}
+    throw "not implemented";
+    {% endif %}
+}
 
 {% if context.operation.variables %}
 void set_variables(

@@ -60,6 +60,11 @@ class OperationHandlerABC
   // abstract functions.
   virtual const QString &ENV_NAME() = 0;
   virtual const bases::OperationMetadata &OPERATION_METADATA() = 0;
+  /*
+   * Releases objects retained by this operation
+   * This can be called as long as
+   */
+  virtual void loose() = 0;
   // end abstract functions.
 
   void fetch() {
