@@ -66,7 +66,7 @@ class NodeRecord {
     m_retainers.remove(operation_id);
   }
 
-  [[nodiscard]] bool has_retainers() const { return m_retainers.isEmpty(); }
+  [[nodiscard]] bool has_retainers() const { return !m_retainers.isEmpty(); }
 };
 
 template <extendsObjectTypeABCWithID T>
@@ -97,8 +97,6 @@ class ObjectStore {
     m_records.at(node_id)->loose(operation_id);
     if (!m_records.at(node_id)->has_retainers()) {
       m_records.erase(node_id);
-      qDebug() << "Node with ID: " << node_id << "has ref count of "
-               << m_records.at(node_id)->node.use_count();
     }
   }
 };
