@@ -1,6 +1,18 @@
 CHANGELOG
 =========
 
+0.119.7 - 2023-06-05
+--------------------
+
+This release adds initial support for scalars. Querying a scalar is not yes feasible
+though concrete objects are now uses correct inheritance hierarchy.
+
+From this release onwards only types that comply with [`Node`](https://graphql.org/learn/global-object-identification) interface
+would be treated as cache-able or update-able.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #239](https://github.com/qtgql/qtgql/pull/239/)
+
+
 0.119.6 - 2023-06-04
 --------------------
 
