@@ -116,17 +116,17 @@ m_inst->👉field.definition.getter_name 👈()
 
 {% if field.type.is_object_type  and field.type.is_optional() %}
 if (👉 instance_of_concrete 👈){
-👉field.private_name👈 = new 👉field.type_name👈(this, 👉 instance_of_concrete 👈);
+👉field.private_name👈 = new 👉field.type_name👈(this, 👉 instance_of_concrete 👈, metadata);
 }
 else{
 👉field.private_name👈 = nullptr;
 }
 {% elif field.type.is_object_type %}
-👉field.private_name👈 = new 👉field.type_name👈(this, 👉 instance_of_concrete 👈);
+👉field.private_name👈 = new 👉field.type_name👈(this, 👉 instance_of_concrete 👈, metadata);
 {% elif field.type.is_model.is_object_type %}
 auto init_list_👉 field.name 👈 =  std::make_unique<QList<👉field.narrowed_type.name👈*>>();
-for (const auto & node: 👉 instance_of_concrete 👈.value(OPERATION_ID)){
-init_list_👉 field.name 👈->append(new 👉field.narrowed_type.name👈(this, node));
+for (const auto & node: 👉 instance_of_concrete 👈.value(metadata.operation_id)){
+init_list_👉 field.name 👈->append(new 👉field.narrowed_type.name👈(this, node, metadata));
 }
 👉field.private_name👈 = new 👉 field.type_name 👈(this, std::move(init_list_👉 field.name 👈));
 {% endif %}

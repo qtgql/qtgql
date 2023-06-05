@@ -31,6 +31,7 @@ TEST_CASE(
   auto env = test_utils::get_or_create_env(
       ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = std::make_shared<mainquery::MainQuery>();
+  auto operation_metadata = mq->operation_metadata();
   mq->fetch();
   test_utils::wait_for_completion(mq);
   typedef qtgql::bases::ListModelABC<mainquery::Person__age$id$name> ModelType;
@@ -104,7 +105,8 @@ TEST_CASE(
   }
 
   SECTION("test append") {
-    auto new_obj = new mainquery::Person__age$id$name(nullptr, {});
+    auto new_obj =
+        new mainquery::Person__age$id$name(mq.get(), {}, operation_metadata);
     auto before_count = model_with_data->rowCount();
     model_with_data->append(new_obj);
     insert_spy.validate();
@@ -113,7 +115,8 @@ TEST_CASE(
     REQUIRE(model_with_data->last() == new_obj);
   }
   SECTION("test insert") {
-    auto new_obj = new mainquery::Person__age$id$name(nullptr, {});
+    auto new_obj =
+        new mainquery::Person__age$id$name(mq.get(), {}, operation_metadata);
     auto before_count = model_with_data->rowCount();
     model_with_data->insert(0, new_obj);
     insert_spy.validate();
@@ -123,7 +126,8 @@ TEST_CASE(
   }
   SECTION("test insert after max index") {
     QSignalSpy spy(model_with_data, &ModelType ::rowsAboutToBeInserted);
-    auto new_obj = new mainquery::Person__age$id$name(nullptr, {});
+    auto new_obj =
+        new mainquery::Person__age$id$name(mq.get(), {}, operation_metadata);
     auto before_count = model_with_data->rowCount();
     model_with_data->insert(20000, new_obj);
     insert_spy.validate();
