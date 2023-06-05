@@ -30,3 +30,6 @@ target_link_libraries(${TESTS_TARGET}
                       PRIVATE generated::ObjectWithListOfObjectTestCase)
 add_subdirectory(generated_test_projects/EnumTestCase/graphql/__generated__)
 target_link_libraries(${TESTS_TARGET} PRIVATE generated::EnumTestCase)
+add_subdirectory(
+  generated_test_projects/InterfaceTestCase/graphql/__generated__)
+target_link_libraries(${TESTS_TARGET} PRIVATE generated::InterfaceTestCase)

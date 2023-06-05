@@ -39,10 +39,30 @@ inline static const std::vector<std::pair<QString, 👉enum.name👈>> members =
 };
 {% endif %}
 
+// ---------- Interfaces ----------
+{% for interface in context.interfaces -%}
+class 👉 interface.name 👈 {% if interface.bases %}:{% endif %}{% for base in interface.bases %} public 👉 base.name 👈{% if not loop.last %},{% endif %} {% endfor %}{
+
+👉 macros.concrete_type_fields(interface) 👈
+
+static std::shared_ptr<👉 interface.name 👈> from_json(const QJsonObject& data,
+                                                const qtgql::bases::SelectionsConfig &config,
+                                                const qtgql::bases::OperationMetadata& metadata){
+auto tp_name = data["__typename"].toString();
+{% for impl in interface.implementations.values() -%}
+if ("👉 impl.name 👈" == tp_name){
+    return 👉 impl.name 👈::from_json(data, config, metadata);
+}
+{% endfor %}
+}
+
+};
+{% endfor %}
+
 // ---------- Object Types ----------
 {% for type in context.types %}
 {%- set base_class -%}{% if type.has_id_field %}ObjectTypeABCWithID{% else %}ObjectTypeABC{% endif %}{%- endset -%}
-class 👉 type.name 👈 : public qtgql::bases::👉 base_class 👈{
+class 👉 type.name 👈 : public qtgql::bases::👉 base_class 👈 {% for base in type.bases %}, public 👉 base.name 👈 {% endfor %}{
 Q_OBJECT
 
 protected:

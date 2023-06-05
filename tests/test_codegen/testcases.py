@@ -679,6 +679,7 @@ implemented_testcases = [
     OptionalNestedObjectTestCase,
     ObjectWithListOfObjectTestCase,
     EnumTestCase,
+    InterfaceTestCase,
 ]
 
 
@@ -692,4 +693,4 @@ def generate_testcases() -> None:
 
 
 if __name__ == "__main__":
-    generate_testcases()
+    InterfaceTestCase.generate()

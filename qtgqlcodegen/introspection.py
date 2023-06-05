@@ -284,7 +284,7 @@ class SchemaEvaluator:
 
         ret = QtGqlObjectTypeDefinition(
             name=t_name,
-            implements=implements,
+            interfaces_raw=implements,
             docstring=type_.description,
             fields_dict={
                 name: self._evaluate_field(name, field) for name, field in type_.fields.items()
@@ -322,7 +322,7 @@ class SchemaEvaluator:
         implements = [self._evaluate_interface_type(base) for base in interface.interfaces]
         ret = QtGqlInterfaceDefinition(
             name=interface.name,
-            implements=implements,
+            interfaces_raw=implements,
             docstring=interface.description,
             fields_dict={
                 name: self._evaluate_field(name, field) for name, field in interface.fields.items()

@@ -178,7 +178,43 @@ class BaseGqlTypeDefinition:
 
 @define(slots=False)
 class QtGqlObjectTypeDefinition(BaseGqlTypeDefinition):
-    implements: list[QtGqlInterfaceDefinition] = attrs.Factory(list)
+    interfaces_raw: list[QtGqlInterfaceDefinition] = attrs.Factory(list)
+
+    def implements(self, interface: QtGqlInterfaceDefinition) -> bool:
+        for m_interface in self.interfaces_raw:
+            if interface is m_interface or m_interface.implements(interface):
+                return True
+        return False
+
+    @cached_property
+    def bases(self) -> list[QtGqlInterfaceDefinition]:
+        """
+        returns only the top level interfaces that should be inherited.
+        if i.e
+        ```graphql
+        interface Node{
+        id: ID!
+        }
+
+        interface A implements Node{
+        otherField: String!
+        }
+
+        type Foo implements A{
+        ...
+        }
+        ```
+        Type `Foo` would extend only `A`
+        """
+        not_unique_interfaces: list[QtGqlInterfaceDefinition] = []
+
+        for interface in self.interfaces_raw:
+            for other in self.interfaces_raw:
+                if other is not interface:
+                    if interface.implements(other):
+                        not_unique_interfaces.append(other)
+
+        return [intfs for intfs in self.interfaces_raw if intfs not in not_unique_interfaces]
 
     @cached_property
     def has_id_field(self) -> Optional[QtGqlFieldDefinition]:
@@ -191,7 +227,9 @@ class QtGqlObjectTypeDefinition(BaseGqlTypeDefinition):
                 return id_f
 
     def __attrs_post_init__(self):
-        for base in self.implements:
+        # inject this object type to the interface.
+        # later the interface would use this list to know who he might resolve to.
+        for base in self.interfaces_raw:
             if not base.implementations.get(self.name):
                 base.implementations[self.name] = self
 

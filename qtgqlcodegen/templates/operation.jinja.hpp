@@ -87,6 +87,8 @@ public:
         {%- for line in context.operation.query.splitlines() %}"👉 line 👈"{% endfor -%}
         ), OPERATION_ID)){};
 
+QTGQL_STATIC_MAKE_SHARED(👉 context.operation.name 👈)
+
 inline const QUuid &operation_id() const override{
 return OPERATION_ID;
 }
