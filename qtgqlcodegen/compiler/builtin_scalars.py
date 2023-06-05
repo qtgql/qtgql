@@ -68,6 +68,7 @@ class _BuiltinScalars:
             if scalar.graphql_name == name:
                 return scalar
 
+    @cached_property
     def keys(self) -> list[str]:
         return [scalar.graphql_name for scalar in self]
 

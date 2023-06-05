@@ -16,8 +16,8 @@ TEST_CASE("InterfaceTestCase", "[generated-testcase]") {
   auto mq = mainquery::MainQuery::shared();
   mq->fetch();
   test_utils::wait_for_completion(mq);
-  SECTION("test deserialize"){
-
+  SECTION("test deserialize") {
+    REQUIRE(mq->get_data()->get_name().isEmpty());
   };
 }
 

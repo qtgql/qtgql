@@ -16,6 +16,7 @@ from typingref import UNSET
 
 from qtgqlcodegen.compiler.builtin_scalars import BuiltinScalar
 from qtgqlcodegen.compiler.operation import QtGqlQueriedObjectType
+from qtgqlcodegen.cppref import QtGqlTypes
 from qtgqlcodegen.utils import AntiForwardRef
 
 if TYPE_CHECKING:
@@ -205,8 +206,18 @@ class QtGqlObjectTypeDefinition(BaseGqlTypeDefinition):
         }
         ```
         Type `Foo` would extend only `A`
+
+        If there are no interfaces returns only ObjectTypeABCWithID or ObjectTypeABC.
         """
         not_unique_interfaces: list[QtGqlInterfaceDefinition] = []
+
+        if not self.interfaces_raw:
+            # these are not really interfaces though they are inherited if there are no interfaces.
+            if self.has_id_field:
+                return [QtGqlTypes.ObjectTypeABCWithID]  # type: ignore
+
+            else:
+                return [QtGqlTypes.ObjectTypeABC]  # type: ignore
 
         for interface in self.interfaces_raw:
             for other in self.interfaces_raw:

@@ -41,20 +41,13 @@ inline static const std::vector<std::pair<QString, 👉enum.name👈>> members =
 
 // ---------- Interfaces ----------
 {% for interface in context.interfaces -%}
-class 👉 interface.name 👈 {% if interface.bases %}:{% endif %}{% for base in interface.bases %} public 👉 base.name 👈{% if not loop.last %},{% endif %} {% endfor %}{
-
+class 👉 interface.name 👈 {% for base in interface.bases %} {%if loop.first %}: {% endif %} public 👉 base.name 👈 {% if not loop.last %}, {% endif %}{% endfor %}{
+Q_OBJECT
 👉 macros.concrete_type_fields(interface) 👈
 
 static std::shared_ptr<👉 interface.name 👈> from_json(const QJsonObject& data,
                                                 const qtgql::bases::SelectionsConfig &config,
-                                                const qtgql::bases::OperationMetadata& metadata){
-auto tp_name = data["__typename"].toString();
-{% for impl in interface.implementations.values() -%}
-if ("👉 impl.name 👈" == tp_name){
-    return 👉 impl.name 👈::from_json(data, config, metadata);
-}
-{% endfor %}
-}
+                                                const qtgql::bases::OperationMetadata& metadata);
 
 };
 {% endfor %}
@@ -62,7 +55,7 @@ if ("👉 impl.name 👈" == tp_name){
 // ---------- Object Types ----------
 {% for type in context.types %}
 {%- set base_class -%}{% if type.has_id_field %}ObjectTypeABCWithID{% else %}ObjectTypeABC{% endif %}{%- endset -%}
-class 👉 type.name 👈 : public qtgql::bases::👉 base_class 👈 {% for base in type.bases %}, public 👉 base.name 👈 {% endfor %}{
+class 👉 type.name 👈 {% for base in type.bases %}{%if loop.first%}: {% endif %} public 👉 base.name 👈 {% if not loop.last %}, {% endif %}{% endfor %}{
 Q_OBJECT
 
 protected:
@@ -76,9 +69,6 @@ inline static const QString TYPE_NAME = "👉 type.name 👈";
 static auto get_node(const QString & id){
     return INST_STORE().get_node(id);
 }
-explicit 👉 type.name 👈 (QObject* parent = nullptr)
-: qtgql::bases::👉 base_class 👈::👉 base_class 👈(parent) {};
-
 
 static std::shared_ptr<👉 type.name 👈> from_json(const QJsonObject& data,
                                  const qtgql::bases::SelectionsConfig &config,
