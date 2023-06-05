@@ -29,10 +29,13 @@ class BotCommentContext:
     release_context: ReleaseContext
 
 
-class Status(NamedTuple):
+class ImplementationStatus(NamedTuple):
     success: bool
+    ignored: bool = False
 
     def __str__(self):
+        if self.ignored:
+            return ":heavy_minus_sign:"
         if self.success:
             return ":heavy_check_mark:"
         return "❌"
@@ -47,10 +50,10 @@ class Status(NamedTuple):
 @define
 class TstCaseStatus:
     test: QGQLObjectTestCase
-    implemented: Status
-    deserialization: Status
-    update: Status
-    garbage_collection: Status
+    implemented: ImplementationStatus
+    deserialization: ImplementationStatus
+    update: ImplementationStatus
+    garbage_collection: ImplementationStatus
 
 
 @define
@@ -72,15 +75,21 @@ class TstCaseImplementationStatusTemplateContext:
 def get_testcases_context() -> TstCaseImplementationStatusTemplateContext:
     test_cases: list[TstCaseStatus] = []
     for tc in all_test_cases:
-        implemented = Status(tc in implemented_testcases)
+        implemented = ImplementationStatus(tc in implemented_testcases)
         tst_content = tc.testcase_file.read_text() if implemented else ""
         test_cases.append(
             TstCaseStatus(
                 test=tc,
                 implemented=implemented,
-                deserialization=Status("test deserialize" in tst_content),
-                update=Status("test update" in tst_content),
-                garbage_collection=Status("test garbage collection" in tst_content),
+                deserialization=ImplementationStatus("test deserialize" in tst_content),
+                update=ImplementationStatus(
+                    "test update" in tst_content,
+                    ignored=tc.metadata.should_test_updates,
+                ),
+                garbage_collection=ImplementationStatus(
+                    "test garbage collection" in tst_content,
+                    ignored=tc.metadata.should_test_garbage_collection,
+                ),
             ),
         )
 
