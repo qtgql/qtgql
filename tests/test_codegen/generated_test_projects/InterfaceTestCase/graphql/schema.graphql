@@ -1,0 +1,19 @@
+interface Node {
+  id: ID!
+}
+
+type Query {
+  user: User!
+}
+
+type User implements UserInterface & Node {
+  id: ID!
+  name: String!
+  age: Int!
+}
+
+interface UserInterface implements Node {
+  id: ID!
+  name: String!
+  age: Int!
+}

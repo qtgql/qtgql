@@ -16,6 +16,7 @@ from typingref import UNSET
 
 from qtgqlcodegen.compiler.builtin_scalars import BuiltinScalar
 from qtgqlcodegen.compiler.operation import QtGqlQueriedObjectType
+from qtgqlcodegen.cppref import QtGqlTypes
 from qtgqlcodegen.utils import AntiForwardRef
 
 if TYPE_CHECKING:
@@ -161,8 +162,8 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
         if not object_type:
             if self.type.is_model:
                 object_type = self.type.is_model.is_object_type
-        if object_type:
-            return object_type.has_id_field
+        if object_type and object_type.implements_node:
+            return object_type.fields_dict["id"]
 
 
 @define(slots=False)
@@ -178,20 +179,65 @@ class BaseGqlTypeDefinition:
 
 @define(slots=False)
 class QtGqlObjectTypeDefinition(BaseGqlTypeDefinition):
-    implements: list[QtGqlInterfaceDefinition] = attrs.Factory(list)
+    interfaces_raw: list[QtGqlInterfaceDefinition] = attrs.Factory(list)
+
+    def implements(self, interface: QtGqlInterfaceDefinition) -> bool:
+        for m_interface in self.interfaces_raw:
+            if interface is m_interface or m_interface.implements(interface):
+                return True
+        return False
 
     @cached_property
-    def has_id_field(self) -> Optional[QtGqlFieldDefinition]:
-        return self.fields_dict.get("id", None)
+    def bases(self) -> list[QtGqlInterfaceDefinition]:
+        """
+        returns only the top level interfaces that should be inherited.
+        if i.e
+        ```graphql
+        interface Node{
+        id: ID!
+        }
+
+        interface A implements Node{
+        otherField: String!
+        }
+
+        type Foo implements A{
+        ...
+        }
+        ```
+        Type `Foo` would extend only `A`
+
+        If there are no interfaces returns only ObjectTypeABCWithID or ObjectTypeABC.
+        """
+        not_unique_interfaces: list[QtGqlInterfaceDefinition] = []
+
+        if not self.interfaces_raw:
+            # these are not really interfaces though they are inherited if there are no interfaces.
+            if self.implements_node:
+                return [QtGqlTypes.ObjectTypeABCWithID]  # type: ignore
+
+            else:
+                return [QtGqlTypes.ObjectTypeABC]  # type: ignore
+
+        for interface in self.interfaces_raw:
+            for other in self.interfaces_raw:
+                if other is not interface:
+                    if interface.implements(other):
+                        not_unique_interfaces.append(other)
+
+        return [intfs for intfs in self.interfaces_raw if intfs not in not_unique_interfaces]
 
     @cached_property
-    def id_is_optional(self) -> Optional[QtGqlFieldDefinition]:
-        if id_f := self.has_id_field:
-            if id_f.type.is_optional():
-                return id_f
+    def implements_node(self) -> bool:
+        if isinstance(self, QtGqlInterfaceDefinition):
+            if self.name == "Node":
+                return True
+        return any(base.implements_node for base in self.bases)
 
     def __attrs_post_init__(self):
-        for base in self.implements:
+        # inject this object type to the interface.
+        # later the interface would use this list to know who he might resolve to.
+        for base in self.interfaces_raw:
             if not base.implementations.get(self.name):
                 base.implementations[self.name] = self
 

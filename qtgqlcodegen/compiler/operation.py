@@ -162,7 +162,7 @@ class QtGqlQueriedField:
                 assert concrete
                 if not has_typename_selection(fragment.selection_set):
                     inject_typename_selection(fragment.selection_set)
-                if not has_id_selection(fragment.selection_set) and concrete.has_id_field:
+                if not has_id_selection(fragment.selection_set) and concrete.implements_node:
                     inject_id_selection(fragment.selection_set)
 
                 for selection_node in fragment.selection_set.selections:

@@ -2,6 +2,7 @@
 #pragma once
 #include <QObject>
 #include <QJsonObject>
+#include <QJsonArray>
 #include <memory>
 
 #include <qtgql/bases/bases.hpp>
@@ -39,10 +40,23 @@ inline static const std::vector<std::pair<QString, 👉enum.name👈>> members =
 };
 {% endif %}
 
+// ---------- Interfaces ----------
+{% for interface in context.interfaces -%}
+class 👉 interface.name 👈 {% for base in interface.bases %} {%if loop.first %}: {% endif %} public 👉 base.name 👈 {% if not loop.last %}, {% endif %}{% endfor %}{
+Q_OBJECT
+👉 macros.concrete_type_fields(interface) 👈
+
+static std::shared_ptr<👉 interface.name 👈> from_json(const QJsonObject& data,
+                                                const qtgql::bases::SelectionsConfig &config,
+                                                const qtgql::bases::OperationMetadata& metadata);
+
+};
+{% endfor %}
+
 // ---------- Object Types ----------
 {% for type in context.types %}
-{%- set base_class -%}{% if type.has_id_field %}ObjectTypeABCWithID{% else %}ObjectTypeABC{% endif %}{%- endset -%}
-class 👉 type.name 👈 : public qtgql::bases::👉 base_class 👈{
+{%- set base_class -%}{% if type. implements_node %}ObjectTypeABCWithID{% else %}ObjectTypeABC{% endif %}{%- endset -%}
+class 👉 type.name 👈 {% for base in type.bases %}{%if loop.first%}: {% endif %} public 👉 base.name 👈 {% if not loop.last %}, {% endif %}{% endfor %}{
 Q_OBJECT
 
 protected:
@@ -56,9 +70,6 @@ inline static const QString TYPE_NAME = "👉 type.name 👈";
 static auto get_node(const QString & id){
     return INST_STORE().get_node(id);
 }
-explicit 👉 type.name 👈 (QObject* parent = nullptr)
-: qtgql::bases::👉 base_class 👈::👉 base_class 👈(parent) {};
-
 
 static std::shared_ptr<👉 type.name 👈> from_json(const QJsonObject& data,
                                  const qtgql::bases::SelectionsConfig &config,
@@ -66,7 +77,7 @@ static std::shared_ptr<👉 type.name 👈> from_json(const QJsonObject& data,
 if (data.isEmpty()){
     return {};
 }
-{% if type.has_id_field %}
+{% if type. implements_node %}
 if (config.selections.contains("id") && !data.value("id").isNull()) {
     auto cached_maybe = get_node(data.value("id").toString());
     if(cached_maybe.has_value()){
@@ -82,18 +93,14 @@ auto inst = std::make_shared<👉 type.name 👈>();
 {% set assign_to %} inst->👉 f.private_name 👈 {% endset %}
 👉macros.deserialize_field(f, assign_to)👈
 {% endfor %}
-{% if type.id_is_optional %}
-if (inst->id) {
-INST_STORE().add_node(inst, metadata.operation_id);
-}
-{% elif type.has_id_field and not type.id_is_optional %}
+{% if type. implements_node %}
 INST_STORE().add_node(inst, metadata.operation_id);
 {% endif %}
 return inst;
 };
 
 void loose(const qtgql::bases::OperationMetadata &metadata){
-    {% if type.has_id_field %}
+    {% if type. implements_node %}
     INST_STORE().loose(m_id, metadata.operation_id);
     {% else %}
     throw "not implemented";

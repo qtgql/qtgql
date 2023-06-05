@@ -36,7 +36,8 @@ def wrap_curly_filter(v: str, ignore: bool = False) -> str:
 
 template_env.filters["wrapcurly"] = wrap_curly_filter
 
-SCHEMA_TEMPLATE = template_env.get_template("schema.jinja.hpp")
+SCHEMA_HPP_TEMPLATE = template_env.get_template("schema.jinja.hpp")
+SCHEMA_CPP_TEMPLATE = template_env.get_template("schema.jinja.cpp")
 OPERATION_TEMPLATE = template_env.get_template("operation.jinja.hpp")
 CONFIG_TEMPLATE = template_env.get_template("config.jinja.hpp")
 CMAKE_TEMPLATE = template_env.get_template("CMakeLists.jinja.cmake")
@@ -81,8 +82,12 @@ class OperationTemplateContext:
         return self.config.env_name
 
 
-def schema_types_template(context: SchemaTemplateContext) -> str:
-    return SCHEMA_TEMPLATE.render(context=context)
+def schema_types_template_hpp(context: SchemaTemplateContext) -> str:
+    return SCHEMA_HPP_TEMPLATE.render(context=context)
+
+
+def schema_types_template_cpp(context: SchemaTemplateContext) -> str:
+    return SCHEMA_CPP_TEMPLATE.render(context=context)
 
 
 def operation_template(context: OperationTemplateContext) -> str:

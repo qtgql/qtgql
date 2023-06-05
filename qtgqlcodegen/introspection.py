@@ -21,7 +21,8 @@ from qtgqlcodegen.compiler.template import cmake_template
 from qtgqlcodegen.compiler.template import CmakeTemplateContext
 from qtgqlcodegen.compiler.template import operation_template
 from qtgqlcodegen.compiler.template import OperationTemplateContext
-from qtgqlcodegen.compiler.template import schema_types_template
+from qtgqlcodegen.compiler.template import schema_types_template_cpp
+from qtgqlcodegen.compiler.template import schema_types_template_hpp
 from qtgqlcodegen.compiler.template import SchemaTemplateContext
 from qtgqlcodegen.exceptions import QtGqlException
 from qtgqlcodegen.graphql_ref import is_enum_definition
@@ -284,7 +285,7 @@ class SchemaEvaluator:
 
         ret = QtGqlObjectTypeDefinition(
             name=t_name,
-            implements=implements,
+            interfaces_raw=implements,
             docstring=type_.description,
             fields_dict={
                 name: self._evaluate_field(name, field) for name, field in type_.fields.items()
@@ -322,7 +323,7 @@ class SchemaEvaluator:
         implements = [self._evaluate_interface_type(base) for base in interface.interfaces]
         ret = QtGqlInterfaceDefinition(
             name=interface.name,
-            implements=implements,
+            interfaces_raw=implements,
             docstring=interface.description,
             fields_dict={
                 name: self._evaluate_field(name, field) for name, field in interface.fields.items()
@@ -381,17 +382,6 @@ class SchemaEvaluator:
     def generate(self) -> list[FileSpec]:
         self.parse_schema_concretes()
         self.parse_operations()
-        context = SchemaTemplateContext(
-            enums=list(self._enums_def_map.values()),
-            types=[
-                t
-                for name, t in self._objecttypes_def_map.items()
-                if name not in BuiltinScalars.keys() and name not in self.root_types_names
-            ],
-            interfaces=list(self._interfaces_map.values()),
-            input_objects=list(self._input_objects_def_map.values()),
-            config=self.config,
-        )
 
         operations: list[FileSpec] = []
         for op_name, op in self._operations.items():
@@ -407,26 +397,42 @@ class SchemaEvaluator:
                     path=self.config.generated_dir / f"{op_name}.hpp",
                 ),
             )
-        schema = FileSpec(
-            content=schema_types_template(context),
+
+        context = SchemaTemplateContext(
+            enums=list(self._enums_def_map.values()),
+            types=[
+                t
+                for name, t in self._objecttypes_def_map.items()
+                if name not in BuiltinScalars.keys and name not in self.root_types_names
+            ],
+            interfaces=list(self._interfaces_map.values()),
+            input_objects=list(self._input_objects_def_map.values()),
+            config=self.config,
+        )
+        schema_hpp = FileSpec(
+            content=schema_types_template_hpp(context),
             path=self.config.generated_dir / "schema.hpp",
         )
+        schema_cpp = FileSpec(
+            content=schema_types_template_cpp(context),
+            path=self.config.generated_dir / "schema.cpp",
+        )
 
-        return [schema, *operations]
+        return [schema_hpp, schema_cpp, *operations]
 
     def dump(self):
         """:param file: Path to the directory the codegen would dump to."""
-        headers = self.generate()
+        sources = self.generate()
 
         args = ["clang-format"] + [
-            str(f.path) for f in headers if f.path.suffix in (".cpp", ".h", ".hpp")
+            str(f.path) for f in sources if f.path.suffix in (".cpp", ".h", ".hpp")
         ]
         cmake = FileSpec(
-            content=cmake_template(CmakeTemplateContext(config=self.config, sources=headers)),
+            content=cmake_template(CmakeTemplateContext(config=self.config, sources=sources)),
             path=self.config.generated_dir / "CMakeLists.txt",
         )
-        headers.append(cmake)
+        sources.append(cmake)
         args.append("-i")
-        for f in headers:
+        for f in sources:
             f.dump()
         subprocess.run(args)

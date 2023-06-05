@@ -5,8 +5,10 @@ import re
 import subprocess
 from functools import cached_property
 from pathlib import Path
+from typing import NamedTuple
 from typing import TYPE_CHECKING
 
+import attrs
 import jinja2
 from attr import define
 from typer.testing import CliRunner
@@ -49,6 +51,11 @@ class TstTemplateContext:
     test_name: str
 
 
+class TestCaseMetadata(NamedTuple):
+    should_test_updates: bool = True
+    should_test_garbage_collection: bool = True
+
+
 @define(slots=False, kw_only=True)
 class QGQLObjectTestCase:
     operations: str
@@ -60,6 +67,7 @@ class QGQLObjectTestCase:
     first_field: str = "user"
     qml_file: str = ""
     needs_debug: bool = False
+    metadata: TestCaseMetadata = attrs.Factory(TestCaseMetadata)
 
     @cached_property
     def evaluator(self) -> SchemaEvaluator:
@@ -192,7 +200,8 @@ OptionalScalarsTestCase = QGQLObjectTestCase(
     """,
     test_name="OptionalScalarsTestCase",
 )
-NoIdOnQueryTestCase = QGQLObjectTestCase(  # should append id automatically.
+NoIdOnQueryTestCase = QGQLObjectTestCase(
+    # should append id to types that implements Node automatically.
     schema=schemas.object_with_scalar.schema,
     operations="""
     query MainQuery {
@@ -204,6 +213,10 @@ NoIdOnQueryTestCase = QGQLObjectTestCase(  # should append id automatically.
           }
         }""",
     test_name="NoIdOnQueryTestCase",
+    metadata=TestCaseMetadata(
+        False,
+        False,
+    ),
 )
 DateTimeTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_datetime.schema,
@@ -593,7 +606,6 @@ MutationOperationTestCase = QGQLObjectTestCase(
             age
             agePoint
             male
-            id
             uuid
           }
         }""",
@@ -679,6 +691,7 @@ implemented_testcases = [
     OptionalNestedObjectTestCase,
     ObjectWithListOfObjectTestCase,
     EnumTestCase,
+    InterfaceTestCase,
 ]
 
 

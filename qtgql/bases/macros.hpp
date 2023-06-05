@@ -19,3 +19,8 @@
     }                                                       \
     throw std::runtime_error("Couldn't find enum member");  \
   }
+
+#define QTGQL_STATIC_MAKE_SHARED(type)                  \
+  [[nodiscard]] static std::shared_ptr<type> shared() { \
+    return std::make_shared<type>();                    \
+  };

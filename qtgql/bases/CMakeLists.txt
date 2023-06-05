@@ -9,6 +9,7 @@ target_sources(
           metadata.hpp
           listmodel.hpp
           networklayer.hpp
+          exceptions.hpp
           constants.hpp
           environment.hpp)
 target_link_libraries(${COMPONENT_NAME} PUBLIC Qt6::Core)
