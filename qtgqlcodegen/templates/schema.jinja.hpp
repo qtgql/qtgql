@@ -93,11 +93,7 @@ auto inst = std::make_shared<👉 type.name 👈>();
 {% set assign_to %} inst->👉 f.private_name 👈 {% endset %}
 👉macros.deserialize_field(f, assign_to)👈
 {% endfor %}
-{% if type.id_is_optional %}
-if (inst->id) {
-INST_STORE().add_node(inst, metadata.operation_id);
-}
-{% elif type. implements_node and not type.id_is_optional %}
+{% if type. implements_node %}
 INST_STORE().add_node(inst, metadata.operation_id);
 {% endif %}
 return inst;

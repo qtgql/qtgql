@@ -200,7 +200,8 @@ OptionalScalarsTestCase = QGQLObjectTestCase(
     """,
     test_name="OptionalScalarsTestCase",
 )
-NoIdOnQueryTestCase = QGQLObjectTestCase(  # should append id automatically.
+NoIdOnQueryTestCase = QGQLObjectTestCase(
+    # should append id to types that implements Node automatically.
     schema=schemas.object_with_scalar.schema,
     operations="""
     query MainQuery {
@@ -605,7 +606,6 @@ MutationOperationTestCase = QGQLObjectTestCase(
             age
             agePoint
             male
-            id
             uuid
           }
         }""",

@@ -162,8 +162,8 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
         if not object_type:
             if self.type.is_model:
                 object_type = self.type.is_model.is_object_type
-        if object_type:
-            return object_type.implements_node
+        if object_type and object_type.implements_node:
+            return object_type.fields_dict["id"]
 
 
 @define(slots=False)
@@ -233,12 +233,6 @@ class QtGqlObjectTypeDefinition(BaseGqlTypeDefinition):
             if self.name == "Node":
                 return True
         return any(base.implements_node for base in self.bases)
-
-    @cached_property
-    def id_is_optional(self) -> Optional[QtGqlFieldDefinition]:
-        if id_f := self.implements_node:
-            if id_f.type.is_optional():
-                return id_f
 
     def __attrs_post_init__(self):
         # inject this object type to the interface.
