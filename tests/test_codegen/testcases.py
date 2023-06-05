@@ -705,4 +705,4 @@ def generate_testcases() -> None:
 
 
 if __name__ == "__main__":
-    InterfaceTestCase.generate()
+    generate_testcases()
