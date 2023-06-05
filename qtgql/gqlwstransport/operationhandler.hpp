@@ -46,6 +46,8 @@ class OperationHandlerABC
       public _OperationHandlerABCSignals,
       public std::enable_shared_from_this<OperationHandlerABC> {
  protected:
+  QUuid m_operation_id = QUuid::createUuid();
+
   const std::shared_ptr<bases::Environment> &environment() {
     static auto m_env = bases::Environment::get_gql_env(ENV_NAME());
     return m_env.value();
@@ -59,7 +61,8 @@ class OperationHandlerABC
 
   // abstract functions.
   virtual const QString &ENV_NAME() = 0;
-  virtual const bases::OperationMetadata &OPERATION_METADATA() = 0;
+  virtual bases::OperationMetadata operation_metadata() = 0;
+  virtual const qtgql::bases::SelectionsConfig &SELECTIONS_CONFIG() = 0;
   /*
    * Releases objects retained by this operation
    * This can be called as long as

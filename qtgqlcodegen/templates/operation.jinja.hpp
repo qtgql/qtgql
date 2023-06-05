@@ -6,7 +6,6 @@
 
 namespace 👉 context.config.env_name 👈{
 namespace 👉context.ns👈{
-const auto OPERATION_ID = QUuid::fromString("👉 context.operation.operation_id👈");
 
 {% for t in context.operation.narrowed_types %}
 class 👉 t.name 👈: public QObject{
@@ -37,7 +36,9 @@ std::shared_ptr<👉context.schema_ns👈::👉 t.definition.name 👈> m_inst;
 {% endfor %}
 
 public:
-👉 t.name 👈(QObject* parent, const std::shared_ptr<👉 t.definition.name 👈> &inst ): m_inst{inst}, QObject::QObject(parent){
+👉 t.name 👈(QObject * parent,
+        const std::shared_ptr<👉 t.definition.name 👈> &inst,
+        qtgql::bases::OperationMetadata & metadata): m_inst{inst}, QObject::QObject(parent){
 {% for field in t.fields -%}
 👉 macros.initialize_proxy_field(field) 👈
 {# updates logic -#}
@@ -74,48 +75,54 @@ inline const QString &ENV_NAME() override{
     static const auto ret = QString("👉 context.config.env_name 👈");
     return ret;
     }
-
-inline const qtgql::bases::OperationMetadata & OPERATION_METADATA() override{
-auto static ret = qtgql::bases::OperationMetadata{
-        OPERATION_ID,
+inline const qtgql::bases::SelectionsConfig & SELECTIONS_CONFIG() override{
+    static auto ret = qtgql::bases::SelectionsConfig(
         {👉 context.operation.root_field.as_conf_string() 👈}
-};
-return ret;
-};
+    );
+    return ret;
+}
+
+
 public:
 👉 context.operation.name 👈(): qtgql::gqlwstransport::OperationHandlerABC(qtgql::gqlwstransport::GqlWsTrnsMsgWithID(qtgql::gqlwstransport::OperationPayload(
         {%- for line in context.operation.query.splitlines() %}"👉 line 👈"{% endfor -%}
-        ), OPERATION_ID)){};
+        ))){
+m_message_template.op_id = m_operation_id;
+};
 
 QTGQL_STATIC_MAKE_SHARED(👉 context.operation.name 👈)
 
-inline const QUuid &operation_id() const override{
-return OPERATION_ID;
+inline qtgql::bases::OperationMetadata operation_metadata() override{
+return qtgql::bases::OperationMetadata(operation_id());
+};
+
+
+inline const QUuid & operation_id() const override{
+return m_operation_id;
 }
 
 
 void on_next(const QJsonObject &message) override{
     if (!m_data && message.contains("data")){
         auto data = message.value("data").toObject();
+        auto metadata = operation_metadata();
         if (data.contains("👉 context.operation.root_field.definition.name 👈")){
 {%- set do_after_deserialized -%} 👉 macros.initialize_proxy_field(context.operation.root_field) 👈 {% endset -%}
             👉 macros.deserialize_field(context.operation.root_field.definition,
                                     "auto concrete", False,
-                                    "OPERATION_METADATA().selections",
-                                    "OPERATION_METADATA()",
+                                    "SELECTIONS_CONFIG()",
+                                    "metadata",
                                     do_after_deserialized,
                                     ) 👈
-        // initialize proxy
-
         }
     }
 }
 inline const 👉 context.operation.root_field.property_type 👈 get_data(){
     return m_data.value();
 }
-inline void loose(){
+inline void loose() override{
     {% if context.operation.root_field.type.is_object_type %}
-    👉 context.operation.root_field.type.is_object_type.name 👈::INST_STORE().get_node(m_data.value()->get_id()).value()->loose(OPERATION_METADATA());
+    👉 context.operation.root_field.type.is_object_type.name 👈::INST_STORE().get_node(m_data.value()->get_id()).value()->loose(operation_metadata());
     {% else %}
     throw "not implemented";
     {% endif %}
