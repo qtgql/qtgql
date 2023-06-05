@@ -6,7 +6,7 @@ from tests.test_codegen.schemas.node_interface import Node
 @strawberry.interface
 class UserInterface(Node):
     name: str
-    age: str
+    age: int
 
 
 @strawberry.type

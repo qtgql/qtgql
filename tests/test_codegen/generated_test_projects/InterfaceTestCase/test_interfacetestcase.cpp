@@ -8,7 +8,7 @@ namespace InterfaceTestCase {
 using namespace qtgql;
 
 auto ENV_NAME = QString("InterfaceTestCase");
-auto SCHEMA_ADDR = get_server_address("10980498");
+auto SCHEMA_ADDR = get_server_address("40628803");
 
 TEST_CASE("InterfaceTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
@@ -17,7 +17,9 @@ TEST_CASE("InterfaceTestCase", "[generated-testcase]") {
   mq->fetch();
   test_utils::wait_for_completion(mq);
   SECTION("test deserialize") {
-    REQUIRE(mq->get_data()->get_name().isEmpty());
+    qDebug() << mq->get_data()->get_name();
+    REQUIRE(mq->get_data()->get_name() == "Patrick");
+    REQUIRE(mq->get_data()->get_age() == 100);
   };
 }
 
