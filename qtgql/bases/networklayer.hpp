@@ -4,15 +4,16 @@
  * at ../gqlwstransport dir.
  */
 #pragma once
-#include "../utils/utils.hpp"
+#include "../utils.hpp"
 #include "QJsonObject"
 #include "QUuid"
+#include "exceptions.hpp"
 namespace qtgql {
 namespace bases {
 
 struct HashAbleABC {
   [[nodiscard]] virtual QJsonObject serialize() const {
-    throw utils::NotImplementedError({});
+    throw exceptions::NotImplementedError({});
   };
 };
 
@@ -40,7 +41,7 @@ class that should  support executing handlers
 class NetworkLayer {
  public:
   virtual void execute(const std::shared_ptr<HandlerABC> &handler) {
-    throw utils::NotImplementedError({});
+    throw exceptions::NotImplementedError({});
   }
 };
 }  // namespace bases

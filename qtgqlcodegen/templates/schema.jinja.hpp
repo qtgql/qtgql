@@ -2,6 +2,7 @@
 #pragma once
 #include <QObject>
 #include <QJsonObject>
+#include <QJsonArray>
 #include <memory>
 
 #include <qtgql/bases/bases.hpp>

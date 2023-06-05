@@ -11,6 +11,7 @@ std::shared_ptr<👉 interface.name 👈> 👉 interface.name 👈::from_json(co
         return std::static_pointer_cast<👉 interface.name 👈>(👉 impl.name 👈::from_json(data, config, metadata));
     }
     {% endfor %}
+    throw qtgql::exceptions::InterfaceDeserializationError(tp_name.toStdString());
     }
 {% endfor %}
 }
