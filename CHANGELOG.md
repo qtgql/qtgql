@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+0.119.8 - 2023-06-05
+--------------------
+
+This release migrates operations to not use a constant operation ID
+as discussed in #230.
+
 0.119.7 - 2023-06-05
 --------------------
 
