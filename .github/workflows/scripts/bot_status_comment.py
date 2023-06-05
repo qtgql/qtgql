@@ -84,11 +84,11 @@ def get_testcases_context() -> TstCaseImplementationStatusTemplateContext:
                 deserialization=ImplementationStatus("test deserialize" in tst_content),
                 update=ImplementationStatus(
                     "test update" in tst_content,
-                    ignored=tc.metadata.should_test_updates,
+                    ignored=not tc.metadata.should_test_updates,
                 ),
                 garbage_collection=ImplementationStatus(
                     "test garbage collection" in tst_content,
-                    ignored=tc.metadata.should_test_garbage_collection,
+                    ignored=not tc.metadata.should_test_garbage_collection,
                 ),
             ),
         )

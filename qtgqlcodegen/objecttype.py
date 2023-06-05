@@ -163,7 +163,7 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
             if self.type.is_model:
                 object_type = self.type.is_model.is_object_type
         if object_type:
-            return object_type.has_id_field
+            return object_type.implements_node
 
 
 @define(slots=False)
@@ -213,7 +213,7 @@ class QtGqlObjectTypeDefinition(BaseGqlTypeDefinition):
 
         if not self.interfaces_raw:
             # these are not really interfaces though they are inherited if there are no interfaces.
-            if self.has_id_field:
+            if self.implements_node:
                 return [QtGqlTypes.ObjectTypeABCWithID]  # type: ignore
 
             else:
@@ -228,12 +228,15 @@ class QtGqlObjectTypeDefinition(BaseGqlTypeDefinition):
         return [intfs for intfs in self.interfaces_raw if intfs not in not_unique_interfaces]
 
     @cached_property
-    def has_id_field(self) -> Optional[QtGqlFieldDefinition]:
-        return self.fields_dict.get("id", None)
+    def implements_node(self) -> bool:
+        if isinstance(self, QtGqlInterfaceDefinition):
+            if self.name == "Node":
+                return True
+        return any(base.implements_node for base in self.bases)
 
     @cached_property
     def id_is_optional(self) -> Optional[QtGqlFieldDefinition]:
-        if id_f := self.has_id_field:
+        if id_f := self.implements_node:
             if id_f.type.is_optional():
                 return id_f
 
