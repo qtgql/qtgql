@@ -280,8 +280,16 @@ DecimalTestCase = QGQLObjectTestCase(
             balance
           }
         }
+        mutation UpdateBalance ($newBalance: Decimal!, $id: ID!){
+          changeBalance(newBalance: $newBalance, nodeId: $id) {
+            balance
+          }
+        }
     """,
     test_name="DecimalTestCase",
+    metadata=TestCaseMetadata(
+        should_test_garbage_collection=CUSTOM_SCALARS_DOESNT_CACHE,
+    ),
 )
 DateTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_date.schema,
@@ -746,4 +754,4 @@ def generate_testcases() -> None:
 
 
 if __name__ == "__main__":
-    generate_testcases()
+    DecimalTestCase.generate()

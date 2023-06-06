@@ -71,8 +71,6 @@ Now you project structure should look like this (with the generated files)
 │   │   └── schema.hpp
 │   ├── operations.graphql
 │   └── schema.graphql
-├── __pycache__
-│   └── qtgqlconfig.cpython-311.pyc
 ├── qtgqlconfig.py
 └── test_scalarstestcase.cpp
 ```
@@ -100,13 +98,13 @@ including scalars and custom-scalars.
 | GraphQL type                                                | Default                                             |
 |-------------------------------------------------------------|-----------------------------------------------------|
 | `Int`                                                       | `qtgql::DEFAULTS::INT` *(compiler lowest int)*      |
-| `String`                                                    | `" - "`                                             |
+| `String`                                                    | `""` Empty QString.                                 |
 | `Float`                                                     | `qtgql::DEFAULTS::FLOAT` *(compiler lowest double)* |
 | `ID`                                                        | `'9b2a0828-880d-4023-9909-de067984523c'`            |
 | `Boolean`                                                   | `false`                                             |
 | `UUID`                                                      | `QUuid("9b2a0828-880d-4023-9909-de067984523c")`     |
 | `List` or in our context a `QAbstractListModel`             | `<modelname>` Blank corresponding generated model   |
-| `ObjectType` or in our context an `QObject` with properties | `None`                                              |
+| `ObjectType` or in our context an `QObject` with properties | Empty pointer                                       |
 | `SCALAR`                                                    | Provided by scalar implementation.                  |
 
 
