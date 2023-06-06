@@ -30,9 +30,8 @@ TEST_CASE("ScalarsTestCase", "[generated-testcase]") {
   SECTION("test update") {
     auto user = mq->get_data();
     auto previous_name = mq->get_data()->get_name();
-    auto modified_user_op =
-        std::make_shared<userwithsameidanddifferentfieldsquery::
-                             UserWithSameIDAndDifferentFieldsQuery>();
+    auto modified_user_op = userwithsameidanddifferentfieldsquery::
+        UserWithSameIDAndDifferentFieldsQuery::shared();
     auto catcher = test_utils::SignalCatcher(user);
     modified_user_op->fetch();
     REQUIRE(catcher.wait());

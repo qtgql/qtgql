@@ -103,7 +103,10 @@ SignalCatcher::SignalCatcher(const QObject *source_obj,
     }
   }
 };
-
+/*
+ * Wait for signals emission, returns true if all included
+ * signals were caught.
+ */
 bool SignalCatcher::wait(int timeout) {
   for (const auto &spy_pair : m_spys) {
     if (!QTest::qWaitFor([&]() -> bool { return spy_pair.first->isEmpty(); },
