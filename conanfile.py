@@ -10,7 +10,6 @@ from conan.tools.cmake import CMake
 from conan.tools.cmake import cmake_layout
 from conan.tools.cmake import CMakeDeps
 from conan.tools.cmake import CMakeToolchain
-
 from tests.conftest import PATHS
 
 
@@ -35,11 +34,14 @@ class QtGqlRecipe(ConanFile):
     topics = ("GraphQL", "Qt", "codegen")
     version = get_version_from_poetry()
     build_policy = "missing"
-    options = {"qt_version": ["6.5.0"], "verbose": ConanBool}
+    options = {"qt_version": ["6.5.0"], "verbose": ConanBool, "test": ConanBool}
     default_options = {
         "verbose": False,
         "qt_version": "6.5.0",
+        "test": False,
     }
+
+    exports_sources = "CMakeLists.txt", "qtgql/*", "pyproject.toml"
 
     def requirements(self) -> None:
         self.requires("openssl/1.1.1t")
@@ -95,7 +97,7 @@ class QtGqlRecipe(ConanFile):
 
     @property
     def should_test(self) -> bool:
-        return True
+        return self.options.test.value in ("True", "true", True)
 
     def generate(self) -> None:
         if not self.qt6_install_dir:

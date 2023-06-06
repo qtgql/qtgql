@@ -35,9 +35,8 @@ if(QTGQL_TESTING)
   endif()
   include(CTest)
   add_subdirectory(tests)
+  add_custom_target(
+    tidy
+    COMMAND run-clang-tidy -p ${CMAKE_BINARY_DIR}
+    COMMENT "cpp linter")
 endif()
-
-add_custom_target(
-  tidy
-  COMMAND run-clang-tidy -p ${CMAKE_BINARY_DIR}
-  COMMENT "cpp linter")
