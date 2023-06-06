@@ -239,9 +239,19 @@ DateTimeTestCase = QGQLObjectTestCase(
             birth
           }
         }
+
+        mutation ChangeUserBirth($nodeId: ID!) {
+          changeBirth(newBirth: $new_birth, nodeId: $nodeId) {
+            age
+            id
+            birth
+            name
+          }
+        }
         """,
     test_name="DateTimeTestCase",
 )
+
 DecimalTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_decimal.schema,
     operations="""
@@ -716,4 +726,4 @@ def generate_testcases() -> None:
 
 
 if __name__ == "__main__":
-    generate_testcases()
+    DateTimeTestCase.generate()

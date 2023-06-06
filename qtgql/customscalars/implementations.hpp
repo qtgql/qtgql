@@ -4,38 +4,45 @@
 #include "basecustomscalar.hpp"
 namespace qtgql {
 namespace customscalars {
-class BaseCacheAbleScalar {
+class BaseTimeScalar {
  protected:
   QString m_cached_to_qt;
   bool m_should_update = true;
+
+ public:
+  inline static Qt::DateFormat FORMAT = Qt::DateFormat(Qt::ISODate);
 };
 
 class DateTimeScalar : public CustomScalarABC<QDateTime, QString>,
-                       BaseCacheAbleScalar {
+                       BaseTimeScalar {
  public:
   void deserialize(const QJsonValue &raw_data) override;
 
   const QString &GRAPHQL_NAME() override;
 
   const QString &to_qt() override;
+
+  [[nodiscard]] QJsonValue serialize() const override;
 };
 
-class DateScalar : public CustomScalarABC<QDate, QString>, BaseCacheAbleScalar {
+class DateScalar : public CustomScalarABC<QDate, QString>, BaseTimeScalar {
  public:
   void deserialize(const QJsonValue &raw_data) override;
 
   const QString &GRAPHQL_NAME() override;
 
   const QString &to_qt() override;
+  [[nodiscard]] QJsonValue serialize() const override;
 };
 
-class TimeScalar : public CustomScalarABC<QTime, QString>, BaseCacheAbleScalar {
+class TimeScalar : public CustomScalarABC<QTime, QString>, BaseTimeScalar {
  public:
   void deserialize(const QJsonValue &raw_data) override;
 
   const QString &GRAPHQL_NAME() override;
 
   const QString &to_qt() override;
+  [[nodiscard]] QJsonValue serialize() const override;
 };
 
 class DecimalScalar : public CustomScalarABC<QString, QString> {
@@ -45,6 +52,7 @@ class DecimalScalar : public CustomScalarABC<QString, QString> {
   const QString &GRAPHQL_NAME() override;
 
   const QString &to_qt() override;
+  [[nodiscard]] QJsonValue serialize() const override;
 };
 };  // namespace customscalars
 };  // namespace qtgql
