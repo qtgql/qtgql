@@ -49,6 +49,9 @@ void TimeScalar::deserialize(const QJsonValue &raw_data) {
   m_value = QTime::fromString(raw_data.toString(), BaseTimeScalar::FORMAT);
   m_should_update = true;
 }
+QJsonValue TimeScalar::serialize() const {
+  return {m_value.toString(BaseTimeScalar::FORMAT)};
+}
 
 const QString &TimeScalar::GRAPHQL_NAME() {
   static const QString ret = "Time";
@@ -62,8 +65,6 @@ const QString &TimeScalar::to_qt() {
   }
   return m_cached_to_qt;
 }
-
-QJsonValue TimeScalar::serialize() const { return {}; }
 
 void DecimalScalar::deserialize(const QJsonValue &raw_data) {
   m_value = raw_data.toString();

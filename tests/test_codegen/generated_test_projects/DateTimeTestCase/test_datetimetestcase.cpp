@@ -32,7 +32,9 @@ TEST_CASE("DateTimeTestCase", "[generated-testcase]") {
     auto catcher =
         test_utils::SignalCatcher({.source_obj = user, .only = "birth"});
     modified_user_op->fetch();
-    REQUIRE(catcher.wait());
+    REQUIRE(catcher.wait()
+
+    );
     test_utils::wait_for_completion(modified_user_op);
     REQUIRE(user->get_id() == modified_user_op->get_data()->get_id());
     REQUIRE(modified_user_op->get_data()->get_birth() == new_birth.to_qt());

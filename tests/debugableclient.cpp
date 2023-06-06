@@ -104,6 +104,10 @@ SignalCatcher::SignalCatcher(const SignalCatcherParams &params) {
                            prop_name);
     }
   }
+  if (params.only.has_value() && m_spys.empty()) {
+    throw std::runtime_error("could not find property signal for " +
+                             params.only.value().toStdString());
+  }
 };
 /*
  * Wait for signals emission, returns true if all included

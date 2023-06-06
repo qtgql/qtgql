@@ -319,7 +319,12 @@ TimeScalarTestCase = QGQLObjectTestCase(
           user {
             name
             age
-            whatTimeIsIt
+            lunchTime
+          }
+        }
+        mutation UpdateLunchTime ($newTime: Time!, $id: ID!) {
+          changeLunchTime(newTime: $newTime, nodeId: $id) {
+            lunchTime
           }
         }
         """,
@@ -759,4 +764,4 @@ def generate_testcases() -> None:
 
 
 if __name__ == "__main__":
-    DateTestCase.generate()
+    TimeScalarTestCase.generate()
