@@ -21,7 +21,7 @@ TEST_CASE("DecimalTestCase", "[generated-testcase]") {
   SECTION("test deserialize") {
     REQUIRE(!mq->get_data()->get_balance().isEmpty());
   }
-  SECTION("test update and as operation variables") {
+  SECTION("test update and as operation variable") {
     auto user = mq->get_data();
     auto modified_user_op = updatebalance::UpdateBalance::shared();
     auto new_balance = customscalars::DecimalScalar(
