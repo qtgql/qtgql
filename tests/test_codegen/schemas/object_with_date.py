@@ -5,6 +5,7 @@ from datetime import timezone
 import strawberry
 
 from tests.test_codegen.schemas.node_interface import Node
+from tests.test_codegen.schemas.node_interface import NODE_DB
 
 
 @strawberry.type
@@ -21,4 +22,13 @@ class Query:
         return User(name="Patrick", age=100, birth=datetime.now(tz=timezone.utc).date())
 
 
-schema = strawberry.Schema(query=Query)
+@strawberry.type
+class Mutation:
+    @strawberry.field()
+    def change_birth(self, node_id: strawberry.ID, new_birth: date) -> User:
+        user: User = NODE_DB.get(node_id)
+        user.birth = new_birth
+        return user
+
+
+schema = strawberry.Schema(query=Query, mutation=Mutation)

@@ -29,7 +29,7 @@ class Environment {
   UniqueNetworkLayer m_network_layer;
   inline static QMap<QString, SharedQtGqlEnv> ENV_MAP = {};
 
- public:
+public:
   const QString m_name;
 
   explicit Environment(QString name, UniqueNetworkLayer network_layer)
@@ -48,9 +48,9 @@ class Environment {
 
   static void set_gql_env(SharedQtGqlEnv env);
 
-  static std::optional<Environment::SharedQtGqlEnv> get_gql_env(
-      const QString &name);
+  static std::optional<Environment::SharedQtGqlEnv>
+  get_gql_env(const QString &name);
 };
 
-}  // namespace bases
-}  // namespace qtgql
+} // namespace bases
+} // namespace qtgql

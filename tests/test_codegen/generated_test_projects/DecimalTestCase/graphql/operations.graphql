@@ -6,3 +6,8 @@
             balance
           }
         }
+        mutation UpdateBalance ($newBalance: Decimal!, $id: ID!){
+          changeBalance(newBalance: $newBalance, nodeId: $id) {
+            balance
+          }
+        }

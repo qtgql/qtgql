@@ -21,4 +21,4 @@ TEST_CASE("NoIdOnQueryTestCase", "[generated-testcase]") {
   }
 }
 
-};  // namespace NoIdOnQueryTestCase
+}; // namespace NoIdOnQueryTestCase

@@ -33,4 +33,4 @@ TEST_CASE("OptionalNestedObjectTestCase", "[generated-testcase]") {
   }
 }
 
-};  // namespace OptionalNestedObjectTestCase
+}; // namespace OptionalNestedObjectTestCase

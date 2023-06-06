@@ -69,8 +69,9 @@ void wait_for_completion(
     throw std::runtime_error(error_message);
   }
 }
-std::shared_ptr<qtgql::bases::Environment> get_or_create_env(
-    const QString &env_name, const DebugClientSettings &settings) {
+std::shared_ptr<qtgql::bases::Environment>
+get_or_create_env(const QString &env_name,
+                  const DebugClientSettings &settings) {
   auto env = bases::Environment::get_gql_env(env_name);
   if (!env.has_value()) {
     auto env_ = std::make_shared<bases::Environment>(
@@ -83,24 +84,30 @@ std::shared_ptr<qtgql::bases::Environment> get_or_create_env(
   return env.value();
 };
 
-SignalCatcher::SignalCatcher(const QObject *source_obj,
-                             const QSet<QString> &excludes, bool exclude_id) {
-  m_excludes = excludes;
-  m_source_obj = source_obj;
-  if (exclude_id) {
+SignalCatcher::SignalCatcher(const SignalCatcherParams &params) {
+  m_excludes = params.excludes;
+  m_source_obj = params.source_obj;
+  if (params.exclude_id) {
     m_excludes.insert("id");
   }
-  auto mo = source_obj->metaObject();
+  auto mo = params.source_obj->metaObject();
   for (int i = mo->propertyOffset(); i < mo->propertyCount(); ++i) {
     auto property = mo->property(i);
-    QString sig_name = property.name();
-    if (!m_excludes.contains(sig_name)) {
+    QString prop_name = property.name();
+    if (!m_excludes.contains(prop_name)) {
       assert_m(property.hasNotifySignal(),
-               sig_name + " property has no signal");
-      m_spys.emplace_front(
-          std::make_unique<QSignalSpy>(source_obj, property.notifySignal()),
-          sig_name);
+               prop_name + " property has no signal");
+      if (params.only.has_value() && params.only.value() != prop_name) {
+        continue;
+      }
+      m_spys.emplace_front(std::make_unique<QSignalSpy>(
+                               params.source_obj, property.notifySignal()),
+                           prop_name);
     }
+  }
+  if (params.only.has_value() && m_spys.empty()) {
+    throw std::runtime_error("could not find property signal for " +
+                             params.only.value().toStdString());
   }
 };
 /*
@@ -118,4 +125,4 @@ bool SignalCatcher::wait(int timeout) {
   return true;
 }
 
-};  // namespace test_utils
+}; // namespace test_utils

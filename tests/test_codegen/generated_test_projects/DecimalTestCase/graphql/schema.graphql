@@ -1,6 +1,10 @@
 """Decimal (fixed-point)"""
 scalar Decimal
 
+type Mutation {
+  changeBalance(nodeId: ID!, newBalance: Decimal!): User!
+}
+
 interface Node {
   id: ID!
 }

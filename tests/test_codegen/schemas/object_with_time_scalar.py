@@ -5,20 +5,30 @@ from datetime import timezone
 import strawberry
 
 from tests.test_codegen.schemas.node_interface import Node
+from tests.test_codegen.schemas.node_interface import NODE_DB
 
 
 @strawberry.type
 class User(Node):
     name: str
     age: int
-    whatTimeIsIt: time
+    lunch_time: time
 
 
 @strawberry.type
 class Query:
     @strawberry.field
     def user(self) -> User:
-        return User(name="Patrick", age=100, whatTimeIsIt=datetime.now(tz=timezone.utc).time())
+        return User(name="Patrick", age=100, lunch_time=datetime.now(tz=timezone.utc).time())
 
 
-schema = strawberry.Schema(query=Query)
+@strawberry.type
+class Mutation:
+    @strawberry.field()
+    def change_lunch_time(self, node_id: strawberry.ID, new_time: time) -> User:
+        user: User = NODE_DB.get(node_id)
+        user.lunch_time = new_time
+        return user
+
+
+schema = strawberry.Schema(query=Query, mutation=Mutation)

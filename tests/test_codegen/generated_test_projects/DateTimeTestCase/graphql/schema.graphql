@@ -1,6 +1,10 @@
 """Date with time (isoformat)"""
 scalar DateTime
 
+type Mutation {
+  changeBirth(nodeId: ID!, newBirth: DateTime!): User!
+}
+
 interface Node {
   id: ID!
 }

@@ -15,13 +15,16 @@ const QString &DateTimeScalar::GRAPHQL_NAME() {
 }
 
 void DateTimeScalar::deserialize(const QJsonValue &raw_data) {
-  m_value =
-      QDateTime::fromString(raw_data.toString(), Qt::DateFormat(Qt::ISODate));
+  m_value = QDateTime::fromString(raw_data.toString(), DateTimeScalar::FORMAT);
   m_should_update = true;
 }
 
+QJsonValue DateTimeScalar::serialize() const {
+  return {m_value.toString(DateTimeScalar::FORMAT)};
+}
+
 void DateScalar::deserialize(const QJsonValue &raw_data) {
-  m_value = QDate::fromString(raw_data.toString(), Qt::DateFormat(Qt::ISODate));
+  m_value = QDate::fromString(raw_data.toString(), BaseTimeScalar::FORMAT);
   m_should_update = true;
 }
 
@@ -38,9 +41,16 @@ const QString &DateScalar::to_qt() {
   return m_cached_to_qt;
 }
 
+QJsonValue DateScalar::serialize() const {
+  return {m_value.toString(BaseTimeScalar::FORMAT)};
+}
+
 void TimeScalar::deserialize(const QJsonValue &raw_data) {
-  m_value = QTime::fromString(raw_data.toString(), Qt::DateFormat(Qt::ISODate));
+  m_value = QTime::fromString(raw_data.toString(), BaseTimeScalar::FORMAT);
   m_should_update = true;
+}
+QJsonValue TimeScalar::serialize() const {
+  return {m_value.toString(BaseTimeScalar::FORMAT)};
 }
 
 const QString &TimeScalar::GRAPHQL_NAME() {
@@ -66,5 +76,7 @@ const QString &DecimalScalar::GRAPHQL_NAME() {
 }
 
 const QString &DecimalScalar::to_qt() { return m_value; }
-};  // namespace customscalars
-};  // namespace qtgql
+
+QJsonValue DecimalScalar::serialize() const { return {m_value}; }
+}; // namespace customscalars
+}; // namespace qtgql

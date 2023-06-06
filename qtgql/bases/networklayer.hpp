@@ -39,10 +39,10 @@ class that should  support executing handlers
 `on_error` / 'on_completed' when the operation is completed.
 */
 class NetworkLayer {
- public:
+public:
   virtual void execute(const std::shared_ptr<HandlerABC> &handler) {
     throw exceptions::NotImplementedError({});
   }
 };
-}  // namespace bases
-}  // namespace qtgql
+} // namespace bases
+} // namespace qtgql

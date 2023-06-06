@@ -67,14 +67,15 @@ class QtGqlVariableDefinition(Generic[T], QtGqlBaseTypedNode):
     def json_repr(self, attr_name: Optional[str] = None) -> str:
         if not attr_name:
             attr_name = self.name
+        attr_name += ".value()"  # unwrap optional
         if self.type.is_input_object_type:
-            return f"{attr_name}.value().to_json()"
+            return f"{attr_name}.to_json()"
         elif self.type.is_builtin_scalar:
-            return f"{attr_name}.value()"
+            return f"{attr_name}"
         elif enum_def := self.type.is_enum:
-            return f"Enums::{enum_def.map_name}::name_by_value({attr_name}.value())"
+            return f"Enums::{enum_def.map_name}::name_by_value({attr_name})"
         elif self.is_custom_scalar:
-            raise NotImplementedError
+            return f"{attr_name}.serialize()"
 
         raise NotImplementedError(f"{self.type} is not supported as an input type ATM")
 

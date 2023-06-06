@@ -5,7 +5,7 @@
 namespace qtgql {
 namespace utils {
 
-inline std::optional<QString> get_operation_name(const QString& query) {
+inline std::optional<QString> get_operation_name(const QString &query) {
   static QRegularExpression re("(subscription|mutation|query)( [0-9a-zA-Z]+)*");
   auto match = re.match(query);
   if (match.hasMatch()) {
@@ -14,6 +14,6 @@ inline std::optional<QString> get_operation_name(const QString& query) {
   return {};
 }
 
-}  // namespace utils
+} // namespace utils
 
-}  // namespace qtgql
+} // namespace qtgql

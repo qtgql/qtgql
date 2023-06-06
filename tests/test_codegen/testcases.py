@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import os
 import re
-import subprocess
 from functools import cached_property
 from pathlib import Path
 from typing import NamedTuple
@@ -19,14 +18,10 @@ from qtgqlcodegen.introspection import SchemaEvaluator
 from qtgqlcodegen.runtime.custom_scalars import CustomScalarDefinition
 from qtgqlcodegen.runtime.custom_scalars import DateTimeScalarDefinition
 from tests.conftest import hash_schema
-from tests.conftest import IS_GITHUB_ACTION
 from tests.test_codegen import schemas
 
 if TYPE_CHECKING:
     from strawberry import Schema
-
-
-BaseQueryHandler = None  # TODO: remove this when done migrating, this is just for readability.
 
 GENERATED_TESTS_DIR = Path(__file__).parent / "generated_test_projects"
 if not GENERATED_TESTS_DIR.exists:
@@ -51,9 +46,26 @@ class TstTemplateContext:
     test_name: str
 
 
+@define
+class BoolWithReason:
+    v: bool
+    reason: str
+
+    @classmethod
+    def false(cls, reason: str) -> BoolWithReason:
+        return cls(False, reason)
+
+    @classmethod
+    def true(cls, reason: str) -> BoolWithReason:
+        return cls(True, reason)
+
+    def __bool__(self):
+        return self.v
+
+
 class TestCaseMetadata(NamedTuple):
-    should_test_updates: bool = True
-    should_test_garbage_collection: bool = True
+    should_test_updates: BoolWithReason = BoolWithReason.true("")
+    should_test_garbage_collection: BoolWithReason = BoolWithReason.true("")
 
 
 @define(slots=False, kw_only=True)
@@ -225,10 +237,12 @@ NoIdOnQueryTestCase = QGQLObjectTestCase(
         }""",
     test_name="NoIdOnQueryTestCase",
     metadata=TestCaseMetadata(
-        False,
-        False,
+        BoolWithReason.false("nothing special here in that context"),
+        BoolWithReason.false("nothing special here in that context"),
     ),
 )
+
+CUSTOM_SCALARS_DOESNT_CACHE = BoolWithReason.false("custom scalars doesnt use cache")
 DateTimeTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_datetime.schema,
     operations="""
@@ -239,9 +253,21 @@ DateTimeTestCase = QGQLObjectTestCase(
             birth
           }
         }
+mutation ChangeUserBirth($new_birth: DateTime!, $nodeId: ID!) {
+  changeBirth(newBirth: $new_birth, nodeId: $nodeId) {
+    age
+    id
+    birth
+    name
+  }
+}
         """,
     test_name="DateTimeTestCase",
+    metadata=TestCaseMetadata(
+        should_test_garbage_collection=CUSTOM_SCALARS_DOESNT_CACHE,
+    ),
 )
+
 DecimalTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_decimal.schema,
     operations="""
@@ -252,8 +278,16 @@ DecimalTestCase = QGQLObjectTestCase(
             balance
           }
         }
+        mutation UpdateBalance ($newBalance: Decimal!, $id: ID!){
+          changeBalance(newBalance: $newBalance, nodeId: $id) {
+            balance
+          }
+        }
     """,
     test_name="DecimalTestCase",
+    metadata=TestCaseMetadata(
+        should_test_garbage_collection=CUSTOM_SCALARS_DOESNT_CACHE,
+    ),
 )
 DateTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_date.schema,
@@ -265,8 +299,16 @@ DateTestCase = QGQLObjectTestCase(
             birth
           }
         }
+        mutation ChangeUserBirth($new_birth: Date!, $nodeId: ID!) {
+          changeBirth(newBirth: $new_birth, nodeId: $nodeId) {
+            birth
+          }
+        }
         """,
     test_name="DateTestCase",
+    metadata=TestCaseMetadata(
+        should_test_garbage_collection=CUSTOM_SCALARS_DOESNT_CACHE,
+    ),
 )
 TimeScalarTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_time_scalar.schema,
@@ -275,13 +317,20 @@ TimeScalarTestCase = QGQLObjectTestCase(
           user {
             name
             age
-            whatTimeIsIt
+            lunchTime
+          }
+        }
+        mutation UpdateLunchTime ($newTime: Time!, $id: ID!) {
+          changeLunchTime(newTime: $newTime, nodeId: $id) {
+            lunchTime
           }
         }
         """,
     test_name="TimeScalarTestCase",
+    metadata=TestCaseMetadata(
+        should_test_garbage_collection=CUSTOM_SCALARS_DOESNT_CACHE,
+    ),
 )
-
 
 OperationErrorTestCase = QGQLObjectTestCase(
     schema=schemas.operation_error.schema,
@@ -451,7 +500,6 @@ ObjectsThatReferenceEachOtherTestCase = QGQLObjectTestCase(
 """,
 )
 
-
 CountryScalar = CustomScalarDefinition(
     type_name="CountryScalar",
     graphql_name="Country",
@@ -459,7 +507,6 @@ CountryScalar = CustomScalarDefinition(
     deserialized_type="QString",
     include_path="NOT IMPLEMENTED",
 )
-
 
 CustomUserScalarTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_user_defined_scalar.schema,
@@ -572,7 +619,6 @@ OperationVariableTestCase = QGQLObjectTestCase(
     test_name="OperationVariableTestCase",
     type_name="Post",
 )
-
 
 OptionalInputTestCase = QGQLObjectTestCase(
     schema=schemas.optional_input_schema.schema,
@@ -706,14 +752,5 @@ implemented_testcases = [
 ]
 
 
-def generate_testcases() -> None:
-    for testcase in implemented_testcases:
-        testcase.generate()
-    if not IS_GITHUB_ACTION:
-        # run pc hooks to reduce diffs
-        subprocess.run("pre-commit run -a".split(" "), check=False)
-        subprocess.run("pre-commit run -a".split(" "), check=False)
-
-
 if __name__ == "__main__":
-    generate_testcases()
+    TimeScalarTestCase.generate()

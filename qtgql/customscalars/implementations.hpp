@@ -4,47 +4,64 @@
 #include "basecustomscalar.hpp"
 namespace qtgql {
 namespace customscalars {
-class BaseCacheAbleScalar {
- protected:
+class BaseTimeScalar {
+protected:
   QString m_cached_to_qt;
   bool m_should_update = true;
+
+public:
+  inline static Qt::DateFormat FORMAT = Qt::DateFormat(Qt::ISODate);
 };
 
 class DateTimeScalar : public CustomScalarABC<QDateTime, QString>,
-                       BaseCacheAbleScalar {
- public:
+                       BaseTimeScalar {
+public:
+  using CustomScalarABC<QDateTime, QString>::CustomScalarABC;
+
   void deserialize(const QJsonValue &raw_data) override;
 
   const QString &GRAPHQL_NAME() override;
 
   const QString &to_qt() override;
+
+  [[nodiscard]] QJsonValue serialize() const override;
 };
 
-class DateScalar : public CustomScalarABC<QDate, QString>, BaseCacheAbleScalar {
- public:
+class DateScalar : public CustomScalarABC<QDate, QString>, BaseTimeScalar {
+
+public:
+  using CustomScalarABC<QDate, QString>::CustomScalarABC;
+
   void deserialize(const QJsonValue &raw_data) override;
 
   const QString &GRAPHQL_NAME() override;
 
   const QString &to_qt() override;
+  [[nodiscard]] QJsonValue serialize() const override;
 };
 
-class TimeScalar : public CustomScalarABC<QTime, QString>, BaseCacheAbleScalar {
- public:
+class TimeScalar : public CustomScalarABC<QTime, QString>, BaseTimeScalar {
+public:
+  using CustomScalarABC<QTime, QString>::CustomScalarABC;
+
   void deserialize(const QJsonValue &raw_data) override;
 
   const QString &GRAPHQL_NAME() override;
 
   const QString &to_qt() override;
+  [[nodiscard]] QJsonValue serialize() const override;
 };
 
 class DecimalScalar : public CustomScalarABC<QString, QString> {
- public:
+public:
+  using CustomScalarABC<QString, QString>::CustomScalarABC;
+
   void deserialize(const QJsonValue &raw_data) override;
 
   const QString &GRAPHQL_NAME() override;
 
   const QString &to_qt() override;
+  [[nodiscard]] QJsonValue serialize() const override;
 };
-};  // namespace customscalars
-};  // namespace qtgql
+}; // namespace customscalars
+}; // namespace qtgql

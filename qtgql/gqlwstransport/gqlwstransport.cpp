@@ -65,6 +65,7 @@ void GqlWsTransportClient::on_gql_next(const GqlWsTrnsMsgWithID &message) {
 
 void GqlWsTransportClient::on_gql_error(const GqlWsTrnsMsgWithID &message) {
   qWarning() << "GraphQL Error occurred on ID: " << message.op_id.toString();
+  qWarning() << message.errors;
   if (message.has_errors()) {
     if (m_handlers.contains(message.op_id)) {
       m_handlers.value(message.op_id)->on_error(message.errors);
@@ -194,7 +195,7 @@ void GqlWsTransportClient::execute(
       m_pending_handlers.remove(handler);
     }
   } else if (!m_pending_handlers.contains(handler)) {
-    m_pending_handlers << handler;  // refcount increased (copy constructor)
+    m_pending_handlers << handler; // refcount increased (copy constructor)
   }
 }
 

@@ -8,7 +8,10 @@ class CustomStringScalar
     : public qtgql::customscalars::CustomScalarABC<QString, QString> {
   QString m_cached;
 
- public:
+public:
+  using qtgql::customscalars::CustomScalarABC<QString,
+                                              QString>::CustomScalarABC;
+
   const QString &to_qt() override {
     if (m_cached.isEmpty()) {
       m_cached = QString("Decoration-") + m_value;
@@ -23,14 +26,25 @@ class CustomStringScalar
   void deserialize(const QJsonValue &raw_data) override {
     m_value = raw_data.toString();
   }
+  [[nodiscard]] QJsonValue serialize() const override { return {m_value}; }
 };
 
-TEST_CASE("Test custom scalar by hand implementation") {
-  auto a = CustomStringScalar();
-  a.deserialize("initial");
-  REQUIRE(a.to_qt() == "Decoration-initial");
-  REQUIRE(a.GRAPHQL_NAME() == "CustomStringScalar");
+void preform_test(CustomStringScalar &s) {
+  REQUIRE(s.to_qt() == "Decoration-initial");
+  REQUIRE(s.GRAPHQL_NAME() == "CustomStringScalar");
   auto b = CustomStringScalar();
   b.deserialize("second");
-  REQUIRE(a != b);
+  REQUIRE(s != b);
+}
+
+TEST_CASE("Test custom scalar by hand implementation") {
+  SECTION("from json") {
+    auto a = CustomStringScalar();
+    a.deserialize({"initial"});
+    preform_test(a);
+  }
+  SECTION("to_json") {
+    auto s = CustomStringScalar("initial");
+    preform_test(s);
+  }
 }

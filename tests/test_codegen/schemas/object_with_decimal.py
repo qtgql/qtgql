@@ -4,6 +4,7 @@ import strawberry
 
 from tests.conftest import fake
 from tests.test_codegen.schemas.node_interface import Node
+from tests.test_codegen.schemas.node_interface import NODE_DB
 
 
 @strawberry.type
@@ -20,4 +21,13 @@ class Query:
         return User(name="Patrick", age=100, balance=Decimal(fake.pyfloat()))
 
 
-schema = strawberry.Schema(query=Query)
+@strawberry.type
+class Mutation:
+    @strawberry.field()
+    def change_balance(self, node_id: strawberry.ID, new_balance: Decimal) -> User:
+        user: User = NODE_DB.get(node_id)
+        user.balance = new_balance
+        return user
+
+
+schema = strawberry.Schema(query=Query, mutation=Mutation)

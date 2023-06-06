@@ -46,7 +46,7 @@ TEST_CASE("OptionalScalarsTestCase", "[generated-testcase]") {
     auto change_name_mutation = changename::ChangeName::shared();
     QString new_name = "Moise";
     change_name_mutation->set_variables(mq->get_data()->get_id(), new_name);
-    auto catcher = test_utils::SignalCatcher(mq->get_data());
+    auto catcher = test_utils::SignalCatcher({mq->get_data()});
     change_name_mutation->fetch();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(change_name_mutation);
@@ -65,4 +65,4 @@ TEST_CASE("OptionalScalarsTestCase", "[generated-testcase]") {
   }
 }
 
-};  // namespace OptionalScalarsTestCase
+}; // namespace OptionalScalarsTestCase

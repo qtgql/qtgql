@@ -1,3 +1,7 @@
+type Mutation {
+  changeLunchTime(nodeId: ID!, newTime: Time!): User!
+}
+
 interface Node {
   id: ID!
 }
@@ -13,5 +17,5 @@ type User implements Node {
   id: ID!
   name: String!
   age: Int!
-  whatTimeIsIt: Time!
+  lunchTime: Time!
 }

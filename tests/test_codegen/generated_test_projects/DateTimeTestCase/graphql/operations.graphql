@@ -6,3 +6,11 @@
             birth
           }
         }
+mutation ChangeUserBirth($new_birth: DateTime!, $nodeId: ID!) {
+  changeBirth(newBirth: $new_birth, nodeId: $nodeId) {
+    age
+    id
+    birth
+    name
+  }
+}

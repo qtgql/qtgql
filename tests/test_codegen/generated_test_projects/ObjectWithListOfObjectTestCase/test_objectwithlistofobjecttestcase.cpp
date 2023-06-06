@@ -66,7 +66,7 @@ TEST_CASE(
     auto res = model_with_data->data(model_with_data->index(0),
                                      ModelType ::QOBJECT_ROLE);
     REQUIRE(res.canConvert<ObjectType>());
-    auto v = res.value<ObjectType*>();
+    auto v = res.value<ObjectType *>();
     REQUIRE(v->get_name() ==
             raw_persons_list.at(0).toObject().value("name").toString());
   }
@@ -151,4 +151,4 @@ TEST_CASE(
     REQUIRE(ok);
   }
 }
-}  // namespace ObjectWithListOfObjectTestCase
+} // namespace ObjectWithListOfObjectTestCase
