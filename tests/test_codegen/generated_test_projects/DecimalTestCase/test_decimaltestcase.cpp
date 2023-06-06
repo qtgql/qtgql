@@ -29,7 +29,7 @@ TEST_CASE("DecimalTestCase", "[generated-testcase]") {
     auto user_id = user->get_id();
     modified_user_op->set_variables({new_balance}, user_id);
     auto catcher =
-        test_utils::SignalCatcher({.source_obj = user, .only = "birth"});
+        test_utils::SignalCatcher({.source_obj = user, .only = "balance"});
     modified_user_op->fetch();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(modified_user_op);
