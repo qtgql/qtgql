@@ -7,6 +7,7 @@ from uuid import UUID
 import strawberry
 
 from tests.test_codegen.schemas.node_interface import Node
+from tests.test_codegen.schemas.node_interface import NODE_DB
 
 
 @strawberry.type
@@ -33,4 +34,14 @@ class Query:
         )
 
 
-schema = strawberry.Schema(query=Query)
+@strawberry.type()
+class Mutation:
+    @strawberry.field()
+    def modify_name(self, user_id: strawberry.ID, new_name: str) -> User:
+        user: User = NODE_DB.get(user_id)
+        assert user
+        user.name = new_name
+        return user
+
+
+schema = strawberry.Schema(query=Query, mutation=Mutation)

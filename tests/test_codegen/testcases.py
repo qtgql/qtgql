@@ -197,6 +197,17 @@ OptionalScalarsTestCase = QGQLObjectTestCase(
         birth
       }
     }
+
+    mutation ChangeName($userId: ID!, $newName: String!){
+      modifyName(userId: $userId, newName: $newName) {
+        uuid
+        name
+        id
+        birth
+        agePoint
+        age
+      }
+    }
     """,
     test_name="OptionalScalarsTestCase",
 )
