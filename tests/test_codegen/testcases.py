@@ -25,9 +25,6 @@ from tests.test_codegen import schemas
 if TYPE_CHECKING:
     from strawberry import Schema
 
-
-BaseQueryHandler = None  # TODO: remove this when done migrating, this is just for readability.
-
 GENERATED_TESTS_DIR = Path(__file__).parent / "generated_test_projects"
 if not GENERATED_TESTS_DIR.exists:
     GENERATED_TESTS_DIR.mkdir()
@@ -51,9 +48,26 @@ class TstTemplateContext:
     test_name: str
 
 
+@define
+class BoolWithReason:
+    v: bool
+    reason: str
+
+    @classmethod
+    def false(cls, reason: str) -> BoolWithReason:
+        return cls(False, reason)
+
+    @classmethod
+    def true(cls, reason: str) -> BoolWithReason:
+        return cls(True, reason)
+
+    def __bool__(self):
+        return self.v
+
+
 class TestCaseMetadata(NamedTuple):
-    should_test_updates: bool = True
-    should_test_garbage_collection: bool = True
+    should_test_updates: BoolWithReason = BoolWithReason.false("")
+    should_test_garbage_collection: BoolWithReason = BoolWithReason.false("")
 
 
 @define(slots=False, kw_only=True)
@@ -225,10 +239,12 @@ NoIdOnQueryTestCase = QGQLObjectTestCase(
         }""",
     test_name="NoIdOnQueryTestCase",
     metadata=TestCaseMetadata(
-        False,
-        False,
+        BoolWithReason.false("nothing special here in that context"),
+        BoolWithReason.false("nothing special here in that context"),
     ),
 )
+
+CUSTOM_SCALARS_DOESNT_CACHE = BoolWithReason.false("custom scalars doesnt use cache")
 DateTimeTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_datetime.schema,
     operations="""
@@ -249,6 +265,9 @@ mutation ChangeUserBirth($new_birth: DateTime!, $nodeId: ID!) {
 }
         """,
     test_name="DateTimeTestCase",
+    metadata=TestCaseMetadata(
+        should_test_garbage_collection=CUSTOM_SCALARS_DOESNT_CACHE,
+    ),
 )
 
 DecimalTestCase = QGQLObjectTestCase(
@@ -276,6 +295,9 @@ DateTestCase = QGQLObjectTestCase(
         }
         """,
     test_name="DateTestCase",
+    metadata=TestCaseMetadata(
+        should_test_garbage_collection=CUSTOM_SCALARS_DOESNT_CACHE,
+    ),
 )
 TimeScalarTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_time_scalar.schema,
@@ -289,8 +311,10 @@ TimeScalarTestCase = QGQLObjectTestCase(
         }
         """,
     test_name="TimeScalarTestCase",
+    metadata=TestCaseMetadata(
+        should_test_garbage_collection=CUSTOM_SCALARS_DOESNT_CACHE,
+    ),
 )
-
 
 OperationErrorTestCase = QGQLObjectTestCase(
     schema=schemas.operation_error.schema,
@@ -460,7 +484,6 @@ ObjectsThatReferenceEachOtherTestCase = QGQLObjectTestCase(
 """,
 )
 
-
 CountryScalar = CustomScalarDefinition(
     type_name="CountryScalar",
     graphql_name="Country",
@@ -468,7 +491,6 @@ CountryScalar = CustomScalarDefinition(
     deserialized_type="QString",
     include_path="NOT IMPLEMENTED",
 )
-
 
 CustomUserScalarTestCase = QGQLObjectTestCase(
     schema=schemas.object_with_user_defined_scalar.schema,
@@ -581,7 +603,6 @@ OperationVariableTestCase = QGQLObjectTestCase(
     test_name="OperationVariableTestCase",
     type_name="Post",
 )
-
 
 OptionalInputTestCase = QGQLObjectTestCase(
     schema=schemas.optional_input_schema.schema,
