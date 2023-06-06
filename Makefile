@@ -7,7 +7,7 @@ serve_tests:
 
 # TODO should run the generate command directly
 generate_test_files:
-	poetry run python -m tests.test_codegen.testcases
+	poetry run python -m tests.test_codegen.generate
 
 test:
 	pytest tests --cov=qtgql --cov-report=xml --cov-append
