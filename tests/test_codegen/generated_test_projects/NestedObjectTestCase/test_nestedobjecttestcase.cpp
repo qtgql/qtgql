@@ -21,4 +21,4 @@ TEST_CASE("NestedObjectTestCase", "[generated-testcase]") {
   }
 }
 
-};  // namespace NestedObjectTestCase
+}; // namespace NestedObjectTestCase

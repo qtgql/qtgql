@@ -18,5 +18,5 @@ struct SelectionsConfig {
 struct OperationMetadata {
   const QUuid operation_id;
 };
-}  // namespace bases
-}  // namespace qtgql
+} // namespace bases
+} // namespace qtgql

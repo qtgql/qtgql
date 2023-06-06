@@ -51,4 +51,4 @@ TEST_CASE("ScalarsTestCase", "[generated-testcase]") {
     REQUIRE(user.use_count() == 2);
   }
 };
-};  // namespace ScalarsTestCase
+}; // namespace ScalarsTestCase

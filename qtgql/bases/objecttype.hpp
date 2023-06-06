@@ -14,15 +14,15 @@ class ObjectTypeABC : public QObject {
 
   Q_PROPERTY(QString typeName READ getTypeName CONSTANT)
 
- private:
+private:
   inline const QString getTypeName() const { return "__NOT_IMPLEMENTED__"; }
 
- public:
+public:
   using QObject::QObject;
 };
 
 class ObjectTypeABCWithID : public ObjectTypeABC {
- public:
+public:
   using ObjectTypeABC::ObjectTypeABC;
 
   virtual const QString &get_id() const = 0;
@@ -47,12 +47,11 @@ concept extendsObjectTypeABCWithID =
     std::is_base_of<ObjectTypeABCWithID, T>::value;
 
 // stores global node of graphql type and it's retainers.
-template <extendsObjectTypeABCWithID T>
-class NodeRecord {
+template <extendsObjectTypeABCWithID T> class NodeRecord {
   QSet<QUuid> m_retainers;
   typedef std::shared_ptr<T> T_sharedQObject;
 
- public:
+public:
   T_sharedQObject node;
 
   NodeRecord() { throw "tried to instantiate without arguments"; };
@@ -69,15 +68,14 @@ class NodeRecord {
   [[nodiscard]] bool has_retainers() const { return !m_retainers.isEmpty(); }
 };
 
-template <extendsObjectTypeABCWithID T>
-class ObjectStore {
+template <extendsObjectTypeABCWithID T> class ObjectStore {
   typedef std::shared_ptr<T> T_sharedQObject;
   typedef std::unique_ptr<NodeRecord<T>> UniqueRecord;
 
- protected:
+protected:
   std::map<QString, UniqueRecord> m_records;
 
- public:
+public:
   std::optional<T_sharedQObject> get_node(const QString &id) const {
     if (m_records.contains(id)) {
       return {m_records.at(id)->node};
@@ -101,5 +99,5 @@ class ObjectStore {
   }
 };
 
-}  // namespace bases
-}  // namespace qtgql
+} // namespace bases
+} // namespace qtgql

@@ -14,14 +14,14 @@ class ListModelMixin : public QAbstractListModel {
   Q_PROPERTY(int currentIndex MEMBER m_current_index WRITE set_current_index
                  NOTIFY currentIndexChanged)
 
- private:
+private:
   static QHash<int, QByteArray> default_roles() {
     QHash<int, QByteArray> roles;
     roles.insert(Qt::UserRole + 1, "qtObject");
     return roles;
   }
 
- protected:
+protected:
   const QHash<int, QByteArray> c_role_names = default_roles();
 
   static const QModelIndex &invalid_index() {
@@ -32,7 +32,7 @@ class ListModelMixin : public QAbstractListModel {
   int m_count = 0;
   int m_current_index = 0;
 
- public:
+public:
   explicit ListModelMixin(QObject *parent = nullptr)
       : QAbstractListModel(parent) {}
 
@@ -51,18 +51,17 @@ class ListModelMixin : public QAbstractListModel {
     emit currentIndexChanged();
   }
 
- signals:
+signals:
 
   void countChanged();
 
   void currentIndexChanged();
 };
 
-template <typename T_QObject>
-class ListModelABC : public ListModelMixin {
+template <typename T_QObject> class ListModelABC : public ListModelMixin {
   typedef std::unique_ptr<QList<T_QObject *>> T_QObjectList;
 
- private:
+private:
   void update_count() {
     auto cur_count = m_data->count();
     if (m_count != cur_count) {
@@ -71,7 +70,7 @@ class ListModelABC : public ListModelMixin {
     }
   };
 
- protected:
+protected:
   T_QObjectList m_data;
 
   void insert_common(const int from, const int to) {
@@ -92,7 +91,7 @@ class ListModelABC : public ListModelMixin {
     endRemoveRows();
   }
 
- public:
+public:
   explicit ListModelABC(QObject *parent, T_QObjectList data = {})
       : ListModelMixin(parent), m_data{std::move(data)} {
     m_count = m_data->length();
@@ -171,5 +170,5 @@ class ListModelABC : public ListModelMixin {
   }
 };
 
-}  // namespace bases
-}  // namespace qtgql
+} // namespace bases
+} // namespace qtgql

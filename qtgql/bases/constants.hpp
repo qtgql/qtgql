@@ -13,6 +13,6 @@ inline static const QString STRING = "";
 inline static const int INT = std::numeric_limits<int>::lowest();
 inline static const float FLOAT = std::numeric_limits<float>::lowest();
 inline static const bool BOOL = false;
-}  // namespace DEFAULTS
-}  // namespace bases
-}  // namespace qtgql
+} // namespace DEFAULTS
+} // namespace bases
+} // namespace qtgql

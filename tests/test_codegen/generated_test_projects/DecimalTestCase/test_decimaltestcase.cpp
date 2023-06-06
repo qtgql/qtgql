@@ -39,4 +39,4 @@ TEST_CASE("DecimalTestCase", "[generated-testcase]") {
   };
 }
 
-};  // namespace DecimalTestCase
+}; // namespace DecimalTestCase

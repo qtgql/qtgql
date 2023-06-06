@@ -65,4 +65,4 @@ TEST_CASE("OptionalScalarsTestCase", "[generated-testcase]") {
   }
 }
 
-};  // namespace OptionalScalarsTestCase
+}; // namespace OptionalScalarsTestCase

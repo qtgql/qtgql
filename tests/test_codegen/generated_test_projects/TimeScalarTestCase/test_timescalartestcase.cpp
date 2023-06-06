@@ -41,4 +41,4 @@ TEST_CASE("TimeScalarTestCase", "[generated-testcase]") {
   };
 }
 
-};  // namespace TimeScalarTestCase
+}; // namespace TimeScalarTestCase

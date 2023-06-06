@@ -195,7 +195,7 @@ void GqlWsTransportClient::execute(
       m_pending_handlers.remove(handler);
     }
   } else if (!m_pending_handlers.contains(handler)) {
-    m_pending_handlers << handler;  // refcount increased (copy constructor)
+    m_pending_handlers << handler; // refcount increased (copy constructor)
   }
 }
 

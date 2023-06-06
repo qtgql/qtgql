@@ -8,7 +8,7 @@ class CustomStringScalar
     : public qtgql::customscalars::CustomScalarABC<QString, QString> {
   QString m_cached;
 
- public:
+public:
   using qtgql::customscalars::CustomScalarABC<QString,
                                               QString>::CustomScalarABC;
 

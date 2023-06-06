@@ -22,4 +22,4 @@ TEST_CASE("EnumTestCase", "[generated-testcase]") {
   }
 }
 
-};  // namespace EnumTestCase
+}; // namespace EnumTestCase

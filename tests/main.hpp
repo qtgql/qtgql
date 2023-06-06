@@ -17,7 +17,7 @@ class Main : public QObject {
     qDebug() << proc->readAllStandardError();
   }
 
- public:
+public:
   QProcess *proc;
   QString server_address = "";
   ~Main(){};
@@ -26,7 +26,7 @@ class Main : public QObject {
     return inst;
   }
 
- private:
+private:
   QProcess m_proc;
   explicit Main() : QObject(nullptr) {
     proc = new QProcess(this);

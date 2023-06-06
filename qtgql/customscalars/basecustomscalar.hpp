@@ -9,12 +9,11 @@ namespace customscalars {
  * T_QtType - the property type that would be exposed to QML, usually this would
  * be a string
  */
-template <typename T, typename T_QtType>
-class CustomScalarABC {
- protected:
+template <typename T, typename T_QtType> class CustomScalarABC {
+protected:
   T m_value;
 
- public:
+public:
   // abstract methods
   /*
    * The *real* GraphQL name of the scalar (used by the codegen inspection
@@ -48,5 +47,5 @@ class CustomScalarABC {
     return !(operator==(other));
   }
 };
-};  // namespace customscalars
-};  // namespace qtgql
+}; // namespace customscalars
+}; // namespace qtgql

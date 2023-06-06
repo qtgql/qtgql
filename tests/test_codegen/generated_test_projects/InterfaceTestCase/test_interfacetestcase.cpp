@@ -23,4 +23,4 @@ TEST_CASE("InterfaceTestCase", "[generated-testcase]") {
   };
 }
 
-};  // namespace InterfaceTestCase
+}; // namespace InterfaceTestCase

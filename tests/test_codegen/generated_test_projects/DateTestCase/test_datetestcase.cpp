@@ -41,4 +41,4 @@ TEST_CASE("DateTestCase", "[generated-testcase]") {
   };
 }
 
-};  // namespace DateTestCase
+}; // namespace DateTestCase

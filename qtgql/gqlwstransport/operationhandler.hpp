@@ -14,11 +14,11 @@ class _OperationHandlerABCSignals : public QObject {
   Q_PROPERTY(bool operationOnFlight READ operation_on_flight NOTIFY
                  operationOnFlightChanged)
 
- protected:
+protected:
   bool m_completed = false;
   bool m_operation_on_the_fly = false;
 
- signals:
+signals:
 
   void completedChanged();
 
@@ -26,13 +26,13 @@ class _OperationHandlerABCSignals : public QObject {
 
   void error(const QJsonArray &);
 
- protected slots:
+protected slots:
 
   void set_completed(bool v);
 
   void set_operation_on_flight(bool v);
 
- public:
+public:
   using QObject::QObject;
 
   bool completed() const;
@@ -45,7 +45,7 @@ class OperationHandlerABC
     : public bases::HandlerABC,
       public _OperationHandlerABCSignals,
       public std::enable_shared_from_this<OperationHandlerABC> {
- protected:
+protected:
   QUuid m_operation_id = QUuid::createUuid();
 
   const std::shared_ptr<bases::Environment> &environment() {
@@ -55,7 +55,7 @@ class OperationHandlerABC
   QJsonObject m_variables;
   GqlWsTrnsMsgWithID m_message_template = GqlWsTrnsMsgWithID{{}};
 
- public:
+public:
   explicit OperationHandlerABC(GqlWsTrnsMsgWithID message)
       : _OperationHandlerABCSignals(), m_message_template(std::move(message)) {}
 
@@ -98,5 +98,5 @@ class OperationHandlerABC
     emit error(errors);
   };
 };
-};  // namespace gqlwstransport
-}  // namespace qtgql
+}; // namespace gqlwstransport
+} // namespace qtgql

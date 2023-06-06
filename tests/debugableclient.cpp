@@ -69,8 +69,9 @@ void wait_for_completion(
     throw std::runtime_error(error_message);
   }
 }
-std::shared_ptr<qtgql::bases::Environment> get_or_create_env(
-    const QString &env_name, const DebugClientSettings &settings) {
+std::shared_ptr<qtgql::bases::Environment>
+get_or_create_env(const QString &env_name,
+                  const DebugClientSettings &settings) {
   auto env = bases::Environment::get_gql_env(env_name);
   if (!env.has_value()) {
     auto env_ = std::make_shared<bases::Environment>(
@@ -124,4 +125,4 @@ bool SignalCatcher::wait(int timeout) {
   return true;
 }
 
-};  // namespace test_utils
+}; // namespace test_utils

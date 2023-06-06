@@ -25,8 +25,8 @@ inline const QString NEXT = "next";
 inline const QString PING = "ping";
 inline const QString PONG = "pong";
 inline const QString SUBSCRIBE =
-    "subscribe";  // for queries | mutations as well.
-};                // namespace PROTOCOL
+    "subscribe"; // for queries | mutations as well.
+};               // namespace PROTOCOL
 
 struct BaseGqlWsTrnsMsg : public bases::HashAbleABC {
   QString type;
@@ -85,7 +85,7 @@ struct GqlWsTrnsMsgWithID : public BaseGqlWsTrnsMsg {
   QUuid op_id;
 
   explicit GqlWsTrnsMsgWithID(const QJsonObject &data)
-      : BaseGqlWsTrnsMsg(data) {  // NOLINT
+      : BaseGqlWsTrnsMsg(data) { // NOLINT
     this->op_id = QUuid::fromString(data["id"].toString());
     if (this->type == PROTOCOL::ERROR) {
       errors = data.value("payload").toArray();
@@ -114,7 +114,7 @@ namespace DEF_MESSAGES {
 const auto CONNECTION_INIT = BaseGqlWsTrnsMsg(PROTOCOL::CONNECTION_INIT);
 const auto PING = BaseGqlWsTrnsMsg(PROTOCOL::PING);
 const auto PONG = BaseGqlWsTrnsMsg(PROTOCOL::PONG);
-}  // namespace DEF_MESSAGES
+} // namespace DEF_MESSAGES
 
 struct GqlWsTransportClientSettings {
   const QUrl url;
@@ -129,12 +129,12 @@ struct GqlWsTransportClientSettings {
 class GqlWsTransportClient : public QObject, public bases::NetworkLayer {
   Q_OBJECT
 
- private:
+private:
   GqlWsTransportClient() = delete;
 
   void send_message(const bases::HashAbleABC &message);
 
- private Q_SLOTS:
+private Q_SLOTS:
 
   void onReconnectTimeout();
 
@@ -142,7 +142,7 @@ class GqlWsTransportClient : public QObject, public bases::NetworkLayer {
 
   void onPingTesterTimeout();
 
- protected:
+protected:
   QUrl m_url;
   bool m_auto_reconnect = true;
   bool m_connection_ack = false;
@@ -171,7 +171,7 @@ class GqlWsTransportClient : public QObject, public bases::NetworkLayer {
 
   void init_connection(const QNetworkRequest &request);
 
- protected Q_SLOTS:
+protected Q_SLOTS:
 
   virtual void onTextMessageReceived(const QString &raw_message);
 
@@ -181,7 +181,7 @@ class GqlWsTransportClient : public QObject, public bases::NetworkLayer {
 
   void onError(const QAbstractSocket::SocketError &error);
 
- public:
+public:
   inline static const QString SUB_PROTOCOL = "graphql-transport-ws";
 
   explicit GqlWsTransportClient(const GqlWsTransportClientSettings &settings);
@@ -202,5 +202,5 @@ class GqlWsTransportClient : public QObject, public bases::NetworkLayer {
   void reconnect();
 };
 
-}  // namespace gqlwstransport
-}  // namespace qtgql
+} // namespace gqlwstransport
+} // namespace qtgql

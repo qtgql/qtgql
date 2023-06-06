@@ -78,5 +78,5 @@ const QString &DecimalScalar::GRAPHQL_NAME() {
 const QString &DecimalScalar::to_qt() { return m_value; }
 
 QJsonValue DecimalScalar::serialize() const { return {m_value}; }
-};  // namespace customscalars
-};  // namespace qtgql
+}; // namespace customscalars
+}; // namespace qtgql
