@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+0.119.9 - 2023-06-06
+--------------------
+
+This release adds support for using custom scalars (including ours) in
+operation variables and also adds the update&gc tests for custom scalars.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #244](https://github.com/qtgql/qtgql/pull/244/)
+
+
 0.119.8 - 2023-06-05
 --------------------
 
