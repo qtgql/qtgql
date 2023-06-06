@@ -32,7 +32,7 @@ TEST_CASE("ScalarsTestCase", "[generated-testcase]") {
     auto previous_name = mq->get_data()->get_name();
     auto modified_user_op = userwithsameidanddifferentfieldsquery::
         UserWithSameIDAndDifferentFieldsQuery::shared();
-    auto catcher = test_utils::SignalCatcher(user);
+    auto catcher = test_utils::SignalCatcher({user});
     modified_user_op->fetch();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(modified_user_op);

@@ -239,15 +239,14 @@ DateTimeTestCase = QGQLObjectTestCase(
             birth
           }
         }
-
-        mutation ChangeUserBirth($nodeId: ID!) {
-          changeBirth(newBirth: $new_birth, nodeId: $nodeId) {
-            age
-            id
-            birth
-            name
-          }
-        }
+mutation ChangeUserBirth($new_birth: DateTime!, $nodeId: ID!) {
+  changeBirth(newBirth: $new_birth, nodeId: $nodeId) {
+    age
+    id
+    birth
+    name
+  }
+}
         """,
     test_name="DateTimeTestCase",
 )

@@ -99,8 +99,14 @@ auto new_👉f.name👈 = data.value("👉f.name👈").👉 f.type.is_builtin_sc
 if (👉private_name👈 != new_👉f.name👈){
     👉fset_name👈(new_👉f.name👈);
 }
+{% elif f.type.is_custom_scalar %}
+auto new_👉f.name👈 = 👉 f.is_custom_scalar.type_name 👈();
+new_👉f.name👈.deserialize(data.value("👉f.name👈"));
+if (👉private_name👈 != new_👉f.name👈){
+    👉fset_name👈(new_👉f.name👈);
+}
 {% else %}
-throw "not implemented";
+Not implemented
 {% endif %}
 }
 {%- endmacro %}

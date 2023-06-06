@@ -16,6 +16,8 @@ class BaseTimeScalar {
 class DateTimeScalar : public CustomScalarABC<QDateTime, QString>,
                        BaseTimeScalar {
  public:
+  using CustomScalarABC<QDateTime, QString>::CustomScalarABC;
+
   void deserialize(const QJsonValue &raw_data) override;
 
   const QString &GRAPHQL_NAME() override;
@@ -27,6 +29,8 @@ class DateTimeScalar : public CustomScalarABC<QDateTime, QString>,
 
 class DateScalar : public CustomScalarABC<QDate, QString>, BaseTimeScalar {
  public:
+  using CustomScalarABC<QDate, QString>::CustomScalarABC;
+
   void deserialize(const QJsonValue &raw_data) override;
 
   const QString &GRAPHQL_NAME() override;
@@ -37,6 +41,8 @@ class DateScalar : public CustomScalarABC<QDate, QString>, BaseTimeScalar {
 
 class TimeScalar : public CustomScalarABC<QTime, QString>, BaseTimeScalar {
  public:
+  using CustomScalarABC<QTime, QString>::CustomScalarABC;
+
   void deserialize(const QJsonValue &raw_data) override;
 
   const QString &GRAPHQL_NAME() override;
@@ -47,6 +53,8 @@ class TimeScalar : public CustomScalarABC<QTime, QString>, BaseTimeScalar {
 
 class DecimalScalar : public CustomScalarABC<QString, QString> {
  public:
+  using CustomScalarABC<QString, QString>::CustomScalarABC;
+
   void deserialize(const QJsonValue &raw_data) override;
 
   const QString &GRAPHQL_NAME() override;

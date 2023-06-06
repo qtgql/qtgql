@@ -69,6 +69,13 @@ struct ModelSignalSpy {
   }
 };
 
+struct SignalCatcherParams {
+  const QObject* source_obj;
+  const QSet<QString>& excludes = {};
+  bool exclude_id = true;
+  const std::optional<QString>& only = {};
+};
+
 std::shared_ptr<qtgql::bases::Environment> get_or_create_env(
     const QString& env_name, const DebugClientSettings& settings);
 
@@ -78,8 +85,7 @@ class SignalCatcher {
   const QObject* m_source_obj;
 
  public:
-  SignalCatcher(const QObject* source_obj, const QSet<QString>& excludes = {},
-                bool exclude_id = true);
+  SignalCatcher(const SignalCatcherParams& params);
 
   [[nodiscard]] bool wait(int timeout = 1000);
 };
