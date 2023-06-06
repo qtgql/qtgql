@@ -27,7 +27,6 @@ frozendict = "^2.3.8"
 
 
 [tool.poetry.group.dev.dependencies]
-pytest-cov = "^4.0.0"
 aiohttp = {extras = ["speedups"], version = "^3.8.3"}
 faker = ">=15.3.4,<19.0.0"
 mypy = ">=1.0.1"
@@ -40,6 +39,8 @@ githubrelease = ">=1.5.9"
 httpx = ">=0.18.2"
 autopub = ">=0.2.2"
 mimesis = ">=10.1.0"
+pytest-cov = ">=4.1.0"
+
 
 [tool.poetry.group.docs.dependencies]
 mkdocs-material = "^9.0.5"
@@ -220,10 +221,10 @@ keep-runtime-typing = true
 
 [tool.pytest.ini_options]
 addopts = "--cov-config=pyproject.toml --ignore=qtgqlcodegen/codegen/py/templates/"
-markers = [
-    "no_captcha: This test requires that `LOGIN_REQUIRE_CAPTCHA=False` on the server",
-]
+
+
 [tool.coverage.run]
+source = ["qtgqlcodegen"]
 omit = ['test_*', 'tests/*', '**/*.jinja.py']
 relative_files = true
 

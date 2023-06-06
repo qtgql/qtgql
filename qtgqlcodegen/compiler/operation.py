@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import uuid
 from collections import defaultdict
 from functools import cached_property
 from typing import Optional
@@ -296,10 +295,6 @@ class QtGqlOperationDefinition:
     fragments: list[str] = attrs.Factory(list)
     variables: list[QtGqlVariableDefinition] = attrs.Factory(list)
     narrowed_types_map: dict[str, QtGqlQueriedObjectType] = attrs.Factory(dict)
-
-    @cached_property
-    def operation_id(self) -> str:
-        return uuid.uuid4().hex
 
     def __attrs_post_init__(self) -> None:
         # instantiating the queried fields here, they build the narrowed types.

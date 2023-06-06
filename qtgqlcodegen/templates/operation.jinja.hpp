@@ -77,7 +77,7 @@ inline const QString &ENV_NAME() override{
     }
 inline const qtgql::bases::SelectionsConfig & SELECTIONS_CONFIG() override{
     static auto ret = qtgql::bases::SelectionsConfig(
-        {👉 context.operation.root_field.as_conf_string() 👈}
+        {👉 context.operation.operation_config 👈}
     );
     return ret;
 }

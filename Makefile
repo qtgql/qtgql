@@ -10,4 +10,4 @@ generate_test_files:
 	poetry run python -m tests.test_codegen.generate
 
 test:
-	pytest tests --cov=qtgql --cov-report=xml --cov-append
+	pytest tests --cov=qtgqlcodegen --cov-report=xml --cov-append
