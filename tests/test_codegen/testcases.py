@@ -716,4 +716,4 @@ def generate_testcases() -> None:
 
 
 if __name__ == "__main__":
-    OptionalScalarsTestCase.generate()
+    generate_testcases()
