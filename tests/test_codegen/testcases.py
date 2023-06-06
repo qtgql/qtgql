@@ -725,4 +725,4 @@ def generate_testcases() -> None:
 
 
 if __name__ == "__main__":
-    DateTimeTestCase.generate()
+    generate_testcases()

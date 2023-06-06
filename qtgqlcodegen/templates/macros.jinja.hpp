@@ -106,7 +106,7 @@ if (👉private_name👈 != new_👉f.name👈){
     👉fset_name👈(new_👉f.name👈);
 }
 {% else %}
-Not implemented
+throw qtgql::exceptions::NotImplementedError({"👉f.type👈 is not supporting updates ATM"});
 {% endif %}
 }
 {%- endmacro %}
