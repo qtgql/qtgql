@@ -66,8 +66,8 @@ class BoolWithReason:
 
 
 class TestCaseMetadata(NamedTuple):
-    should_test_updates: BoolWithReason = BoolWithReason.false("")
-    should_test_garbage_collection: BoolWithReason = BoolWithReason.false("")
+    should_test_updates: BoolWithReason = BoolWithReason.true("")
+    should_test_garbage_collection: BoolWithReason = BoolWithReason.true("")
 
 
 @define(slots=False, kw_only=True)
