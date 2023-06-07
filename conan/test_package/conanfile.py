@@ -23,5 +23,5 @@ class helloTestConan(ConanFile):
 
     def test(self):
         if can_run(self):
-            cmd = Path(self.cpp.build.bindir) / "example"
-            self.run(cmd, env="conanrun")
+            cmd = (Path(self.cpp.build.bindir) / "example").resolve(True).absolute()
+            self.run(str(cmd), env="conanrun")

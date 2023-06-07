@@ -4,7 +4,7 @@
  * at ../gqlwstransport dir.
  */
 #pragma once
-#include "../utils.hpp"
+#include "../../utils.hpp"
 #include "QJsonObject"
 #include "QUuid"
 #include "exceptions.hpp"

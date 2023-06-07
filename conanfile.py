@@ -41,7 +41,7 @@ class QtGqlRecipe(ConanFile):
         "test": False,
     }
 
-    exports_sources = "CMakeLists.txt", "qtgql/*", "pyproject.toml"
+    exports_sources = "CMakeLists.txt", "include/*", "pyproject.toml"
 
     def requirements(self) -> None:
         self.requires("openssl/1.1.1t")
@@ -129,7 +129,7 @@ class QtGqlRecipe(ConanFile):
         cmake.install()
 
     def package_info(self):
-        self.cpp_info.libs = ["gqlwstransport"]
+        self.cpp_info.libs = ["qtgql"]  # checks that can link against this lib name.
 
 
 #

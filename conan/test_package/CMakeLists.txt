@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
 project(PackageTest CXX)
 
-find_package(qtgql REQUIRED COMPONENTS bases gqlwstransport)
+find_package(qtgql)
 
 add_executable(example src/example.cpp)
-target_link_libraries(example PRIVATE gqlwstransport)
+target_link_libraries(example PRIVATE qtgql::qtgql)
