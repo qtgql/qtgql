@@ -46,7 +46,7 @@ class QtGqlRecipe(ConanFile):
     def requirements(self) -> None:
         self.requires("openssl/1.1.1t")
 
-    def build_requirements(self) -> None:
+    def test_requirements(self) -> None:
         self.test_requires("catch2/3.1.0")
 
     def layout(self) -> None:
@@ -127,6 +127,9 @@ class QtGqlRecipe(ConanFile):
     def package(self):
         cmake = CMake(self)
         cmake.install()
+
+    def package_info(self):
+        self.cpp_info.libs = ["qtgql::gqlwstransport"]
 
 
 #

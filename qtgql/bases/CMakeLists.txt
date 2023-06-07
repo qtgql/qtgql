@@ -1,4 +1,4 @@
-set(COMPONENT_NAME qtgqlbases)
+set(COMPONENT_NAME bases)
 add_library(${COMPONENT_NAME} "")
 add_library(${PROJECT_NAME}::bases ALIAS ${COMPONENT_NAME})
 target_sources(

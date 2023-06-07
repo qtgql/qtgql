@@ -1,13 +1,10 @@
 cmake_minimum_required(VERSION 3.25.0)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-execute_process(COMMAND poetry version OUTPUT_VARIABLE RAW_VER)
-string(REPLACE "qtgql " "" RAW_VER ${RAW_VER})
-string(STRIP ${RAW_VER} POETRY_VERSION)
 
 project(
   qtgql
-  VERSION ${POETRY_VERSION}
+  VERSION 0.119.9
   LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -40,3 +37,5 @@ if(QTGQL_TESTING)
     COMMAND run-clang-tidy -p ${CMAKE_BINARY_DIR}
     COMMENT "cpp linter")
 endif()
+
+install(TARGETS gqlwstransport bases customscalars)
