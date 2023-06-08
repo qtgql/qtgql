@@ -37,7 +37,7 @@ class ImplementationStatus(NamedTuple):
         if self.ignored:
             return ":heavy_minus_sign:"
         if self.success:
-            return ":heavy_check_mark:"
+            return ":white_check_mark:"
         return "❌"
 
     def __repr__(self):
