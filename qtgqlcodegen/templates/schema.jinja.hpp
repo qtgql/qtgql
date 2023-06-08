@@ -99,10 +99,15 @@ return inst;
 };
 
 void loose(const qtgql::bases::OperationMetadata &metadata){
-    {% if type. implements_node %}
+    {% for f in type.fields %}
+    {% if f.type.is_object_type %}
+    👉 f.private_name 👈->loose(metadata);
+    {% endif %}
+    {% endfor %}
+    {% if type.implements_node %}
     INST_STORE().loose(m_id, metadata.operation_id);
     {% else %}
-    throw "not implemented";
+    deleteLater();
     {% endif %}
 };
 void update(const QJsonObject &data,
