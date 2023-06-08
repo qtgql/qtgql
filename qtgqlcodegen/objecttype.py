@@ -159,6 +159,9 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
 
     @cached_property
     def can_select_id(self) -> Optional[QtGqlFieldDefinition]:
+        """
+        :return: The id field of this field object/model type if implements `Node`
+        """
         object_type = self.type.is_object_type or self.type.is_interface
         if not object_type:
             if self.type.is_model:
