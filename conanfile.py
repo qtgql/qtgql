@@ -113,8 +113,8 @@ class QtGqlRecipe(ConanFile):
                 f"poetry run aqt install-qt {self.os_name} "
                 f"desktop {self.qt_version} {self.qt_arch} "
                 f"--outputdir {str(self.aqt_install_dir)} "
-                f"-m qtwebsockets".split(" "),
-            )
+                f"-m websockets".split(" "),
+            ).check_returncode()
         assert self.qt6_install_dir
         assert self.qt6_install_dir.exists()
         deps = CMakeDeps(self)
@@ -138,10 +138,3 @@ class QtGqlRecipe(ConanFile):
 
     def package_info(self):
         self.cpp_info.libs = ["qtgql"]  # checks that can link against this lib name.
-
-
-#
-
-# if __name__ == "__main__":
-
-#     rec
