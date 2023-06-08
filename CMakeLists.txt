@@ -19,19 +19,16 @@ endif()
 find_package(Qt6 REQUIRED COMPONENTS Core Qml Quick WebSockets)
 qt_standard_project_setup()
 
-add_library(${PROJECT_NAME})
 
-target_sources(
-        ${PROJECT_NAME}
-        PRIVATE
-        # bases
-        include/qtgql/bases/detail/environment.cpp
-        # gqlwstransport
-        include/qtgql/gqlwstransport/detail/gqlwstransport.cpp
-        include/qtgql/gqlwstransport/detail/operationhandler.cpp
-        # customscalars
-        include/qtgql/customscalars/detail/implementations.cpp
-)
+
+
+file(GLOB_RECURSE QTGQL_SOURCES "include/*.cpp" "include/*.hpp")
+
+file(GLOB_RECURSE QTGQL_HEADERS "include/*.hpp")
+
+add_library(${PROJECT_NAME} SHARED ${QTGQL_SOURCES})
+
+
 target_link_libraries(
         ${PROJECT_NAME}
         PUBLIC
@@ -46,28 +43,7 @@ target_link_libraries(
 target_sources(${PROJECT_NAME} PUBLIC FILE_SET HEADERS
         BASE_DIRS include
         FILES
-        # interfaces
-        include/qtgql/bases/bases.hpp
-        include/qtgql/gqlwstransport/gqlwstransport.hpp
-        include/qtgql/customscalars/customscalars.hpp
-        # bases
-        include/qtgql/bases/detail/objecttype.hpp
-        include/qtgql/bases/detail/metadata.hpp
-        include/qtgql/bases/detail/listmodel.hpp
-        include/qtgql/bases/detail/networklayer.hpp
-        include/qtgql/bases/detail/exceptions.hpp
-        include/qtgql/bases/detail/constants.hpp
-        include/qtgql/bases/detail/environment.hpp
-        include/qtgql/bases/detail/macros.hpp
-        # gqlwstransport
-        include/qtgql/gqlwstransport/detail/operationhandler.cpp
-        include/qtgql/gqlwstransport/detail/gqlwstransport.hpp
-        include/qtgql/gqlwstransport/detail/operationhandler.hpp
-        # customscalars
-        include/qtgql/customscalars/detail/basecustomscalar.hpp
-        include/qtgql/customscalars/detail/implementations.hpp
-        # misc
-        include/qtgql/utils.hpp
+        ${QTGQL_HEADERS}
         )
 
 # install with headers

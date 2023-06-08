@@ -22,6 +22,11 @@ if TYPE_CHECKING:
 fake = Faker()
 
 
+class PATHS:
+    PROJECT_ROOT = Path(__file__).parent.parent
+    QTGQL_TEST_TARGET = PROJECT_ROOT / "tests" / "build"
+
+
 class factory:
     person = mimesis.Person(locale=Locale.DEFAULT)
     develop = mimesis.Development()

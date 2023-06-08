@@ -77,7 +77,7 @@ jobs:
         run: |
           poetry run conan profile detect
           poetry run conan install . -pr=profiles/${{ runner.os }} -s build_type=Debug --build=missing
-          poetry run conan build . -s build_type=Debug -pr=profiles/${{ runner.os }}
+          poetry run conan build . -o test=True -s build_type=Debug -pr=profiles/${{ runner.os }}
 
       - name: Run tests
         shell: bash

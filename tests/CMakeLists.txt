@@ -11,7 +11,7 @@ include_directories(../tests)
 add_subdirectory(test_codegen)
 set_target_properties(${TESTS_TARGET} PROPERTIES AUTOMOC TRUE)
 target_link_libraries(${TESTS_TARGET} PRIVATE Catch2::Catch2)
-target_link_libraries(${TESTS_TARGET} PRIVATE Qt6::Core Qt6::Test Qt6::Network)
+target_link_libraries(${TESTS_TARGET} PRIVATE Qt6::Test)
 target_link_libraries(${TESTS_TARGET} PRIVATE qtgql)
 
 catch_discover_tests(${TESTS_TARGET})
