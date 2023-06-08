@@ -4,7 +4,7 @@ target_link_libraries(${TESTS_TARGET} PRIVATE generated::👉 tc.test_name 👈)
 {% endfor %}
 
 
-LIST(APPEND CODEGEN_TESTS
+set(CODEGEN_TEST_SOURCES
 {% for tc in context.testcases -%}
 👉 tc.testcase_file 👈
 {% endfor %}
