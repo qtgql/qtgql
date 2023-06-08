@@ -356,6 +356,14 @@ NestedObjectTestCase = QGQLObjectTestCase(
             }
         }
     }
+    
+    mutation UpdateUserName($nodeId: ID!, $newName: String!) {
+      changeName(newName: $newName, nodeId: $nodeId) {
+        person {
+          name
+        }
+      }
+    }
     """,
     test_name="NestedObjectTestCase",
 )
@@ -753,4 +761,4 @@ implemented_testcases = [
 
 
 if __name__ == "__main__":
-    TimeScalarTestCase.generate()
+    NestedObjectTestCase.generate()
