@@ -12,7 +12,7 @@ auto SCHEMA_ADDR = get_server_address("34284866");
 
 TEST_CASE("NestedObjectTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
-      ENV_NAME, DebugClientSettings{.print_debug=true, .prod_settings = {.url = SCHEMA_ADDR}});
+      ENV_NAME, DebugClientSettings{ .prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = std::make_shared<mainquery::MainQuery>();
   mq->fetch();
   test_utils::wait_for_completion(mq);
@@ -29,13 +29,12 @@ TEST_CASE("NestedObjectTestCase", "[generated-testcase]") {
       auto inner_person = user->get_person();
       auto catcher = test_utils::SignalCatcher(
               {.source_obj = inner_person, .only = "name"});
-      test_utils::wait_for_completion(change_user_name_op);
-//      REQUIRE(catcher.wait());
+        REQUIRE(catcher.wait());
+
+        test_utils::wait_for_completion(change_user_name_op);
       auto new_person = change_user_name_op->get_data()->get_person();
         REQUIRE(user->get_person()->get_id() == new_person->get_id());
-        qDebug() << user->get_person()->get_name();
-            qDebug() << new_person->get_name();
-            REQUIRE(user->get_person()->get_name() == new_name);
+        REQUIRE(user->get_person()->get_name() == new_name);
     }
 
 }
