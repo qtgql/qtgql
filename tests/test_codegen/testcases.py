@@ -33,7 +33,7 @@ template_env = jinja2.Environment(
     variable_end_string="👈",
 )
 
-TST_CMAKE_TEMPLATE = template_env.get_template("CMakeLists.jinja.txt") # only build what you test.
+TST_CMAKE_TEMPLATE = template_env.get_template("CMakeLists.jinja.txt")  # only build what you test.
 TST_CONFIG_TEMPLATE = template_env.get_template("configtemplate.jinja.py")
 TST_CATCH2_TEMPLATE = template_env.get_template("testcase.jinja.cpp")
 CLI_RUNNER = CliRunner()
@@ -98,10 +98,10 @@ class QtGqlTestCase:
         if not ret.exists():
             ret.mkdir()
         return ret
+
     @property
     def generated_dir(self):
         return self.config.generated_dir
-
 
     @cached_property
     def config_file(self) -> Path:
@@ -118,7 +118,6 @@ class QtGqlTestCase:
     @cached_property
     def testcase_file(self) -> Path:
         return self.test_dir / f"test_{self.test_name.lower()}.cpp"
-
 
     @cached_property
     def config(self) -> QtGqlConfig:
@@ -345,7 +344,7 @@ NestedObjectTestCase = QtGqlTestCase(
             }
         }
     }
-    
+
     mutation UpdateUserName($nodeId: ID!, $newName: String!) {
       changeName(newName: $newName, nodeId: $nodeId) {
         person {
@@ -748,16 +747,16 @@ implemented_testcases = [
     InterfaceTestCase,
 ]
 
+
 def generate_testcases(*testcases: QtGqlTestCase) -> None:
     (GENERATED_TESTS_DIR / "CMakeLists.txt").write_text(
-        TST_CMAKE_TEMPLATE.render(context={"testcases": testcases})
+        TST_CMAKE_TEMPLATE.render(context={"testcases": testcases}),
     )
     for tc in testcases:
         tc.generate()
 
 
-
 if __name__ == "__main__":
     generate_testcases(
-        NestedObjectTestCase
+        NestedObjectTestCase,
     )
