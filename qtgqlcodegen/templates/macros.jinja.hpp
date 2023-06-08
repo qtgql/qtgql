@@ -107,21 +107,24 @@ if (👉private_name👈 != new_👉f.name👈){
     👉fset_name👈(new_👉f.name👈);
 }
 {% elif f.type.is_object_type %}
+auto 👉f.name👈_inner_config = config.selections.value("person");
+
 {% if f.can_select_id %}
-if (👉private_name👈 && 👉private_name👈->get_id() == data.value("👉f.name👈").toString()){
-👉private_name👈->update(data.value("👉f.name👈").toObject(), config, metadata);
+auto 👉f.name👈_data = data.value("person").toObject();
+if (👉private_name👈 && 👉private_name👈->get_id() == 👉f.name👈_data.value("id").toString()){
+👉private_name👈->update(👉f.name👈_data, 👉f.name👈_inner_config, metadata);
 }
     else{
 👉fset_name👈(👉f.type.is_object_type.name👈::from_json(
-        data.value("👉f.name👈").toObject(),
-        config,
+        👉f.name👈_data,
+        👉f.name👈_inner_config,
         metadata
 ));
     }
 {% endif %}
 👉fset_name👈(👉f.type.is_object_type.name👈::from_json(
         data.value("👉f.name👈").toObject(),
-        config,
+        👉f.name👈_inner_config,
         metadata
 ));
 
