@@ -146,10 +146,10 @@ __temp.py
 /tests/test_sample_ui/graphql/handlers.py
 /tests/test_sample_ui/graphql/objecttypes.py
 **/__generated__/
-
+tests/test_codegen/generated_test_projects/**/qtgqlconfig.py
+/tests/test_codegen/generated_test_projects/CMakeLists.txt
 
 # C++ packages
 3rdParty/Qt/
 **/CMakeUserPresets.json
 /coverage.json
-tests/test_codegen/generated_test_projects/**/qtgqlconfig.py

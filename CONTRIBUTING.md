@@ -2,12 +2,12 @@
 To contribute create a fork and clone your fork locally.
 
 ### Install dependencies
-We use Poetry for managing dependencies.
+We use [Poetry](https://python-poetry.org/) for managing dependencies.
 ```bash
 poetry install
 ```
 
-### Install pre-commit hooks
+### Install [pre-commit](https://pre-commit.com/) hooks
 ```bash
 pre-commit install
 ```
@@ -26,7 +26,7 @@ make generate_test_files
 ### Build
 conan would generate cmake presets for IDE's usage as well.
 ```bash
-poetry run conan build .
+poetry run conan build . -o test=True
 ```
 ### Testing
 Run tests GraphQL server

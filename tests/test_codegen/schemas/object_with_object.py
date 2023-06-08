@@ -4,6 +4,7 @@ import strawberry
 
 from tests.conftest import fake
 from tests.test_codegen.schemas.node_interface import Node
+from tests.test_codegen.schemas.node_interface import NODE_DB
 
 
 # WARNING: This schema correlates with the optional nested object schema
@@ -25,4 +26,13 @@ class Query:
         return User(person=Person(name=fake.name(), age=fake.pyint()))
 
 
-schema = strawberry.Schema(query=Query)
+@strawberry.type
+class Mutation:
+    @strawberry.field()
+    def change_name(self, node_id: strawberry.ID, new_name: str) -> User:
+        user: User = NODE_DB.get(node_id)
+        user.person.name = new_name
+        return user
+
+
+schema = strawberry.Schema(query=Query, mutation=Mutation)

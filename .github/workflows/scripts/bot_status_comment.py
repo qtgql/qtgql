@@ -11,7 +11,7 @@ from .ghub import get_current_pr
 from tests.conftest import PATHS
 
 if TYPE_CHECKING:
-    from tests.test_codegen.testcases import QGQLObjectTestCase
+    from tests.test_codegen.testcases import QtGqlTestCase
 
 from tests.test_codegen.testcases import all_test_cases, implemented_testcases
 
@@ -49,7 +49,7 @@ class ImplementationStatus(NamedTuple):
 
 @define
 class TstCaseStatus:
-    test: QGQLObjectTestCase
+    test: QtGqlTestCase
     implemented: ImplementationStatus
     deserialization: ImplementationStatus
     update: ImplementationStatus

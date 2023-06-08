@@ -29,7 +29,7 @@ public:
 
   // updates a node based on new GraphQL data.
   virtual void update(const QJsonObject &data,
-                      const SelectionsConfig &selections) = 0;
+                      const SelectionsConfig &selections, const OperationMetadata &metadata) = 0;
 
   /*
   releases all child objects if exists.

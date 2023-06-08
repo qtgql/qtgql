@@ -29,6 +29,7 @@ emit 👉 f.signal_name 👈();
 {% endmacro -%}
 
 
+
 {% macro deserialize_field(f, assign_to, include_selection_check = True, config_name = "config", metadata_name = "metadata",
                            do_after_deserialized = "") -%}
 
@@ -105,10 +106,38 @@ new_👉f.name👈.deserialize(data.value("👉f.name👈"));
 if (👉private_name👈 != new_👉f.name👈){
     👉fset_name👈(new_👉f.name👈);
 }
+{% elif f.type.is_object_type %}
+auto 👉f.name👈_inner_config = config.selections.value("person");
+
+{% if f.can_select_id %}
+auto 👉f.name👈_data = data.value("person").toObject();
+if (👉private_name👈 && 👉private_name👈->get_id() == 👉f.name👈_data.value("id").toString()){
+👉private_name👈->update(👉f.name👈_data, 👉f.name👈_inner_config, metadata);
+}
+    else{
+👉fset_name👈(👉f.type.is_object_type.name👈::from_json(
+        👉f.name👈_data,
+        👉f.name👈_inner_config,
+        metadata
+));
+    }
+{% endif %}
+👉fset_name👈(👉f.type.is_object_type.name👈::from_json(
+        data.value("👉f.name👈").toObject(),
+        👉f.name👈_inner_config,
+        metadata
+));
+
+
 {% else %}
 throw qtgql::exceptions::NotImplementedError({"👉f.type👈 is not supporting updates ATM"});
 {% endif %}
 }
+{% if f.type.is_optional() %}
+else {
+👉fset_name👈({});
+}
+{% endif %}
 {%- endmacro %}
 
 

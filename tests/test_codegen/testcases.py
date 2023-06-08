@@ -33,10 +33,10 @@ template_env = jinja2.Environment(
     variable_end_string="👈",
 )
 
+TST_CMAKE_TEMPLATE = template_env.get_template("CMakeLists.jinja.txt")  # only build what you test.
 TST_CONFIG_TEMPLATE = template_env.get_template("configtemplate.jinja.py")
 TST_CATCH2_TEMPLATE = template_env.get_template("testcase.jinja.cpp")
 CLI_RUNNER = CliRunner()
-TST_CMAKE = (Path(__file__).parent / "CMakeLists.txt").resolve(True)
 
 
 @define
@@ -69,7 +69,7 @@ class TestCaseMetadata(NamedTuple):
 
 
 @define(slots=False, kw_only=True)
-class QGQLObjectTestCase:
+class QtGqlTestCase:
     operations: str
     schema: Schema
     test_name: str
@@ -85,16 +85,6 @@ class QGQLObjectTestCase:
     def evaluator(self) -> SchemaEvaluator:
         return SchemaEvaluator(config=self.config)
 
-    @property
-    def initialize_dict(self) -> dict:
-        res = self.schema.execute_sync(
-            self.evaluator._query_handlers[self.query_operationName].query,
-        )
-        if res.errors:
-            raise Exception("graphql operations failed", res.errors)
-        else:
-            return res.data
-
     @cached_property
     def test_dir(self) -> Path:
         ret = GENERATED_TESTS_DIR / self.test_name
@@ -109,16 +99,20 @@ class QGQLObjectTestCase:
             ret.mkdir()
         return ret
 
+    @property
+    def generated_dir(self):
+        return self.config.generated_dir
+
     @cached_property
-    def config_dir(self) -> Path:
+    def config_file(self) -> Path:
         return self.test_dir / "qtgqlconfig.py"
 
     @cached_property
-    def schema_dir(self) -> Path:
+    def schema_file(self) -> Path:
         return self.graphql_dir / "schema.graphql"
 
     @cached_property
-    def operations_dir(self) -> Path:
+    def operations_file(self) -> Path:
         return self.graphql_dir / "operations.graphql"
 
     @cached_property
@@ -145,9 +139,9 @@ class QGQLObjectTestCase:
             url_suffix=self.url_suffix,
             test_name=self.test_name,
         )
-        self.schema_dir.write_text(self.schema.as_str())
-        self.operations_dir.write_text(self.operations)
-        self.config_dir.write_text(TST_CONFIG_TEMPLATE.render(context=template_context))
+        self.schema_file.write_text(self.schema.as_str())
+        self.operations_file.write_text(self.operations)
+        self.config_file.write_text(TST_CONFIG_TEMPLATE.render(context=template_context))
         if not self.testcase_file.exists():
             self.testcase_file.write_text(TST_CATCH2_TEMPLATE.render(context=template_context))
         else:
@@ -159,18 +153,12 @@ class QGQLObjectTestCase:
             self.testcase_file.write_text(updated)
 
         cwd = Path.cwd()
-        os.chdir(self.config_dir.parent)
+        os.chdir(self.config_file.parent)
         CLI_RUNNER.invoke(app, "gen", catch_exceptions=False)
         os.chdir(cwd)
-        prev = TST_CMAKE.read_text()
-        link_line = "target_link_libraries(${TESTS_TARGET} PRIVATE generated::%s)" % (
-            self.config.env_name
-        )
-        if self.config.env_name not in prev:
-            TST_CMAKE.write_text(prev + f"\n {link_line}")
 
 
-ScalarsTestCase = QGQLObjectTestCase(
+ScalarsTestCase = QtGqlTestCase(
     schema=schemas.object_with_scalar.schema,
     operations="""
         query MainQuery {
@@ -197,7 +185,7 @@ ScalarsTestCase = QGQLObjectTestCase(
         """,
     test_name="ScalarsTestCase",
 )
-OptionalScalarsTestCase = QGQLObjectTestCase(
+OptionalScalarsTestCase = QtGqlTestCase(
     schema=schemas.object_with_optional_scalar.schema,
     operations="""
     query MainQuery($returnNone: Boolean! = false) {
@@ -223,7 +211,7 @@ OptionalScalarsTestCase = QGQLObjectTestCase(
     """,
     test_name="OptionalScalarsTestCase",
 )
-NoIdOnQueryTestCase = QGQLObjectTestCase(
+NoIdOnQueryTestCase = QtGqlTestCase(
     # should append id to types that implements Node automatically.
     schema=schemas.object_with_scalar.schema,
     operations="""
@@ -243,7 +231,7 @@ NoIdOnQueryTestCase = QGQLObjectTestCase(
 )
 
 CUSTOM_SCALARS_DOESNT_CACHE = BoolWithReason.false("custom scalars doesnt use cache")
-DateTimeTestCase = QGQLObjectTestCase(
+DateTimeTestCase = QtGqlTestCase(
     schema=schemas.object_with_datetime.schema,
     operations="""
        query MainQuery {
@@ -268,7 +256,7 @@ mutation ChangeUserBirth($new_birth: DateTime!, $nodeId: ID!) {
     ),
 )
 
-DecimalTestCase = QGQLObjectTestCase(
+DecimalTestCase = QtGqlTestCase(
     schema=schemas.object_with_decimal.schema,
     operations="""
        query MainQuery {
@@ -289,7 +277,7 @@ DecimalTestCase = QGQLObjectTestCase(
         should_test_garbage_collection=CUSTOM_SCALARS_DOESNT_CACHE,
     ),
 )
-DateTestCase = QGQLObjectTestCase(
+DateTestCase = QtGqlTestCase(
     schema=schemas.object_with_date.schema,
     operations="""
        query MainQuery {
@@ -310,7 +298,7 @@ DateTestCase = QGQLObjectTestCase(
         should_test_garbage_collection=CUSTOM_SCALARS_DOESNT_CACHE,
     ),
 )
-TimeScalarTestCase = QGQLObjectTestCase(
+TimeScalarTestCase = QtGqlTestCase(
     schema=schemas.object_with_time_scalar.schema,
     operations="""
       query MainQuery {
@@ -332,7 +320,7 @@ TimeScalarTestCase = QGQLObjectTestCase(
     ),
 )
 
-OperationErrorTestCase = QGQLObjectTestCase(
+OperationErrorTestCase = QtGqlTestCase(
     schema=schemas.operation_error.schema,
     operations="""
     query MainQuery {
@@ -345,7 +333,7 @@ OperationErrorTestCase = QGQLObjectTestCase(
     test_name="OperationErrorTestCase",
 )
 
-NestedObjectTestCase = QGQLObjectTestCase(
+NestedObjectTestCase = QtGqlTestCase(
     schema=schemas.object_with_object.schema,
     operations="""
     query MainQuery {
@@ -356,10 +344,18 @@ NestedObjectTestCase = QGQLObjectTestCase(
             }
         }
     }
+
+    mutation UpdateUserName($nodeId: ID!, $newName: String!) {
+      changeName(newName: $newName, nodeId: $nodeId) {
+        person {
+          name
+        }
+      }
+    }
     """,
     test_name="NestedObjectTestCase",
 )
-OptionalNestedObjectTestCase = QGQLObjectTestCase(
+OptionalNestedObjectTestCase = QtGqlTestCase(
     schema=schemas.object_with_optional_object.schema,
     operations="""
     query MainQuery($return_null: Boolean!) {
@@ -373,7 +369,7 @@ OptionalNestedObjectTestCase = QGQLObjectTestCase(
     """,
     test_name="OptionalNestedObjectTestCase",
 )
-ObjectWithListOfObjectTestCase = QGQLObjectTestCase(
+ObjectWithListOfObjectTestCase = QtGqlTestCase(
     schema=schemas.object_with_list_of_object.schema,
     operations="""
     query MainQuery {
@@ -389,7 +385,7 @@ ObjectWithListOfObjectTestCase = QGQLObjectTestCase(
     needs_debug=True,
 )
 
-RootListOfTestCase = QGQLObjectTestCase(
+RootListOfTestCase = QtGqlTestCase(
     schema=schemas.root_list_of_object.schema,
     operations="""
     query MainQuery {
@@ -402,7 +398,7 @@ RootListOfTestCase = QGQLObjectTestCase(
     test_name="RootListOfTestCase",
 )
 
-InterfaceTestCase = QGQLObjectTestCase(
+InterfaceTestCase = QtGqlTestCase(
     schema=schemas.object_with_interface.schema,
     operations="""
     query MainQuery {
@@ -414,7 +410,7 @@ InterfaceTestCase = QGQLObjectTestCase(
     """,
     test_name="InterfaceTestCase",
 )
-UnionTestCase = QGQLObjectTestCase(
+UnionTestCase = QtGqlTestCase(
     schema=schemas.object_with_union.schema,
     operations="""
         query MainQuery {
@@ -436,7 +432,7 @@ UnionTestCase = QGQLObjectTestCase(
     """,
     test_name="UnionTestCase",
 )
-ListOfObjectWithUnionTestCase = QGQLObjectTestCase(
+ListOfObjectWithUnionTestCase = QtGqlTestCase(
     schema=schemas.object_with_list_of_type_with_union.schema,
     operations="""
         query MainQuery {
@@ -461,7 +457,7 @@ ListOfObjectWithUnionTestCase = QGQLObjectTestCase(
     """,
     test_name="ListOfUnionTestCase",
 )
-EnumTestCase = QGQLObjectTestCase(
+EnumTestCase = QtGqlTestCase(
     schema=schemas.object_with_enum.schema,
     operations="""
         query MainQuery {
@@ -474,7 +470,7 @@ EnumTestCase = QGQLObjectTestCase(
         """,
     test_name="EnumTestCase",
 )
-RootEnumTestCase = QGQLObjectTestCase(
+RootEnumTestCase = QtGqlTestCase(
     schema=schemas.root_enum_schema.schema,
     operations="""
         query MainQuery {
@@ -484,7 +480,7 @@ RootEnumTestCase = QGQLObjectTestCase(
     test_name="RootEnumTestCase",
 )
 
-ObjectsThatReferenceEachOtherTestCase = QGQLObjectTestCase(
+ObjectsThatReferenceEachOtherTestCase = QtGqlTestCase(
     schema=schemas.object_reference_each_other.schema,
     test_name="ObjectsThatReferenceEachOtherTestCase",
     operations="""
@@ -508,7 +504,7 @@ CountryScalar = CustomScalarDefinition(
     include_path="NOT IMPLEMENTED",
 )
 
-CustomUserScalarTestCase = QGQLObjectTestCase(
+CustomUserScalarTestCase = QtGqlTestCase(
     schema=schemas.object_with_user_defined_scalar.schema,
     custom_scalars={CountryScalar.graphql_name: CountryScalar},
     test_name="CustomUserScalarTestCase",
@@ -523,13 +519,13 @@ CustomUserScalarTestCase = QGQLObjectTestCase(
     """,
 )
 
-TypeWithNoIDTestCase = QGQLObjectTestCase(
+TypeWithNoIDTestCase = QtGqlTestCase(
     schema=schemas.type_with_no_id.schema,
     operations="""query MainQuery {users{name}}""",
     test_name="TypeWithNoIDTestCase",
 )
 
-RootTypeNoIDTestCase = QGQLObjectTestCase(
+RootTypeNoIDTestCase = QtGqlTestCase(
     schema=schemas.root_type_no_id.schema,
     operations="""
     query MainQuery {
@@ -541,13 +537,13 @@ RootTypeNoIDTestCase = QGQLObjectTestCase(
     test_name="RootTypeNoIDTestCase",
 )
 
-TypeWithNullAbleIDTestCase = QGQLObjectTestCase(
+TypeWithNullAbleIDTestCase = QtGqlTestCase(
     schema=schemas.type_with_nullable_id.schema,
     operations="""query MainQuery {users{name}}""",
     test_name="TypeWithNullAbleIDTestCase",
 )
 
-ListOfUnionTestCase = QGQLObjectTestCase(
+ListOfUnionTestCase = QtGqlTestCase(
     schema=schemas.list_of_union.schema,
     operations="""
        query MainQuery {
@@ -565,7 +561,7 @@ ListOfUnionTestCase = QGQLObjectTestCase(
     test_name="ListOfUnionTestCase",
 )
 
-OperationVariableTestCase = QGQLObjectTestCase(
+OperationVariableTestCase = QtGqlTestCase(
     schema=schemas.variables_schema.schema,
     operations="""
     query MainQuery {
@@ -620,7 +616,7 @@ OperationVariableTestCase = QGQLObjectTestCase(
     type_name="Post",
 )
 
-OptionalInputTestCase = QGQLObjectTestCase(
+OptionalInputTestCase = QtGqlTestCase(
     schema=schemas.optional_input_schema.schema,
     operations="""
     query HelloOrEchoQuery($echo: String){
@@ -630,7 +626,7 @@ OptionalInputTestCase = QGQLObjectTestCase(
     test_name="OptionalInputTestCase",
 )
 
-CustomScalarInputTestCase = QGQLObjectTestCase(
+CustomScalarInputTestCase = QtGqlTestCase(
     schema=schemas.custom_scalar_input_schema.schema,
     operations="""
         query ArgsQuery($decimal: Decimal!, $dt: DateTime!, $time: Time!, $date: Date!) {
@@ -654,7 +650,7 @@ CustomScalarInputTestCase = QGQLObjectTestCase(
     test_name="CustomScalarInputTestCase",
 )
 
-MutationOperationTestCase = QGQLObjectTestCase(
+MutationOperationTestCase = QtGqlTestCase(
     schema=schemas.mutation_schema.schema,
     operations="""        query MainQuery {
           user {
@@ -669,7 +665,7 @@ MutationOperationTestCase = QGQLObjectTestCase(
     test_name="MutationOperationTestCase",
 )
 
-SubscriptionTestCase = QGQLObjectTestCase(
+SubscriptionTestCase = QtGqlTestCase(
     schema=schemas.subscription_schema.schema,
     operations="""
     subscription CountSubscription ($target: Int = 5){
@@ -679,7 +675,7 @@ SubscriptionTestCase = QGQLObjectTestCase(
     test_name="SubscriptionTestCase",
 )
 
-InterfaceFieldTestCase = QGQLObjectTestCase(
+InterfaceFieldTestCase = QtGqlTestCase(
     schema=schemas.interface_field.schema,
     operations="""
     query MainQuery ($ret: TypesEnum! = Dog) {
@@ -702,7 +698,7 @@ InterfaceFieldTestCase = QGQLObjectTestCase(
     test_name="InterfaceFieldTestCase",
 )
 
-ListOfInterfaceTestcase = QGQLObjectTestCase(
+ListOfInterfaceTestcase = QtGqlTestCase(
     schema=schemas.list_of_interface.schema,
     operations=InterfaceFieldTestCase.operations,
     test_name="ListOfInterfaceTestcase",
@@ -752,5 +748,15 @@ implemented_testcases = [
 ]
 
 
+def generate_testcases(*testcases: QtGqlTestCase) -> None:
+    (GENERATED_TESTS_DIR / "CMakeLists.txt").write_text(
+        TST_CMAKE_TEMPLATE.render(context={"testcases": testcases}),
+    )
+    for tc in testcases:
+        tc.generate()
+
+
 if __name__ == "__main__":
-    TimeScalarTestCase.generate()
+    generate_testcases(
+        NestedObjectTestCase,
+    )

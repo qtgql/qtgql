@@ -82,7 +82,6 @@ get_or_create_env(const QString &env_name, const DebugClientSettings &settings);
 class SignalCatcher {
   std::list<std::pair<std::unique_ptr<QSignalSpy>, QString>> m_spys = {};
   QSet<QString> m_excludes = {};
-  const QObject *m_source_obj;
 
 public:
   SignalCatcher(const SignalCatcherParams &params);

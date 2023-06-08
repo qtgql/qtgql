@@ -86,7 +86,6 @@ get_or_create_env(const QString &env_name,
 
 SignalCatcher::SignalCatcher(const SignalCatcherParams &params) {
   m_excludes = params.excludes;
-  m_source_obj = params.source_obj;
   if (params.exclude_id) {
     m_excludes.insert("id");
   }

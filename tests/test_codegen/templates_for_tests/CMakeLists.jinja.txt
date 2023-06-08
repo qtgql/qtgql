@@ -1,0 +1,13 @@
+{% for tc in context.testcases -%}
+add_subdirectory(👉 tc.generated_dir 👈)
+target_link_libraries(${TESTS_TARGET} PRIVATE generated::👉 tc.test_name 👈)
+{% endfor %}
+
+
+set(CODEGEN_TEST_SOURCES
+{% for tc in context.testcases -%}
+👉 tc.testcase_file 👈
+{% endfor %}
+PARENT_SCOPE
+)
+
