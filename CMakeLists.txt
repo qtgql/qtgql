@@ -27,7 +27,7 @@ file(GLOB_RECURSE QTGQL_SOURCES "include/*.cpp" "include/*.hpp")
 file(GLOB_RECURSE QTGQL_HEADERS "include/*.hpp")
 
 add_library(${PROJECT_NAME} SHARED ${QTGQL_SOURCES})
-
+add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 target_link_libraries(
         ${PROJECT_NAME}

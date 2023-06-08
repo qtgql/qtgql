@@ -7,5 +7,5 @@ target_sources(${SCHEMA_TARGET} PUBLIC
 👉 file.path.as_posix() 👈
 {% endfor -%}
 )
-target_link_libraries(${SCHEMA_TARGET} PUBLIC Qt6::Core qtgql::gqlwstransport qtgql::bases qtgql::customscalars)
+target_link_libraries(${SCHEMA_TARGET} PUBLIC Qt6::Core qtgql::qtgql)
 target_include_directories(${SCHEMA_TARGET} PUBLIC ${CMAKE_CURRENT_LIST_DIR})
