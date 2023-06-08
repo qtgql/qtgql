@@ -20,30 +20,16 @@ find_package(Qt6 REQUIRED COMPONENTS Core Qml Quick WebSockets)
 qt_standard_project_setup()
 
 add_library(${PROJECT_NAME})
+
 target_sources(
         ${PROJECT_NAME}
-        PUBLIC
-        include/qtgql/bases/bases.hpp
-        include/qtgql/gqlwstransport/gqlwstransport.hpp
-        include/qtgql/customscalars/customscalars.hpp
         PRIVATE
         # bases
         include/qtgql/bases/detail/environment.cpp
-        include/qtgql/bases/detail/objecttype.hpp
-        include/qtgql/bases/detail/metadata.hpp
-        include/qtgql/bases/detail/listmodel.hpp
-        include/qtgql/bases/detail/networklayer.hpp
-        include/qtgql/bases/detail/exceptions.hpp
-        include/qtgql/bases/detail/constants.hpp
-        include/qtgql/bases/detail/environment.hpp
         # gqlwstransport
         include/qtgql/gqlwstransport/detail/gqlwstransport.cpp
         include/qtgql/gqlwstransport/detail/operationhandler.cpp
-        include/qtgql/gqlwstransport/detail/gqlwstransport.hpp
-        include/qtgql/gqlwstransport/detail/operationhandler.hpp
         # customscalars
-        include/qtgql/customscalars/detail/basecustomscalar.hpp
-        include/qtgql/customscalars/detail/implementations.hpp
         include/qtgql/customscalars/detail/implementations.cpp
 )
 target_link_libraries(
@@ -52,24 +38,46 @@ target_link_libraries(
         Qt6::Core
         Qt6::WebSockets
 )
-target_include_directories(${PROJECT_NAME} PUBLIC include)
+
+
+# header files get added via FILE_SET
+# BASE_DIR should point to the same directory that is used as the
+# target_include_directory, otherwise the install paths may be off.
+target_sources(${PROJECT_NAME} PUBLIC FILE_SET HEADERS
+        BASE_DIRS include
+        FILES
+        # interfaces
+        include/qtgql/bases/bases.hpp
+        include/qtgql/gqlwstransport/gqlwstransport.hpp
+        include/qtgql/customscalars/customscalars.hpp
+        # bases
+        include/qtgql/bases/detail/objecttype.hpp
+        include/qtgql/bases/detail/metadata.hpp
+        include/qtgql/bases/detail/listmodel.hpp
+        include/qtgql/bases/detail/networklayer.hpp
+        include/qtgql/bases/detail/exceptions.hpp
+        include/qtgql/bases/detail/constants.hpp
+        include/qtgql/bases/detail/environment.hpp
+        include/qtgql/bases/detail/macros.hpp
+        # gqlwstransport
+        include/qtgql/gqlwstransport/detail/operationhandler.cpp
+        include/qtgql/gqlwstransport/detail/gqlwstransport.hpp
+        include/qtgql/gqlwstransport/detail/operationhandler.hpp
+        # customscalars
+        include/qtgql/customscalars/detail/basecustomscalar.hpp
+        include/qtgql/customscalars/detail/implementations.hpp
+        # misc
+        include/qtgql/utils.hpp
+        )
+
+# install with headers
+install(TARGETS ${PROJECT_NAME} FILE_SET HEADERS)
+
 
 # --options--
 option(QTGQL_VERBOSE "display helpful build information" true)
 option(QTGQL_TESTING "Enable tests" FALSE)
 
-
-
-
-# install
-install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}Targets
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-        )
-
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 # ───── LIBRARY TESTS ─────
 

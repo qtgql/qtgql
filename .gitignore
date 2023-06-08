@@ -150,5 +150,5 @@ __temp.py
 
 # C++ packages
 3rdParty/Qt/
-CMakeUserPresets.json
+**/CMakeUserPresets.json
 /coverage.json

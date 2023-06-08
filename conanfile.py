@@ -10,7 +10,11 @@ from conan.tools.cmake import CMake
 from conan.tools.cmake import cmake_layout
 from conan.tools.cmake import CMakeDeps
 from conan.tools.cmake import CMakeToolchain
-from tests.conftest import PATHS
+
+
+class PATHS:
+    PROJECT_ROOT = Path(__file__).parent
+    QTGQL_TEST_TARGET = PROJECT_ROOT / "tests" / "build"
 
 
 ConanBool = [True, False]
@@ -52,14 +56,6 @@ class QtGqlRecipe(ConanFile):
     def layout(self) -> None:
         cmake_layout(self)
 
-    @cached_property
-    def aqt_install_dir(self) -> Path:
-        ret = Path.home() / "MyConnandeps" / "Qt"
-
-        if not ret.exists():
-            ret.mkdir(parents=True)
-        return ret
-
     @property
     def os_name(self):
         return self.settings.os.value.lower()
@@ -87,6 +83,14 @@ class QtGqlRecipe(ConanFile):
         elif self.is_windows():
             return "win64_mingw"
 
+    @cached_property
+    def aqt_install_dir(self) -> Path:
+        ret = Path.home() / "MyConnandeps" / "Qt"
+
+        if not ret.exists():
+            ret.mkdir(parents=True)
+        return ret
+
     @property
     def qt6_install_dir(self) -> Path | None:
         relative_to = self.aqt_install_dir / self.qt_version
@@ -95,9 +99,13 @@ class QtGqlRecipe(ConanFile):
             p = (relative_to / res[0]).resolve(True)
             return p.parent
 
-    @property
+    @cached_property
     def should_test(self) -> bool:
-        return self.options.test.value in ("True", "true", True)
+        if self.options.test.value in ("True", "true", True):
+            if not PATHS.QTGQL_TEST_TARGET.exists():
+                PATHS.QTGQL_TEST_TARGET.mkdir()
+            return True
+        return False
 
     def generate(self) -> None:
         if not self.qt6_install_dir:

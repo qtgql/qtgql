@@ -33,13 +33,6 @@ IS_WINDOWS = platform.system() == "Windows"
 IS_GITHUB_ACTION = os.environ.get("CI", False)
 
 
-class PATHS:
-    PROJECT_ROOT = Path(__file__).parent.parent
-    QTGQL_TEST_TARGET = PROJECT_ROOT / "tests" / "build"
-    if not QTGQL_TEST_TARGET.exists():
-        QTGQL_TEST_TARGET.mkdir()
-
-
 def hash_schema(schema: Schema) -> int:
     return int(hashlib.sha256(str(schema).encode("utf-8")).hexdigest(), 16) % 10**8
 
