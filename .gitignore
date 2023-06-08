@@ -152,3 +152,4 @@ __temp.py
 3rdParty/Qt/
 **/CMakeUserPresets.json
 /coverage.json
+tests/test_codegen/generated_test_projects/**/qtgqlconfig.py
