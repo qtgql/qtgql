@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+0.119.11 - 2023-06-08
+---------------------
+
+This release adds support for updates & garbage collection of nested object types.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #250](https://github.com/qtgql/qtgql/pull/250/)
+
+
 0.119.10 - 2023-06-08
 ---------------------
 
