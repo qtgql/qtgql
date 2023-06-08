@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+0.119.10 - 2023-06-08
+---------------------
+
+This release refactored the project structure and
+added initial conan support.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #248](https://github.com/qtgql/qtgql/pull/248/)
+
+
 0.119.9 - 2023-06-06
 --------------------
 
