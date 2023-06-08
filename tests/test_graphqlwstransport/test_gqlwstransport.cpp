@@ -1,8 +1,8 @@
 #include <QTest>
 #include <catch2/catch_test_macros.hpp>
 
-#include "../../qtgql/bases/environment.hpp"
-#include "../../qtgql/gqlwstransport/gqlwstransport.hpp"
+#include "qtgql/bases/bases.hpp"
+#include "qtgql/gqlwstransport/gqlwstransport.hpp"
 #include "debugableclient.hpp"
 using namespace qtgql;
 

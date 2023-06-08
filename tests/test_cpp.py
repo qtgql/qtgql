@@ -3,6 +3,7 @@ import os
 import re
 import subprocess
 from functools import cached_property
+from importlib.metadata import version
 from pathlib import Path
 from typing import Optional
 
@@ -72,7 +73,7 @@ def collect_tests() -> list[CtestTestCommand]:
 
 
 @pytest.mark.parametrize("command", collect_tests(), ids=lambda v: v.test_name)
-def test_cpp(command: CtestTestCommand, schemas_server: MiniServer):
+def test_generated_tests(command: CtestTestCommand, schemas_server: MiniServer):
     os.environ.setdefault("SCHEMAS_SERVER_ADDR", schemas_server.address.replace("graphql", ""))
     command.run()
     if log_file := command.failed_log:
@@ -80,3 +81,14 @@ def test_cpp(command: CtestTestCommand, schemas_server: MiniServer):
             pytest.fail(  # noqa: PT016
                 reason=f"\n {'-'*8} Test {command.test_name} Failed {'-'*8} \n {log_file}",
             )
+
+
+def test_conan_test_package():
+    v = version("qtgql")
+    res = subprocess.run(
+        f"conan test conan/test_package qtgql/{v} --build=missing".split(" "),
+        capture_output=True,
+        cwd=PATHS.PROJECT_ROOT,
+    )
+    if res.returncode != 0:
+        pytest.fail(f"Failed to build conan test-package \n{res.stderr}")

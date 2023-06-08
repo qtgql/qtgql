@@ -1,6 +1,6 @@
-#include "gqlwstransport.hpp"
+#include "operationhandler.hpp"
 
-#include <QtGlobal>
+
 using namespace qtgql;
 using namespace gqlwstransport;
 

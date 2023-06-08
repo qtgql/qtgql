@@ -35,7 +35,7 @@ protected slots:
 public:
   using QObject::QObject;
 
-  bool completed() const;
+  [[nodiscard]] bool completed() const;
 
   bool operation_on_flight();
 };
