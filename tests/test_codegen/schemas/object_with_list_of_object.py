@@ -28,7 +28,7 @@ class Query:
 class Mutation:
     @strawberry.mutation()
     def rename_friend_name(self, friend_id: strawberry.ID, name: str) -> Person:
-        p: Person = NODE_DB.get_node(friend_id)
+        p: Person = NODE_DB.get(friend_id)
         p.name = name
         return p
 

@@ -19,7 +19,6 @@ TEST_CASE("ObjectWithListOfObjectTestCase", "[generated-testcase]") {
   SECTION("test deserialize") {
     auto friends = mq->get_data()->get_friends();
     auto p = friends->first();
-    qDebug() << p->get_name();
     REQUIRE(p->get_name() != bases::DEFAULTS::STRING);
   }
   SECTION("test update"){
