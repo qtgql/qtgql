@@ -1,5 +1,6 @@
 import contextlib
 import glob
+import subprocess
 from functools import cached_property
 from pathlib import Path
 
@@ -18,18 +19,26 @@ class helloTestConan(ConanFile):
         "qt_version": "6.5.0",
     }
 
+
+    def requirements(self):
+        self.requires(self.tested_reference_str)
     def generate(self) -> None:
         # should be removed when https://github.com/conan-io/conan-center-index/pull/17539 gets merged.
+        if not self.qt6_install_dir:
+            subprocess.run(
+                f"poetry run aqt install-qt {self.os_name} "
+                f"desktop {self.qt_version} {self.qt_arch} "
+                f"--outputdir {str(self.aqt_install_dir)} "
+                f"-m qtwebsockets".split(" "),
+            ).check_returncode()
         assert self.qt6_install_dir
         assert self.qt6_install_dir.exists()
         deps = CMakeDeps(self)
         deps.generate()
         tc = CMakeToolchain(self)
+        tc = CMakeToolchain(self)
         tc.cache_variables["Qt6_DIR"] = str(self.qt6_install_dir)
         tc.generate()
-
-    def requirements(self):
-        self.requires(self.tested_reference_str)
 
     def build(self):
         cmake = CMake(self)
