@@ -86,7 +86,6 @@ def test_generated_tests(command: CtestTestCommand, schemas_server: MiniServer):
 def test_conan_test_package():
     subprocess.run(
         "conan create . --build=missing".split(" "),
-        capture_output=True,
         cwd=PATHS.PROJECT_ROOT,
     ).check_returncode()
     v = version("qtgql")
