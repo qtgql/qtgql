@@ -366,6 +366,14 @@ OptionalNestedObjectTestCase = QtGqlTestCase(
         }
       }
     }
+    
+    mutation UpdateUserName($nodeId: ID!, $newName: String!) {
+      changeName(newName: $newName, nodeId: $nodeId) {
+        person {
+          name
+        }
+      }
+    }
     """,
     test_name="OptionalNestedObjectTestCase",
 )
@@ -758,5 +766,5 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 if __name__ == "__main__":
     generate_testcases(
-        NestedObjectTestCase,
+        OptionalNestedObjectTestCase,
     )
