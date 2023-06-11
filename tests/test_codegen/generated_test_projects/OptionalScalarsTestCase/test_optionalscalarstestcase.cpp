@@ -9,7 +9,7 @@
 namespace OptionalScalarsTestCase {
 using namespace qtgql;
 auto ENV_NAME = QString("OptionalScalarsTestCase");
-auto SCHEMA_ADDR = get_server_address("44892051");
+auto SCHEMA_ADDR = get_server_address("65545288");
 
 TEST_CASE("OptionalScalarsTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
