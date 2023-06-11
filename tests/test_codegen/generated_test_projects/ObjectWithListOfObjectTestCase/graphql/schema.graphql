@@ -10,10 +10,9 @@ type Person implements Node {
 
 type Query {
   user: User!
-  userWithSamePerson: User!
 }
 
 type User implements Node {
   id: ID!
-  persons: [Person!]!
+  friends: [Person!]!
 }

@@ -1,9 +1,10 @@
 
     query MainQuery {
         user{
-            persons{
+            friends{
                 name
                 age
             }
         }
     }
+    

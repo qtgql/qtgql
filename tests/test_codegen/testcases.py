@@ -374,7 +374,7 @@ ObjectWithListOfObjectTestCase = QtGqlTestCase(
     operations="""
     query MainQuery {
         user{
-            persons{
+            friends{
                 name
                 age
             }
@@ -758,5 +758,5 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 if __name__ == "__main__":
     generate_testcases(
-        NestedObjectTestCase,
+        ObjectWithListOfObjectTestCase,
     )
