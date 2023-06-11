@@ -380,6 +380,12 @@ ObjectWithListOfObjectTestCase = QtGqlTestCase(
             }
         }
     }
+    mutation RenameFriendName($friendId: ID!, $name: String!) {
+      renameFriendName(friendId: $friendId, name: $name) {
+        age
+        name
+      }
+    }
     """,
     test_name="ObjectWithListOfObjectTestCase",
     needs_debug=True,

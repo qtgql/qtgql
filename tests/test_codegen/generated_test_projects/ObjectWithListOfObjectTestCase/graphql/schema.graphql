@@ -1,3 +1,7 @@
+type Mutation {
+  renameFriendName(friendId: ID!, name: String!): Person!
+}
+
 interface Node {
   id: ID!
 }

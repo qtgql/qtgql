@@ -3,11 +3,12 @@
 
 #include "debugableclient.hpp"
 #include "graphql/__generated__/MainQuery.hpp"
+#include "graphql/__generated__/RenameFriendName.hpp"
 
 namespace ObjectWithListOfObjectTestCase {
 using namespace qtgql;
 auto ENV_NAME = QString("ObjectWithListOfObjectTestCase");
-auto SCHEMA_ADDR = get_server_address("11319538");
+auto SCHEMA_ADDR = get_server_address("79508671");
 
 TEST_CASE("ObjectWithListOfObjectTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
@@ -20,6 +21,15 @@ TEST_CASE("ObjectWithListOfObjectTestCase", "[generated-testcase]") {
     auto p = friends->first();
     qDebug() << p->get_name();
     REQUIRE(p->get_name() != bases::DEFAULTS::STRING);
+  }
+  SECTION("test update"){
+      auto rename_friend_name = renamefriendname::RenameFriendName::shared();
+      QString new_name("New name");
+      auto first_friend = mq->get_data()->get_friends()->first();
+      rename_friend_name->set_variables(first_friend->get_id(), new_name);
+      rename_friend_name->fetch();
+      test_utils::wait_for_completion(rename_friend_name);
+      REQUIRE(first_friend->get_name() == new_name);
   }
 }
 

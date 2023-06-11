@@ -13,8 +13,8 @@ class User(Node):
 
 @strawberry.type()
 class Person(Node):
-    name: str = strawberry.field(default_factory=fake.name())
-    age: int = strawberry.field(default_factory=fake.pyint())
+    name: str = strawberry.field(default_factory=fake.name)
+    age: int = strawberry.field(default_factory=fake.pyint)
 
 
 @strawberry.type
@@ -27,10 +27,10 @@ class Query:
 @strawberry.type()
 class Mutation:
     @strawberry.mutation()
-    def add_friend(self, user_id: strawberry.ID) -> User:
-        user: User = NODE_DB.get_node(user_id)
-        user.friends.append(Person())
-        return user
+    def rename_friend_name(self, friend_id: strawberry.ID, name: str) -> Person:
+        p: Person = NODE_DB.get_node(friend_id)
+        p.name = name
+        return p
 
 
-schema = strawberry.Schema(query=Query)
+schema = strawberry.Schema(query=Query, mutation=Mutation)
