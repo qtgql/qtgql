@@ -1,4 +1,4 @@
-name: 🔂 Unit tests
+name: 📦 Test conan package
 
 on:
   push:
