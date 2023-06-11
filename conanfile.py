@@ -38,10 +38,10 @@ class QtGqlRecipe(ConanFile):
     topics = ("GraphQL", "Qt", "codegen")
     version = get_version_from_poetry()
     build_policy = "missing"
-    options = {"qt_version": ["6.5.1"], "verbose": ConanBool, "test": ConanBool}
+    options = {"qt_version": ["6.5.0"], "verbose": ConanBool, "test": ConanBool}
     default_options = {
         "verbose": False,
-        "qt_version": "6.5.1",
+        "qt_version": "6.5.0",
         "test": False,
     }
 
