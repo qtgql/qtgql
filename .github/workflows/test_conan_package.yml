@@ -2,15 +2,16 @@ name: 🔂 Unit tests
 
 on:
   push:
-    branches: [cpp, main]
+    branches: [main]
   pull_request:
-    branches: [cpp, main]
+    branches: [main]
     paths:
       - "qtgql/**"
       - "tests/**"
+      - "conanfile.py"
       - "pyproject.toml"
       - "poetry.lock"
-      - ".github/workflows/test.yml"
+      - ".github/workflows/test_conan_package.yml"
 env:
   IS_GITHUB_ACTION: 1
 
@@ -63,31 +64,10 @@ jobs:
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: poetry install
 
-      - name: Install Qt dependencies
-        shell: bash
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt update
-          sudo apt install libgl1-mesa-dev libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-render-util0 libxcb-xinerama0 libzstd-dev libcurl4-openssl-dev
-
-      - name: Generate test files and coverage python
-        run: poetry run coverage run tests/test_codegen/generate.py -a
-
-      - name: Configure and Build
+      - name: Test Conan package
         run: |
           poetry run conan profile detect
-          poetry run conan install . -pr=profiles/${{ runner.os }} -s build_type=Debug --build=missing
-          poetry run conan build . -o test=True -s build_type=Debug -pr=profiles/${{ runner.os }}
-
-      - name: Run tests
-        shell: bash
-        run: |
-          if [ "$RUNNER_OS" == "Windows" ]; then
-            poetry run make test
-          elif [ "$RUNNER_OS" == "Linux" ]; then
-            poetry run xvfb-run make test
-          fi
+          poetry run conan create . -pr=profiles/${{ runner.os }} -s build_type=Debug --build=missing
+          poetry run conan conan test conan/test_package qtgql/0.119.9  -pr=profiles/${{ runner.os }} --build=missing
 
 
-      - name: Codecov
-        uses: codecov/codecov-action@v3.1.2
