@@ -13,6 +13,10 @@ from conan.tools.cmake import CMakeToolchain
 
 class helloTestConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
+    options = {"qt_version": ["6.5.0"]}
+    default_options = {
+        "qt_version": "6.5.0",
+    }
 
     def generate(self) -> None:
         # should be removed when https://github.com/conan-io/conan-center-index/pull/17539 gets merged.
@@ -32,6 +36,30 @@ class helloTestConan(ConanFile):
         cmake.configure()
         cmake.build()
 
+    @property
+    def os_name(self):
+        return self.settings.os.value.lower()
+
+    def is_windows(self) -> bool:
+        return self.os_name == "windows"
+
+    def is_linux(self) -> bool:
+        return self.os_name == "linux"
+
+    @cached_property
+    def qt_version(self) -> str:
+        qt_version = self.options.qt_version.value
+        if self.is_windows() and "6.5" in qt_version:
+            return "6.4.3"
+        return qt_version
+
+    @property
+    def qt_arch(self) -> str:
+        if self.is_linux():
+            return "gcc_64"
+        elif self.is_windows():
+            return "win64_mingw"
+
     @cached_property
     def aqt_install_dir(self) -> Path:
         ret = Path.home() / "MyConnandeps" / "Qt"
@@ -42,12 +70,11 @@ class helloTestConan(ConanFile):
 
     @property
     def qt6_install_dir(self) -> Path | None:
-        relative_to = self.aqt_install_dir / "6.5.0"
+        relative_to = self.aqt_install_dir / self.qt_version
         res = glob.glob("**/Qt6Config.cmake", root_dir=relative_to, recursive=True)
         with contextlib.suppress(IndexError):
             p = (relative_to / res[0]).resolve(True)
             return p.parent
-
     def layout(self):
         cmake_layout(self)
 
