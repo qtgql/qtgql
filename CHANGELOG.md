@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+0.119.12 - 2023-06-11
+---------------------
+
+This release adds support for optional nested objects
+updates and gc.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #252](https://github.com/qtgql/qtgql/pull/252/)
+
+
 0.119.11 - 2023-06-08
 ---------------------
 
