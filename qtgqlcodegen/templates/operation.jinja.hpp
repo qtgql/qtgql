@@ -90,6 +90,10 @@ public:
 m_message_template.op_id = m_operation_id;
 };
 
+~👉 context.operation.name 👈() override{
+ loose();
+}
+
 QTGQL_STATIC_MAKE_SHARED(👉 context.operation.name 👈)
 
 inline qtgql::bases::OperationMetadata operation_metadata() override{
