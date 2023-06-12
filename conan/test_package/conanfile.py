@@ -19,9 +19,9 @@ class helloTestConan(ConanFile):
         "qt_version": "6.5.0",
     }
 
-
     def requirements(self):
         self.requires(self.tested_reference_str)
+
     def generate(self) -> None:
         # should be removed when https://github.com/conan-io/conan-center-index/pull/17539 gets merged.
         if not self.qt6_install_dir:
@@ -84,6 +84,7 @@ class helloTestConan(ConanFile):
         with contextlib.suppress(IndexError):
             p = (relative_to / res[0]).resolve(True)
             return p.parent
+
     def layout(self):
         cmake_layout(self)
 

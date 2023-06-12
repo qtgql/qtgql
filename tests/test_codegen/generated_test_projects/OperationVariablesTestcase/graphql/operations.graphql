@@ -1,0 +1,12 @@
+
+  query UserQuery($connected: Boolean!) {
+    user {
+      id
+      name
+      friend(connected: $connected) {
+        id
+        name
+      }
+    }
+  }
+        

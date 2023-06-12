@@ -19,6 +19,7 @@ class User(Node):
     uuid: UUID = strawberry.field(default_factory=uuid.uuid4)
     void_field: None = None
 
+
 CONST_USER = User(
     name="nir",
     age=24,

@@ -15,7 +15,8 @@ from attrs import define
 from typingref import TypeHinter
 from typingref import UNSET
 
-from qtgqlcodegen.compiler.builtin_scalars import BuiltinScalar, BuiltinScalars
+from qtgqlcodegen.compiler.builtin_scalars import BuiltinScalar
+from qtgqlcodegen.compiler.builtin_scalars import BuiltinScalars
 from qtgqlcodegen.compiler.operation import QtGqlQueriedObjectType
 from qtgqlcodegen.cppref import QtGqlTypes
 from qtgqlcodegen.utils import AntiForwardRef
@@ -76,8 +77,14 @@ class QtGqlVariableDefinition(Generic[T], QtGqlBaseTypedNode):
 class BaseQtGqlFieldDefinition(QtGqlBaseTypedNode):
     description: Optional[str] = ""
 
+
 @define(slots=False)
 class QtGqlInputFieldDefinition(BaseQtGqlFieldDefinition, QtGqlVariableDefinition):
+    ...
+
+
+@define(slots=False)
+class QtGqlArgumentDefinition(QtGqlInputFieldDefinition):
     ...
 
 
@@ -103,6 +110,7 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
             return f"{enum_def.namespaced_name}(0)"
 
         raise NotImplementedError
+
     @cached_property
     def member_type(self) -> str:
         """
@@ -113,7 +121,7 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
 
         ret = self.type.member_type
         if self.arguments:
-            return f"QMap<QJsonObject, {ret}>"
+            return f"QMap<QJsonValue, {ret}>"
         return ret
 
     @cached_property

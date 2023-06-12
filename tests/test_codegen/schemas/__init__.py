@@ -1,4 +1,5 @@
 from . import custom_scalar_input_schema
+from . import input_type
 from . import interface_field
 from . import list_of_interface
 from . import list_of_union
@@ -19,6 +20,7 @@ from . import object_with_time_scalar
 from . import object_with_union
 from . import object_with_user_defined_scalar
 from . import operation_error
+from . import operation_variables
 from . import optional_input_schema
 from . import root_enum_schema
 from . import root_list_of_object
@@ -26,12 +28,12 @@ from . import root_type_no_id
 from . import subscription_schema
 from . import type_with_no_id
 from . import type_with_nullable_id
-from . import variables_schema
 from . import wrogn_id_type
 
 __all__ = [  # noqa: PLE0604
     object_with_optional_object,
     object_with_optional_scalar,
+    operation_variables,
     object_with_object,
     object_with_scalar,
     object_with_list_of_object,
@@ -50,7 +52,7 @@ __all__ = [  # noqa: PLE0604
     type_with_nullable_id,
     wrogn_id_type,
     list_of_union,
-    variables_schema,
+    input_type,
     root_enum_schema,
     optional_input_schema,
     custom_scalar_input_schema,

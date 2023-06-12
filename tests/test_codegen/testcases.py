@@ -73,10 +73,7 @@ class QtGqlTestCase:
     operations: str
     schema: Schema
     test_name: str
-    type_name: str = "User"
     custom_scalars: dict = {}
-    query_operationName: str = "MainQuery"
-    first_field: str = "user"
     qml_file: str = ""
     needs_debug: bool = False
     metadata: TestCaseMetadata = attrs.Factory(TestCaseMetadata)
@@ -186,6 +183,23 @@ ScalarsTestCase = QtGqlTestCase(
         """,
     test_name="ScalarsTestCase",
 )
+OperationVariablesTestcase = QtGqlTestCase(
+    schema=schemas.operation_variables.schema,
+    operations="""
+  query UserQuery($connected: Boolean!) {
+    user {
+      id
+      name
+      friend(connected: $connected) {
+        id
+        name
+      }
+    }
+  }
+        """,
+    test_name="OperationVariablesTestcase",
+)
+
 OptionalScalarsTestCase = QtGqlTestCase(
     schema=schemas.object_with_optional_scalar.schema,
     operations="""
@@ -573,8 +587,8 @@ ListOfUnionTestCase = QtGqlTestCase(
     test_name="ListOfUnionTestCase",
 )
 
-OperationVariableTestCase = QtGqlTestCase(
-    schema=schemas.variables_schema.schema,
+InputTypeOperationVariableTestCase = QtGqlTestCase(
+    schema=schemas.input_type.schema,
     operations="""
     query MainQuery {
       post {
@@ -624,8 +638,7 @@ OperationVariableTestCase = QtGqlTestCase(
       getEnumName(enumInput: $enumVar)
     }
     """,
-    test_name="OperationVariableTestCase",
-    type_name="Post",
+    test_name="InputTypeOperationVariableTestCase",
 )
 
 OptionalInputTestCase = QtGqlTestCase(
@@ -726,7 +739,7 @@ all_test_cases = [
     NestedObjectTestCase,
     OptionalNestedObjectTestCase,
     ObjectWithListOfObjectTestCase,
-    OperationVariableTestCase,
+    InputTypeOperationVariableTestCase,
     InterfaceTestCase,
     UnionTestCase,
     ListOfObjectWithUnionTestCase,
@@ -770,5 +783,5 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 if __name__ == "__main__":
     generate_testcases(
-        ScalarsTestCase,
+        OperationVariablesTestcase,
     )

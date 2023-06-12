@@ -3,7 +3,6 @@ import os
 import re
 import subprocess
 from functools import cached_property
-from importlib.metadata import version
 from pathlib import Path
 from typing import Optional
 
@@ -81,4 +80,3 @@ def test_generated_tests(command: CtestTestCommand, schemas_server: MiniServer):
             pytest.fail(  # noqa: PT016
                 reason=f"\n {'-'*8} Test {command.test_name} Failed {'-'*8} \n {log_file}",
             )
-
