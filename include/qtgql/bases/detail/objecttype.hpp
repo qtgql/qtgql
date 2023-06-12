@@ -61,12 +61,11 @@ public:
   void retain(const QUuid &operation_id) { m_retainers.insert(operation_id); }
 
   void loose(const QUuid &operation_id) {
-    qDebug() << "removing: " << operation_id << "from: " << m_retainers;
+    qDebug() << "Loosing operation: " << operation_id << "from: " << m_retainers;
     m_retainers.remove(operation_id);
   }
 
-  [[nodiscard]] bool has_retainers() const { return !m_retainers.isEmpty(); }
-};
+  [[nodiscard]] bool has_retainers() const {return !m_retainers.isEmpty();}};
 
 template <extendsObjectTypeABCWithID T> class ObjectStore {
   typedef std::shared_ptr<T> T_sharedQObject;

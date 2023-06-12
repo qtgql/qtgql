@@ -235,6 +235,7 @@ class SchemaEvaluator:
             scalars=self.config.custom_scalars,
             enums=self._enums_def_map,
             description=field.description,
+            arguments=[self._evaluate_input_field(name, arg) for name, arg in field.args.items()]
         )
 
     def _evaluate_input_field(

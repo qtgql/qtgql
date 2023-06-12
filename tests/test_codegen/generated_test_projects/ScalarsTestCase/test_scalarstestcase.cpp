@@ -9,7 +9,7 @@
 namespace ScalarsTestCase {
 using namespace qtgql;
 auto ENV_NAME = QString("ScalarsTestCase");
-auto SCHEMA_ADDR = get_server_address("39238999");
+auto SCHEMA_ADDR = get_server_address("76177312");
 
 TEST_CASE("ScalarsTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
@@ -17,7 +17,8 @@ TEST_CASE("ScalarsTestCase", "[generated-testcase]") {
   auto mq = std::make_shared<mainquery::MainQuery>();
   mq->fetch();
   test_utils::wait_for_completion(mq);
-  SECTION("test deserialize") {
+    qDebug() << mq->operation_id();
+    SECTION("test deserialize") {
     auto d = mq->get_data();
     REQUIRE(d->get_age() == 24);
     REQUIRE(d->get_agePoint() == 24.0f);
@@ -26,7 +27,8 @@ TEST_CASE("ScalarsTestCase", "[generated-testcase]") {
     REQUIRE(d->get_name() == "nir");
     REQUIRE(d->get_uuid() ==
             QUuid::fromString("06335e84-2872-4914-8c5d-3ed07d2a2f16"));
-  };
+    REQUIRE(d->get_voidField() == qtgql::bases::DEFAULTS::VOID);
+    };
   SECTION("test update") {
     auto user = mq->get_data();
     auto previous_name = mq->get_data()->get_name();
@@ -42,10 +44,10 @@ TEST_CASE("ScalarsTestCase", "[generated-testcase]") {
     REQUIRE(new_name != previous_name);
   };
   SECTION("test garbage collection") {
-    std::weak_ptr<mainquery::MainQuery> weak_mq = {mq};
     auto node_id = mq->get_data()->get_id();
+    qDebug() << "on gc" << mq->operation_id();
     auto user = ScalarsTestCase::User::INST_STORE().get_node(node_id).value();
-    // the map uses count and this reference.
+    // at map, at query, the instance itself?.
     REQUIRE(user.use_count() == 3);
     mq->loose();
     REQUIRE(user.use_count() == 2);

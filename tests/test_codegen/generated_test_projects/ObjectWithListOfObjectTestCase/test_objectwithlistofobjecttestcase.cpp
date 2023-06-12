@@ -3,12 +3,12 @@
 
 #include "debugableclient.hpp"
 #include "graphql/__generated__/MainQuery.hpp"
-#include "graphql/__generated__/RenameFriendName.hpp"
+#include "graphql/__generated__/AddFriend.hpp"
 
 namespace ObjectWithListOfObjectTestCase {
 using namespace qtgql;
 auto ENV_NAME = QString("ObjectWithListOfObjectTestCase");
-auto SCHEMA_ADDR = get_server_address("79508671");
+auto SCHEMA_ADDR = get_server_address("77804516");
 
 TEST_CASE("ObjectWithListOfObjectTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
@@ -22,12 +22,15 @@ TEST_CASE("ObjectWithListOfObjectTestCase", "[generated-testcase]") {
     REQUIRE(p->get_name() != bases::DEFAULTS::STRING);
   }
   SECTION("test update"){
-      auto rename_friend_name = renamefriendname::RenameFriendName::shared();
-      QString new_name("New name");
-      auto first_friend = mq->get_data()->get_friends()->first();
-      rename_friend_name->set_variables(first_friend->get_id(), new_name);
-      rename_friend_name->fetch();
-      test_utils::wait_for_completion(rename_friend_name);
+      auto add_friend_mut = addfriend::AddFriend::shared();
+      QString new_name("New friend name");
+      add_friend_mut->set_variables(mq->get_data()->get_id(), new_name);
+      add_friend_mut->fetch();
+      test_utils::wait_for_completion(add_friend_mut);
+      // instantiate a new query operation it should not update the first one since they don't have
+      // the same variables.
+      auto other_mq = mainquery::MainQuery::shared();
+
       REQUIRE(first_friend->get_name() == new_name);
   }
 }

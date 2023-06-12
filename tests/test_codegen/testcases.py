@@ -170,6 +170,7 @@ ScalarsTestCase = QtGqlTestCase(
             male
             id
             uuid
+            voidField
           }
         }
         query UserWithSameIDAndDifferentFieldsQuery {
@@ -380,11 +381,8 @@ ObjectWithListOfObjectTestCase = QtGqlTestCase(
             }
         }
     }
-    mutation RenameFriendName($friendId: ID!, $name: String!) {
-      renameFriendName(friendId: $friendId, name: $name) {
-        age
-        name
-      }
+    mutation AddFriend ($userId: ID!, $name: String!) {
+      addFriend(userId: $userId, name: $name)
     }
     """,
     test_name="ObjectWithListOfObjectTestCase",
@@ -764,5 +762,5 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 if __name__ == "__main__":
     generate_testcases(
-        ObjectWithListOfObjectTestCase,
+        ScalarsTestCase,
     )

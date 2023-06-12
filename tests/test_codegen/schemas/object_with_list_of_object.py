@@ -1,16 +1,24 @@
 from __future__ import annotations
 
+from typing import Optional
+
 import strawberry
 
 from tests.conftest import fake
 from tests.test_codegen.schemas.node_interface import Node, NODE_DB
 
+user_friends: dict[User, list[Person]] = {}
 
 @strawberry.type
 class User(Node):
-    friends: list[Person]
+    @strawberry.field()
 
+    def friends(self, first: int = 5) -> list[Person]:
+        if ret := user_friends.get(self, None):
+            return ret
 
+        user_friends[self] = ret = [Person() for _ in range(20)]
+        return ret
 @strawberry.type()
 class Person(Node):
     name: str = strawberry.field(default_factory=fake.name)
@@ -20,17 +28,17 @@ class Person(Node):
 @strawberry.type
 class Query:
     @strawberry.field
-    def user(self) -> User:
-        return User(friends=[Person() for _ in range(5)])
+    def user(self, id: Optional[strawberry.ID] = None) -> User:
+        return User()
 
 
 @strawberry.type()
 class Mutation:
     @strawberry.mutation()
-    def rename_friend_name(self, friend_id: strawberry.ID, name: str) -> Person:
-        p: Person = NODE_DB.get(friend_id)
-        p.name = name
-        return p
+    def add_friend(self, user_id: strawberry.ID, name: str) -> None:
+        u: User = NODE_DB.get(user_id)
+        u.friends.append(Person(name=name))
+
 
 
 schema = strawberry.Schema(query=Query, mutation=Mutation)

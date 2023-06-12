@@ -10,11 +10,12 @@ from typing import TYPE_CHECKING
 from typing import TypeVar
 
 import attrs
+from attr import Factory
 from attrs import define
 from typingref import TypeHinter
 from typingref import UNSET
 
-from qtgqlcodegen.compiler.builtin_scalars import BuiltinScalar
+from qtgqlcodegen.compiler.builtin_scalars import BuiltinScalar, BuiltinScalars
 from qtgqlcodegen.compiler.operation import QtGqlQueriedObjectType
 from qtgqlcodegen.cppref import QtGqlTypes
 from qtgqlcodegen.utils import AntiForwardRef
@@ -47,15 +48,6 @@ class QtGqlBaseTypedNode:
     def is_custom_scalar(self) -> Optional[CustomScalarDefinition]:
         return self.type.is_custom_scalar
 
-    @cached_property
-    def member_type(self) -> str:
-        """
-        :returns: Annotation of the field based on the real type,
-        meaning that the private attribute would be of that type.
-        this goes for init and the property setter.
-        """
-        return self.type.member_type
-
 
 T = TypeVar("T")
 
@@ -84,7 +76,6 @@ class QtGqlVariableDefinition(Generic[T], QtGqlBaseTypedNode):
 class BaseQtGqlFieldDefinition(QtGqlBaseTypedNode):
     description: Optional[str] = ""
 
-
 @define(slots=False)
 class QtGqlInputFieldDefinition(BaseQtGqlFieldDefinition, QtGqlVariableDefinition):
     ...
@@ -92,6 +83,8 @@ class QtGqlInputFieldDefinition(BaseQtGqlFieldDefinition, QtGqlVariableDefinitio
 
 @define(slots=False)
 class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
+    arguments: list[QtGqlInputFieldDefinition] = Factory(list)
+
     @cached_property
     def default_value(self):
         if builtin_scalar := self.type.is_builtin_scalar:
@@ -110,6 +103,18 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
             return f"{enum_def.namespaced_name}(0)"
 
         raise NotImplementedError
+    @cached_property
+    def member_type(self) -> str:
+        """
+        :returns: Annotation of the field based on the real type,
+        meaning that the private attribute would be of that type.
+        this goes for init and the property setter.
+        """
+
+        ret = self.type.member_type
+        if self.arguments:
+            return f"QMap<QJsonObject, {ret}>"
+        return ret
 
     @cached_property
     def fget_annotation(self) -> str:
@@ -356,6 +361,12 @@ class GqlTypeHinter(TypeHinter):
         if isinstance(t_self, BuiltinScalar):
             return t_self
 
+    @property
+    def is_void(self) -> bool:
+        if sc := self.is_builtin_scalar:
+            return sc is BuiltinScalars.VOID
+        return False
+
     @cached_property
     def is_custom_scalar(self) -> Optional[CustomScalarDefinition]:
         t_self = self.optional_maybe.type
@@ -398,8 +409,7 @@ class GqlTypeHinter(TypeHinter):
         t_self = self.optional_maybe
 
         if model_of := t_self.is_model:
-            # map of instances based on operation hash.
-            return f"QMap<QUuid, QList<{model_of.member_type}>>"
+            return f"QList<{model_of.member_type}>"
         if t_self.is_object_type or t_self.is_interface:
             return f"std::shared_ptr<{self.type_name}>"
         if q_object_def := t_self.is_queried_object_type:

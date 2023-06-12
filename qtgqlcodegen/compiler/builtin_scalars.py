@@ -50,6 +50,13 @@ class _BuiltinScalars:
         graphql_name="Boolean",
         from_json_convertor="toBool()",
     )
+    VOID = BuiltinScalar(
+        CType("qtgql::bases::Void"),
+        "VOID",
+        graphql_name="Void",
+        from_json_convertor="",
+    )
+
     UUID = BuiltinScalar(
         CType("QUuid"),
         "UUID",

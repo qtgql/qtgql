@@ -7,10 +7,7 @@
             }
         }
     }
-    mutation RenameFriendName($friendId: ID!, $name: String!) {
-      renameFriendName(friendId: $friendId, name: $name) {
-        age
-        name
-      }
+    mutation AddFriend ($userId: ID!, $name: String!) {
+      addFriend(userId: $userId, name: $name)
     }
     

@@ -93,7 +93,7 @@ m_message_template.op_id = m_operation_id;
 QTGQL_STATIC_MAKE_SHARED(👉 context.operation.name 👈)
 
 inline qtgql::bases::OperationMetadata operation_metadata() override{
-return qtgql::bases::OperationMetadata(operation_id());
+return {operation_id()};
 };
 
 
