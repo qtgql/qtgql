@@ -367,6 +367,14 @@ OptionalNestedObjectTestCase = QtGqlTestCase(
         }
       }
     }
+
+    mutation UpdateUserName($nodeId: ID!, $newName: String!) {
+      changeName(newName: $newName, nodeId: $nodeId) {
+        person {
+          name
+        }
+      }
+    }
     """,
     test_name="OptionalNestedObjectTestCase",
 )

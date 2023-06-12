@@ -9,5 +9,5 @@ if __name__ == "__main__":
     CREATE = "conan create . --build=missing"
     BUILD_TESTS = "conan build . -o test=True"
     os.chdir(Path(__file__).parent.parent)  # change working dir to root
-    sys.argv = BUILD_TESTS.split(" ")
+    sys.argv = TEST_PACKAGE.split(" ")
     sys.exit(run())

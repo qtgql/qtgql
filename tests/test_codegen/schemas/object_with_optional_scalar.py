@@ -37,7 +37,7 @@ class Query:
 @strawberry.type()
 class Mutation:
     @strawberry.field()
-    def modify_name(self, user_id: strawberry.ID, new_name: str) -> User:
+    def modify_name(self, user_id: strawberry.ID, new_name: str) -> Optional[User]:
         user: User = NODE_DB.get(user_id)
         assert user
         user.name = new_name

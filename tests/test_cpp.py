@@ -82,13 +82,3 @@ def test_generated_tests(command: CtestTestCommand, schemas_server: MiniServer):
                 reason=f"\n {'-'*8} Test {command.test_name} Failed {'-'*8} \n {log_file}",
             )
 
-
-def test_conan_test_package():
-    v = version("qtgql")
-    res = subprocess.run(
-        f"conan test conan/test_package qtgql/{v} --build=missing".split(" "),
-        capture_output=True,
-        cwd=PATHS.PROJECT_ROOT,
-    )
-    if res.returncode != 0:
-        pytest.fail(f"Failed to build conan test-package \n{res.stderr}")
