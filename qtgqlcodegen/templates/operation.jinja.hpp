@@ -90,9 +90,6 @@ public:
 m_message_template.op_id = m_operation_id;
 };
 
-~👉 context.operation.name 👈() override{
- loose();
-}
 
 QTGQL_STATIC_MAKE_SHARED(👉 context.operation.name 👈)
 
@@ -123,13 +120,6 @@ void on_next(const QJsonObject &message) override{
 }
 inline const 👉 context.operation.root_field.property_type 👈 get_data(){
     return m_data.value();
-}
-inline void loose() override{
-    {% if context.operation.root_field.type.is_object_type %}
-    👉 context.operation.root_field.type.is_object_type.name 👈::INST_STORE().get_node(m_data.value()->get_id()).value()->loose(operation_metadata());
-    {% else %}
-    throw "not implemented";
-    {% endif %}
 }
 
 {% if context.operation.variables %}

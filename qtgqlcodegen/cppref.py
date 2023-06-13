@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from functools import cached_property
-from typing import Optional, Literal, NamedTuple
+from typing import Literal
+from typing import NamedTuple
+from typing import Optional
 from typing import TYPE_CHECKING
 
 from attr import define
@@ -11,6 +13,8 @@ if TYPE_CHECKING:
 
 
 CppAccessor = Literal["::"] | Literal["."] | Literal["->"]
+
+
 @define(slots=False)
 class CppAttribute:
     class InnerCppAttribute(NamedTuple):
@@ -21,9 +25,8 @@ class CppAttribute:
         def create(cls, accessor: CppAccessor, attr: str) -> Self:
             return cls(
                 accessor=accessor,
-                attr=CppAttribute(attr)
+                attr=CppAttribute(attr),
             )
-
 
     attr: str
     inner: Optional[CppAttribute.InnerCppAttribute] = None
@@ -47,6 +50,7 @@ class CppAttribute:
     def name(self) -> str:
         return self.build()
 
+
 def QtGqlNs() -> CppAttribute:
     return CppAttribute(
         attr="qtgql",
@@ -57,9 +61,7 @@ def QtGqlBasesNs() -> CppAttribute:
     return QtGqlNs().ns_add("bases")
 
 
-
 class QtGqlTypes:
     QGraphQLList = QtGqlBasesNs().ns_add("ListModelABC")
     NodeInterfaceABC = QtGqlBasesNs().ns_add("NodeInterfaceABC")
     ObjectTypeABC = QtGqlBasesNs().ns_add("ObjectTypeABC")
-

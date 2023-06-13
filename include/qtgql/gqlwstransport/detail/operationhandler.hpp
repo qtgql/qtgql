@@ -63,11 +63,6 @@ public:
   virtual const QString &ENV_NAME() = 0;
   virtual bases::OperationMetadata operation_metadata() = 0;
   virtual const qtgql::bases::SelectionsConfig &SELECTIONS_CONFIG() = 0;
-  /*
-   * Releases objects retained by this operation
-   * This can be called as long as
-   */
-  virtual void loose() = 0;
   // end abstract functions.
 
   void fetch() {

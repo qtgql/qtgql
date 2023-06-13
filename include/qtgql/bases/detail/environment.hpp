@@ -27,6 +27,7 @@ class Environment {
   typedef std::unique_ptr<NetworkLayer> UniqueNetworkLayer;
 
   UniqueNetworkLayer m_network_layer;
+
   inline static QMap<QString, SharedQtGqlEnv> ENV_MAP = {};
 
 public:
@@ -49,6 +50,8 @@ public:
 
   static std::optional<Environment::SharedQtGqlEnv>
   get_gql_env(const QString &name);
+
+  void collect_garbage();
 };
 
 } // namespace bases

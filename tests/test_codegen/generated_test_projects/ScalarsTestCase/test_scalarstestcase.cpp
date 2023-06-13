@@ -46,10 +46,9 @@ TEST_CASE("ScalarsTestCase", "[generated-testcase]") {
   SECTION("test garbage collection") {
     auto node_id = mq->get_data()->get_id();
     qDebug() << "on gc" << mq->operation_id();
-    auto user = ScalarsTestCase::User::INST_STORE().get_node(node_id).value();
+    auto user = ScalarsTestCase::User::get_node(node_id).value();
     // at map, at query, the instance itself?.
     REQUIRE(user.use_count() == 3);
-    mq->loose();
     REQUIRE(user.use_count() == 2);
   }
 };

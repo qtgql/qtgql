@@ -204,7 +204,9 @@ class SchemaEvaluator(visitor.Visitor):
         return ret
 
     def _evaluate_field(
-        self, name: str, field: gql_def.GraphQLField,
+        self,
+        name: str,
+        field: gql_def.GraphQLField,
     ) -> QtGqlFieldDefinition:
         ret = QtGqlFieldDefinition(
             type=self._evaluate_field_type(field.type),

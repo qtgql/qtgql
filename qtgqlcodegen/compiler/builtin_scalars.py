@@ -1,16 +1,19 @@
 from functools import cached_property
-from typing import NewType
 from typing import Optional
 
 from attr import define
 
-from qtgqlcodegen.cppref import QtGqlBasesNs, CppAttribute
+from qtgqlcodegen.cppref import CppAttribute
+from qtgqlcodegen.cppref import QtGqlBasesNs
+
 
 def ScalarsNs() -> CppAttribute:
     return QtGqlBasesNs().ns_add("scalars")
 
+
 def DefaultsNs() -> CppAttribute:
     return QtGqlBasesNs().ns_add("DEFAULTS")
+
 
 @define(slots=False)
 class BuiltinScalar:

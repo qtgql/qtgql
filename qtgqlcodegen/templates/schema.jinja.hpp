@@ -47,13 +47,6 @@ Q_OBJECT
 
 👉 macros.concrete_type_fields(interface) 👈
 
-{% if interface.is_node_interface -%}
-static auto & NODE_STORE() {
-    static qtgql::bases::NodeInstanceStore<👉 interface.name 👈> _store;
-    return _store;
-}
-{% endif %}
-
 static std::shared_ptr<👉 interface.name 👈> from_json(const QJsonObject& data,
                                                 const qtgql::bases::SelectionsConfig &config,
                                                 const qtgql::bases::OperationMetadata& metadata);
@@ -105,23 +98,11 @@ auto inst = std::make_shared<👉 type.name 👈>();
 👉macros.deserialize_field(f, assign_to)👈
 {% endfor %}
 {% if type. implements_node %}
-NODE_STORE().add_node(inst, metadata.operation_id);
+NODE_STORE().add_node(inst);
 {% endif %}
 return inst;
 };
 
-void loose(const qtgql::bases::OperationMetadata &metadata){
-    {% for f in type.fields %}
-    {% if f.type.is_object_type %}
-    👉 f.private_name 👈->loose(metadata);
-    {% endif %}
-    {% endfor %}
-    {% if type.implements_node %}
-    NODE_STORE().loose(m_id, metadata.operation_id);
-    {% else %}
-    deleteLater();
-    {% endif %}
-};
 void update(const QJsonObject &data,
             const qtgql::bases::SelectionsConfig &config,
             const qtgql::bases::OperationMetadata &metadata)

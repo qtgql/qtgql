@@ -121,7 +121,6 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
 
         ret = self.type.member_type
         # if self.arguments:
-        #     return f"QMap<QJsonValue, {ret}>"
         return ret
 
     @cached_property
