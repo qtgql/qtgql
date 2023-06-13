@@ -23,9 +23,6 @@ TEST_CASE("OperationVariablesTestcase", "[generated-testcase]") {
     SECTION("test update"){
         REQUIRE(false);
     };
-    SECTION("test garbage collection"){
-        REQUIRE(false);
-    };
 }
 
 };

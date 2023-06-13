@@ -8,9 +8,12 @@ import strawberry
 
 @strawberry.interface
 class Node:
+
+
     id: strawberry.ID = strawberry.field(default_factory=lambda: uuid.uuid4().hex)
 
     def __init_subclass__(cls, **kwargs):
+        cls.__hash__ = cls.hash_impl  # because of https://stackoverflow.com/a/53519136/16776498
         setattr(cls, f"_{cls.__name__}__typename", cls.__name__)
 
     def __post_init__(self):
@@ -18,6 +21,12 @@ class Node:
 
     def resolve_type(self) -> str:
         return self.__type_name
+
+    def hash_impl(self) -> int:
+        return hash(self.id)
+
+    def __hash__(self) -> int:
+        return self.hash_impl()
 
 
 T_Node = TypeVar("T_Node", bound=Node)

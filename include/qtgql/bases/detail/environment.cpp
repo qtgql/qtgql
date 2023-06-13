@@ -54,4 +54,3 @@ Environment::get_env(const QString &name) {
         connect(m_gc_timer, &QTimer::timeout, this, &EnvCache::collect_garbage);
         m_gc_timer->start();
     }
-

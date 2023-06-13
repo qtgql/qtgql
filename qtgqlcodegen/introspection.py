@@ -216,9 +216,9 @@ class SchemaEvaluator(visitor.Visitor):
             enums=self._enums_def_map,
             description=field.description,
         )
-        ret.arguments = (
-            [self._evaluate_input_field(name, arg) for name, arg in field.args.items()],
-        )
+        # TODO: fix mypy here.
+        ret.arguments = [self._evaluate_input_field(name, arg) for name, arg in field.args.items()]  # type: ignore
+
         return ret
 
     def _evaluate_input_field(

@@ -31,9 +31,6 @@ class UserWithFriend(Node):
 
         return UserWithFriend()
 
-    def __hash__(self):
-        return hash(self.id)
-
 
 CONST_USER = UserWithFriend()
 

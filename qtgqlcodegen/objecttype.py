@@ -426,7 +426,8 @@ class GqlTypeHinter(TypeHinter):
         t_self = self.optional_maybe
 
         if model_of := t_self.is_model:
-            return f"QList<{model_of.member_type}>"
+            # map of instances based on operation id.
+            return f"QMap<QUuid, QList<{model_of.member_type}>>"
         if t_self.is_object_type or t_self.is_interface:
             return f"std::shared_ptr<{self.type_name}>"
         if q_object_def := t_self.is_queried_object_type:

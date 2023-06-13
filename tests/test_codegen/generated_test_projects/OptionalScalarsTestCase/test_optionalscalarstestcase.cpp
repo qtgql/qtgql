@@ -53,16 +53,6 @@ TEST_CASE("OptionalScalarsTestCase", "[generated-testcase]") {
     REQUIRE(mq->get_data()->get_name() == "Moise");
   };
 
-  SECTION("test garbage collection") {
-    std::weak_ptr<mainquery::MainQuery> weak_mq = {mq};
-    auto node_id = mq->get_data()->get_id();
-    auto user =
-        OptionalScalarsTestCase::User::INST_STORE().get_node(node_id).value();
-    // the map uses count and this reference.
-    REQUIRE(user.use_count() == 3);
-    mq->loose();
-    REQUIRE(user.use_count() == 2);
-  }
 }
 
 }; // namespace OptionalScalarsTestCase

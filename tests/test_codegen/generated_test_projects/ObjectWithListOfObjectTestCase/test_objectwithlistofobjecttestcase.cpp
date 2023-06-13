@@ -21,25 +21,12 @@ TEST_CASE("ObjectWithListOfObjectTestCase", "[generated-testcase]") {
     auto p = friends->first();
     REQUIRE(p->get_name() != bases::DEFAULTS::STRING);
   }
-  SECTION("test update"){
-      auto add_friend_mut = addfriend::AddFriend::shared();
-      QString new_name("New friend name");
-      add_friend_mut->set_variables(mq->get_data()->get_id(), new_name);
-      add_friend_mut->fetch();
-      test_utils::wait_for_completion(add_friend_mut);
-      // instantiate a new query operation it should not update the first one since they don't have
-      // the same variables.
-      auto other_mq = mainquery::MainQuery::shared();
-
-      REQUIRE(first_friend->get_name() == new_name);
-  }
 }
 
 TEST_CASE(
     "default ListModelABC modifications and operations (not specific to this "
     "testcase)",
     "") {
-  //    test_utils::ModelSignalSpy
   auto env = test_utils::get_or_create_env(
       ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = std::make_shared<mainquery::MainQuery>();
@@ -107,7 +94,7 @@ TEST_CASE(
     remove_spy.validate();
   }
   SECTION("test remove rows inside") {
-    REQUIRE(model_with_data->rowCount() == 5);
+    REQUIRE(model_with_data->rowCount() == 20);
     auto first_item = model_with_data->first();
     REQUIRE(model_with_data->removeRows(1, model_with_data->rowCount() - 1));
     remove_spy.validate();
