@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+0.119.13 - 2023-06-13
+---------------------
+
+This release removes the previose `loose()` approach mainly due to complexity reasons.
+Starting from now we have a periodic garbage collector on all `Node` derived classes.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #253](https://github.com/qtgql/qtgql/pull/253/)
+
+
 0.119.12 - 2023-06-11
 ---------------------
 
