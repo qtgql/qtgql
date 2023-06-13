@@ -69,5 +69,3 @@ jobs:
           poetry run conan profile detect
           poetry run conan create . -pr=profiles/${{ runner.os }} -s build_type=Debug --build=missing
           poetry run conan conan test conan/test_package qtgql/0.119.9  -pr=profiles/${{ runner.os }} --build=missing
-
-

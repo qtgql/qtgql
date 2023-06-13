@@ -44,7 +44,15 @@ inline static const std::vector<std::pair<QString, 👉enum.name👈>> members =
 {% for interface in context.interfaces -%}
 class 👉 interface.name 👈 {% for base in interface.bases %} {%if loop.first %}: {% endif %} public 👉 base.name 👈 {% if not loop.last %}, {% endif %}{% endfor %}{
 Q_OBJECT
+
 👉 macros.concrete_type_fields(interface) 👈
+
+{% if interface.is_node_interface -%}
+static auto & ENV_CACHE() {
+        static auto cache = qtgql::bases::Environment::get_env_strict("👉 context.config.env_name 👈")->get_cache();
+        return cache;
+}
+{% endif %}
 
 static std::shared_ptr<👉 interface.name 👈> from_json(const QJsonObject& data,
                                                 const qtgql::bases::SelectionsConfig &config,
@@ -55,20 +63,24 @@ static std::shared_ptr<👉 interface.name 👈> from_json(const QJsonObject& da
 
 // ---------- Object Types ----------
 {% for type in context.types %}
-{%- set base_class -%}{% if type. implements_node %}ObjectTypeABCWithID{% else %}ObjectTypeABC{% endif %}{%- endset -%}
+{%- set base_class -%}{% if type. implements_node %}NodeInterfaceABC{% else %}ObjectTypeABC{% endif %}{%- endset -%}
 class 👉 type.name 👈 {% for base in type.bases %}{%if loop.first%}: {% endif %} public 👉 base.name 👈 {% if not loop.last %}, {% endif %}{% endfor %}{
 Q_OBJECT
 
 👉 macros.concrete_type_fields(type) 👈
 public:
-static auto & INST_STORE() {
-    static qtgql::bases::ObjectStore<👉 type.name 👈> _store;
-    return _store;
-}
+
 inline static const QString TYPE_NAME = "👉 type.name 👈";
-static auto get_node(const QString & id){
-    return INST_STORE().get_node(id);
+
+{% if type.implements_node -%}
+static std::optional<std::shared_ptr<👉 type.name 👈>> get_node(const QString & id){
+    auto node = ENV_CACHE()->get_node(id);
+    if (node.has_value()){
+        return std::static_pointer_cast<👉 type.name 👈>(node.value());
+    }
+    return {};
 }
+{% endif %}
 
 static std::shared_ptr<👉 type.name 👈> from_json(const QJsonObject& data,
                                  const qtgql::bases::SelectionsConfig &config,
@@ -93,23 +105,11 @@ auto inst = std::make_shared<👉 type.name 👈>();
 👉macros.deserialize_field(f, assign_to)👈
 {% endfor %}
 {% if type. implements_node %}
-INST_STORE().add_node(inst, metadata.operation_id);
+ENV_CACHE()->add_node(inst);
 {% endif %}
 return inst;
 };
 
-void loose(const qtgql::bases::OperationMetadata &metadata){
-    {% for f in type.fields %}
-    {% if f.type.is_object_type %}
-    👉 f.private_name 👈->loose(metadata);
-    {% endif %}
-    {% endfor %}
-    {% if type.implements_node %}
-    INST_STORE().loose(m_id, metadata.operation_id);
-    {% else %}
-    deleteLater();
-    {% endif %}
-};
 void update(const QJsonObject &data,
             const qtgql::bases::SelectionsConfig &config,
             const qtgql::bases::OperationMetadata &metadata)

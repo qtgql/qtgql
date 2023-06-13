@@ -3,11 +3,12 @@
 
 #include "debugableclient.hpp"
 #include "graphql/__generated__/MainQuery.hpp"
+#include "graphql/__generated__/AddFriend.hpp"
 
 namespace ObjectWithListOfObjectTestCase {
 using namespace qtgql;
 auto ENV_NAME = QString("ObjectWithListOfObjectTestCase");
-auto SCHEMA_ADDR = get_server_address("89749059");
+auto SCHEMA_ADDR = get_server_address("77804516");
 
 TEST_CASE("ObjectWithListOfObjectTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
@@ -16,9 +17,8 @@ TEST_CASE("ObjectWithListOfObjectTestCase", "[generated-testcase]") {
   mq->fetch();
   test_utils::wait_for_completion(mq);
   SECTION("test deserialize") {
-    auto persons = mq->get_data()->get_persons();
-    auto p = persons->first();
-    qDebug() << p->get_name();
+    auto friends = mq->get_data()->get_friends();
+    auto p = friends->first();
     REQUIRE(p->get_name() != bases::DEFAULTS::STRING);
   }
 }
@@ -27,7 +27,6 @@ TEST_CASE(
     "default ListModelABC modifications and operations (not specific to this "
     "testcase)",
     "") {
-  //    test_utils::ModelSignalSpy
   auto env = test_utils::get_or_create_env(
       ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = std::make_shared<mainquery::MainQuery>();
@@ -37,13 +36,13 @@ TEST_CASE(
   typedef qtgql::bases::ListModelABC<mainquery::Person__age$id$name> ModelType;
   typedef mainquery::Person__age$id$name ObjectType;
 
-  auto model_with_data = mq->get_data()->m_persons;
+  auto model_with_data = mq->get_data()->m_friends;
   auto raw_message = DebugAbleClient::from_environment(env)->m_current_message;
-  auto raw_persons_list = raw_message.value("data")
+  auto raw_friends_list = raw_message.value("data")
                               .toObject()
                               .value("user")
                               .toObject()
-                              .value("persons")
+                              .value("friends")
                               .toArray();
   QSignalSpy p_pre_remove(model_with_data, &ModelType::rowsAboutToBeRemoved);
   QSignalSpy p_after_remove(model_with_data, &ModelType::rowsRemoved);
@@ -59,7 +58,7 @@ TEST_CASE(
   }
 
   SECTION("test row count") {
-    REQUIRE(model_with_data->rowCount() == raw_persons_list.size());
+    REQUIRE(model_with_data->rowCount() == raw_friends_list.size());
   }
 
   SECTION("test returns data") {
@@ -68,15 +67,15 @@ TEST_CASE(
     REQUIRE(res.canConvert<ObjectType>());
     auto v = res.value<ObjectType *>();
     REQUIRE(v->get_name() ==
-            raw_persons_list.at(0).toObject().value("name").toString());
+            raw_friends_list.at(0).toObject().value("name").toString());
   }
 
   SECTION("test pop") {
     model_with_data->pop();
-    REQUIRE(model_with_data->rowCount() == raw_persons_list.size() - 1);
+    REQUIRE(model_with_data->rowCount() == raw_friends_list.size() - 1);
     auto val =
         model_with_data->get(model_with_data->rowCount() - 1)->get_name();
-    auto val2 = raw_persons_list.at(model_with_data->rowCount() - 1)
+    auto val2 = raw_friends_list.at(model_with_data->rowCount() - 1)
                     .toObject()
                     .value("name")
                     .toString();
@@ -95,7 +94,7 @@ TEST_CASE(
     remove_spy.validate();
   }
   SECTION("test remove rows inside") {
-    REQUIRE(model_with_data->rowCount() == 5);
+    REQUIRE(model_with_data->rowCount() == 20);
     auto first_item = model_with_data->first();
     REQUIRE(model_with_data->removeRows(1, model_with_data->rowCount() - 1));
     remove_spy.validate();

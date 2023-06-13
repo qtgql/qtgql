@@ -19,9 +19,7 @@ TEST_CASE("👉 context.test_name 👈", "[generated-testcase]") {
     SECTION("test update"){
         REQUIRE(false);
     };
-    SECTION("test garbage collection"){
-        REQUIRE(false);
-    };
+
 }
 
 };

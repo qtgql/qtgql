@@ -1,3 +1,7 @@
+type Mutation {
+  addFriend(userId: ID!, name: String!): Void
+}
+
 interface Node {
   id: ID!
 }
@@ -9,11 +13,13 @@ type Person implements Node {
 }
 
 type Query {
-  user: User!
-  userWithSamePerson: User!
+  user(id: ID = null): User!
 }
 
 type User implements Node {
   id: ID!
-  persons: [Person!]!
+  friends(first: Int! = 5): [Person!]!
 }
+
+"""Represents NULL values"""
+scalar Void

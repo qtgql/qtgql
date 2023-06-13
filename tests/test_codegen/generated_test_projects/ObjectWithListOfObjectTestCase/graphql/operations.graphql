@@ -1,9 +1,12 @@
 
     query MainQuery {
         user{
-            persons{
+            friends{
                 name
                 age
             }
         }
+    }
+    mutation AddFriend ($userId: ID!, $name: String!) {
+      addFriend(userId: $userId, name: $name)
     }

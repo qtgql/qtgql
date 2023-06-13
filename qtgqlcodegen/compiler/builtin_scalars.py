@@ -1,58 +1,73 @@
 from functools import cached_property
-from typing import NewType
 from typing import Optional
 
 from attr import define
 
-CType = NewType("CType", str)
+from qtgqlcodegen.cppref import CppAttribute
+from qtgqlcodegen.cppref import QtGqlBasesNs
+
+
+def ScalarsNs() -> CppAttribute:
+    return QtGqlBasesNs().ns_add("scalars")
+
+
+def DefaultsNs() -> CppAttribute:
+    return QtGqlBasesNs().ns_add("DEFAULTS")
 
 
 @define(slots=False)
 class BuiltinScalar:
-    tp: CType
-    defaults_member_name: str
+    attr: CppAttribute
+    default_value_: CppAttribute
     graphql_name: str
     from_json_convertor: str
 
-    @cached_property
+    @property
     def default_value(self) -> str:
-        return f"qtgql::bases::DEFAULTS::{self.defaults_member_name}"
+        return self.default_value_.name
 
 
 class _BuiltinScalars:
     INT = BuiltinScalar(
-        CType("int"),
-        "INT",
+        CppAttribute("int"),
+        DefaultsNs().ns_add("INT"),
         graphql_name="Int",
         from_json_convertor="toInt()",
     )
     FLOAT = BuiltinScalar(
-        CType("float"),
-        "FLOAT",
+        CppAttribute("float"),
+        DefaultsNs().ns_add("FLOAT"),
         graphql_name="Float",
         from_json_convertor="toDouble()",
     )
     STRING = BuiltinScalar(
-        CType("QString"),
-        "STRING",
+        CppAttribute("QString"),
+        DefaultsNs().ns_add("STRING"),
         graphql_name="String",
         from_json_convertor="toString()",
     )
     ID = BuiltinScalar(
-        CType("QString"),
-        "ID",
+        ScalarsNs().ns_add("Id"),
+        DefaultsNs().ns_add("ID"),
         graphql_name="ID",
         from_json_convertor="toString()",
     )
     BOOLEAN = BuiltinScalar(
-        CType("bool"),
-        "BOOL",
+        CppAttribute("bool"),
+        DefaultsNs().ns_add("BOOL"),
         graphql_name="Boolean",
         from_json_convertor="toBool()",
     )
+    VOID = BuiltinScalar(
+        ScalarsNs().ns_add("Void"),
+        DefaultsNs().ns_add("VOID"),
+        graphql_name="Void",
+        from_json_convertor="",
+    )
+
     UUID = BuiltinScalar(
-        CType("QUuid"),
-        "UUID",
+        CppAttribute("QUuid"),
+        DefaultsNs().ns_add("UUID"),
         graphql_name="UUID",
         from_json_convertor="toVariant().toUuid()",
     )

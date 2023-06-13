@@ -10,11 +10,13 @@ from typing import TYPE_CHECKING
 from typing import TypeVar
 
 import attrs
+from attr import Factory
 from attrs import define
 from typingref import TypeHinter
 from typingref import UNSET
 
 from qtgqlcodegen.compiler.builtin_scalars import BuiltinScalar
+from qtgqlcodegen.compiler.builtin_scalars import BuiltinScalars
 from qtgqlcodegen.compiler.operation import QtGqlQueriedObjectType
 from qtgqlcodegen.cppref import QtGqlTypes
 from qtgqlcodegen.utils import AntiForwardRef
@@ -46,15 +48,6 @@ class QtGqlBaseTypedNode:
     @cached_property
     def is_custom_scalar(self) -> Optional[CustomScalarDefinition]:
         return self.type.is_custom_scalar
-
-    @cached_property
-    def member_type(self) -> str:
-        """
-        :returns: Annotation of the field based on the real type,
-        meaning that the private attribute would be of that type.
-        this goes for init and the property setter.
-        """
-        return self.type.member_type
 
 
 T = TypeVar("T")
@@ -91,7 +84,14 @@ class QtGqlInputFieldDefinition(BaseQtGqlFieldDefinition, QtGqlVariableDefinitio
 
 
 @define(slots=False)
+class QtGqlArgumentDefinition(QtGqlInputFieldDefinition):
+    ...
+
+
+@define(slots=False)
 class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
+    arguments: list[QtGqlInputFieldDefinition] = Factory(list)
+
     @cached_property
     def default_value(self):
         if builtin_scalar := self.type.is_builtin_scalar:
@@ -110,6 +110,18 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
             return f"{enum_def.namespaced_name}(0)"
 
         raise NotImplementedError
+
+    @cached_property
+    def member_type(self) -> str:
+        """
+        :returns: Annotation of the field based on the real type,
+        meaning that the private attribute would be of that type.
+        this goes for init and the property setter.
+        """
+
+        ret = self.type.member_type
+        # if self.arguments:
+        return ret
 
     @cached_property
     def fget_annotation(self) -> str:
@@ -211,14 +223,14 @@ class QtGqlObjectTypeDefinition(BaseGqlTypeDefinition):
         ```
         Type `Foo` would extend only `A`
 
-        If there are no interfaces returns only ObjectTypeABCWithID or ObjectTypeABC.
+        If there are no interfaces returns only NodeInterfaceABC or ObjectTypeABC.
         """
         not_unique_interfaces: list[QtGqlInterfaceDefinition] = []
 
         if not self.interfaces_raw:
             # these are not really interfaces though they are inherited if there are no interfaces.
             if self.implements_node:
-                return [QtGqlTypes.ObjectTypeABCWithID]  # type: ignore
+                return [QtGqlTypes.NodeInterfaceABC]  # type: ignore
 
             else:
                 return [QtGqlTypes.ObjectTypeABC]  # type: ignore
@@ -234,8 +246,8 @@ class QtGqlObjectTypeDefinition(BaseGqlTypeDefinition):
     @cached_property
     def implements_node(self) -> bool:
         if isinstance(self, QtGqlInterfaceDefinition):
-            if self.name == "Node":
-                return True
+            return self.is_node_interface
+
         return any(base.implements_node for base in self.bases)
 
     def __attrs_post_init__(self):
@@ -249,6 +261,16 @@ class QtGqlObjectTypeDefinition(BaseGqlTypeDefinition):
 @define(slots=False)
 class QtGqlInterfaceDefinition(QtGqlObjectTypeDefinition):
     implementations: dict[str, BaseGqlTypeDefinition] = attrs.field(factory=dict)
+
+    @cached_property
+    def is_node_interface(self) -> bool:
+        """As specified by https://graphql.org/learn/global-object-
+        identification/#node-interface."""
+        if self.name == "Node":
+            id_field_maybe = self.fields[0].type.is_builtin_scalar
+            if id_field_maybe and id_field_maybe is BuiltinScalars.ID:
+                return True
+        return False
 
 
 @define(slots=False)
@@ -356,6 +378,12 @@ class GqlTypeHinter(TypeHinter):
         if isinstance(t_self, BuiltinScalar):
             return t_self
 
+    @property
+    def is_void(self) -> bool:
+        if sc := self.is_builtin_scalar:
+            return sc is BuiltinScalars.VOID
+        return False
+
     @cached_property
     def is_custom_scalar(self) -> Optional[CustomScalarDefinition]:
         t_self = self.optional_maybe.type
@@ -366,7 +394,7 @@ class GqlTypeHinter(TypeHinter):
     def type_name(self) -> str:
         t_self = self.optional_maybe
         if builtin_scalar := t_self.is_builtin_scalar:
-            return builtin_scalar.tp
+            return builtin_scalar.attr.name
 
         if scalar := t_self.is_custom_scalar:
             return scalar.type_name
@@ -398,7 +426,7 @@ class GqlTypeHinter(TypeHinter):
         t_self = self.optional_maybe
 
         if model_of := t_self.is_model:
-            # map of instances based on operation hash.
+            # map of instances based on operation id.
             return f"QMap<QUuid, QList<{model_of.member_type}>>"
         if t_self.is_object_type or t_self.is_interface:
             return f"std::shared_ptr<{self.type_name}>"

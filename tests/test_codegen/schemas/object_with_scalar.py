@@ -17,6 +17,7 @@ class User(Node):
     male: bool = strawberry.field(default_factory=factory.develop.boolean)
     id: strawberry.ID = strawberry.field(default_factory=lambda: strawberry.ID(uuid.uuid4().hex))
     uuid: UUID = strawberry.field(default_factory=uuid.uuid4)
+    void_field: None = None
 
 
 CONST_USER = User(

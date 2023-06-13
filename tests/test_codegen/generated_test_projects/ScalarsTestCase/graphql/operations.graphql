@@ -8,6 +8,7 @@
             male
             id
             uuid
+            voidField
           }
         }
         query UserWithSameIDAndDifferentFieldsQuery {

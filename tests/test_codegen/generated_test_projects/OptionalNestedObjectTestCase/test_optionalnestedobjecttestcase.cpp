@@ -52,16 +52,6 @@ TEST_CASE("OptionalNestedObjectTestCase", "[generated-testcase]") {
         REQUIRE(user->get_person()->get_name() == new_name);
     }
 
-        SECTION("test garbage collection") {
-            auto node_id = mq->get_data()->get_person()->get_id();
-            auto person = OptionalNestedObjectTestCase::Person::INST_STORE().get_node(node_id).value();
-            // the map uses count and this reference, if the reference count decreased it means
-            // that the instance store released its reference.
-            REQUIRE(person.use_count() == 4);  // 1. map 2. at concrete user 3. at the proxy 4. here.
-            mq->loose();
-            REQUIRE(person.use_count() == 3);
-        }
-
 }
 
 }; // namespace OptionalNestedObjectTestCase

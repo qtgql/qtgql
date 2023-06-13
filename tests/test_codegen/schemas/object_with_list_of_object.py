@@ -1,36 +1,46 @@
 from __future__ import annotations
 
+from typing import Optional
+
 import strawberry
 
 from tests.conftest import fake
 from tests.test_codegen.schemas.node_interface import Node
+from tests.test_codegen.schemas.node_interface import NODE_DB
+
+user_friends: dict[User, list[Person]] = {}
 
 
 @strawberry.type
 class User(Node):
-    persons: list[Person]
+    @strawberry.field()
+    def friends(self, first: int = 5) -> list[Person]:
+        if ret := user_friends.get(self, None):
+            return ret
+
+        user_friends[self] = ret = [Person() for _ in range(20)]
+        return ret
 
 
 @strawberry.type()
 class Person(Node):
-    name: str
-    age: int
+    name: str = strawberry.field(default_factory=fake.name)
+    age: int = strawberry.field(default_factory=fake.pyint)
 
 
 @strawberry.type
 class Query:
     @strawberry.field
-    def user(self) -> User:
-        persons = [Person(name=fake.name(), age=fake.pyint()) for _ in range(5)]
-        return User(persons=persons)
-
-    @strawberry.field()
-    def userWithSamePerson(self) -> User:
-        user = Query.user(None)
-        fp = user.persons[0]
-        for person in user.persons:
-            person.id = fp.id
-        return user
+    def user(self, id: Optional[strawberry.ID] = None) -> User:
+        return User()
 
 
-schema = strawberry.Schema(query=Query)
+@strawberry.type()
+class Mutation:
+    @strawberry.mutation()
+    def add_friend(self, user_id: strawberry.ID, name: str) -> None:
+        u: User = NODE_DB.get(user_id)
+        u.friends.append(Person(name=name))
+
+
+schema = strawberry.Schema(query=Query, mutation=Mutation)

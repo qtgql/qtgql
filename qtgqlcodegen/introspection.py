@@ -60,30 +60,17 @@ class GeneratedNamespace(TypedDict):
     objecttypes: str
 
 
-class QtGqlVisitor(visitor.Visitor):
-    """Creates handlers for root operations.
-
-    Also injects id field to types that have id field but not explicitly
-    queried it.
-    """
-
-    def __init__(self, evaluator: SchemaEvaluator):
+class SchemaEvaluator(visitor.Visitor):
+    def __init__(self, config: QtGqlConfig):
         super().__init__()
-        self.operations: dict[str, QtGqlOperationDefinition] = {}
-        self.evaluator = evaluator
-
-    def _parse_variable_definition(
-        self,
-        var: gql_lang.VariableDefinitionNode,
-    ) -> QtGqlVariableDefinition:
-        return QtGqlVariableDefinition(
-            name=var.variable.name.value,
-            type=self.evaluator.get_type(var.type),
-            type_map=self.evaluator._objecttypes_def_map,
-            scalars=self.evaluator.config.custom_scalars,
-            enums=self.evaluator._enums_def_map,
-            default_value=var.default_value,
-        )
+        self.config = config
+        self._objecttypes_def_map: dict[str, QtGqlObjectTypeDefinition] = {}
+        self._enums_def_map: EnumMap = {}
+        self._input_objects_def_map: dict[str, QtGqlInputObjectTypeDefinition] = {}
+        self._interfaces_map: dict[str, QtGqlInterfaceDefinition] = {}
+        self._operations: dict[str, QtGqlOperationDefinition] = {}
+        self._flat_arguments_map: dict[str, QtGqlInputFieldDefinition] = {}
+        self.operation_types: dict[OperationType, QtGqlObjectTypeDefinition] = {}
 
     def enter_operation_definition(self, node, key, parent, path, ancestors) -> None:
         if operation := is_operation_def_node(node):
@@ -98,26 +85,15 @@ class QtGqlVisitor(visitor.Visitor):
                 # input variables
                 if variables_def := operation.variable_definitions:
                     for var in variables_def:
-                        operation_vars.append(self._parse_variable_definition(var))
+                        operation_vars.append(self._evaluate_variable(var))
 
                 operation_definition = QtGqlOperationDefinition.from_definition(
                     operation_def=operation,
-                    evaluator=self.evaluator,
+                    evaluator=self,
                     directives=node.directives,
                     variables=operation_vars,
                 )
-                self.operations[operation_definition.name] = operation_definition
-
-
-class SchemaEvaluator:
-    def __init__(self, config: QtGqlConfig):
-        self.config = config
-        self._objecttypes_def_map: dict[str, QtGqlObjectTypeDefinition] = {}
-        self._enums_def_map: EnumMap = {}
-        self._input_objects_def_map: dict[str, QtGqlInputObjectTypeDefinition] = {}
-        self._interfaces_map: dict[str, QtGqlInterfaceDefinition] = {}
-        self._operations: dict[str, QtGqlOperationDefinition] = {}
-        self.operation_types: dict[OperationType, QtGqlObjectTypeDefinition] = {}
+                self._operations[operation_definition.name] = operation_definition
 
     def get_interface_by_name(self, name: str) -> Optional[QtGqlInterfaceDefinition]:
         return self._interfaces_map.get(name, None)
@@ -227,8 +203,12 @@ class SchemaEvaluator:
             return GqlTypeHinter(type=Optional, of_type=(ret,), scalars=self.config.custom_scalars)
         return ret
 
-    def _evaluate_field(self, name: str, field: gql_def.GraphQLField) -> QtGqlFieldDefinition:
-        return QtGqlFieldDefinition(
+    def _evaluate_field(
+        self,
+        name: str,
+        field: gql_def.GraphQLField,
+    ) -> QtGqlFieldDefinition:
+        ret = QtGqlFieldDefinition(
             type=self._evaluate_field_type(field.type),
             name=name,
             type_map=self._objecttypes_def_map,
@@ -236,6 +216,10 @@ class SchemaEvaluator:
             enums=self._enums_def_map,
             description=field.description,
         )
+        # TODO: fix mypy here.
+        ret.arguments = [self._evaluate_input_field(name, arg) for name, arg in field.args.items()]  # type: ignore
+
+        return ret
 
     def _evaluate_input_field(
         self,
@@ -349,6 +333,19 @@ class SchemaEvaluator:
         self._enums_def_map[name] = ret
         return ret
 
+    def _evaluate_variable(
+        self,
+        var: gql_lang.VariableDefinitionNode,
+    ) -> QtGqlVariableDefinition:
+        return QtGqlVariableDefinition(
+            name=var.variable.name.value,
+            type=self.get_type(var.type),
+            type_map=self._objecttypes_def_map,
+            scalars=self.config.custom_scalars,
+            enums=self._enums_def_map,
+            default_value=var.default_value,
+        )
+
     def parse_schema_concretes(self) -> None:
         for name, type_ in self.schema_definition.type_map.items():
             if name.startswith("__"):
@@ -374,10 +371,8 @@ class SchemaEvaluator:
         if errors := graphql.validate(self.schema_definition, operations):
             raise QtGqlException([error.formatted for error in errors])
 
-        # get QtGql fields from the query AST and inject ID field.
-        operation_miner = QtGqlVisitor(self)
-        visitor.visit(operations, operation_miner)
-        self._operations.update(operation_miner.operations)
+        # fill operation definitions
+        visitor.visit(operations, self)
 
     def generate(self) -> list[FileSpec]:
         self.parse_schema_concretes()

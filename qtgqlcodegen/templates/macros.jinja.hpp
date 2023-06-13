@@ -77,7 +77,11 @@ for node in field_data:
 👉 assign_to 👈 = qtgql::ListModel(parent, data=model_data)
 {% endif %}
 {% elif f.type.is_builtin_scalar -%}
+{% if f.type.is_void -%}
+/* deliberately empty */
+{% else -%}
 👉 assign_to 👈 = data.value("👉f.name👈").👉 f.type.is_builtin_scalar.from_json_convertor 👈;
+{% endif %}
 {% elif f.is_custom_scalar -%}
 👉 assign_to 👈 = 👉 f.is_custom_scalar.type_name 👈();
 👉 assign_to 👈.deserialize(data.value("👉f.name👈"));
@@ -95,11 +99,15 @@ choice = inner_👉config_name👈.choices[type_name]
 {% macro update_concrete_field(f, fset_name, private_name, config_name= "config", include_selection_check=True) -%}
 
 if ({% if include_selection_check %}👉config_name👈.selections.contains("👉f.name👈") && {% endif %} !data.value("👉f.name👈").isNull()){
-{% if f.type.is_builtin_scalar %}
+{% if f.type.is_builtin_scalar -%}
+{% if f.type.is_void -%}
+/* deliberately empty */
+{% else -%}
 auto new_👉f.name👈 = data.value("👉f.name👈").👉 f.type.is_builtin_scalar.from_json_convertor 👈;
 if (👉private_name👈 != new_👉f.name👈){
     👉fset_name👈(new_👉f.name👈);
 }
+{% endif %}
 {% elif f.type.is_custom_scalar %}
 auto new_👉f.name👈 = 👉 f.is_custom_scalar.type_name 👈();
 new_👉f.name👈.deserialize(data.value("👉f.name👈"));

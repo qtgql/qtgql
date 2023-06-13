@@ -11,6 +11,4 @@ These scalars are represented by "primitive" type and not by our scalar proxy.
 - `Boolean`, true or false, maps to  `bool`
 - `ID`, a specialised `String` for representing unique object identifiers, maps to `QString`
 - `UUID`, maps to `QUuid`
-
-
-[//]: # (# TODO: add note about uuid)
+- `Void`, `nullptr`.
