@@ -43,13 +43,26 @@ TEST_CASE("ScalarsTestCase", "[generated-testcase]") {
     REQUIRE(user->get_name() == new_name);
     REQUIRE(new_name != previous_name);
   };
-  SECTION("test garbage collection") {
-    auto node_id = mq->get_data()->get_id();
-    qDebug() << "on gc" << mq->operation_id();
-    auto user = ScalarsTestCase::User::get_node(node_id).value();
-    // at map, at query, the instance itself?.
-    REQUIRE(user.use_count() == 3);
-    REQUIRE(user.use_count() == 2);
-  }
 };
+
+std::shared_ptr<ScalarsTestCase::User> get_shared_user(){
+    auto mq = std::make_shared<mainquery::MainQuery>();
+    mq->fetch();
+    test_utils::wait_for_completion(mq);
+    auto node_id = mq->get_data()->get_id();
+    REQUIRE(mq.use_count() == 1);
+    return ScalarsTestCase::User::get_node(node_id).value();
+}
+
+
+TEST_CASE("Test Garbage collection"){
+    auto env = test_utils::get_or_create_env(
+            ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
+    std::weak_ptr<ScalarsTestCase::User> weak_user = get_shared_user();
+    // at map
+    REQUIRE(weak_user.use_count() == 1);
+    env->get_cache()->collect_garbage();
+    REQUIRE(weak_user.use_count() == 0);
+}
+
 }; // namespace ScalarsTestCase

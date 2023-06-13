@@ -23,18 +23,7 @@ public:
 
 class NodeInterfaceABC;
 
-class NodeInstanceStore {
-
-    protected:
-        std::map<QString, std::shared_ptr<NodeInterfaceABC>> m_records;
-
-    public:
-        [[nodiscard]] std::optional<std::shared_ptr<NodeInterfaceABC>> get_node(const QString &id) const;
-
-        void add_node(const std::shared_ptr<NodeInterfaceABC>& node);
-    };
-
-class NodeInterfaceABC : public ObjectTypeABC {
+    class NodeInterfaceABC : public ObjectTypeABC {
 public:
   using ObjectTypeABC::ObjectTypeABC;
 
@@ -43,7 +32,6 @@ public:
   // updates a node based on new GraphQL data.
   virtual void update(const QJsonObject &data,
                       const SelectionsConfig &selections, const OperationMetadata &metadata) = 0;
-    static NodeInstanceStore &  NODE_STORE();
 };
 
 

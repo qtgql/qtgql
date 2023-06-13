@@ -47,6 +47,13 @@ Q_OBJECT
 
 👉 macros.concrete_type_fields(interface) 👈
 
+{% if interface.is_node_interface -%}
+static auto & ENV_CACHE() {
+        static auto cache = qtgql::bases::Environment::get_env_strict("👉 context.config.env_name 👈")->get_cache();
+        return cache;
+}
+{% endif %}
+
 static std::shared_ptr<👉 interface.name 👈> from_json(const QJsonObject& data,
                                                 const qtgql::bases::SelectionsConfig &config,
                                                 const qtgql::bases::OperationMetadata& metadata);
@@ -67,7 +74,7 @@ inline static const QString TYPE_NAME = "👉 type.name 👈";
 
 {% if type.implements_node -%}
 static std::optional<std::shared_ptr<👉 type.name 👈>> get_node(const QString & id){
-    auto node = NODE_STORE().get_node(id);
+    auto node = ENV_CACHE()->get_node(id);
     if (node.has_value()){
         return std::static_pointer_cast<👉 type.name 👈>(node.value());
     }
@@ -98,7 +105,7 @@ auto inst = std::make_shared<👉 type.name 👈>();
 👉macros.deserialize_field(f, assign_to)👈
 {% endfor %}
 {% if type. implements_node %}
-NODE_STORE().add_node(inst);
+ENV_CACHE()->add_node(inst);
 {% endif %}
 return inst;
 };

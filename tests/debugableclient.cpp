@@ -72,14 +72,14 @@ void wait_for_completion(
 std::shared_ptr<qtgql::bases::Environment>
 get_or_create_env(const QString &env_name,
                   const DebugClientSettings &settings) {
-  auto env = bases::Environment::get_gql_env(env_name);
+  auto env = bases::Environment::get_env(env_name);
   if (!env.has_value()) {
     auto env_ = std::make_shared<bases::Environment>(
         env_name, std::unique_ptr<qtgql::gqlwstransport::GqlWsTransportClient>(
                       new DebugAbleClient(settings)));
     bases::Environment::set_gql_env(env_);
     DebugAbleClient::from_environment(env_)->wait_for_valid();
-    env = bases::Environment::get_gql_env(env_name);
+    env = bases::Environment::get_env(env_name);
   }
   return env.value();
 };

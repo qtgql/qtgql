@@ -49,7 +49,7 @@ protected:
   QUuid m_operation_id = QUuid::createUuid();
 
   const std::shared_ptr<bases::Environment> &environment() {
-    static auto m_env = bases::Environment::get_gql_env(ENV_NAME());
+    static auto m_env = bases::Environment::get_env(ENV_NAME());
     return m_env.value();
   };
   QJsonObject m_variables;
