@@ -122,10 +122,6 @@ class SchemaEvaluator(visitor.Visitor):
         )
 
     @cached_property
-    def type_info(self) -> graphql.TypeInfo:
-        return graphql.TypeInfo(self.schema_definition)
-
-    @cached_property
     def root_types(self) -> List[Optional[gql_def.GraphQLObjectType]]:
         return [
             self.schema_definition.get_root_type(OperationType.QUERY),
@@ -207,16 +203,21 @@ class SchemaEvaluator(visitor.Visitor):
             return GqlTypeHinter(type=Optional, of_type=(ret,), scalars=self.config.custom_scalars)
         return ret
 
-    def _evaluate_field(self, name: str, field: gql_def.GraphQLField) -> QtGqlFieldDefinition:
-        return QtGqlFieldDefinition(
+    def _evaluate_field(
+        self, name: str, field: gql_def.GraphQLField,
+    ) -> QtGqlFieldDefinition:
+        ret = QtGqlFieldDefinition(
             type=self._evaluate_field_type(field.type),
             name=name,
             type_map=self._objecttypes_def_map,
             scalars=self.config.custom_scalars,
             enums=self._enums_def_map,
             description=field.description,
-            arguments=[self._evaluate_input_field(name, arg) for name, arg in field.args.items()],
         )
+        ret.arguments = (
+            [self._evaluate_input_field(name, arg) for name, arg in field.args.items()],
+        )
+        return ret
 
     def _evaluate_input_field(
         self,
@@ -336,10 +337,10 @@ class SchemaEvaluator(visitor.Visitor):
     ) -> QtGqlVariableDefinition:
         return QtGqlVariableDefinition(
             name=var.variable.name.value,
-            type=self.evaluator.get_type(var.type),
-            type_map=self.evaluator._objecttypes_def_map,
-            scalars=self.evaluator.config.custom_scalars,
-            enums=self.evaluator._enums_def_map,
+            type=self.get_type(var.type),
+            type_map=self._objecttypes_def_map,
+            scalars=self.config.custom_scalars,
+            enums=self._enums_def_map,
             default_value=var.default_value,
         )
 

@@ -31,7 +31,6 @@ class Environment {
 
 public:
   const QString m_name;
-
   explicit Environment(QString name, UniqueNetworkLayer network_layer)
       : m_name(std::move(name)), m_network_layer(std::move(network_layer)){};
 

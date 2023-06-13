@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from functools import cached_property
-from typing import Optional
+from typing import Optional, Literal, NamedTuple
 from typing import TYPE_CHECKING
 
 from attr import define
@@ -10,45 +10,56 @@ if TYPE_CHECKING:
     from typing_extensions import Self
 
 
-@define
-class NameSpaceBuilder:
-    ns: str
-    inner: Optional[NameSpaceBuilder] = None
+CppAccessor = Literal["::"] | Literal["."] | Literal["->"]
+@define(slots=False)
+class CppAttribute:
+    class InnerCppAttribute(NamedTuple):
+        accessor: CppAccessor
+        attr: CppAttribute
 
-    def add(self, inner: NameSpaceBuilder) -> Self:
+        @classmethod
+        def create(cls, accessor: CppAccessor, attr: str) -> Self:
+            return cls(
+                accessor=accessor,
+                attr=CppAttribute(attr)
+            )
+
+
+    attr: str
+    inner: Optional[CppAttribute.InnerCppAttribute] = None
+
+    def ns_add(self, inner: str) -> Self:
         if self.inner:
-            self.inner.add(inner)
+            self.inner.attr.ns_add(inner)
         else:
-            self.inner = inner
+            self.inner = CppAttribute.InnerCppAttribute.create(
+                "::",
+                inner,
+            )
         return self
 
     def build(self) -> str:
         if self.inner:
-            return f"{self.ns}::{self.inner.build()}"
-        return self.ns
-
-
-def QtGqlNs() -> NameSpaceBuilder:
-    return NameSpaceBuilder(
-        ns="qtgql",
-    )
-
-
-def QtGqlBasesNs() -> NameSpaceBuilder:
-    return QtGqlNs().add(NameSpaceBuilder("bases"))
-
-
-@define(slots=False)
-class CppNamedType:
-    namespace: NameSpaceBuilder
-    type_name: str
+            return f"{self.attr}{self.inner.accessor}{self.inner.attr.build()}"
+        return self.attr
 
     @cached_property
     def name(self) -> str:
-        return self.namespace.add(NameSpaceBuilder(self.type_name)).build()
+        return self.build()
+
+def QtGqlNs() -> CppAttribute:
+    return CppAttribute(
+        attr="qtgql",
+    )
+
+
+def QtGqlBasesNs() -> CppAttribute:
+    return QtGqlNs().ns_add("bases")
+
 
 
 class QtGqlTypes:
-    QGraphQLList = CppNamedType(QtGqlBasesNs(), "ListModelABC")
-    ObjectTypeABCWithID = CppNamedType(QtGqlBasesNs(), "ObjectTypeABCWithID")
-    ObjectTypeABC = CppNamedType(QtGqlBasesNs(), "ObjectTypeABC")
+    QGraphQLList = QtGqlBasesNs().ns_add("ListModelABC")
+    NodeInterfaceABC = QtGqlBasesNs().ns_add("NodeInterfaceABC")
+    ObjectTypeABC = QtGqlBasesNs().ns_add("ObjectTypeABC")
+

@@ -120,8 +120,8 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
         """
 
         ret = self.type.member_type
-        if self.arguments:
-            return f"QMap<QJsonValue, {ret}>"
+        # if self.arguments:
+        #     return f"QMap<QJsonValue, {ret}>"
         return ret
 
     @cached_property
@@ -224,14 +224,14 @@ class QtGqlObjectTypeDefinition(BaseGqlTypeDefinition):
         ```
         Type `Foo` would extend only `A`
 
-        If there are no interfaces returns only ObjectTypeABCWithID or ObjectTypeABC.
+        If there are no interfaces returns only NodeInterfaceABC or ObjectTypeABC.
         """
         not_unique_interfaces: list[QtGqlInterfaceDefinition] = []
 
         if not self.interfaces_raw:
             # these are not really interfaces though they are inherited if there are no interfaces.
             if self.implements_node:
-                return [QtGqlTypes.ObjectTypeABCWithID]  # type: ignore
+                return [QtGqlTypes.NodeInterfaceABC]  # type: ignore
 
             else:
                 return [QtGqlTypes.ObjectTypeABC]  # type: ignore
@@ -247,8 +247,8 @@ class QtGqlObjectTypeDefinition(BaseGqlTypeDefinition):
     @cached_property
     def implements_node(self) -> bool:
         if isinstance(self, QtGqlInterfaceDefinition):
-            if self.name == "Node":
-                return True
+            return self.is_node_interface
+
         return any(base.implements_node for base in self.bases)
 
     def __attrs_post_init__(self):
@@ -262,6 +262,16 @@ class QtGqlObjectTypeDefinition(BaseGqlTypeDefinition):
 @define(slots=False)
 class QtGqlInterfaceDefinition(QtGqlObjectTypeDefinition):
     implementations: dict[str, BaseGqlTypeDefinition] = attrs.field(factory=dict)
+
+    @cached_property
+    def is_node_interface(self) -> bool:
+        """As specified by https://graphql.org/learn/global-object-
+        identification/#node-interface."""
+        if self.name == "Node":
+            id_field_maybe = self.fields[0].type.is_builtin_scalar
+            if id_field_maybe and id_field_maybe is BuiltinScalars.ID:
+                return True
+        return False
 
 
 @define(slots=False)
@@ -385,7 +395,7 @@ class GqlTypeHinter(TypeHinter):
     def type_name(self) -> str:
         t_self = self.optional_maybe
         if builtin_scalar := t_self.is_builtin_scalar:
-            return builtin_scalar.tp
+            return builtin_scalar.attr.name
 
         if scalar := t_self.is_custom_scalar:
             return scalar.type_name
