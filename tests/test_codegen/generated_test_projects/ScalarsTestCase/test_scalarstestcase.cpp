@@ -54,15 +54,16 @@ std::shared_ptr<ScalarsTestCase::User> get_shared_user(){
     return ScalarsTestCase::User::get_node(node_id).value();
 }
 
+    using namespace std::chrono_literals;
 
 TEST_CASE("Test Garbage collection"){
+
     auto env = test_utils::get_or_create_env(
-            ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
+            ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR,}}, 100ms);
     std::weak_ptr<ScalarsTestCase::User> weak_user = get_shared_user();
     // at map
     REQUIRE(weak_user.use_count() == 1);
-    env->get_cache()->collect_garbage();
-    REQUIRE(weak_user.use_count() == 0);
+    REQUIRE(QTest::qWaitFor([&]() {return weak_user.use_count() == 0;}));
 }
 
 }; // namespace ScalarsTestCase

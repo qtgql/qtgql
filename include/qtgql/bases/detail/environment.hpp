@@ -1,5 +1,6 @@
 #pragma once
 #include <utility>
+#include <QTimer>
 
 #include "./networklayer.hpp"
 #include "QMap"
@@ -10,6 +11,7 @@
 
 namespace qtgql {
 namespace bases {
+using namespace std::chrono_literals;
 
 class NodeInstanceStore {
 friend class EnvCache;
@@ -23,11 +25,19 @@ protected:
     void collect_garbage();
 };
 
-class EnvCache {
+struct EnvCacheOptions{
+    std::chrono::milliseconds garbage_collection_period = std::chrono::milliseconds(30s);
+};
+
+class EnvCache: public QObject{
+Q_OBJECT
 protected:
     NodeInstanceStore m_store = {};
+    QTimer* m_gc_timer;
 
 public:
+    explicit EnvCache(const EnvCacheOptions & options = EnvCacheOptions());
+
     [[nodiscard]] auto get_node(const scalars::Id &id) const {
         return m_store.get_node(id);
     }
@@ -35,6 +45,11 @@ public:
         return m_store.add_node(node);
     }
     auto collect_garbage(){m_store.collect_garbage();}
+
+};
+
+
+struct EnvironmentOptions{
 
 };
 
@@ -58,7 +73,7 @@ class Environment {
   typedef std::unique_ptr<EnvCache> UniqueCache;
 
   UniqueNetworkLayer m_network_layer;
-  UniqueCache m_cache;  // using unique pointers for extendability
+  UniqueCache m_cache = std::make_unique<EnvCache>();  // using unique pointers for extendability
   inline static QMap<QString, SharedQtGqlEnv> ENV_MAP = {};
 
 public:
@@ -70,10 +85,14 @@ public:
 
     const QString m_name;
 
-  explicit Environment(QString name, UniqueNetworkLayer network_layer, UniqueCache cache_ = std::make_unique<EnvCache>())
+   Environment(QString name, UniqueNetworkLayer network_layer)
       : m_name(std::move(name)),
-      m_network_layer(std::move(network_layer)),
-      m_cache(std::move(cache_)){};
+      m_network_layer(std::move(network_layer)){};
+
+    Environment(QString name, UniqueNetworkLayer network_layer, UniqueCache cache_)
+            : m_name(std::move(name)),
+              m_network_layer(std::move(network_layer)),
+              m_cache(std::move(cache_)){};
 
   void execute(const std::shared_ptr<HandlerABC> &handler) {
     m_network_layer->execute(handler);

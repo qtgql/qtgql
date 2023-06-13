@@ -1,9 +1,8 @@
 #include "environment.hpp"
 
 
+using namespace qtgql::bases;
 
-namespace qtgql {
-namespace bases {
     void NodeInstanceStore::add_node(const std::shared_ptr <qtgql::bases::NodeInterfaceABC> &node) {
         if (node.get()) {
             m_nodes.emplace(node->get_id(), node);
@@ -48,5 +47,11 @@ Environment::get_env(const QString &name) {
         }
         throw exceptions::EnvironmentNotFoundError(name.toStdString());
     }
-}; // namespace bases
-}; // namespace qtgql
+
+    EnvCache::EnvCache(const qtgql::bases::EnvCacheOptions &options): QObject(nullptr) {
+        m_gc_timer = new QTimer(this);
+        m_gc_timer->setInterval(options.garbage_collection_period);
+        connect(m_gc_timer, &QTimer::timeout, this, &EnvCache::collect_garbage);
+        m_gc_timer->start();
+    }
+
