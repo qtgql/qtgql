@@ -19,10 +19,10 @@ Release type: <patch/minor/major>
 {% endif %}
 
 ### Status of codegen testcases implementation
-| TestCase         | Has implementation? | Deserialization? | Update? | Garbage collection?|
-| -----------------|---------------------|------------------|---------|--------------------|
+| TestCase         | Has implementation? | Deserialization? | Update? |
+| -----------------|---------------------|------------------|---------|
 {%for tc in context.testcases_context.testcases-%}
-|  {{ tc.test.test_name }} | {{ tc.implemented }} | {{ tc.deserialization }} | {{ tc.update }} | {{ tc.garbage_collection }}|
+|  {{ tc.test.test_name }} | {{ tc.implemented }} | {{ tc.deserialization }} | {{ tc.update }} |
 {% endfor -%}
 
 ### Summary 

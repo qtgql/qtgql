@@ -53,6 +53,8 @@ class TstCaseStatus:
     implemented: ImplementationStatus
     deserialization: ImplementationStatus
     update: ImplementationStatus
+    # TODO: replace with "test in operation variable"?
+    # since https://github.com/qtgql/qtgql/pull/253 this is redundant I think.
     garbage_collection: ImplementationStatus
 
 
@@ -87,7 +89,7 @@ def get_testcases_context() -> TstCaseImplementationStatusTemplateContext:
                     ignored=not tc.metadata.should_test_updates,
                 ),
                 garbage_collection=ImplementationStatus(
-                    "test garbage collection" in tst_content,
+                    "test in operation variable" in tst_content,
                     ignored=not tc.metadata.should_test_garbage_collection,
                 ),
             ),
