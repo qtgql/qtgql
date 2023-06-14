@@ -1,16 +1,12 @@
 from __future__ import annotations
 
-from typing import Optional
-
 import strawberry
-
-from tests.test_codegen.schemas.node_interface import Node
-from tests.test_codegen.schemas.node_interface import NODE_DB
+from tests.test_codegen.schemas.node_interface import NODE_DB, Node
 
 
 @strawberry.type
 class User(Node):
-    person: Optional[Person]
+    person: Person | None
 
 
 @strawberry.type()

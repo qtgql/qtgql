@@ -1,9 +1,6 @@
 from __future__ import annotations
 
-from typing import Callable
-from typing import Optional
-from typing import Type
-from typing import TypeVar
+from typing import Callable, TypeVar
 
 from graphql import language as gql_lang
 from graphql.type import definition as gql_def
@@ -12,9 +9,9 @@ T_AST_Node = TypeVar("T_AST_Node", bound=gql_lang.Node)
 
 
 def ast_identifier_factory(
-    expected: Type[T_AST_Node],
-) -> Callable[[gql_lang.Node], Optional[T_AST_Node]]:
-    def type_guarder(node: gql_lang.ast.Node) -> Optional[T_AST_Node]:
+    expected: type[T_AST_Node],
+) -> Callable[[gql_lang.Node], T_AST_Node | None]:
+    def type_guarder(node: gql_lang.ast.Node) -> T_AST_Node | None:
         if isinstance(node, expected):
             return node
 
@@ -33,9 +30,9 @@ T_Definition = TypeVar("T_Definition", bound=gql_def.GraphQLType)
 
 
 def definition_identifier_factory(
-    expected: Type[T_Definition],
-) -> Callable[[gql_def.GraphQLType], Optional[T_Definition]]:
-    def type_guarder(definition: gql_def.GraphQLType) -> Optional[T_Definition]:
+    expected: type[T_Definition],
+) -> Callable[[gql_def.GraphQLType], T_Definition | None]:
+    def type_guarder(definition: gql_def.GraphQLType) -> T_Definition | None:
         if isinstance(definition, expected):
             return definition
 

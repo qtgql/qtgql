@@ -1,16 +1,16 @@
+from __future__ import annotations
+
 import json
 import os
 import re
 import subprocess
 from functools import cached_property
 from pathlib import Path
-from typing import Optional
 
 import pytest
 from typing_extensions import TypedDict
 
-from tests.conftest import MiniServer
-from tests.conftest import PATHS
+from tests.conftest import PATHS, MiniServer
 
 build_dir = PATHS.PROJECT_ROOT / "build" / "Debug"
 if not build_dir.exists():
@@ -35,7 +35,7 @@ class CtestTestCommand:
     def __init__(self, test_name: str) -> None:
         self._data: list[str] = ["ctest", "-R"]
         self.test_name: str = test_name
-        self.ret_res: Optional[subprocess.CompletedProcess] = None
+        self.ret_res: subprocess.CompletedProcess | None = None
 
     def add_command(self, command: str):
         self._data.append(command)

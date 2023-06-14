@@ -1,8 +1,6 @@
-from enum import auto
-from enum import Enum
+from enum import Enum, auto
 
 import strawberry
-
 from tests.test_codegen.schemas.node_interface import Node
 
 

@@ -3,8 +3,7 @@ from typing import Optional
 
 from attr import define
 
-from qtgqlcodegen.cppref import CppAttribute
-from qtgqlcodegen.cppref import QtGqlBasesNs
+from qtgqlcodegen.core.cppref import CppAttribute, QtGqlBasesNs
 
 
 def ScalarsNs() -> CppAttribute:

@@ -1,9 +1,6 @@
 from __future__ import annotations
 
-from typing import Union
-
 import strawberry
-
 from tests.conftest import fake
 from tests.test_codegen.schemas.node_interface import Node
 
@@ -16,7 +13,7 @@ class Frog(Node):
 
 @strawberry.type
 class User(Node):
-    who_am_i: Union[Frog, Person]
+    who_am_i: Frog | Person
 
 
 @strawberry.type()

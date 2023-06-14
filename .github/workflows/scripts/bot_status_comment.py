@@ -1,14 +1,13 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import NamedTuple
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, NamedTuple
 
 import jinja2
 from attr import define
+from tests.conftest import PATHS
 
 from .ghub import get_current_pr
-from tests.conftest import PATHS
 
 if TYPE_CHECKING:
     from tests.test_codegen.testcases import QtGqlTestCase
@@ -53,7 +52,8 @@ class TstCaseStatus:
     implemented: ImplementationStatus
     deserialization: ImplementationStatus
     update: ImplementationStatus
-    # TODO: replace with "test in operation variable"?
+    # TODO(nir): replace with "test in operation variable"?
+    # https://github.com/qtgql/qtgql/issues/266
     # since https://github.com/qtgql/qtgql/pull/253 this is redundant I think.
     garbage_collection: ImplementationStatus
 

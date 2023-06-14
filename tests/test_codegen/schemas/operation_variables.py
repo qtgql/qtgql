@@ -16,6 +16,11 @@ def get_or_create_friends(inst: UserWithFriend) -> UserWithFriend:
     return ret
 
 
+@strawberry.input()
+class ConnectedInput:
+    bool_var: bool
+
+
 @strawberry.type()
 class UserWithFriend(Node):
     name: str = strawberry.field(default_factory=factory.person.name)
@@ -23,10 +28,10 @@ class UserWithFriend(Node):
     @strawberry.field()
     def friend(
         self,
-        connected: bool = False,
+        connected_arg: ConnectedInput,
     ) -> UserWithFriend | None:
         friends_ = get_or_create_friends(self)
-        if connected:
+        if connected_arg:
             return friends_[0]
 
         return UserWithFriend()

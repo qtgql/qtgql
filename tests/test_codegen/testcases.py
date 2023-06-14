@@ -4,21 +4,19 @@ import os
 import re
 from functools import cached_property
 from pathlib import Path
-from typing import NamedTuple
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, NamedTuple
 
 import attrs
+import graphql
 import jinja2
 from attr import define
-from typer.testing import CliRunner
-
 from qtgqlcodegen.cli import app
 from qtgqlcodegen.config import QtGqlConfig
-from qtgqlcodegen.introspection import SchemaEvaluator
-from qtgqlcodegen.runtime.custom_scalars import CustomScalarDefinition
-from qtgqlcodegen.runtime.custom_scalars import DateTimeScalarDefinition
+from qtgqlcodegen.custom_scalars import CustomScalarDefinition, DateTimeScalarDefinition
+from qtgqlcodegen.generator import SchemaGenerator
 from tests.conftest import hash_schema
 from tests.test_codegen import schemas
+from typer.testing import CliRunner
 
 if TYPE_CHECKING:
     from strawberry import Schema
@@ -79,8 +77,13 @@ class QtGqlTestCase:
     metadata: TestCaseMetadata = attrs.Factory(TestCaseMetadata)
 
     @cached_property
-    def evaluator(self) -> SchemaEvaluator:
-        return SchemaEvaluator(config=self.config)
+    def evaluator(self) -> SchemaGenerator:
+        return SchemaGenerator(
+            config=self.config,
+            schema=graphql.build_schema(
+                (self.graphql_dir / "schema.graphql").resolve(True).read_text(),
+            ),
+        )
 
     @cached_property
     def test_dir(self) -> Path:
@@ -186,11 +189,11 @@ ScalarsTestCase = QtGqlTestCase(
 OperationVariablesTestcase = QtGqlTestCase(
     schema=schemas.operation_variables.schema,
     operations="""
-  query UserQuery($connected: Boolean!) {
+  query UserQuery($connectedVar: ConnectedInput!) {
     user {
       id
       name
-      friend(connected: $connected) {
+      friend(connectedArg: $connectedVar) {
         id
         name
       }

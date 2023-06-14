@@ -1,8 +1,7 @@
 import subprocess
 
 from tests.conftest import IS_GITHUB_ACTION
-from tests.test_codegen.testcases import generate_testcases
-from tests.test_codegen.testcases import implemented_testcases
+from tests.test_codegen.testcases import generate_testcases, implemented_testcases
 
 
 def generate_all_testscases() -> None:

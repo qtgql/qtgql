@@ -1,5 +1,7 @@
 from attrs import define
 
+from qtgqlcodegen.schema.typing import CustomScalarMap
+
 
 @define
 class CustomScalarDefinition:
@@ -41,8 +43,6 @@ DecimalScalarDefinition = CustomScalarDefinition(
     include_path="<qtgql/customscalars/customscalars.hpp>",
 )
 
-
-CustomScalarMap = dict[str, CustomScalarDefinition]
 CUSTOM_SCALARS: CustomScalarMap = {
     DateTimeScalarDefinition.graphql_name: DateTimeScalarDefinition,
     DateScalarDefinition.graphql_name: DateScalarDefinition,

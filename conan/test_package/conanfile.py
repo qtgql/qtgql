@@ -6,10 +6,7 @@ from pathlib import Path
 
 from conan import ConanFile
 from conan.tools.build import can_run
-from conan.tools.cmake import CMake
-from conan.tools.cmake import cmake_layout
-from conan.tools.cmake import CMakeDeps
-from conan.tools.cmake import CMakeToolchain
+from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
 
 
 class helloTestConan(ConanFile):
@@ -28,7 +25,7 @@ class helloTestConan(ConanFile):
             subprocess.run(
                 f"poetry run aqt install-qt {self.os_name} "
                 f"desktop {self.qt_version} {self.qt_arch} "
-                f"--outputdir {str(self.aqt_install_dir)} "
+                f"--outputdir {self.aqt_install_dir!s} "
                 f"-m qtwebsockets".split(" "),
             ).check_returncode()
         assert self.qt6_install_dir

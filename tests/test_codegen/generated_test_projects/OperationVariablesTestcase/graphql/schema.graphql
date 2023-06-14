@@ -1,3 +1,7 @@
+input ConnectedInput {
+  boolVar: Boolean!
+}
+
 interface Node {
   id: ID!
 }
@@ -9,5 +13,5 @@ type Query {
 type UserWithFriend implements Node {
   id: ID!
   name: String!
-  friend(connected: Boolean! = false): UserWithFriend
+  friend(connectedArg: ConnectedInput!): UserWithFriend
 }

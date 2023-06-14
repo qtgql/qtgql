@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import strawberry
-
 from tests.conftest import fake
 
 

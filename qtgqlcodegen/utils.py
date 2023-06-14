@@ -1,10 +1,11 @@
-import re
-from pathlib import Path
-from typing import Any
-from typing import Optional
-from typing import Type
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from attr import define
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 @define
@@ -33,10 +34,18 @@ class AntiForwardRef:
         return cls.type_map[cls.name]
 
 
-def anti_forward_ref(name: str, type_map: dict) -> Type[AntiForwardRef]:
+def anti_forward_ref(name: str, type_map: dict) -> type[AntiForwardRef]:
     return type(name, (AntiForwardRef,), {"name": name, "type_map": type_map})
 
 
-def get_operation_name(query: str) -> Optional[str]:
-    if match := re.search(r"(subscription|mutation|query)(.*?({|\())", query):
-        return match.group(2).replace(" ", "").strip("{").strip("(")
+T = TypeVar("T")
+
+
+def require(v: T | None) -> T:  # pragma: no cover
+    if not v:
+        raise RuntimeError(f"{v} returned no value")
+    return v
+
+
+def freeze(self, key, value):  # pragma: no cover
+    raise PermissionError("setattr called on frozen type")

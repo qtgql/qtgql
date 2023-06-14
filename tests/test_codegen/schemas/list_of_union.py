@@ -2,11 +2,9 @@ from __future__ import annotations
 
 import random
 import uuid
-from typing import Union
 from uuid import UUID
 
 import strawberry
-
 from tests.conftest import fake
 from tests.test_codegen.schemas.node_interface import Node
 
@@ -30,7 +28,7 @@ class Frog(Node):
 @strawberry.type
 class Query:
     @strawberry.field
-    def usersAndFrogs(self) -> list[Union[Frog, User]]:
+    def usersAndFrogs(self) -> list[Frog | User]:
         return [random.choice((User(), Frog())) for _ in range(7)]  # noqa: S311
 
 

@@ -1,10 +1,7 @@
 from __future__ import annotations
 
 from functools import cached_property
-from typing import Literal
-from typing import NamedTuple
-from typing import Optional
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal, NamedTuple
 
 from attr import define
 
@@ -29,7 +26,7 @@ class CppAttribute:
             )
 
     attr: str
-    inner: Optional[CppAttribute.InnerCppAttribute] = None
+    inner: CppAttribute.InnerCppAttribute | None = None
 
     def ns_add(self, inner: str) -> Self:
         if self.inner:

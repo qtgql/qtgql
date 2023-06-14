@@ -1,6 +1,4 @@
-from datetime import date
-from datetime import datetime
-from datetime import time
+from datetime import date, datetime, time
 from decimal import Decimal
 
 import strawberry

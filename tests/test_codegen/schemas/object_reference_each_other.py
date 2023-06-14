@@ -1,9 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional
-
 import strawberry
-
 from tests.conftest import fake
 from tests.test_codegen.schemas.node_interface import Node
 
@@ -11,7 +8,7 @@ from tests.test_codegen.schemas.node_interface import Node
 @strawberry.type
 class User(Node):
     password: str
-    person: Optional[Person]
+    person: Person | None
 
 
 @strawberry.type()
