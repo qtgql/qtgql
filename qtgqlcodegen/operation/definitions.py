@@ -14,12 +14,8 @@ if TYPE_CHECKING:
     from graphql.type import definition as gql_def
 
     from qtgqlcodegen.operation.typing import OperationTypeInfo
-    from qtgqlcodegen.schema.definitions import (
-        QtGqlFieldDefinition,
-        QtGqlObjectTypeDefinition,
-        QtGqlVariableDefinition,
-    )
-    from qtgqlcodegen.schema.typing import GqlTypeHinter, SchemaTypeInfo
+    from qtgqlcodegen.schema.typing import GqlTypeHinter, SchemaTypeInfo, QtGqlVariableDefinition, QtGqlFieldDefinition, \
+    QtGqlObjectTypeDefinition
 
 
 @attrs.define(frozen=True, slots=False, repr=False)
@@ -119,7 +115,6 @@ class QtGqlQueriedObjectType:
 @define(slots=False, repr=False)
 class QtGqlOperationDefinition:
     operation_def: gql_def.OperationDefinitionNode
-    type_info: SchemaTypeInfo
     root_field: QtGqlQueriedField
     fragments: list[str] = attrs.Factory(list)
     variables: list[QtGqlVariableDefinition] = attrs.Factory(list)

@@ -6,8 +6,7 @@ import attrs
 
 if TYPE_CHECKING:
     from qtgqlcodegen.operation.definitions import QtGqlQueriedObjectType
-    from qtgqlcodegen.schema.definitions import QtGqlVariableDefinition
-    from qtgqlcodegen.schema.typing import SchemaTypeInfo
+    from qtgqlcodegen.schema.typing import SchemaTypeInfo, QtGqlVariableDefinition
 
 
 @attrs.define(slots=False)

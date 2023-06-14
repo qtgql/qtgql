@@ -1,16 +1,4 @@
-from attrs import define
-
-from qtgqlcodegen.schema.typing import CustomScalarMap
-
-
-@define
-class CustomScalarDefinition:
-    type_name: str
-    graphql_name: str
-    deserialized_type: str
-    type_for_proxy: str
-    include_path: str
-
+from qtgqlcodegen.schema.typing import CustomScalarMap, CustomScalarDefinition
 
 # An ISO-8601 encoded datetime.
 DateTimeScalarDefinition = CustomScalarDefinition(

@@ -19,17 +19,9 @@ from qtgqlcodegen.core.graphql_ref import (
     is_scalar_definition,
     is_union_definition,
 )
-from qtgqlcodegen.schema.definitions import (
-    EnumValue,
-    QtGqlEnumDefinition,
-    QtGqlFieldDefinition,
-    QtGqlInputFieldDefinition,
-    QtGqlInputObjectTypeDefinition,
-    QtGqlInterfaceDefinition,
-    QtGqlObjectTypeDefinition,
-    QtGqlVariableDefinition,
-)
-from qtgqlcodegen.schema.typing import CustomScalarMap, GqlTypeHinter, SchemaTypeInfo
+from qtgqlcodegen.schema.typing import CustomScalarMap, GqlTypeHinter, SchemaTypeInfo, QtGqlVariableDefinition, \
+    QtGqlInputFieldDefinition, QtGqlFieldDefinition, QtGqlObjectTypeDefinition, QtGqlInterfaceDefinition, \
+    QtGqlInputObjectTypeDefinition, EnumValue, QtGqlEnumDefinition
 from qtgqlcodegen.utils import anti_forward_ref
 
 
@@ -94,7 +86,7 @@ def evaluate_field_type(
                 GqlTypeHinter(
                     type=anti_forward_ref(
                         name=possible.name,
-                        type_map=type_info.object_types,
+                        type_map=type_info._object_types,
                     ),
                     scalars=type_info.custom_scalars,
                 )
@@ -160,7 +152,7 @@ def evaluate_object_type(
     type_: gql_def.GraphQLObjectType,
 ) -> QtGqlObjectTypeDefinition | None:
     t_name: str = type_.name
-    if evaluated := type_info.object_types.get(t_name, None):
+    if evaluated := type_info.get_object_type(t_name):
         return evaluated
     if type_.name not in type_info.root_types_names:
         # TODO(nir): remove this check.
@@ -197,7 +189,7 @@ def evaluate_object_type(
             name: evaluate_field(type_info, name, field) for name, field in type_.fields.items()
         },
     )
-    type_info.object_types[ret.name] = ret
+    type_info.set_objecttype(ret)
     for interface in type_.interfaces:
         qtgql_interface = evaluate_interface_type(type_info, interface)
         qtgql_interface.implementations[type_.name] = ret

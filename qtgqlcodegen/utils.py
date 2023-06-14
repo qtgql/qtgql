@@ -43,7 +43,7 @@ T = TypeVar("T")
 
 def require(v: T | None) -> T:  # pragma: no cover
     if not v:
-        raise RuntimeError(f"{v} returned no value")
+        raise AttributeError(f"{v} returned no value")
     return v
 
 

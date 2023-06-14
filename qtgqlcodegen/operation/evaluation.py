@@ -28,8 +28,7 @@ from qtgqlcodegen.schema.evaluation import evaluate_variable
 from qtgqlcodegen.utils import require
 
 if TYPE_CHECKING:
-    from qtgqlcodegen.schema.definitions import QtGqlFieldDefinition, QtGqlObjectTypeDefinition
-    from qtgqlcodegen.schema.typing import SchemaTypeInfo
+    from qtgqlcodegen.schema.typing import SchemaTypeInfo, QtGqlFieldDefinition, QtGqlObjectTypeDefinition
 
 
 def is_type_name_selection(field_node: gql_lang.FieldNode):
@@ -38,7 +37,8 @@ def is_type_name_selection(field_node: gql_lang.FieldNode):
         return True
     return False
 
-
+def get_operation_root_field_name(operation_node: gql_lang.OperationDefinitionNode) -> str:
+    return operation_node.selection_set.selections[0].name.value  # type: ignore
 def _evaluate_field_from_node(
     field_node: gql_lang.FieldNode,
     field_type: QtGqlObjectTypeDefinition,
@@ -92,7 +92,7 @@ def _evaluate_field(
             assert fragment
 
             type_name = fragment.type_condition.name.value
-            concrete = type_info.schema_type_info.get_objecttype_by_name(type_name)
+            concrete = type_info.schema_type_info.get_object_type(type_name)
             assert concrete
             if not has_typename_selection(fragment.selection_set):
                 inject_typename_selection(fragment.selection_set)
@@ -131,7 +131,7 @@ def _evaluate_field(
             if inline_frag := is_inline_fragment(selection):
                 type_name = inline_frag.type_condition.name.value
                 # no need to validate inner types are implementation, graphql-core does this.
-                concrete = type_info.schema_type_info.get_objecttype_by_name(
+                concrete = type_info.schema_type_info.get_object_type(
                     type_name,
                 ) or type_info.schema_type_info.get_interface_by_name(type_name)
                 assert concrete
@@ -195,17 +195,16 @@ def _evaluate_operation(
             type_info.variables.append(evaluate_variable(type_info, var))
 
     root_field_def = require(is_field_node(operation.selection_set.selections[0]))
-    root_type = require(type_info.schema_type_info.get_objecttype_by_name(operation.operation.name))
+    root_type = require(type_info.schema_type_info.get_object_type(operation.operation.name))
     root_field = _evaluate_field(
         type_info,
-        root_type.fields_dict,
+        root_type.fields_dict[get_operation_root_field_name(operation)],
         root_field_def.selection_set,
         parent_interface_field=None,
         is_root=True,
     )
     return QtGqlOperationDefinition(
         root_field=root_field,
-        type_info=type_info,
         operation_def=operation,
         variables=type_info.variables,
     )

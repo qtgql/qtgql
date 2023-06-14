@@ -1,28 +1,24 @@
 from __future__ import annotations
 
+import abc
 import contextlib
 from functools import cached_property
 from typing import TYPE_CHECKING, Any
 
+import attrs
 from attr import Factory, define
 from graphql import OperationType
-from typingref import TypeHinter
+from typingref import TypeHinter, UNSET
 
 from qtgqlcodegen.builtin_scalars import BuiltinScalar, BuiltinScalars
+from qtgqlcodegen.core.cppref import QtGqlTypes
 from qtgqlcodegen.operation.definitions import QtGqlQueriedObjectType
-from qtgqlcodegen.schema.definitions import (
-    QtGqlEnumDefinition,
-    QtGqlInputObjectTypeDefinition,
-    QtGqlInterfaceDefinition,
-    QtGqlObjectTypeDefinition,
-)
 from qtgqlcodegen.utils import AntiForwardRef, freeze
 
 if TYPE_CHECKING:
     from graphql.type import definition as gql_def
-    from typing_extensions import TypeAlias
+    from typing_extensions import TypeAlias, TypeGuard
 
-    from qtgqlcodegen.custom_scalars import CustomScalarDefinition
 
 EnumMap: TypeAlias = "dict[str, QtGqlEnumDefinition]"
 ObjectTypeMap: TypeAlias = "dict[str, QtGqlObjectTypeDefinition]"
@@ -44,8 +40,11 @@ class SchemaTypeInfo:
     def get_interface_by_name(self, name: str) -> QtGqlInterfaceDefinition | None:
         return self.interfaces.get(name, None)
 
-    def get_objecttype_by_name(self, name: str) -> QtGqlObjectTypeDefinition | None:
-        return self.object_types.get(name, None)
+    def get_object_type(self, name: str) -> QtGqlObjectTypeDefinition | None:
+        return self.object_types.get(name.lower(), None)
+
+    def set_objecttype(self, objecttype: QtGqlObjectTypeDefinition) -> None:
+        self.object_types[objecttype.name.lower()] = objecttype
 
     @cached_property
     def root_types(self) -> list[gql_def.GraphQLObjectType | None]:
@@ -59,26 +58,350 @@ class SchemaTypeInfo:
     def root_types_names(self) -> str:
         return " ".join([tp.name for tp in self.root_types if tp])
 
+class QtGqlTypeABC(abc.ABC):
+    def is_union(self) -> TypeGuard[QtGqlUnion]:
+        raise False
 
-class GqlTypeHinter(TypeHinter):
+    def is_object_type(self) -> TypeGuard[QtGqlObjectTypeDefinition]:
+        raise False
+
+    def is_interface(self) -> TypeGuard[QtGqlInterfaceDefinition]:
+        return False
+
+    def is_optional(self) -> TypeGuard[QtGqlOptional]:
+        """
+        represents GraphQL types that are not marked with "!"
+        """
+        return False
+    def is_list(self) -> TypeGuard[QtGqlList]:
+        return False
+
+    def is_builtin_scalar(self) -> TypeGuard[QtGqlBuiltinScalar]:
+        return False
+    def is_custom_scalar(self) -> TypeGuard[CustomScalarDefinition]:
+        return False
+class QtGqlOptional(QtGqlTypeABC):
+    def is_optional(self) -> TypeGuard[QtGqlOptional]:
+        return True
+
+class QtGqlList(QtGqlTypeABC):
+    def is_list(self) -> TypeGuard[QtGqlList]:
+        return True
+class QtGqlUnion(QtGqlTypeABC):
+
+    def is_union(self) -> TypeGuard[QtGqlUnion]:
+        return True
+
+class QtGqlDeferredType(QtGqlTypeABC):
+    
+    def __init__(self, object_map: dict[str, QtGqlTypeABC], name: str):
+        self.object_map = object_map
+        self.name = name
+    
+    def resolve(self) -> QtGqlTypeABC:
+        return self.object_map[self.name]
+
+class QtGqlBuiltinScalar(QtGqlTypeABC):
+    def is_builtin_scalar(self) -> TypeGuard[QtGqlBuiltinScalar]:
+        return True
+
+
+@define
+class CustomScalarDefinition(QtGqlTypeABC):
+    type_name: str
+    graphql_name: str
+    deserialized_type: str
+    type_for_proxy: str
+    include_path: str
+    
+    def is_custom_scalar(self) -> TypeGuard[CustomScalarDefinition]:
+        return True
+
+
+
+@define(slots=False)
+class QtGqlBaseTypedNode:
+    name: str
+    type: GqlTypeHinter
+    type_info: SchemaTypeInfo
+
+    @cached_property
+    def is_custom_scalar(self) -> CustomScalarDefinition | None:
+        return self.type.is_custom_scalar
+
+
+@define(slots=False)
+class QtGqlVariableDefinition(QtGqlBaseTypedNode):
+    default_value = UNSET
+
+    def json_repr(self, attr_name: str | None = None) -> str:
+        if not attr_name:
+            attr_name = self.name
+        attr_name += ".value()"  # unwrap optional
+        if self.type.is_input_object_type:
+            return f"{attr_name}.to_json()"
+        elif self.type.is_builtin_scalar:
+            return f"{attr_name}"
+        elif enum_def := self.type.is_enum:
+            return f"Enums::{enum_def.map_name}::name_by_value({attr_name})"
+        elif self.is_custom_scalar:
+            return f"{attr_name}.serialize()"
+
+        raise NotImplementedError(f"{self.type} is not supported as an input type ATM")
+
+
+@define(slots=False)
+class BaseQtGqlFieldDefinition(QtGqlBaseTypedNode):
+    description: str | None = ""
+
+
+@define(slots=False)
+class QtGqlInputFieldDefinition(BaseQtGqlFieldDefinition, QtGqlVariableDefinition):
+    ...
+
+
+@define(slots=False)
+class QtGqlArgumentDefinition(QtGqlInputFieldDefinition):
+    ...
+
+
+@define(slots=False, kw_only=True)
+class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
+    arguments: list[QtGqlInputFieldDefinition] = Factory(list)
+
+    @cached_property
+    def default_value(self):
+        if builtin_scalar := self.type.is_builtin_scalar:
+            return builtin_scalar.default_value
+        if self.type.is_object_type:
+            return "{}"
+
+        if self.type.is_model:
+            # this would just generate the model without data.
+            return "{}"
+
+        if self.type.is_custom_scalar:
+            return "{}"
+
+        if enum_def := self.type.is_enum:
+            return f"{enum_def.namespaced_name}(0)"
+
+        raise NotImplementedError
+
+    @cached_property
+    def member_type(self) -> str:
+        """
+        :returns: Annotation of the field based on the real type,
+        meaning that the private attribute would be of that type.
+        this goes for init and the property setter.
+        """
+
+        ret = self.type.member_type
+        # if self.arguments:
+        return ret
+
+    @cached_property
+    def fget_annotation(self) -> str:
+        """This annotates the value that is QML-compatible."""
+        if custom_scalar := self.type.is_custom_scalar:
+            return TypeHinter.from_annotations(
+                custom_scalar.type_for_proxy,
+            ).stringify()
+        if self.type.is_enum:
+            return "int"
+
+        return self.member_type
+
+    @cached_property
+    def type_for_proxy(self) -> str:
+        if self.type.is_builtin_scalar or self.type.is_custom_scalar:
+            return self.fget_annotation
+        else:
+            if self.type.is_enum:
+                # QEnum value must be int
+                return "int"
+            # might be a model, which is also QObject
+            # graphql doesn't support scalars or enums in Unions ATM.
+            assert (
+                self.type.is_model
+                or self.type.is_object_type
+                or self.type.is_interface
+                or self.type.is_union
+            )
+            return "QObject"
+
+    @cached_property
+    def getter_name(self) -> str:
+        return f"get_{self.name}"
+
+    @cached_property
+    def setter_name(self) -> str:
+        return f"set_{self.name}"
+
+    @cached_property
+    def signal_name(self) -> str:
+        return f"{self.name}Changed"
+
+    @cached_property
+    def private_name(self) -> str:
+        return f"m_{self.name}"
+
+    @cached_property
+    def can_select_id(self) -> QtGqlFieldDefinition | None:
+        """
+        :return: The id field of this field object/model type if implements `Node`
+        """
+        object_type = self.type.is_object_type or self.type.is_interface
+        if not object_type:
+            if self.type.is_model:
+                object_type = self.type.is_model.is_object_type
+        if object_type and object_type.implements_node:
+            return object_type.fields_dict["id"]
+
+
+@define(slots=False)
+class BaseQtGqlObjectType:
+    name: str
+    fields_dict: dict[str, QtGqlFieldDefinition]
+    docstring: str | None = ""
+
+    @property
+    def fields(self) -> list[QtGqlFieldDefinition]:
+        return list(self.fields_dict.values())
+
+
+@define(slots=False, kw_only=True)
+class QtGqlObjectTypeDefinition(QtGqlTypeABC, BaseQtGqlObjectType):
+    interfaces_raw: list[QtGqlInterfaceDefinition] = attrs.Factory(list)
+    
+    def is_object_type(self) -> TypeGuard[QtGqlObjectTypeDefinition]:
+        return True
+    def implements(self, interface: QtGqlInterfaceDefinition) -> bool:
+        for m_interface in self.interfaces_raw:
+            if interface is m_interface or m_interface.implements(interface):
+                return True
+        return False
+
+    @cached_property
+    def bases(self) -> list[QtGqlInterfaceDefinition]:
+        """
+        returns only the top level interfaces that should be inherited.
+        if i.e
+        ```graphql
+        interface Node{
+        id: ID!
+        }
+
+        interface A implements Node{
+        otherField: String!
+        }
+
+        type Foo implements A{
+        ...
+        }
+        ```
+        Type `Foo` would extend only `A`
+
+        If there are no interfaces returns only NodeInterfaceABC or ObjectTypeABC.
+        """
+        not_unique_interfaces: list[QtGqlInterfaceDefinition] = []
+
+        if not self.interfaces_raw:
+            # TODO(nir): these are not really interfaces though they are inherited if there are no interfaces.
+            # https://github.com/qtgql/qtgql/issues/267
+            if self.implements_node:
+                return [QtGqlTypes.NodeInterfaceABC]  # type: ignore
+
+            else:
+                return [QtGqlTypes.ObjectTypeABC]  # type: ignore
+
+        for interface in self.interfaces_raw:
+            for other in self.interfaces_raw:
+                if other is not interface:
+                    if interface.implements(other):
+                        not_unique_interfaces.append(other)
+
+        return [intfs for intfs in self.interfaces_raw if intfs not in not_unique_interfaces]
+
+    @cached_property
+    def implements_node(self) -> bool:
+        if isinstance(self, QtGqlInterfaceDefinition):
+            return self.is_node_interface
+
+        return any(base.implements_node for base in self.bases)
+
+    def __attrs_post_init__(self):
+        # inject this object type to the interface.
+        # later the interface would use this list to know who he might resolve to.
+        for base in self.interfaces_raw:
+            if not base.implementations.get(self.name):
+                base.implementations[self.name] = self
+
+
+@define(slots=False, kw_only=True)
+class QtGqlInterfaceDefinition(QtGqlObjectTypeDefinition):
+    implementations: dict[str, BaseQtGqlObjectType] = attrs.field(factory=dict)
+
+    @cached_property
+    def is_node_interface(self) -> bool:
+        """As specified by https://graphql.org/learn/global-object-
+        identification/#node-interface."""
+        if self.name == "Node":
+            id_field_maybe = self.fields[0].type.is_builtin_scalar
+            if id_field_maybe and id_field_maybe is BuiltinScalars.ID:
+                return True
+        return False
+
+
+@define(slots=False)
+class QtGqlInputObjectTypeDefinition(BaseQtGqlObjectType):
+    fields_dict: dict[str, QtGqlInputFieldDefinition] = attrs.field(factory=dict)  # type: ignore
+
+
+@define
+class EnumValue:
+    """encapsulates enumValues from introspection, maps to an Enum member."""
+
+    name: str
+    index: int
+    description: str = ""
+
+
+@define(slots=False)
+class QtGqlEnumDefinition:
+    name: str
+    members: list[EnumValue]
+
+    @cached_property
+    def map_name(self) -> str:
+        return f"{self.name}EnumMap"
+
+    @cached_property
+    def namespaced_name(self) -> str:
+        return f"Enums::{self.name}"
+
+
+
+class GqlTypeHinter:
     def __init__(
-        self,
-        type: Any,
-        scalars: CustomScalarMap,
-        of_type: tuple[GqlTypeHinter, ...] = (),
+            self,
+            type: QtGqlTypeABC,
+            scalars: CustomScalarMap,
+            of_type: tuple[GqlTypeHinter, ...] = (),
     ):
         self.type = type
         self.of_type: tuple[GqlTypeHinter, ...] = of_type
         self.scalars = scalars
         self.__setattr__ = freeze
 
+
     @cached_property
     def optional_maybe(self) -> GqlTypeHinter:
-        return self if not super().is_optional() else self.of_type[0]
+        return self if not self.type.is_optional() else self.of_type[0]
 
     @cached_property
     def is_union(self) -> bool:
-        return super().is_union()
+        return self.type.is_union()
 
     @cached_property
     def is_object_type(self) -> QtGqlObjectTypeDefinition | None:
@@ -86,7 +409,7 @@ class GqlTypeHinter(TypeHinter):
         if self.is_interface:
             return None
         with contextlib.suppress(TypeError):
-            if issubclass(t_self, AntiForwardRef):
+            if isinstance(t_self, QtGqlDeferredType):
                 ret = t_self.resolve()
                 if isinstance(ret, QtGqlObjectTypeDefinition):
                     return ret
@@ -106,7 +429,7 @@ class GqlTypeHinter(TypeHinter):
     @cached_property
     def is_model(self) -> GqlTypeHinter | None:
         t_self = self.optional_maybe
-        if t_self.is_list():
+        if t_self.type.is_list():
             # scalars or unions are not supported in lists yet (valid graphql spec though)
             return t_self.of_type[0]
 
@@ -125,9 +448,9 @@ class GqlTypeHinter(TypeHinter):
                     return t_self.resolve()
 
     @cached_property
-    def is_builtin_scalar(self) -> BuiltinScalar | None:
+    def is_builtin_scalar(self) -> QtGqlBuiltinScalar | None:
         t_self = self.optional_maybe.type
-        if isinstance(t_self, BuiltinScalar):
+        if isinstance(t_self, QtGqlBuiltinScalar):
             return t_self
 
     @property

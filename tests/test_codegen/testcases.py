@@ -12,7 +12,8 @@ import jinja2
 from attr import define
 from qtgqlcodegen.cli import app
 from qtgqlcodegen.config import QtGqlConfig
-from qtgqlcodegen.custom_scalars import CustomScalarDefinition, DateTimeScalarDefinition
+from qtgqlcodegen.custom_scalars import DateTimeScalarDefinition
+from qtgqlcodegen.schema.typing import CustomScalarDefinition
 from qtgqlcodegen.generator import SchemaGenerator
 from tests.conftest import hash_schema
 from tests.test_codegen import schemas
