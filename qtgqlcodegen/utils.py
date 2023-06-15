@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import TYPE_CHECKING, Any, Literal, TypeVar
 
 from attr import define
 
@@ -37,6 +37,8 @@ class AntiForwardRef:
 def anti_forward_ref(name: str, type_map: dict) -> type[AntiForwardRef]:
     return type(name, (AntiForwardRef,), {"name": name, "type_map": type_map})
 
+
+UNSET: Any = Literal["UNSET"]
 
 T = TypeVar("T")
 

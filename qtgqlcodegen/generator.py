@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import subprocess
 from typing import TYPE_CHECKING
 
 import graphql
@@ -81,15 +80,10 @@ class SchemaGenerator:
         """:param file: Path to the directory the codegen would dump to."""
         sources = self.generate()
 
-        args = ["clang-format"] + [
-            str(f.path) for f in sources if f.path.suffix in (".cpp", ".h", ".hpp")
-        ]
         cmake = FileSpec(
             content=cmake_template(CmakeTemplateContext(config=self.config, sources=sources)),
             path=self.config.generated_dir / "CMakeLists.txt",
         )
         sources.append(cmake)
-        args.append("-i")
         for f in sources:
             f.dump()
-        subprocess.run(args)

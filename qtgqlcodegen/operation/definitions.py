@@ -59,6 +59,10 @@ class QtGqlQueriedField:
 
     @cached_property
     def property_type(self) -> str:
+        """
+
+        :return: C++ property type that will be exposed to QML.
+        """
         tp = self.definition.type
         if tp.is_object_type:
             assert self.narrowed_type

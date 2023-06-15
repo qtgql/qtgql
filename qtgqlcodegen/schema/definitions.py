@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING, Literal
 
 from attr import Factory, define
 from graphql import OperationType
-from typingref import TypeHinter
 
 if TYPE_CHECKING:
     from graphql.type import definition as gql_def
@@ -37,16 +36,7 @@ class QtGqlVariableDefinition(QtGqlBaseTypedNode):
         if not attr_name:
             attr_name = self.name
         attr_name += ".value()"  # unwrap optional
-        if self.type.is_input_object_type:
-            return f"{attr_name}.to_json()"
-        elif self.type.is_builtin_scalar:
-            return f"{attr_name}"
-        elif enum_def := self.type.is_enum:
-            return f"Enums::{enum_def.map_name}::name_by_value({attr_name})"
-        elif self.type.is_custom_scalar:
-            return f"{attr_name}.serialize()"
-
-        raise NotImplementedError(f"{self.type} is not supported as an input type ATM")
+        return self.type.json_repr(attr_name)
 
 
 @define(slots=False)
@@ -67,52 +57,6 @@ class QtGqlArgumentDefinition(QtGqlInputFieldDefinition):
 @define(slots=False, kw_only=True)
 class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
     arguments: list[QtGqlInputFieldDefinition] = Factory(list)
-
-    @property
-    def default_value(self):
-        return self.type.default_value()
-
-    @cached_property
-    def member_type(self) -> str:
-        """
-        :returns: Annotation of the field based on the real type,
-        meaning that the private attribute would be of that type.
-        this goes for init and the property setter.
-        """
-
-        ret = self.type.member_type
-        # if self.arguments:
-        return ret
-
-    @cached_property
-    def fget_annotation(self) -> str:
-        """This annotates the value that is QML-compatible."""
-        if custom_scalar := self.type.is_custom_scalar:
-            return TypeHinter.from_annotations(
-                custom_scalar.type_for_proxy,
-            ).stringify()
-        if self.type.is_enum:
-            return "int"
-
-        return self.member_type
-
-    @cached_property
-    def type_for_proxy(self) -> str:
-        if self.type.is_builtin_scalar or self.type.is_custom_scalar:
-            return self.fget_annotation
-        else:
-            if self.type.is_enum:
-                # QEnum value must be int
-                return "int"
-            # might be a model, which is also QObject
-            # graphql doesn't support scalars or enums in Unions ATM.
-            assert (
-                self.type.is_model
-                or self.type.is_object_type
-                or self.type.is_interface
-                or self.type.is_union
-            )
-            return "QObject"
 
     @cached_property
     def getter_name(self) -> str:

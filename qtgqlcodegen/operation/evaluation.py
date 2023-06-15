@@ -7,7 +7,6 @@ import graphql
 from frozendict import frozendict
 from graphql import OperationDefinitionNode, OperationType, language as gql_lang
 from graphql.language import visitor
-from typingref import UNSET
 
 from qtgqlcodegen.core.graphql_ref import (
     has_id_selection,
@@ -32,7 +31,7 @@ from qtgqlcodegen.schema.definitions import (
 )
 from qtgqlcodegen.schema.evaluation import evaluate_graphql_type
 from qtgqlcodegen.types import QtGqlQueriedObjectType
-from qtgqlcodegen.utils import require
+from qtgqlcodegen.utils import UNSET, require
 
 if TYPE_CHECKING:
     from qtgqlcodegen.types import QtGqlObjectType, QtGqlTypeABC

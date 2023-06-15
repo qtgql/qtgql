@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+import jinja2
 from attrs import define
 from jinja2 import Environment, PackageLoader, select_autoescape
 
@@ -14,6 +15,7 @@ template_env = Environment(
     autoescape=select_autoescape(),
     variable_start_string="👉",  # originally {{ variable }}, using 👉 variable 👈 because C++ uses curly brackets.
     variable_end_string="👈",
+    undefined=jinja2.StrictUndefined,
 )
 
 

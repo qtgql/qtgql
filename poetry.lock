@@ -2999,14 +2999,14 @@ files = [
 
 [[package]]
 name = "strawberry-graphql"
-version = "0.185.0"
+version = "0.186.0"
 description = "A library for creating GraphQL APIs"
 category = "dev"
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "strawberry_graphql-0.185.0-py3-none-any.whl", hash = "sha256:d4f8d1c24980365b5a83538189e99a9b14077e844c55754942bd756e82bf685e"},
-    {file = "strawberry_graphql-0.185.0.tar.gz", hash = "sha256:87c6b0f40a6b90e50fb7c35c385e798e7ed377250226ba9e4c45a4a1f4b29369"},
+    {file = "strawberry_graphql-0.186.0-py3-none-any.whl", hash = "sha256:6a788de7f6168cff0577d380070ddc0e79515505c112cf9e9c3396df7374c6c3"},
+    {file = "strawberry_graphql-0.186.0.tar.gz", hash = "sha256:5dddc9deba323a4fe54ecad85e0a6c8cc249cbca3b5d17c34b9c8a55534f9f05"},
 ]
 
 [package.dependencies]
@@ -3122,18 +3122,6 @@ python-versions = ">=3.7"
 files = [
     {file = "typing_extensions-4.6.3-py3-none-any.whl", hash = "sha256:88a4153d8505aabbb4e13aacb7c486c2b4a33ca3b3f807914a9b4c844c471c26"},
     {file = "typing_extensions-4.6.3.tar.gz", hash = "sha256:d91d5919357fe7f681a9f2b5b4cb2a5f1ef0a1e9f59c4d8ff0d3491e05c0ffd5"},
-]
-
-[[package]]
-name = "typingref"
-version = "0.100.0"
-description = "Introspect Python type annotation, with ease."
-category = "main"
-optional = false
-python-versions = ">=3.9,<3.12"
-files = [
-    {file = "typingref-0.100.0-py3-none-any.whl", hash = "sha256:2c3eaf8b03fee2c2b6f3035a018cec197bf81ed7745bc50079f96b861ea78e9c"},
-    {file = "typingref-0.100.0.tar.gz", hash = "sha256:a297131a941ec98f1a6052922db601001652617a1f59458c28295c8e3820cbb2"},
 ]
 
 [[package]]
@@ -3412,4 +3400,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.12"
-content-hash = "6317f86dca340dfb523b39decada2ff4c5043efe37679ac50134c4bbc97ee17f"
+content-hash = "489b0bbb1e8c658dcd3edd9366b42b91952548c91604aed46d87b55cc5dd6f81"

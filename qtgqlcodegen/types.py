@@ -56,11 +56,8 @@ class QtGqlTypeABC(ABC):
     def is_builtin_scalar(self) -> BuiltinScalar | None:
         return None
 
-    @property
-    def is_void(self) -> bool:
-        if sc := self.is_builtin_scalar:
-            return sc is BuiltinScalars.VOID
-        return False
+    def json_repr(self, attr_name: str | None = None) -> str:
+        raise NotImplementedError(f"{self} is not supported as an input type ATM")
 
     @property
     def is_custom_scalar(self) -> CustomScalarDefinition | None:
@@ -74,6 +71,7 @@ class QtGqlTypeABC(ABC):
         """
         raise NotImplementedError
 
+    @property
     def default_value(self) -> str:
         """
 
@@ -89,6 +87,9 @@ class QtGqlTypeABC(ABC):
         # if the type needs to return something else this is overridden.
         return self.type_name
 
+    def __str__(self):
+        raise RuntimeError("the template probobly tried to render this object")
+
 
 @define
 class QtGqlOptional(QtGqlTypeABC):
@@ -96,45 +97,18 @@ class QtGqlOptional(QtGqlTypeABC):
 
     of_type: QtGqlTypeABC
 
-    @property
-    def is_optional(self) -> bool:
-        return True
+    def __getattr__(self, item):
+        return getattr(self.of_type, item)
+
+    def __getattribute__(self, name):
+        if name not in ("of_type"):
+            raise AttributeError
+        else:
+            return super().__getattribute__(name)
 
     @property
-    def is_union(self) -> QtGqlUnion | None:
-        return self.of_type.is_union
-
-    @property
-    def is_object_type(self) -> QtGqlObjectType | None:
-        return self.of_type.is_object_type
-
-    @property
-    def is_interface(self) -> QtGqlInterfaceDefinition | None:
-        return self.of_type.is_interface
-
-    @property
-    def is_input_object_type(self) -> QtGqlInputObjectTypeDefinition | None:
-        return self.of_type.is_input_object_type
-
-    @property
-    def is_model(self) -> QtGqlTypeABC | None:
-        return self.of_type.is_model
-
-    @property
-    def is_enum(self) -> QtGqlEnumDefinition | None:
-        return self.of_type.is_enum
-
-    @property
-    def is_builtin_scalar(self) -> BuiltinScalar | None:
-        return self.of_type.is_builtin_scalar
-
-    @property
-    def member_type(self) -> str:
-        return self.of_type.member_type
-
-    @property
-    def type_name(self) -> str:
-        return self.of_type.type_name
+    def type_name(self) -> str:  # pragma: no cover
+        raise NotImplementedError
 
 
 @define
@@ -169,6 +143,7 @@ class QtGqlUnion(QtGqlTypeABC):
     def type_name(self) -> str:
         raise NotImplementedError
 
+    @property
     def default_value(self) -> str:
         raise NotImplementedError
 
@@ -180,6 +155,7 @@ class BuiltinScalar(QtGqlTypeABC):
     graphql_name: str
     from_json_convertor: str
 
+    @property
     def default_value(self) -> str:
         return self.default_value_.name
 
@@ -190,6 +166,13 @@ class BuiltinScalar(QtGqlTypeABC):
     @property
     def type_name(self) -> str:
         return self.attr.name
+
+    @property
+    def is_void(self) -> bool:
+        return self is BuiltinScalars.VOID
+
+    def json_repr(self, attr_name: str | None = None) -> str:
+        return f"{attr_name}"
 
 
 @define
@@ -203,6 +186,9 @@ class CustomScalarDefinition(QtGqlTypeABC):
     @property
     def is_custom_scalar(self) -> CustomScalarDefinition | None:
         return self
+
+    def json_repr(self, attr_name: str | None = None) -> str:
+        return f"{attr_name}.serialize()"
 
 
 @define(slots=False)
@@ -395,6 +381,9 @@ class QtGqlInputObjectTypeDefinition(BaseQtGqlObjectType):
     def type_name(self) -> str:
         return self.name
 
+    def json_repr(self, attr_name: str | None = None) -> str:
+        return f"{attr_name}.to_json()"
+
 
 @define
 class EnumValue:
@@ -426,8 +415,12 @@ class QtGqlEnumDefinition(QtGqlTypeABC):
     def type_name(self) -> str:
         return self.namespaced_name
 
+    @property
     def default_value(self) -> str:
         return f"{self.namespaced_name}(0)"
+
+    def json_repr(self, attr_name: str | None = None) -> str:
+        return f"Enums::{self.map_name}::name_by_value({attr_name})"
 
 
 def ScalarsNs() -> CppAttribute:
