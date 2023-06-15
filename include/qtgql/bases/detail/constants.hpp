@@ -4,11 +4,10 @@
 
 namespace qtgql {
 namespace bases {
-namespace scalars{
-    typedef std::nullptr_t Void; // represents null value
-    typedef QString Id; // GraphQL ID scalar
-}
-
+namespace scalars {
+typedef std::nullptr_t Void; // represents null value
+typedef QString Id;          // GraphQL ID scalar
+} // namespace scalars
 
 namespace DEFAULTS {
 inline static const QUuid UUID =
