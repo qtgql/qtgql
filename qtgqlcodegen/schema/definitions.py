@@ -68,24 +68,9 @@ class QtGqlArgumentDefinition(QtGqlInputFieldDefinition):
 class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
     arguments: list[QtGqlInputFieldDefinition] = Factory(list)
 
-    @cached_property
+    @property
     def default_value(self):
-        if builtin_scalar := self.type.is_builtin_scalar:
-            return builtin_scalar.default_value
-        if self.type.is_object_type:
-            return "{}"
-
-        if self.type.is_model:
-            # this would just generate the model without data.
-            return "{}"
-
-        if self.type.is_custom_scalar:
-            return "{}"
-
-        if enum_def := self.type.is_enum:
-            return f"{enum_def.namespaced_name}(0)"
-
-        raise NotImplementedError
+        return self.type.default_value()
 
     @cached_property
     def member_type(self) -> str:

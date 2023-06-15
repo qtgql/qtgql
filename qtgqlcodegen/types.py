@@ -74,6 +74,13 @@ class QtGqlTypeABC(ABC):
         """
         raise NotImplementedError
 
+    def default_value(self) -> str:
+        """
+
+        :return: C++ default value initializer for this type
+        """
+        return "{}"
+
     @property
     def member_type(self) -> str:
         """
@@ -162,6 +169,9 @@ class QtGqlUnion(QtGqlTypeABC):
     def type_name(self) -> str:
         raise NotImplementedError
 
+    def default_value(self) -> str:
+        raise NotImplementedError
+
 
 @define
 class BuiltinScalar(QtGqlTypeABC):
@@ -170,7 +180,6 @@ class BuiltinScalar(QtGqlTypeABC):
     graphql_name: str
     from_json_convertor: str
 
-    @property
     def default_value(self) -> str:
         return self.default_value_.name
 
@@ -416,6 +425,9 @@ class QtGqlEnumDefinition(QtGqlTypeABC):
     @property
     def type_name(self) -> str:
         return self.namespaced_name
+
+    def default_value(self) -> str:
+        return f"{self.namespaced_name}(0)"
 
 
 def ScalarsNs() -> CppAttribute:
