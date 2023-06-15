@@ -12,7 +12,8 @@ auto SCHEMA_ADDR = get_server_address("45810550");
 
 TEST_CASE("OptionalNestedObjectTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
-      ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
+      ENV_NAME, DebugClientSettings{.print_debug = true,
+                                    .prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = std::make_shared<mainquery::MainQuery>();
   SECTION("test deserialize") {
     SECTION("returned null") {
@@ -20,12 +21,10 @@ TEST_CASE("OptionalNestedObjectTestCase", "[generated-testcase]") {
       mq->fetch();
       test_utils::wait_for_completion(mq);
       auto p = mq->get_data()->get_person();
-      qDebug() << p;
-      qDebug() << &p;
       REQUIRE(p == nullptr);
     };
+    mq->set_variables({false});
     SECTION("returned value") {
-      mq->set_variables({false});
       mq->fetch();
       test_utils::wait_for_completion(mq);
       auto p = mq->get_data()->get_person();

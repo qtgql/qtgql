@@ -98,6 +98,8 @@ class QtGqlOptional(QtGqlTypeABC):
     of_type: QtGqlTypeABC
 
     def __getattr__(self, item):
+        if item == "is_optional":
+            return True
         return getattr(self.of_type, item)
 
     def __getattribute__(self, name):
