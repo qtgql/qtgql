@@ -27,7 +27,7 @@ public: // WARNING: members are public because you have debug=True in your confi
 {% else %}
 protected:
 {% endif %}
-std::shared_ptr<👉context.schema_ns👈::👉 t.definition.name 👈> m_inst;
+std::shared_ptr<👉context.schema_ns👈::👉 t.concrete.name 👈> m_inst;
 {% for ref_field in t.references -%}
 👉ref_field.property_type👈 m_👉ref_field.name👈 = {};
 {% endfor %}
@@ -37,12 +37,12 @@ std::shared_ptr<👉context.schema_ns👈::👉 t.definition.name 👈> m_inst;
 
 public:
 👉 t.name 👈(QObject * parent,
-        const std::shared_ptr<👉 t.definition.name 👈> &inst,
+        const std::shared_ptr<👉 t.concrete.name 👈> &inst,
         qtgql::bases::OperationMetadata & metadata): m_inst{inst}, QObject::QObject(parent){
 {% for field in t.fields -%}
 👉 macros.initialize_proxy_field(field) 👈
 {# updates logic -#}
-connect(m_inst.get(), &👉context.schema_ns👈::👉t.definition.name👈::👉 field.definition.signal_name 👈, this,
+connect(m_inst.get(), &👉context.schema_ns👈::👉t.concrete.name👈::👉 field.definition.signal_name 👈, this,
         [&](){emit 👉 field.definition.signal_name 👈();});
 {% endfor %}
 }

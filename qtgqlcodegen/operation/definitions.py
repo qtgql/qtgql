@@ -13,12 +13,22 @@ from qtgqlcodegen.operation.template import ConfigContext, config_template
 if TYPE_CHECKING:
     from graphql.type import definition as gql_def
 
-    from qtgqlcodegen.operation.typing import OperationTypeInfo
     from qtgqlcodegen.schema.definitions import (
         QtGqlFieldDefinition,
         QtGqlVariableDefinition,
+        SchemaTypeInfo,
     )
-    from qtgqlcodegen.schema.types.typing import QtGqlObjectTypeDefinition, QtGqlTypeABC
+    from qtgqlcodegen.types import QtGqlQueriedObjectType, QtGqlTypeABC
+
+
+@attrs.define(slots=False)
+class OperationTypeInfo:
+    schema_type_info: SchemaTypeInfo
+    narrowed_types_map: dict[str, QtGqlQueriedObjectType] = attrs.Factory(dict)
+    variables: list[QtGqlVariableDefinition] = attrs.Factory(list)
+
+    def narrowed_types(self) -> tuple[QtGqlQueriedObjectType, ...]:
+        return tuple(self.narrowed_types_map.values())
 
 
 @attrs.define(frozen=True, slots=False, repr=False)
@@ -82,46 +92,12 @@ class QtGqlQueriedField:
 
 
 @define(slots=False, repr=False)
-class QtGqlQueriedObjectType:
-    definition: QtGqlObjectTypeDefinition = attrs.field(on_setattr=attrs.setters.frozen)
-    fields_dict: dict[str, QtGqlQueriedField] = attrs.Factory(dict)
-    is_root_field: bool = False
-
-    @cached_property
-    def fields(self) -> tuple[QtGqlQueriedField, ...]:
-        return tuple(self.fields_dict.values())
-
-    @cached_property
-    def name(self) -> str:
-        return f"{self.definition.name}__{'$'.join(sorted(self.fields_dict.keys()))}"
-
-    @cached_property
-    def doc_fields(self) -> str:
-        return "{} {{\n  {}\n}}".format(
-            self.definition.name,
-            "\n   ".join(self.fields_dict.keys()),
-        )
-
-    @cached_property
-    def references(self) -> list[QtGqlQueriedField]:
-        return [f for f in self.fields if f.type.is_object_type]
-
-    @cached_property
-    def models(self) -> list[QtGqlQueriedField]:
-        return [f for f in self.fields if f.type.is_model]
-
-    @cached_property
-    def private_name(self) -> str:
-        return f"m_{self.name}"
-
-
-@define(slots=False, repr=False)
 class QtGqlOperationDefinition:
     operation_def: gql_def.OperationDefinitionNode
     root_field: QtGqlQueriedField
     fragments: list[str] = attrs.Factory(list)
     variables: list[QtGqlVariableDefinition] = attrs.Factory(list)
-    narrowed_types_map: dict[str, QtGqlQueriedObjectType] = attrs.Factory(dict)
+    narrowed_types: tuple[QtGqlQueriedObjectType, ...] = attrs.Factory(tuple)
 
     @property
     def operation_config(self) -> str:

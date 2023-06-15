@@ -10,6 +10,7 @@ from attr import define
 from qtgqlcodegen.core.cppref import CppAttribute, QtGqlBasesNs, QtGqlTypes
 
 if TYPE_CHECKING:
+    from qtgqlcodegen.operation.definitions import QtGqlQueriedField
     from qtgqlcodegen.schema.definitions import (
         CustomScalarMap,
         QtGqlFieldDefinition,
@@ -28,7 +29,11 @@ class QtGqlTypeABC(ABC):
         return False
 
     @property
-    def is_object_type(self) -> QtGqlObjectTypeDefinition | None:
+    def is_object_type(self) -> QtGqlObjectType | None:
+        return None
+
+    @property
+    def is_queried_object_type(self) -> QtGqlQueriedObjectType | None:
         return None
 
     @property
@@ -93,7 +98,7 @@ class QtGqlOptional(QtGqlTypeABC):
         return self.of_type.is_union
 
     @property
-    def is_object_type(self) -> QtGqlObjectTypeDefinition | None:
+    def is_object_type(self) -> QtGqlObjectType | None:
         return self.of_type.is_object_type
 
     @property
@@ -147,7 +152,7 @@ class QtGqlList(QtGqlTypeABC):
 
 @define
 class QtGqlUnion(QtGqlTypeABC):
-    types: tuple[QtGqlObjectTypeDefinition | QtGqlDeferredType, ...]
+    types: tuple[QtGqlObjectType | QtGqlDeferredType, ...]
 
     @property
     def is_union(self) -> QtGqlUnion | None:
@@ -203,7 +208,7 @@ class BaseQtGqlObjectType(QtGqlTypeABC):
 
 
 @define(slots=False)
-class QtGqlObjectTypeDefinition(BaseQtGqlObjectType):
+class QtGqlObjectType(BaseQtGqlObjectType):
     interfaces_raw: list[QtGqlInterfaceDefinition] = attrs.Factory(list)
 
     def implements(self, interface: QtGqlInterfaceDefinition) -> bool:
@@ -261,7 +266,7 @@ class QtGqlObjectTypeDefinition(BaseQtGqlObjectType):
         return any(base.implements_node for base in self.bases)
 
     @property
-    def is_object_type(self) -> QtGqlObjectTypeDefinition | None:
+    def is_object_type(self) -> QtGqlObjectType | None:
         return self
 
     @property
@@ -280,10 +285,52 @@ class QtGqlObjectTypeDefinition(BaseQtGqlObjectType):
                 base.implementations[self.name] = self
 
 
+@define(slots=False, repr=False)
+class QtGqlQueriedObjectType(QtGqlTypeABC):
+    concrete: QtGqlObjectType = attrs.field(on_setattr=attrs.setters.frozen)
+    fields_dict: dict[str, QtGqlQueriedField] = attrs.Factory(dict)
+    is_root_field: bool = False
+
+    @property
+    def is_queried_object_type(self) -> QtGqlQueriedObjectType | None:
+        return self
+
+    @cached_property
+    def fields(self) -> tuple[QtGqlQueriedField, ...]:
+        return tuple(self.fields_dict.values())
+
+    @cached_property
+    def name(self) -> str:
+        return f"{self.concrete.name}__{'$'.join(sorted(self.fields_dict.keys()))}"
+
+    @cached_property
+    def doc_fields(self) -> str:
+        return "{} {{\n  {}\n}}".format(
+            self.concrete.name,
+            "\n   ".join(self.fields_dict.keys()),
+        )
+
+    @property
+    def type_name(self) -> str:
+        return self.name
+
+    @cached_property
+    def references(self) -> list[QtGqlQueriedField]:
+        return [f for f in self.fields if f.type.is_object_type]
+
+    @cached_property
+    def models(self) -> list[QtGqlQueriedField]:
+        return [f for f in self.fields if f.type.is_model]
+
+    @cached_property
+    def private_name(self) -> str:
+        return f"m_{self.name}"
+
+
 @define
 class QtGqlDeferredType(QtGqlTypeABC):
     name: str
-    object_map__: dict[str, QtGqlObjectTypeDefinition]
+    object_map__: dict[str, QtGqlObjectType]
     cached_: QtGqlTypeABC | None = None
 
     def __getattr__(self, item):
@@ -303,7 +350,7 @@ class QtGqlDeferredType(QtGqlTypeABC):
 
 
 @define(slots=False, kw_only=True)
-class QtGqlInterfaceDefinition(QtGqlObjectTypeDefinition):
+class QtGqlInterfaceDefinition(QtGqlObjectType):
     implementations: dict[str, BaseQtGqlObjectType] = attrs.field(factory=dict)
 
     @cached_property
@@ -319,7 +366,7 @@ class QtGqlInterfaceDefinition(QtGqlObjectTypeDefinition):
         return False
 
     @property
-    def is_object_type(self) -> QtGqlObjectTypeDefinition | None:
+    def is_object_type(self) -> QtGqlObjectType | None:
         return None  # although interface extends object this might be confusing.
 
     @property

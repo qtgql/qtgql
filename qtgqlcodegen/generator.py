@@ -16,7 +16,7 @@ from qtgqlcodegen.schema.template import (
     schema_types_template_cpp,
     schema_types_template_hpp,
 )
-from qtgqlcodegen.schema.types import BuiltinScalars
+from qtgqlcodegen.types import BuiltinScalars
 from qtgqlcodegen.utils import FileSpec
 
 if TYPE_CHECKING:

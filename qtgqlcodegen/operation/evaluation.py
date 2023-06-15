@@ -21,21 +21,21 @@ from qtgqlcodegen.core.graphql_ref import (
     is_operation_def_node,
 )
 from qtgqlcodegen.operation.definitions import (
+    OperationTypeInfo,
     QtGqlOperationDefinition,
     QtGqlQueriedField,
-    QtGqlQueriedObjectType,
 )
-from qtgqlcodegen.operation.typing import OperationTypeInfo
 from qtgqlcodegen.schema.definitions import (
     QtGqlFieldDefinition,
     QtGqlVariableDefinition,
     SchemaTypeInfo,
 )
 from qtgqlcodegen.schema.evaluation import evaluate_graphql_type
+from qtgqlcodegen.types import QtGqlQueriedObjectType
 from qtgqlcodegen.utils import require
 
 if TYPE_CHECKING:
-    from qtgqlcodegen.schema.types import QtGqlObjectTypeDefinition, QtGqlTypeABC
+    from qtgqlcodegen.types import QtGqlObjectType, QtGqlTypeABC
 
 
 def is_type_name_selection(field_node: gql_lang.FieldNode):
@@ -51,7 +51,7 @@ def get_operation_root_field_name(operation_node: gql_lang.OperationDefinitionNo
 
 def _evaluate_field_from_node(
     field_node: gql_lang.FieldNode,
-    field_type: QtGqlObjectTypeDefinition,
+    field_type: QtGqlObjectType,
     type_info: OperationTypeInfo,
     parent_interface_field: QtGqlQueriedField | None = UNSET,
 ) -> QtGqlQueriedField:
@@ -172,7 +172,7 @@ def _evaluate_field(
                 )
                 selections[__f.name] = __f
         queried_obj = QtGqlQueriedObjectType(
-            definition=obj_def,
+            concrete=obj_def,
             fields_dict=selections,
         )
         type_info.narrowed_types_map[queried_obj.name] = queried_obj
@@ -247,6 +247,7 @@ def _evaluate_operation(
         root_field=root_field,
         operation_def=operation,
         variables=type_info.variables,
+        narrowed_types=tuple(type_info.narrowed_types_map.values()),
     )
 
 

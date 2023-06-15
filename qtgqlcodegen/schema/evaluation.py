@@ -23,7 +23,7 @@ from qtgqlcodegen.schema.definitions import (
     QtGqlInputFieldDefinition,
     SchemaTypeInfo,
 )
-from qtgqlcodegen.schema.types import (
+from qtgqlcodegen.types import (
     BuiltinScalars,
     EnumValue,
     QtGqlDeferredType,
@@ -31,7 +31,7 @@ from qtgqlcodegen.schema.types import (
     QtGqlInputObjectTypeDefinition,
     QtGqlInterfaceDefinition,
     QtGqlList,
-    QtGqlObjectTypeDefinition,
+    QtGqlObjectType,
     QtGqlOptional,
     QtGqlTypeABC,
     QtGqlUnion,
@@ -144,7 +144,7 @@ def _evaluate_input_field(
 def evaluate_object_type(
     type_info: SchemaTypeInfo,
     type_: gql_def.GraphQLObjectType,
-) -> QtGqlObjectTypeDefinition | None:
+) -> QtGqlObjectType | None:
     t_name: str = type_.name
     if evaluated := type_info.get_object_type(t_name):
         return evaluated
@@ -175,7 +175,7 @@ def evaluate_object_type(
             )
     implements = [_evaluate_interface_type(type_info, interface) for interface in type_.interfaces]
 
-    ret = QtGqlObjectTypeDefinition(
+    ret = QtGqlObjectType(
         name=t_name,
         interfaces_raw=implements,
         docstring=type_.description,

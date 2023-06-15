@@ -13,7 +13,7 @@ from attr import define
 from qtgqlcodegen.cli import app
 from qtgqlcodegen.config import QtGqlConfig
 from qtgqlcodegen.generator import SchemaGenerator
-from qtgqlcodegen.schema.types import CustomScalarDefinition, DateTimeScalarDefinition
+from qtgqlcodegen.types import CustomScalarDefinition, DateTimeScalarDefinition
 from tests.conftest import hash_schema
 from tests.test_codegen import schemas
 from typer.testing import CliRunner
@@ -786,5 +786,5 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 if __name__ == "__main__":
     generate_testcases(
-        OperationVariablesTestcase,
+        ScalarsTestCase,
     )

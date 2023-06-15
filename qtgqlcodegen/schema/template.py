@@ -9,18 +9,18 @@ from qtgqlcodegen.operation.template import OPERATION_TEMPLATE, OperationTemplat
 
 if TYPE_CHECKING:
     from qtgqlcodegen.config import QtGqlConfig
-    from qtgqlcodegen.schema.types import (
+    from qtgqlcodegen.types import (
         QtGqlEnumDefinition,
         QtGqlInputObjectTypeDefinition,
         QtGqlInterfaceDefinition,
-        QtGqlObjectTypeDefinition,
+        QtGqlObjectType,
     )
 
 
 @define
 class SchemaTemplateContext:
     enums: list[QtGqlEnumDefinition]
-    types: list[QtGqlObjectTypeDefinition]
+    types: list[QtGqlObjectType]
     interfaces: list[QtGqlInterfaceDefinition]
     input_objects: list[QtGqlInputObjectTypeDefinition]
     config: QtGqlConfig

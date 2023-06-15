@@ -11,12 +11,12 @@ if TYPE_CHECKING:
     from graphql.type import definition as gql_def
     from typing_extensions import TypeAlias
 
-    from qtgqlcodegen.schema.types.typing import (
+    from qtgqlcodegen.types import (
         CustomScalarDefinition,
         QtGqlEnumDefinition,
         QtGqlInputObjectTypeDefinition,
         QtGqlInterfaceDefinition,
-        QtGqlObjectTypeDefinition,
+        QtGqlObjectType,
         QtGqlTypeABC,
     )
 
@@ -159,7 +159,7 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
 
 
 EnumMap: TypeAlias = "dict[str, QtGqlEnumDefinition]"
-ObjectTypeMap: TypeAlias = "dict[str, QtGqlObjectTypeDefinition]"
+ObjectTypeMap: TypeAlias = "dict[str, QtGqlObjectType]"
 InputObjectMap: TypeAlias = "dict[str, QtGqlInputObjectTypeDefinition]"
 InterfacesMap: TypeAlias = "dict[str, QtGqlInterfaceDefinition]"
 CustomScalarMap: TypeAlias = "dict[str, CustomScalarDefinition]"
@@ -171,7 +171,7 @@ class SchemaTypeInfo:
     custom_scalars: CustomScalarMap
     operation_types: dict[
         Literal["query", "mutation", "subscription"],
-        QtGqlObjectTypeDefinition,
+        QtGqlObjectType,
     ] = Factory(dict)
     object_types: ObjectTypeMap = Factory(dict)
     enums: EnumMap = Factory(dict)
@@ -181,10 +181,10 @@ class SchemaTypeInfo:
     def get_interface(self, name: str) -> QtGqlInterfaceDefinition | None:
         return self.interfaces.get(name, None)
 
-    def get_object_type(self, name: str) -> QtGqlObjectTypeDefinition | None:
+    def get_object_type(self, name: str) -> QtGqlObjectType | None:
         return self.object_types.get(name, None)
 
-    def set_objecttype(self, objecttype: QtGqlObjectTypeDefinition) -> None:
+    def set_objecttype(self, objecttype: QtGqlObjectType) -> None:
         self.object_types[objecttype.name] = objecttype
 
     @cached_property
