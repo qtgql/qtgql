@@ -6,7 +6,7 @@ from attrs import define
 
 from qtgqlcodegen.custom_scalars import CUSTOM_SCALARS
 from qtgqlcodegen.generator import SchemaGenerator
-from qtgqlcodegen.schema.typing import CustomScalarMap
+from qtgqlcodegen.schema.definitions import CustomScalarMap
 
 
 @define(slots=False)

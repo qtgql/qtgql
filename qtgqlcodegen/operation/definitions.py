@@ -14,8 +14,8 @@ if TYPE_CHECKING:
     from graphql.type import definition as gql_def
 
     from qtgqlcodegen.operation.typing import OperationTypeInfo
-    from qtgqlcodegen.schema.typing import GqlTypeHinter, SchemaTypeInfo, QtGqlVariableDefinition, QtGqlFieldDefinition, \
-    QtGqlObjectTypeDefinition
+    from qtgqlcodegen.schema.typing import GqlTypeHinter, QtGqlObjectTypeDefinition
+    from qtgqlcodegen.schema.definitions import QtGqlVariableDefinition, QtGqlFieldDefinition, SchemaTypeInfo
 
 
 @attrs.define(frozen=True, slots=False, repr=False)

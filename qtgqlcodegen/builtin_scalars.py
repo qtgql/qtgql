@@ -1,9 +1,8 @@
 from functools import cached_property
 from typing import Optional
 
-from attr import define
-
 from qtgqlcodegen.core.cppref import CppAttribute, QtGqlBasesNs
+from qtgqlcodegen.schema.typing import BuiltinScalar
 
 
 def ScalarsNs() -> CppAttribute:
@@ -12,18 +11,6 @@ def ScalarsNs() -> CppAttribute:
 
 def DefaultsNs() -> CppAttribute:
     return QtGqlBasesNs().ns_add("DEFAULTS")
-
-
-@define(slots=False)
-class BuiltinScalar:
-    attr: CppAttribute
-    default_value_: CppAttribute
-    graphql_name: str
-    from_json_convertor: str
-
-    @property
-    def default_value(self) -> str:
-        return self.default_value_.name
 
 
 class _BuiltinScalars:

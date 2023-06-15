@@ -1,4 +1,5 @@
-from qtgqlcodegen.schema.typing import CustomScalarMap, CustomScalarDefinition
+from qtgqlcodegen.schema.typing import CustomScalarDefinition
+from qtgqlcodegen.schema.definitions import CustomScalarMap
 
 # An ISO-8601 encoded datetime.
 DateTimeScalarDefinition = CustomScalarDefinition(

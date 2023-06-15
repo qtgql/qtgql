@@ -28,7 +28,8 @@ from qtgqlcodegen.schema.evaluation import evaluate_variable
 from qtgqlcodegen.utils import require
 
 if TYPE_CHECKING:
-    from qtgqlcodegen.schema.typing import SchemaTypeInfo, QtGqlFieldDefinition, QtGqlObjectTypeDefinition
+    from qtgqlcodegen.schema.typing import QtGqlObjectTypeDefinition
+    from qtgqlcodegen.schema.definitions import QtGqlFieldDefinition, SchemaTypeInfo
 
 
 def is_type_name_selection(field_node: gql_lang.FieldNode):
@@ -165,7 +166,7 @@ def _evaluate_field(
             definition=obj_def,
             fields_dict=selections,
         )
-        type_info.narrowed_types_map[queried_obj.name] = queried_obj
+        type_info.narrowed_types[queried_obj.name] = queried_obj
         narrowed_type = queried_obj
 
     def sorted_distinct_fields(
@@ -192,7 +193,7 @@ def _evaluate_operation(
     # input variables
     if variables_def := operation.variable_definitions:
         for var in variables_def:
-            type_info.variables.append(evaluate_variable(type_info, var))
+            type_info.variables.append(evaluate_variable(type_info.schema_type_info, var))
 
     root_field_def = require(is_field_node(operation.selection_set.selections[0]))
     root_type = require(type_info.schema_type_info.get_object_type(operation.operation.name))
