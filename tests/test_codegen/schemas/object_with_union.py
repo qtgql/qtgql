@@ -1,10 +1,8 @@
 from __future__ import annotations
 
 import enum
-from typing import Union
 
 import strawberry
-
 from tests.test_codegen.schemas.node_interface import Node
 
 
@@ -16,7 +14,7 @@ class Frog(Node):
 
 @strawberry.type
 class User(Node):
-    who_am_i: Union[Frog, Person]
+    who_am_i: Frog | Person
 
 
 @strawberry.enum()

@@ -21,8 +21,6 @@ TEST_CASE("InterfaceTestCase", "[generated-testcase]") {
     REQUIRE(mq->get_data()->get_name() == "Patrick");
     REQUIRE(mq->get_data()->get_age() == 100);
   };
-
-
 }
 
 }; // namespace InterfaceTestCase

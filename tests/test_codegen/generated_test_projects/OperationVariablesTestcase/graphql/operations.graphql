@@ -1,9 +1,9 @@
 
-  query UserQuery($connected: Boolean!) {
+  query UserQuery($connectedVar: ConnectedInput!) {
     user {
       id
       name
-      friend(connected: $connected) {
+      friend(connectedArg: $connectedVar) {
         id
         name
       }

@@ -2,10 +2,8 @@ import uuid
 from uuid import UUID
 
 import strawberry
-
 from tests.conftest import fake
-from tests.test_codegen.schemas.node_interface import Node
-from tests.test_codegen.schemas.node_interface import NODE_DB
+from tests.test_codegen.schemas.node_interface import NODE_DB, Node
 
 
 @strawberry.type

@@ -1,9 +1,6 @@
 from __future__ import annotations
 
-from typing import Optional
-
 import strawberry
-
 from tests.conftest import fake
 
 
@@ -11,7 +8,7 @@ from tests.conftest import fake
 class User:
     name: str
     age: int
-    id: Optional[strawberry.ID] = None
+    id: strawberry.ID | None = None
 
 
 @strawberry.type

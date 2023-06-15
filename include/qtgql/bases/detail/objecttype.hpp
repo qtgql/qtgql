@@ -1,9 +1,9 @@
 #pragma once
+#include "./constants.hpp"
 #include "QDebug"
 #include "QObject"
 #include "QSet"
 #include "metadata.hpp"
-#include "./constants.hpp"
 
 namespace qtgql {
 namespace bases {
@@ -15,7 +15,9 @@ class ObjectTypeABC : public QObject {
   inline static QString __TYPE_NAME = "__NOT_IMPLEMENTED__";
 
 private:
-  [[nodiscard]] inline virtual const QString & getTypeName() const { return __TYPE_NAME; }
+  [[nodiscard]] inline virtual const QString &getTypeName() const {
+    return __TYPE_NAME;
+  }
 
 public:
   using QObject::QObject;
@@ -23,7 +25,7 @@ public:
 
 class NodeInterfaceABC;
 
-    class NodeInterfaceABC : public ObjectTypeABC {
+class NodeInterfaceABC : public ObjectTypeABC {
 public:
   using ObjectTypeABC::ObjectTypeABC;
 
@@ -31,11 +33,9 @@ public:
 
   // updates a node based on new GraphQL data.
   virtual void update(const QJsonObject &data,
-                      const SelectionsConfig &selections, const OperationMetadata &metadata) = 0;
+                      const SelectionsConfig &selections,
+                      const OperationMetadata &metadata) = 0;
 };
-
-
-
 
 } // namespace bases
 } // namespace qtgql

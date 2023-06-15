@@ -1,9 +1,9 @@
 #include <QTest>
 #include <catch2/catch_test_macros.hpp>
 
+#include "debugableclient.hpp"
 #include "qtgql/bases/bases.hpp"
 #include "qtgql/gqlwstransport/gqlwstransport.hpp"
-#include "debugableclient.hpp"
 using namespace qtgql;
 
 QString get_subscription_str(bool raiseOn5 = false,

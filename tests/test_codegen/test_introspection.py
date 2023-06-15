@@ -1,10 +1,11 @@
 import pytest
-
-from qtgqlcodegen.exceptions import QtGqlException
+from qtgqlcodegen.core.exceptions import QtGqlException
 from tests.test_codegen import schemas
-from tests.test_codegen.testcases import QtGqlTestCase
-from tests.test_codegen.testcases import TypeWithNoIDTestCase
-from tests.test_codegen.testcases import TypeWithNullAbleIDTestCase
+from tests.test_codegen.testcases import (
+    QtGqlTestCase,
+    TypeWithNoIDTestCase,
+    TypeWithNullAbleIDTestCase,
+)
 
 TypeWithWrongIDTypeTestCase = QtGqlTestCase(
     schema=schemas.wrogn_id_type.schema,

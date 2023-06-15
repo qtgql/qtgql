@@ -1,9 +1,7 @@
 from __future__ import annotations
 
 import random
-from typing import AsyncGenerator
-from typing import Optional
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, AsyncGenerator
 
 import strawberry
 from aiohttp import web
@@ -36,7 +34,7 @@ class Worm(Node):
 class Apple(Node):
     size: int = strawberry.field(default_factory=lambda: random.randint(10, 100))  # noqa: S311
     owner: str = strawberry.field(default_factory=fake.name)
-    worms: Optional[list[Worm]] = strawberry.field()
+    worms: list[Worm] | None = strawberry.field()
     color: str = strawberry.field(default_factory=fake.color)
 
 

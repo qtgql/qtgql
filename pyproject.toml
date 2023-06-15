@@ -19,7 +19,6 @@ attrs = "^22.2.0"
 # codegen
 graphql-core = "^3.2.3"
 jinja2 = {version = "^3.1.2", optional=true}
-typingref = "^0.100.0"
 typer = "^0.9.0"
 rich = "^13.3.5"
 frozendict = "^2.3.8"
@@ -89,7 +88,6 @@ line-length = 100
 select = ["ALL"]
 target-version = "py38"
 ignore = [
-    "I001", # isort, handled by pc-hook.
     "TID252",
     # we use asserts in tests and to hint mypy
     "E501", # line too long, handled by black.
@@ -129,8 +127,6 @@ ignore = [
     # this seems a potential bug or opportunity for improvement in ruff
     "N806",
 
-    # first argument should named self (found in tests)
-    "N805",
 
     "N815",
 
@@ -209,15 +205,21 @@ ignore = [
     "SIM300",
     "SIM114",
     "DJ008",
+
+    # https://beta.ruff.rs/docs/rules/#flake8-fixme-fix
+    "FIX002",
+    # https://beta.ruff.rs/docs/rules/#flake8-bandit-s
+    "S603",
+    "S607",
+
 ]
 fix = true
 src = ["qtgqlcodegen", "tests"]
 [tool.ruff.flake8-annotations]
 suppress-none-returning = true
 
-[tool.ruff.pyupgrade]
-keep-runtime-typing = true
-
+[tool.ruff.isort]
+combine-as-imports = true
 
 [tool.pytest.ini_options]
 addopts = "--cov-config=pyproject.toml --ignore=qtgqlcodegen/codegen/py/templates/"

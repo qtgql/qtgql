@@ -51,7 +51,7 @@ std::shared_ptr<DebugAbleClient> get_valid_client();
 
 namespace test_utils {
 using namespace std::chrono_literals;
-    void wait_for_completion(
+void wait_for_completion(
     const std::shared_ptr<gqlwstransport::OperationHandlerABC> handler);
 class QCleanerObject : public QObject {};
 
@@ -78,7 +78,8 @@ struct SignalCatcherParams {
 };
 
 std::shared_ptr<qtgql::bases::Environment>
-get_or_create_env(const QString &env_name, const DebugClientSettings &settings, std::chrono::milliseconds cache_dur = 5s);
+get_or_create_env(const QString &env_name, const DebugClientSettings &settings,
+                  std::chrono::milliseconds cache_dur = 5s);
 
 class SignalCatcher {
   std::list<std::pair<std::unique_ptr<QSignalSpy>, QString>> m_spys = {};

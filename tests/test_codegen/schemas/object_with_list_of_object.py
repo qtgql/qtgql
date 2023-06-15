@@ -1,12 +1,8 @@
 from __future__ import annotations
 
-from typing import Optional
-
 import strawberry
-
 from tests.conftest import fake
-from tests.test_codegen.schemas.node_interface import Node
-from tests.test_codegen.schemas.node_interface import NODE_DB
+from tests.test_codegen.schemas.node_interface import NODE_DB, Node
 
 user_friends: dict[User, list[Person]] = {}
 
@@ -31,7 +27,7 @@ class Person(Node):
 @strawberry.type
 class Query:
     @strawberry.field
-    def user(self, id: Optional[strawberry.ID] = None) -> User:
+    def user(self, id: strawberry.ID | None = None) -> User:
         return User()
 
 

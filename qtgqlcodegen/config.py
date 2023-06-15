@@ -1,15 +1,12 @@
 from functools import cached_property
 from pathlib import Path
-from typing import Callable
-from typing import Type
 
+import graphql
 from attrs import define
 
-from qtgqlcodegen.compiler.template import schema_types_template_hpp
-from qtgqlcodegen.compiler.template import SchemaTemplateContext
-from qtgqlcodegen.introspection import SchemaEvaluator
-from qtgqlcodegen.runtime.custom_scalars import CUSTOM_SCALARS
-from qtgqlcodegen.runtime.custom_scalars import CustomScalarMap
+from qtgqlcodegen.generator import SchemaGenerator
+from qtgqlcodegen.schema.definitions import CustomScalarMap
+from qtgqlcodegen.types import CUSTOM_SCALARS
 
 
 @define(slots=False)
@@ -28,12 +25,8 @@ class QtGqlConfig:
 
     Also the generated QML imports would fall under this namespace.
     """
-    evaluator: Type[SchemaEvaluator] = SchemaEvaluator
-    """evaluates the schema and generates types."""
     custom_scalars: CustomScalarMap = {}
     """mapping of custom scalars, respected by the schema evaluator."""
-    template_class: Callable[[SchemaTemplateContext], str] = schema_types_template_hpp
-    """jinja template."""
     debug: bool = False
     """Templates would render some additional helpers for testing."""
 
@@ -53,8 +46,13 @@ class QtGqlConfig:
         return ret
 
     @cached_property
-    def _evaluator(self) -> SchemaEvaluator:
-        return self.evaluator(self)
+    def _evaluator(self) -> SchemaGenerator:
+        return SchemaGenerator(
+            config=self,
+            schema=graphql.build_schema(
+                (self.graphql_dir / "schema.graphql").resolve(True).read_text(),
+            ),
+        )
 
     def generate(self) -> None:
         self._evaluator.dump()

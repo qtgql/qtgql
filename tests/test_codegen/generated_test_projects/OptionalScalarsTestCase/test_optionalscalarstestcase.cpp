@@ -52,7 +52,6 @@ TEST_CASE("OptionalScalarsTestCase", "[generated-testcase]") {
     test_utils::wait_for_completion(change_name_mutation);
     REQUIRE(mq->get_data()->get_name() == "Moise");
   };
-
 }
 
 }; // namespace OptionalScalarsTestCase

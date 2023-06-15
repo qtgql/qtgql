@@ -1,10 +1,8 @@
 from __future__ import annotations
 
 import strawberry
-
 from tests.conftest import fake
-from tests.test_codegen.schemas.node_interface import Node
-from tests.test_codegen.schemas.node_interface import NODE_DB
+from tests.test_codegen.schemas.node_interface import NODE_DB, Node
 
 
 # WARNING: This schema correlates with the optional nested object schema

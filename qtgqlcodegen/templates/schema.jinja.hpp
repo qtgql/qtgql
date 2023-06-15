@@ -134,9 +134,9 @@ Q_OBJECT
 
 public:
 {% for f in type.fields %}
-std::optional<👉f.member_type👈> 👉f.name👈 = {};
+std::optional<👉f.type.member_type👈> 👉f.name👈 = {};
 {% endfor -%}
-👉type.name👈(QObject* parent, {% for f in type.fields %} std::optional<👉f.member_type👈> &👉f.name👈{% if not loop.last %},{% endif %} {% endfor %}): QObject::QObject(parent){
+👉type.name👈(QObject* parent, {% for f in type.fields %} std::optional<👉f.type.member_type👈> &👉f.name👈{% if not loop.last %},{% endif %} {% endfor %}): QObject::QObject(parent){
     {% for f in type.fields -%}
     👉f.name👈 = 👉f.name👈;
     {% endfor %}

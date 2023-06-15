@@ -2,7 +2,7 @@
 {% macro concrete_type_fields(type) -%}
 protected:
 {% for f in type.fields -%}
-👉 f.member_type 👈 👉 f.private_name 👈 = 👉 f.default_value 👈;
+👉 f.type.member_type 👈 👉 f.private_name 👈 = 👉 f.type.default_value 👈;
 {% endfor %}
 signals:
 {%for f in type.fields -%}
@@ -16,11 +16,11 @@ const 👉 f.is_custom_scalar.type_for_proxy 👈 & 👉 f.getter_name 👈() {
 return 👉 f.private_name 👈.to_qt();
 }
 {% else %}
-const 👉 f.member_type 👈 & 👉 f.getter_name 👈() const {
+const 👉 f.type.member_type 👈 & 👉 f.getter_name 👈() const {
 return 👉 f.private_name 👈;
 }
 {% endif %}
-void 👉 f.setter_name 👈(const 👉 f.member_type 👈 &v)
+void 👉 f.setter_name 👈(const 👉 f.type.member_type 👈 &v)
 {
 👉 f.private_name 👈 = v;
 emit 👉 f.signal_name 👈();
@@ -138,10 +138,10 @@ if (👉private_name👈 && 👉private_name👈->get_id() == 👉f.name👈_dat
 
 
 {% else %}
-throw qtgql::exceptions::NotImplementedError({"👉f.type👈 is not supporting updates ATM"});
+throw qtgql::exceptions::NotImplementedError({"👉f.type.__class__.__name__👈 is not supporting updates ATM"});
 {% endif %}
 }
-{% if f.type.is_optional() %}
+{% if f.type.is_optional %}
 else {
 👉fset_name👈({});
 }
@@ -157,7 +157,7 @@ concrete
 m_inst->👉field.definition.getter_name 👈()
 {% endif %}{% endset -%}
 
-{% if field.type.is_object_type  and field.type.is_optional() %}
+{% if field.type.is_object_type  and field.type.is_optional %}
 if (👉 instance_of_concrete 👈){
 👉field.private_name👈 = new 👉field.type_name👈(this, 👉 instance_of_concrete 👈, metadata);
 }
@@ -166,7 +166,7 @@ else{
 }
 {% elif field.type.is_object_type %}
 👉field.private_name👈 = new 👉field.type_name👈(this, 👉 instance_of_concrete 👈, metadata);
-{% elif field.type.is_model.is_object_type %}
+{% elif field.type.is_model and field.type.is_model.is_object_type %}
 auto init_list_👉 field.name 👈 =  std::make_unique<QList<👉field.narrowed_type.name👈*>>();
 for (const auto & node: 👉 instance_of_concrete 👈.value(metadata.operation_id)){
 init_list_👉 field.name 👈->append(new 👉field.narrowed_type.name👈(this, node, metadata));

@@ -1,14 +1,11 @@
 from __future__ import annotations
 
 import enum
-from datetime import datetime
-from datetime import timezone
+from datetime import datetime, timezone
 
 import strawberry
-
 from tests.conftest import fake
-from tests.test_codegen.schemas.node_interface import Node
-from tests.test_codegen.schemas.node_interface import NODE_DB
+from tests.test_codegen.schemas.node_interface import NODE_DB, Node
 
 
 @strawberry.enum

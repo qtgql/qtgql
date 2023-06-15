@@ -1,6 +1,5 @@
 #include "operationhandler.hpp"
 
-
 using namespace qtgql;
 using namespace gqlwstransport;
 

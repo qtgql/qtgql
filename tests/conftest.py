@@ -15,7 +15,6 @@ from attrs import define
 from faker import Faker
 from mimesis.locales import Locale
 
-
 if TYPE_CHECKING:
     from strawberry import Schema
 
