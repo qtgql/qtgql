@@ -28,8 +28,8 @@ from qtgqlcodegen.schema.evaluation import evaluate_variable
 from qtgqlcodegen.utils import require
 
 if TYPE_CHECKING:
-    from qtgqlcodegen.schema.typing import QtGqlObjectTypeDefinition
     from qtgqlcodegen.schema.definitions import QtGqlFieldDefinition, SchemaTypeInfo
+    from qtgqlcodegen.schema.typing import QtGqlObjectTypeDefinition
 
 
 def is_type_name_selection(field_node: gql_lang.FieldNode):
@@ -38,8 +38,11 @@ def is_type_name_selection(field_node: gql_lang.FieldNode):
         return True
     return False
 
+
 def get_operation_root_field_name(operation_node: gql_lang.OperationDefinitionNode) -> str:
     return operation_node.selection_set.selections[0].name.value  # type: ignore
+
+
 def _evaluate_field_from_node(
     field_node: gql_lang.FieldNode,
     field_type: QtGqlObjectTypeDefinition,
