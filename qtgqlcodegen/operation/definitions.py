@@ -14,8 +14,11 @@ if TYPE_CHECKING:
     from graphql.type import definition as gql_def
 
     from qtgqlcodegen.operation.typing import OperationTypeInfo
-    from qtgqlcodegen.schema.typing import GqlTypeHinter, QtGqlObjectTypeDefinition
-    from qtgqlcodegen.schema.definitions import QtGqlVariableDefinition, QtGqlFieldDefinition, SchemaTypeInfo
+    from qtgqlcodegen.schema.definitions import (
+        QtGqlFieldDefinition,
+        QtGqlVariableDefinition,
+    )
+    from qtgqlcodegen.schema.types.typing import QtGqlObjectTypeDefinition, QtGqlTypeABC
 
 
 @attrs.define(frozen=True, slots=False, repr=False)
@@ -27,8 +30,8 @@ class QtGqlQueriedField:
     narrowed_type: QtGqlQueriedObjectType | None = None
     is_root: bool = False
 
-    @cached_property
-    def type(self) -> GqlTypeHinter:
+    @property
+    def type(self) -> QtGqlTypeABC:
         return self.definition.type
 
     @cached_property

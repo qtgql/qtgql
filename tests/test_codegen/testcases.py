@@ -12,9 +12,8 @@ import jinja2
 from attr import define
 from qtgqlcodegen.cli import app
 from qtgqlcodegen.config import QtGqlConfig
-from qtgqlcodegen.custom_scalars import DateTimeScalarDefinition
-from qtgqlcodegen.schema.typing import CustomScalarDefinition
 from qtgqlcodegen.generator import SchemaGenerator
+from qtgqlcodegen.schema.types import CustomScalarDefinition, DateTimeScalarDefinition
 from tests.conftest import hash_schema
 from tests.test_codegen import schemas
 from typer.testing import CliRunner
@@ -787,5 +786,5 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 if __name__ == "__main__":
     generate_testcases(
-        ScalarsTestCase,
+        OperationVariablesTestcase,
     )

@@ -4,9 +4,9 @@ from pathlib import Path
 import graphql
 from attrs import define
 
-from qtgqlcodegen.custom_scalars import CUSTOM_SCALARS
 from qtgqlcodegen.generator import SchemaGenerator
 from qtgqlcodegen.schema.definitions import CustomScalarMap
+from qtgqlcodegen.schema.types import CUSTOM_SCALARS
 
 
 @define(slots=False)

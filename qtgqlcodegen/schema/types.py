@@ -1,23 +1,20 @@
 from __future__ import annotations
 
-import contextlib
-import functools
-from abc import abstractmethod, ABC
+from abc import ABC, abstractmethod
 from functools import cached_property
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING
 
 import attrs
 from attr import define
 
-from qtgqlcodegen.builtin_scalars import BuiltinScalars
-from qtgqlcodegen.core.cppref import QtGqlTypes, CppAttribute
-from qtgqlcodegen.operation.definitions import QtGqlQueriedObjectType
-from qtgqlcodegen.utils import AntiForwardRef, freeze
+from qtgqlcodegen.core.cppref import CppAttribute, QtGqlBasesNs, QtGqlTypes
 
 if TYPE_CHECKING:
-    from typing_extensions import TypeVar, Self
-    from qtgqlcodegen.schema.definitions import QtGqlInputFieldDefinition, QtGqlFieldDefinition, CustomScalarMap, \
-        SchemaTypeInfo
+    from qtgqlcodegen.schema.definitions import (
+        CustomScalarMap,
+        QtGqlFieldDefinition,
+        QtGqlInputFieldDefinition,
+    )
 
 
 @define
@@ -25,12 +22,15 @@ class QtGqlTypeABC(ABC):
     @property
     def is_union(self) -> QtGqlUnion | None:
         return None
+
     @property
     def is_optional(self) -> bool:
         return False
+
     @property
     def is_object_type(self) -> QtGqlObjectTypeDefinition | None:
         return None
+
     @property
     def is_interface(self) -> QtGqlInterfaceDefinition | None:
         return None
@@ -42,6 +42,7 @@ class QtGqlTypeABC(ABC):
     @property
     def is_model(self) -> QtGqlTypeABC | None:
         return None
+
     @property
     def is_enum(self) -> QtGqlEnumDefinition | None:
         return None
@@ -63,29 +64,30 @@ class QtGqlTypeABC(ABC):
     @property
     @abstractmethod
     def type_name(self) -> str:
+        """
+        :returns: The C++ "real" type mostly this would be the member type as well.
+        """
         raise NotImplementedError
 
     @property
     def member_type(self) -> str:
         """
-        :returns: Annotation of the field at the concrete type (for the type of the proxy use property type)
+        :returns: The C++ type of the concrete member
         """
-        # if the type needs to return something else this is overriden.
+        # if the type needs to return something else this is overridden.
         return self.type_name
-        # if q_object_def := t_self.is_queried_object_type:
-        #     return f"{q_object_def.name}"
 
 
 @define
 class QtGqlOptional(QtGqlTypeABC):
-    """
-    represents GraphQL types that are not marked with "!"
-    """
+    """Represents GraphQL types that are not marked with "!"."""
+
     of_type: QtGqlTypeABC
 
     @property
     def is_optional(self) -> bool:
         return True
+
     @property
     def is_union(self) -> QtGqlUnion | None:
         return self.of_type.is_union
@@ -93,6 +95,7 @@ class QtGqlOptional(QtGqlTypeABC):
     @property
     def is_object_type(self) -> QtGqlObjectTypeDefinition | None:
         return self.of_type.is_object_type
+
     @property
     def is_interface(self) -> QtGqlInterfaceDefinition | None:
         return self.of_type.is_interface
@@ -113,7 +116,6 @@ class QtGqlOptional(QtGqlTypeABC):
     def is_builtin_scalar(self) -> BuiltinScalar | None:
         return self.of_type.is_builtin_scalar
 
-
     @property
     def member_type(self) -> str:
         return self.of_type.member_type
@@ -126,10 +128,12 @@ class QtGqlOptional(QtGqlTypeABC):
 @define
 class QtGqlList(QtGqlTypeABC):
     of_type: QtGqlTypeABC
+
     @property
     def is_model(self) -> QtGqlTypeABC | None:
         # scalars or unions are not supported in lists yet (valid graphql spec though)
         return self.of_type
+
     @property
     def member_type(self) -> str:
         return f"QMap<QUuid, QList<{self.of_type.member_type}>>"
@@ -137,18 +141,22 @@ class QtGqlList(QtGqlTypeABC):
     @property
     def type_name(self) -> str:
         raise NotImplementedError(
-                      "models have no valid type for schema concretes, call member_type",
-                  )
+            "models have no valid type for schema concretes, call member_type",
+        )
+
 
 @define
 class QtGqlUnion(QtGqlTypeABC):
     types: tuple[QtGqlObjectTypeDefinition | QtGqlDeferredType, ...]
+
     @property
     def is_union(self) -> QtGqlUnion | None:
         return self
+
     @property
     def type_name(self) -> str:
         raise NotImplementedError
+
 
 @define
 class BuiltinScalar(QtGqlTypeABC):
@@ -166,8 +174,9 @@ class BuiltinScalar(QtGqlTypeABC):
         return self
 
     @property
-    def member_type(self) -> str:
+    def type_name(self) -> str:
         return self.attr.name
+
 
 @define
 class CustomScalarDefinition(QtGqlTypeABC):
@@ -177,8 +186,10 @@ class CustomScalarDefinition(QtGqlTypeABC):
     type_for_proxy: str
     include_path: str
 
+    @property
     def is_custom_scalar(self) -> CustomScalarDefinition | None:
         return self
+
 
 @define(slots=False)
 class BaseQtGqlObjectType(QtGqlTypeABC):
@@ -252,6 +263,7 @@ class QtGqlObjectTypeDefinition(BaseQtGqlObjectType):
     @property
     def is_object_type(self) -> QtGqlObjectTypeDefinition | None:
         return self
+
     @property
     def type_name(self) -> str:
         return self.name
@@ -260,7 +272,6 @@ class QtGqlObjectTypeDefinition(BaseQtGqlObjectType):
     def member_type(self) -> str:
         return f"std::shared_ptr<{self.type_name}>"
 
-
     def __attrs_post_init__(self):
         # inject this object type to the interface.
         # later the interface would use this list to know who he might resolve to.
@@ -268,17 +279,27 @@ class QtGqlObjectTypeDefinition(BaseQtGqlObjectType):
             if not base.implementations.get(self.name):
                 base.implementations[self.name] = self
 
+
 @define
 class QtGqlDeferredType(QtGqlTypeABC):
     name: str
-    object_map: dict[str, QtGqlObjectTypeDefinition]
+    object_map__: dict[str, QtGqlObjectTypeDefinition]
+    cached_: QtGqlTypeABC | None = None
+
+    def __getattr__(self, item):
+        if not self.cached_:
+            self.cached_ = self.object_map__[self.name]  # alias everything.
+        return getattr(self.cached_, item)
 
     def __getattribute__(self, name):
-        resolved = object.__getattribute__(self, 'resolve')()  # alias everything.
-        return getattr(resolved, name)
+        if name not in ("resolve", "object_map__", "cached_", "name"):
+            raise AttributeError
+        else:
+            return super().__getattribute__(name)
 
-    def resolve(self) -> QtGqlObjectTypeDefinition:
-        return self.object_map[self.name]
+    @property
+    def type_name(self) -> str:  # we only override it since it is abstractmethod
+        raise NotImplementedError("this should not be reached since we override __getattribute__")
 
 
 @define(slots=False, kw_only=True)
@@ -287,13 +308,17 @@ class QtGqlInterfaceDefinition(QtGqlObjectTypeDefinition):
 
     @cached_property
     def is_node_interface(self) -> bool:
-        """As specified by
-         https://graphql.org/learn/global-object-identification/#node-interface"""
+        """As specified by https://graphql.org/learn/global-object-
+        identification/#node-interface."""
         if self.name == "Node":
-            id_field_maybe = is_builtin_scalar(self.fields[0].type)
-            if id_field_maybe and id_field_maybe is BuiltinScalars.ID:
-                return True
+            id_field_maybe = self.fields[0]
+            return (
+                id_field_maybe.name == "id"
+                and id_field_maybe.type.is_builtin_scalar is BuiltinScalars.ID
+            )
         return False
+
+    @property
     def is_object_type(self) -> QtGqlObjectTypeDefinition | None:
         return None  # although interface extends object this might be confusing.
 
@@ -305,12 +330,15 @@ class QtGqlInterfaceDefinition(QtGqlObjectTypeDefinition):
 @define(slots=False)
 class QtGqlInputObjectTypeDefinition(BaseQtGqlObjectType):
     fields_dict: dict[str, QtGqlInputFieldDefinition] = attrs.field(factory=dict)  # type: ignore
+
     @property
     def is_input_object_type(self) -> QtGqlInputObjectTypeDefinition | None:
         return self
 
+    @property
     def type_name(self) -> str:
         return self.name
+
 
 @define
 class EnumValue:
@@ -337,6 +365,113 @@ class QtGqlEnumDefinition(QtGqlTypeABC):
     @property
     def is_enum(self) -> QtGqlEnumDefinition | None:
         return self
+
     @property
     def type_name(self) -> str:
         return self.namespaced_name
+
+
+def ScalarsNs() -> CppAttribute:
+    return QtGqlBasesNs().ns_add("scalars")
+
+
+def DefaultsNs() -> CppAttribute:
+    return QtGqlBasesNs().ns_add("DEFAULTS")
+
+
+class _BuiltinScalars:
+    INT = BuiltinScalar(
+        CppAttribute("int"),
+        DefaultsNs().ns_add("INT"),
+        graphql_name="Int",
+        from_json_convertor="toInt()",
+    )
+    FLOAT = BuiltinScalar(
+        CppAttribute("float"),
+        DefaultsNs().ns_add("FLOAT"),
+        graphql_name="Float",
+        from_json_convertor="toDouble()",
+    )
+    STRING = BuiltinScalar(
+        CppAttribute("QString"),
+        DefaultsNs().ns_add("STRING"),
+        graphql_name="String",
+        from_json_convertor="toString()",
+    )
+    ID = BuiltinScalar(
+        ScalarsNs().ns_add("Id"),
+        DefaultsNs().ns_add("ID"),
+        graphql_name="ID",
+        from_json_convertor="toString()",
+    )
+    BOOLEAN = BuiltinScalar(
+        CppAttribute("bool"),
+        DefaultsNs().ns_add("BOOL"),
+        graphql_name="Boolean",
+        from_json_convertor="toBool()",
+    )
+    VOID = BuiltinScalar(
+        ScalarsNs().ns_add("Void"),
+        DefaultsNs().ns_add("VOID"),
+        graphql_name="Void",
+        from_json_convertor="",
+    )
+
+    UUID = BuiltinScalar(
+        CppAttribute("QUuid"),
+        DefaultsNs().ns_add("UUID"),
+        graphql_name="UUID",
+        from_json_convertor="toVariant().toUuid()",
+    )
+
+    @classmethod
+    def __iter__(cls):
+        for name, member in cls.__dict__.items():
+            if name.isupper():
+                yield member
+
+    def by_graphql_name(self, name: str) -> BuiltinScalar | None:
+        for scalar in self:
+            if scalar.graphql_name == name:
+                return scalar
+
+    @cached_property
+    def keys(self) -> list[str]:
+        return [scalar.graphql_name for scalar in self]
+
+
+BuiltinScalars = _BuiltinScalars()
+DateTimeScalarDefinition = CustomScalarDefinition(
+    type_name="qtgql::customscalars::DateTimeScalar",
+    graphql_name="DateTime",
+    deserialized_type="QDateTime",
+    type_for_proxy="QString",
+    include_path="<qtgql/customscalars/customscalars.hpp>",
+)
+DateScalarDefinition = CustomScalarDefinition(
+    type_name="qtgql::customscalars::DateScalar",
+    graphql_name="Date",
+    deserialized_type="QDate",
+    type_for_proxy="QString",
+    include_path="<qtgql/customscalars/customscalars.hpp>",
+)
+TimeScalarDefinition = CustomScalarDefinition(
+    type_name="qtgql::customscalars::TimeScalar",
+    graphql_name="Time",
+    deserialized_type="QTime",
+    type_for_proxy="QString",
+    include_path="<qtgql/customscalars/customscalars.hpp>",
+)
+DecimalScalarDefinition = CustomScalarDefinition(
+    type_name="qtgql::customscalars::DecimalScalar",
+    graphql_name="Decimal",
+    deserialized_type="QString",
+    type_for_proxy="QString",
+    include_path="<qtgql/customscalars/customscalars.hpp>",
+)
+CUSTOM_SCALARS: CustomScalarMap = {
+    DateTimeScalarDefinition.graphql_name: DateTimeScalarDefinition,
+    DateScalarDefinition.graphql_name: DateScalarDefinition,
+    TimeScalarDefinition.graphql_name: TimeScalarDefinition,
+    DecimalScalarDefinition.graphql_name: DecimalScalarDefinition,
+}

@@ -1,13 +1,11 @@
 from __future__ import annotations
 
 import warnings
-from typing import Optional, Union
 
 import graphql
-from graphql import OperationType, language as gql_lang
+from graphql import OperationType
 from graphql.type import definition as gql_def
 
-from qtgqlcodegen.builtin_scalars import BuiltinScalars
 from qtgqlcodegen.core.exceptions import QtGqlException
 from qtgqlcodegen.core.graphql_ref import (
     is_enum_definition,
@@ -19,12 +17,25 @@ from qtgqlcodegen.core.graphql_ref import (
     is_scalar_definition,
     is_union_definition,
 )
-from qtgqlcodegen.schema.typing import GqlTypeHinter, QtGqlObjectTypeDefinition, QtGqlInterfaceDefinition, \
-    QtGqlInputObjectTypeDefinition, EnumValue, QtGqlEnumDefinition, QtGqlOptional, QtGqlTypeABC, QtGqlList, \
-    QtGqlDeferredType, QtGqlUnion
-from qtgqlcodegen.schema.definitions import QtGqlVariableDefinition, QtGqlInputFieldDefinition, QtGqlFieldDefinition, \
-    CustomScalarMap, SchemaTypeInfo
-from qtgqlcodegen.utils import anti_forward_ref
+from qtgqlcodegen.schema.definitions import (
+    CustomScalarMap,
+    QtGqlFieldDefinition,
+    QtGqlInputFieldDefinition,
+    SchemaTypeInfo,
+)
+from qtgqlcodegen.schema.types import (
+    BuiltinScalars,
+    EnumValue,
+    QtGqlDeferredType,
+    QtGqlEnumDefinition,
+    QtGqlInputObjectTypeDefinition,
+    QtGqlInterfaceDefinition,
+    QtGqlList,
+    QtGqlObjectTypeDefinition,
+    QtGqlOptional,
+    QtGqlTypeABC,
+    QtGqlUnion,
+)
 
 
 def evaluate_input_type(
@@ -34,18 +45,18 @@ def evaluate_input_type(
     ret = type_info.input_objects.get(type_.name, None)
     if not ret:
         ret = QtGqlInputObjectTypeDefinition(
-            type_info,
             name=type_.name,
             docstring=type_.description,
             fields_dict={
-                name: _evaluate_input_field(type_info, name, field) for name, field in type_.fields.items()
+                name: _evaluate_input_field(type_info, name, field)
+                for name, field in type_.fields.items()
             },
         )
         type_info.input_objects[ret.name] = ret
     return ret
 
 
-def evaluate_field_type(
+def evaluate_graphql_type(
     type_info: SchemaTypeInfo,
     t: gql_def.GraphQLType,
 ) -> QtGqlTypeABC:
@@ -60,8 +71,7 @@ def evaluate_field_type(
 
     if list_def := is_list_definition(t):
         ret = QtGqlList(
-                type_info,
-                of_type=evaluate_field_type(type_info, list_def.of_type)
+            of_type=evaluate_graphql_type(type_info, list_def.of_type),
         )
     elif scalar_def := is_scalar_definition(t):
         if builtin_scalar := BuiltinScalars.by_graphql_name(scalar_def.name):
@@ -70,26 +80,22 @@ def evaluate_field_type(
             ret = type_info.custom_scalars[scalar_def.name]
 
     elif enum_def := is_enum_definition(t):
-        ret = evaluate_enum(type_info, enum_def)
+        ret = _evaluate_enum(type_info, enum_def)
 
     elif obj_def := is_object_definition(t):
         ret = QtGqlDeferredType(
-            type_info=type_info,
-            object_map=type_info.object_types,
-            name=obj_def.name
+            object_map__=type_info.object_types,
+            name=obj_def.name,
         )
     elif union_def := is_union_definition(t):
         ret = QtGqlUnion(
-            type_info=type_info,
             types=tuple(
                 QtGqlDeferredType(
-                        type_info=type_info,
-                        name=possible.name,
-                        object_map=type_info.object_types,
-                    )
-
+                    name=possible.name,
+                    object_map__=type_info.object_types,
+                )
                 for possible in type_info.schema_definition.get_possible_types(union_def)
-            )
+            ),
         )
     elif input_def := is_input_definition(t):
         concrete = type_info.schema_definition.get_type(input_def.name)
@@ -97,12 +103,12 @@ def evaluate_field_type(
         ret = evaluate_input_type(type_info, input_def)
 
     elif interface_def := is_interface_definition(t):
-        ret = evaluate_interface_type(type_info, interface_def)
+        ret = _evaluate_interface_type(type_info, interface_def)
     if not ret:  # pragma: no cover
         raise NotImplementedError(f"type {t} not supported yet")
 
     if is_optional:
-        return QtGqlOptional(type_info, of_type=ret)
+        return QtGqlOptional(of_type=ret)
     return ret
 
 
@@ -112,9 +118,8 @@ def evaluate_field(
     field: gql_def.GraphQLField,
 ) -> QtGqlFieldDefinition:
     ret = QtGqlFieldDefinition(
-        type=evaluate_field_type(type_info, field.type),
+        type=evaluate_graphql_type(type_info, field.type),
         name=name,
-        type_info=type_info,
         description=field.description,
     )
     ret.arguments = [
@@ -130,9 +135,8 @@ def _evaluate_input_field(
     field: gql_def.GraphQLInputField | gql_def.GraphQLArgument,
 ) -> QtGqlInputFieldDefinition:
     return QtGqlInputFieldDefinition(
-        type=evaluate_field_type(type_info, field.type),
+        type=evaluate_graphql_type(type_info, field.type),
         name=name,
-        type_info=type_info,
         description=field.description,
     )
 
@@ -169,10 +173,9 @@ def evaluate_object_type(
                 f"type {type_} does not not define an id field.\n"
                 f"fields: {type_.fields}",
             )
-    implements = [evaluate_interface_type(type_info, interface) for interface in type_.interfaces]
+    implements = [_evaluate_interface_type(type_info, interface) for interface in type_.interfaces]
 
     ret = QtGqlObjectTypeDefinition(
-        type_info=type_info,
         name=t_name,
         interfaces_raw=implements,
         docstring=type_.description,
@@ -182,20 +185,19 @@ def evaluate_object_type(
     )
     type_info.set_objecttype(ret)
     for interface in type_.interfaces:
-        qtgql_interface = evaluate_interface_type(type_info, interface)
+        qtgql_interface = _evaluate_interface_type(type_info, interface)
         qtgql_interface.implementations[type_.name] = ret
     return ret
 
 
-def evaluate_interface_type(
+def _evaluate_interface_type(
     type_info: SchemaTypeInfo,
     interface: gql_def.GraphQLInterfaceType,
 ) -> QtGqlInterfaceDefinition:
     if ret := type_info.interfaces.get(interface.name, None):
         return ret
-    implements = [evaluate_interface_type(type_info, base) for base in interface.interfaces]
+    implements = [_evaluate_interface_type(type_info, base) for base in interface.interfaces]
     ret = QtGqlInterfaceDefinition(
-        type_info=type_info,
         name=interface.name,
         interfaces_raw=implements,
         docstring=interface.description,
@@ -207,7 +209,7 @@ def evaluate_interface_type(
     return ret
 
 
-def evaluate_enum(
+def _evaluate_enum(
     type_info: SchemaTypeInfo,
     enum: gql_def.GraphQLEnumType,
 ) -> QtGqlEnumDefinition | None:
@@ -217,7 +219,6 @@ def evaluate_enum(
         return definition
 
     ret = QtGqlEnumDefinition(
-        type_info=type_info,
         name=name,
         members=[
             EnumValue(name=enum.value, index=index, description=enum.description or "")
@@ -227,18 +228,6 @@ def evaluate_enum(
 
     type_info.enums[name] = ret
     return ret
-
-
-def evaluate_variable(
-    type_info: SchemaTypeInfo,
-    var: gql_lang.VariableDefinitionNode,
-) -> QtGqlVariableDefinition:
-    return QtGqlVariableDefinition(
-        name=var.variable.name.value,
-        type=type_info.get_type(var.type),
-        type_info=type_info,
-        default_value=var.default_value,
-    )
 
 
 def evaluate_schema(
@@ -252,14 +241,14 @@ def evaluate_schema(
         if object_definition := is_object_definition(type_):
             if object_type := evaluate_object_type(type_info, object_definition):
                 if object_definition is type_info.schema_definition.query_type:
-                    type_info.operation_types[OperationType.QUERY] = object_type
+                    type_info.operation_types[OperationType.QUERY.value] = object_type
                 elif object_definition is type_info.schema_definition.mutation_type:
-                    type_info.operation_types[OperationType.MUTATION] = object_type
+                    type_info.operation_types[OperationType.MUTATION.value] = object_type
                 elif object_definition is type_info.schema_definition.subscription_type:
-                    type_info.operation_types[OperationType.SUBSCRIPTION] = object_type
+                    type_info.operation_types[OperationType.SUBSCRIPTION.value] = object_type
 
         elif enum_def := is_enum_definition(type_):
-            if enum := evaluate_enum(type_info, enum_def):
+            if enum := _evaluate_enum(type_info, enum_def):
                 type_info.enums[enum.name] = enum
 
     return type_info

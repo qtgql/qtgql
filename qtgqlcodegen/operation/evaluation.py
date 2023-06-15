@@ -16,6 +16,8 @@ from qtgqlcodegen.core.graphql_ref import (
     inject_typename_selection,
     is_field_node,
     is_inline_fragment,
+    is_named_type_node,
+    is_nonnull_node,
     is_operation_def_node,
 )
 from qtgqlcodegen.operation.definitions import (
@@ -24,12 +26,16 @@ from qtgqlcodegen.operation.definitions import (
     QtGqlQueriedObjectType,
 )
 from qtgqlcodegen.operation.typing import OperationTypeInfo
-from qtgqlcodegen.schema.evaluation import evaluate_variable
+from qtgqlcodegen.schema.definitions import (
+    QtGqlFieldDefinition,
+    QtGqlVariableDefinition,
+    SchemaTypeInfo,
+)
+from qtgqlcodegen.schema.evaluation import evaluate_graphql_type
 from qtgqlcodegen.utils import require
 
 if TYPE_CHECKING:
-    from qtgqlcodegen.schema.definitions import QtGqlFieldDefinition, SchemaTypeInfo
-    from qtgqlcodegen.schema.typing import QtGqlObjectTypeDefinition
+    from qtgqlcodegen.schema.types import QtGqlObjectTypeDefinition, QtGqlTypeABC
 
 
 def is_type_name_selection(field_node: gql_lang.FieldNode):
@@ -137,7 +143,7 @@ def _evaluate_field(
                 # no need to validate inner types are implementation, graphql-core does this.
                 concrete = type_info.schema_type_info.get_object_type(
                     type_name,
-                ) or type_info.schema_type_info.get_interface_by_name(type_name)
+                ) or type_info.schema_type_info.get_interface(type_name)
                 assert concrete
                 for inner_selection in inline_frag.selection_set.selections:
                     field_node = is_field_node(inner_selection)
@@ -169,7 +175,7 @@ def _evaluate_field(
             definition=obj_def,
             fields_dict=selections,
         )
-        type_info.narrowed_types[queried_obj.name] = queried_obj
+        type_info.narrowed_types_map[queried_obj.name] = queried_obj
         narrowed_type = queried_obj
 
     def sorted_distinct_fields(
@@ -187,6 +193,35 @@ def _evaluate_field(
     )
 
 
+def _evaluate_variable_node_type(
+    type_info: SchemaTypeInfo,
+    node: graphql.TypeNode,
+) -> QtGqlTypeABC:
+    if nonnull := is_nonnull_node(node):
+        return evaluate_graphql_type(
+            type_info,
+            graphql.type.GraphQLNonNull(
+                type_info.schema_definition.get_type(nonnull.type.name.value),  # type: ignore
+            ),
+        )
+
+    if named_type := is_named_type_node(node):
+        gql_concrete = type_info.schema_definition.get_type(named_type.name.value)
+        assert gql_concrete
+        return evaluate_graphql_type(type_info, gql_concrete)
+    raise NotImplementedError(node, "Type is not supported as a variable ATM")
+
+
+def _evaluate_variable(
+    type_info: SchemaTypeInfo,
+    var: gql_lang.VariableDefinitionNode,
+) -> QtGqlVariableDefinition:
+    return QtGqlVariableDefinition(
+        name=var.variable.name.value,
+        type=_evaluate_variable_node_type(type_info, var.type),
+    )
+
+
 def _evaluate_operation(
     operation: OperationDefinitionNode,
     schema_type_info: SchemaTypeInfo,
@@ -196,10 +231,11 @@ def _evaluate_operation(
     # input variables
     if variables_def := operation.variable_definitions:
         for var in variables_def:
-            type_info.variables.append(evaluate_variable(type_info.schema_type_info, var))
+            type_info.variables.append(_evaluate_variable(type_info.schema_type_info, var))
 
     root_field_def = require(is_field_node(operation.selection_set.selections[0]))
-    root_type = require(type_info.schema_type_info.get_object_type(operation.operation.name))
+    root_type = type_info.schema_type_info.operation_types[operation.operation.value]
+    assert root_type, f"Make sure you have {operation.operation.name} type defined in your schema"
     root_field = _evaluate_field(
         type_info,
         root_type.fields_dict[get_operation_root_field_name(operation)],

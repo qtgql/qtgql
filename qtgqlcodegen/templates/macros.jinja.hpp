@@ -141,7 +141,7 @@ if (👉private_name👈 && 👉private_name👈->get_id() == 👉f.name👈_dat
 throw qtgql::exceptions::NotImplementedError({"👉f.type👈 is not supporting updates ATM"});
 {% endif %}
 }
-{% if f.type.is_optional() %}
+{% if f.type.is_optional %}
 else {
 👉fset_name👈({});
 }
@@ -157,7 +157,7 @@ concrete
 m_inst->👉field.definition.getter_name 👈()
 {% endif %}{% endset -%}
 
-{% if field.type.is_object_type  and field.type.is_optional() %}
+{% if field.type.is_object_type  and field.type.is_optional %}
 if (👉 instance_of_concrete 👈){
 👉field.private_name👈 = new 👉field.type_name👈(this, 👉 instance_of_concrete 👈, metadata);
 }

@@ -12,5 +12,8 @@ if TYPE_CHECKING:
 @attrs.define(slots=False)
 class OperationTypeInfo:
     schema_type_info: SchemaTypeInfo
-    narrowed_types: tuple[QtGqlQueriedObjectType, ...] = attrs.Factory(dict)
+    narrowed_types_map: dict[str, QtGqlQueriedObjectType] = attrs.Factory(dict)
     variables: list[QtGqlVariableDefinition] = attrs.Factory(list)
+
+    def narrowed_types(self) -> tuple[QtGqlQueriedObjectType, ...]:
+        return tuple(self.narrowed_types_map.values())

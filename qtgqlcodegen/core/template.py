@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from attrs import define
 from jinja2 import Environment, PackageLoader, select_autoescape
@@ -23,7 +23,12 @@ def wrap_curly_filter(v: str, ignore: bool = False) -> str:
     return "{" + v + "}"
 
 
+def debug(obj: Any):  # pragma: no cover
+    print(obj)  # noqa
+
+
 template_env.filters["wrapcurly"] = wrap_curly_filter
+template_env.globals.update(debug=debug)
 
 CMAKE_TEMPLATE = template_env.get_template("CMakeLists.jinja.cmake")
 

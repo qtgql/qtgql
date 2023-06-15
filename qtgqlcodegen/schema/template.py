@@ -9,8 +9,12 @@ from qtgqlcodegen.operation.template import OPERATION_TEMPLATE, OperationTemplat
 
 if TYPE_CHECKING:
     from qtgqlcodegen.config import QtGqlConfig
-    from qtgqlcodegen.schema.typing import QtGqlObjectTypeDefinition, QtGqlInterfaceDefinition, \
-        QtGqlInputObjectTypeDefinition, QtGqlEnumDefinition
+    from qtgqlcodegen.schema.types import (
+        QtGqlEnumDefinition,
+        QtGqlInputObjectTypeDefinition,
+        QtGqlInterfaceDefinition,
+        QtGqlObjectTypeDefinition,
+    )
 
 
 @define

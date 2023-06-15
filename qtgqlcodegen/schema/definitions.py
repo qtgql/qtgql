@@ -1,32 +1,38 @@
 from __future__ import annotations
 
 from functools import cached_property
+from typing import TYPE_CHECKING, Literal
 
-from attr import define, Factory
+from attr import Factory, define
 from graphql import OperationType
-from graphql.type import definition as gql_def
-from typing_extensions import TypeAlias
-from typingref import UNSET, TypeHinter
+from typingref import TypeHinter
 
-from qtgqlcodegen.schema.typing import QtGqlTypeABC, CustomScalarDefinition, is_custom_scalar, \
-    QtGqlEnumDefinition, QtGqlObjectTypeDefinition, QtGqlInputObjectTypeDefinition, QtGqlInterfaceDefinition
+if TYPE_CHECKING:
+    from graphql.type import definition as gql_def
+    from typing_extensions import TypeAlias
+
+    from qtgqlcodegen.schema.types.typing import (
+        CustomScalarDefinition,
+        QtGqlEnumDefinition,
+        QtGqlInputObjectTypeDefinition,
+        QtGqlInterfaceDefinition,
+        QtGqlObjectTypeDefinition,
+        QtGqlTypeABC,
+    )
 
 
 @define(slots=False)
 class QtGqlBaseTypedNode:
     name: str
     type: QtGqlTypeABC
-    type_info: SchemaTypeInfo
 
     @cached_property
     def is_custom_scalar(self) -> CustomScalarDefinition | None:
-        return is_custom_scalar(self.type)
+        return self.type.is_custom_scalar
 
 
 @define(slots=False)
 class QtGqlVariableDefinition(QtGqlBaseTypedNode):
-    default_value = UNSET
-
     def json_repr(self, attr_name: str | None = None) -> str:
         if not attr_name:
             attr_name = self.name
@@ -116,10 +122,10 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
             # might be a model, which is also QObject
             # graphql doesn't support scalars or enums in Unions ATM.
             assert (
-                    self.type.is_model
-                    or self.type.is_object_type
-                    or self.type.is_interface
-                    or self.type.is_union
+                self.type.is_model
+                or self.type.is_object_type
+                or self.type.is_interface
+                or self.type.is_union
             )
             return "QObject"
 
@@ -163,20 +169,23 @@ CustomScalarMap: TypeAlias = "dict[str, CustomScalarDefinition]"
 class SchemaTypeInfo:
     schema_definition: gql_def.GraphQLSchema
     custom_scalars: CustomScalarMap
-    operation_types: dict[OperationType:QtGqlObjectTypeDefinition] = Factory(dict)
+    operation_types: dict[
+        Literal["query", "mutation", "subscription"],
+        QtGqlObjectTypeDefinition,
+    ] = Factory(dict)
     object_types: ObjectTypeMap = Factory(dict)
     enums: EnumMap = Factory(dict)
     input_objects: InputObjectMap = Factory(dict)
     interfaces: InterfacesMap = Factory(dict)
 
-    def get_interface_by_name(self, name: str) -> QtGqlInterfaceDefinition | None:
+    def get_interface(self, name: str) -> QtGqlInterfaceDefinition | None:
         return self.interfaces.get(name, None)
 
     def get_object_type(self, name: str) -> QtGqlObjectTypeDefinition | None:
-        return self.object_types.get(name.lower(), None)
+        return self.object_types.get(name, None)
 
     def set_objecttype(self, objecttype: QtGqlObjectTypeDefinition) -> None:
-        self.object_types[objecttype.name.lower()] = objecttype
+        self.object_types[objecttype.name] = objecttype
 
     @cached_property
     def root_types(self) -> list[gql_def.GraphQLObjectType | None]:
