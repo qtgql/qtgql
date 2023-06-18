@@ -50,13 +50,34 @@ class QtGqlInputFieldDefinition(BaseQtGqlFieldDefinition, QtGqlVariableDefinitio
 
 
 @define(slots=False)
-class QtGqlArgumentDefinition(QtGqlInputFieldDefinition):
+class QtGqlArgumentDefinition(BaseQtGqlFieldDefinition):
     ...
 
 
 @define(slots=False, kw_only=True)
 class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
-    arguments: list[QtGqlInputFieldDefinition] = Factory(list)
+    arguments_dict: dict[str, QtGqlInputFieldDefinition] = Factory(dict)
+
+    @cached_property
+    def arguments(self) -> tuple[QtGqlInputFieldDefinition, ...]:
+        return tuple(self.arguments_dict.values())
+
+    @cached_property
+    def arguments_type(self) -> str:
+        return "std::tuple<" + ",".join([arg.type.type_name() for arg in self.arguments]) + ">"
+
+    def index_for_argument(self, arg: str) -> int:
+        return self.arguments.index(self.arguments_dict[arg])
+
+    @cached_property
+    def type_with_args(self) -> str:
+        """
+
+        :return: if the field has args returns am map of <args_type>: <member_type> for caching purposes.
+        """
+        if self.arguments_dict:
+            return f"std::map<{self.arguments_type}, {self.type.member_type}>"
+        return self.type.member_type
 
     @cached_property
     def getter_name(self) -> str:

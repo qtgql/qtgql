@@ -189,7 +189,7 @@ ScalarsTestCase = QtGqlTestCase(
 OperationVariablesTestcase = QtGqlTestCase(
     schema=schemas.operation_variables.schema,
     operations="""
-  query UserQuery($connectedVar: ConnectedInput!) {
+  query UserQuery($connectedVar: Boolean!) {
     user {
       id
       name
@@ -526,9 +526,9 @@ ObjectsThatReferenceEachOtherTestCase = QtGqlTestCase(
 )
 
 CountryScalar = CustomScalarDefinition(
-    type_name="CountryScalar",
+    name="CountryScalar",
     graphql_name="Country",
-    type_for_proxy="QString",
+    to_qt_type="QString",
     deserialized_type="QString",
     include_path="NOT IMPLEMENTED",
 )
@@ -786,5 +786,5 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 if __name__ == "__main__":
     generate_testcases(
-        OptionalNestedObjectTestCase,
+        ScalarsTestCase,
     )

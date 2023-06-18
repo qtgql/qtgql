@@ -56,14 +56,13 @@ class QtGqlTypeABC(ABC):
     def is_builtin_scalar(self) -> BuiltinScalar | None:
         return None
 
-    def json_repr(self, attr_name: str | None = None) -> str:
-        raise NotImplementedError(f"{self} is not supported as an input type ATM")
-
     @property
     def is_custom_scalar(self) -> CustomScalarDefinition | None:
         return None
 
-    @property
+    def json_repr(self, attr_name: str | None = None) -> str:
+        raise NotImplementedError(f"{self} is not supported as an input type ATM")
+
     @abstractmethod
     def type_name(self) -> str:
         """
@@ -82,10 +81,19 @@ class QtGqlTypeABC(ABC):
     @property
     def member_type(self) -> str:
         """
-        :returns: The C++ type of the concrete member
+        :returns: The C++ type of the concrete instance member.
         """
-        # if the type needs to return something else this is overridden.
-        return self.type_name
+        # Usually `type_name` should suffice, if the type needs to return something else this is overridden.
+        return self.type_name()
+
+    @property
+    def fget_type(self) -> str:
+        """
+
+        :return: type for the proxy object, usually this would be the member type though for custom scalars
+        there is `to_qt` that has different type.
+        """
+        return self.member_type
 
     def __str__(self):
         raise RuntimeError("the template probobly tried to render this object")
@@ -108,7 +116,6 @@ class QtGqlOptional(QtGqlTypeABC):
         else:
             return super().__getattribute__(name)
 
-    @property
     def type_name(self) -> str:  # pragma: no cover
         raise NotImplementedError
 
@@ -126,7 +133,6 @@ class QtGqlList(QtGqlTypeABC):
     def member_type(self) -> str:
         return f"QMap<QUuid, QList<{self.of_type.member_type}>>"
 
-    @property
     def type_name(self) -> str:
         raise NotImplementedError(
             "models have no valid type for schema concretes, call member_type",
@@ -141,7 +147,6 @@ class QtGqlUnion(QtGqlTypeABC):
     def is_union(self) -> QtGqlUnion | None:
         return self
 
-    @property
     def type_name(self) -> str:
         raise NotImplementedError
 
@@ -165,7 +170,6 @@ class BuiltinScalar(QtGqlTypeABC):
     def is_builtin_scalar(self) -> BuiltinScalar | None:
         return self
 
-    @property
     def type_name(self) -> str:
         return self.attr.name
 
@@ -179,10 +183,10 @@ class BuiltinScalar(QtGqlTypeABC):
 
 @define
 class CustomScalarDefinition(QtGqlTypeABC):
-    type_name: str
+    name: str
     graphql_name: str
     deserialized_type: str
-    type_for_proxy: str
+    to_qt_type: str
     include_path: str
 
     @property
@@ -192,6 +196,13 @@ class CustomScalarDefinition(QtGqlTypeABC):
     def json_repr(self, attr_name: str | None = None) -> str:
         return f"{attr_name}.serialize()"
 
+    def type_name(self) -> str:
+        return self.name
+
+    @property
+    def fget_type(self) -> str:
+        return self.to_qt_type
+
 
 @define(slots=False)
 class BaseQtGqlObjectType(QtGqlTypeABC):
@@ -200,13 +211,14 @@ class BaseQtGqlObjectType(QtGqlTypeABC):
     docstring: str | None = ""
 
     @cached_property
-    def fields(self) -> list[QtGqlFieldDefinition]:
-        return list(self.fields_dict.values())
+    def fields(self) -> tuple[QtGqlFieldDefinition, ...]:
+        return tuple(self.fields_dict.values())
 
 
 @define(slots=False)
 class QtGqlObjectType(BaseQtGqlObjectType):
-    interfaces_raw: list[QtGqlInterfaceDefinition] = attrs.Factory(list)
+    interfaces_raw: tuple[QtGqlInterfaceDefinition, ...] = attrs.Factory(tuple)
+    unique_fields: tuple[QtGqlFieldDefinition, ...] = attrs.Factory(tuple)
 
     def implements(self, interface: QtGqlInterfaceDefinition) -> bool:
         for m_interface in self.interfaces_raw:
@@ -266,13 +278,20 @@ class QtGqlObjectType(BaseQtGqlObjectType):
     def is_object_type(self) -> QtGqlObjectType | None:
         return self
 
-    @property
     def type_name(self) -> str:
         return self.name
 
     @property
+    def deserializer_name(self) -> str:
+        return f"deserializers::des_{self.name}"
+
+    @property
+    def updater_name(self) -> str:
+        return f"updaters::update_{self.name}"
+
+    @property
     def member_type(self) -> str:
-        return f"std::shared_ptr<{self.type_name}>"
+        return f"std::shared_ptr<{self.type_name()}>"
 
     def __attrs_post_init__(self):
         # inject this object type to the interface.
@@ -307,7 +326,6 @@ class QtGqlQueriedObjectType(QtGqlTypeABC):
             "\n   ".join(self.fields_dict.keys()),
         )
 
-    @property
     def type_name(self) -> str:
         return self.name
 
@@ -341,7 +359,6 @@ class QtGqlDeferredType(QtGqlTypeABC):
         else:
             return super().__getattribute__(name)
 
-    @property
     def type_name(self) -> str:  # we only override it since it is abstractmethod
         raise NotImplementedError("this should not be reached since we override __getattribute__")
 
@@ -379,7 +396,6 @@ class QtGqlInputObjectTypeDefinition(BaseQtGqlObjectType):
     def is_input_object_type(self) -> QtGqlInputObjectTypeDefinition | None:
         return self
 
-    @property
     def type_name(self) -> str:
         return self.name
 
@@ -413,7 +429,6 @@ class QtGqlEnumDefinition(QtGqlTypeABC):
     def is_enum(self) -> QtGqlEnumDefinition | None:
         return self
 
-    @property
     def type_name(self) -> str:
         return self.namespaced_name
 
@@ -496,31 +511,31 @@ class _BuiltinScalars:
 
 BuiltinScalars = _BuiltinScalars()
 DateTimeScalarDefinition = CustomScalarDefinition(
-    type_name="qtgql::customscalars::DateTimeScalar",
+    name="qtgql::customscalars::DateTimeScalar",
     graphql_name="DateTime",
     deserialized_type="QDateTime",
-    type_for_proxy="QString",
+    to_qt_type="QString",
     include_path="<qtgql/customscalars/customscalars.hpp>",
 )
 DateScalarDefinition = CustomScalarDefinition(
-    type_name="qtgql::customscalars::DateScalar",
+    name="qtgql::customscalars::DateScalar",
     graphql_name="Date",
     deserialized_type="QDate",
-    type_for_proxy="QString",
+    to_qt_type="QString",
     include_path="<qtgql/customscalars/customscalars.hpp>",
 )
 TimeScalarDefinition = CustomScalarDefinition(
-    type_name="qtgql::customscalars::TimeScalar",
+    name="qtgql::customscalars::TimeScalar",
     graphql_name="Time",
     deserialized_type="QTime",
-    type_for_proxy="QString",
+    to_qt_type="QString",
     include_path="<qtgql/customscalars/customscalars.hpp>",
 )
 DecimalScalarDefinition = CustomScalarDefinition(
-    type_name="qtgql::customscalars::DecimalScalar",
+    name="qtgql::customscalars::DecimalScalar",
     graphql_name="Decimal",
     deserialized_type="QString",
-    type_for_proxy="QString",
+    to_qt_type="QString",
     include_path="<qtgql/customscalars/customscalars.hpp>",
 )
 CUSTOM_SCALARS: CustomScalarMap = {

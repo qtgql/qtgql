@@ -33,7 +33,7 @@ class OperationTypeInfo:
 
 @attrs.define(frozen=True, slots=False, repr=False)
 class QtGqlQueriedField:
-    definition: QtGqlFieldDefinition
+    concrete: QtGqlFieldDefinition
     type_info: OperationTypeInfo
     choices: frozendict[str, dict[str, QtGqlQueriedField]] = attrs.Factory(frozendict)
     selections: dict[str, QtGqlQueriedField] = attrs.Factory(dict)
@@ -42,7 +42,7 @@ class QtGqlQueriedField:
 
     @property
     def type(self) -> QtGqlTypeABC:
-        return self.definition.type
+        return self.concrete.type
 
     @cached_property
     def type_name(self) -> str:
@@ -63,13 +63,13 @@ class QtGqlQueriedField:
 
         :return: C++ property type that will be exposed to QML.
         """
-        tp = self.definition.type
+        tp = self.concrete.type
         if tp.is_object_type:
             assert self.narrowed_type
             return f"{self.type_name} *"
 
         if cs := tp.is_custom_scalar:
-            return cs.type_for_proxy
+            return cs.to_qt_type
 
         if model_of := tp.is_model:
             if model_of.is_object_type:
@@ -81,13 +81,13 @@ class QtGqlQueriedField:
     def name(self) -> str:
         if self.is_root:
             return "data"
-        return self.definition.name
+        return self.concrete.name
 
     @cached_property
     def private_name(self):
         if self.is_root:
             return f"m_{self.name}"
-        return self.definition.private_name
+        return self.concrete.private_name
 
     def as_conf_string(self) -> str:
         return config_template(
@@ -102,6 +102,10 @@ class QtGqlOperationDefinition:
     fragments: list[str] = attrs.Factory(list)
     variables: list[QtGqlVariableDefinition] = attrs.Factory(list)
     narrowed_types: tuple[QtGqlQueriedObjectType, ...] = attrs.Factory(tuple)
+
+    @property
+    def generated_variables_type(self) -> str:
+        return self.name + "Variables"
 
     @property
     def operation_config(self) -> str:

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from attr import define
 
@@ -9,14 +9,13 @@ from qtgqlcodegen.core.template import template_env
 if TYPE_CHECKING:
     from qtgqlcodegen.config import QtGqlConfig
     from qtgqlcodegen.operation.definitions import QtGqlOperationDefinition, QtGqlQueriedField
+    from qtgqlcodegen.types import QtGqlInterfaceDefinition
 
 
 @define(slots=False)
 class OperationTemplateContext:
-    def print(self, v: Any) -> None:
-        print(v)
-
     operation: QtGqlOperationDefinition
+    interfaces: list[QtGqlInterfaceDefinition]
     config: QtGqlConfig
     debug: bool = False
 
@@ -60,5 +59,6 @@ def config_template(context: ConfigContext):
     return CONFIG_TEMPLATE.render(context=context)
 
 
-OPERATION_TEMPLATE = template_env.get_template("operation.jinja.hpp")
+OPERATION_HPP_TEMPLATE = template_env.get_template("operation.jinja.hpp")
+OPERATION_CPP_TEMPLATE = template_env.get_template("operation.jinja.cpp")
 CONFIG_TEMPLATE = template_env.get_template("config.jinja.hpp")

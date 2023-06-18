@@ -4,8 +4,24 @@
 #include <qtgql/gqlwstransport/gqlwstransport.hpp>
 #include <QObject>
 
-namespace 👉 context.config.env_name 👈{
-namespace 👉context.ns👈{
+namespace 👉 context.config.env_name 👈::👉context.ns👈{
+class 👉 context.operation.name 👈;
+
+namespace deserializers{
+{% for t in context.operation.narrowed_types -%}
+std::shared_ptr<👉 t.concrete.name 👈> des_👉 t.concrete.name 👈(const QJsonObject& data, const 👉 context.operation.name 👈 * operation);
+{% endfor -%}
+{% for t in context.interfaces -%}
+std::shared_ptr<👉 t.name 👈> des_👉 t.name 👈(const QJsonObject& data, const 👉 context.operation.name 👈 * operation);
+{% endfor -%}
+};
+
+namespace updaters{
+{% for t in context.operation.narrowed_types -%}
+void update_👉 t.concrete.name 👈(👉 t.concrete.member_type 👈 &inst, const QJsonObject &data, const 👉 context.operation.name 👈 * operation);
+{% endfor -%}
+
+};
 
 {% for t in context.operation.narrowed_types %}
 class 👉 t.name 👈: public QObject{
@@ -14,11 +30,11 @@ class 👉 t.name 👈: public QObject{
  */
     Q_OBJECT
 {% for f in t.fields -%}
-Q_PROPERTY(const 👉 f.property_type 👈 👉 f.name 👈 READ 👉 f.definition.getter_name 👈 NOTIFY 👉 f.definition.signal_name 👈);
+Q_PROPERTY(const 👉 f.property_type 👈 👉 f.name 👈 READ 👉 f.concrete.getter_name 👈 NOTIFY 👉 f.concrete.signal_name 👈);
 {% endfor %}
 signals:
 {%for f in t.fields -%}
-void 👉 f.definition.signal_name 👈();
+void 👉 f.concrete.signal_name 👈();
 {% endfor %}
 
 {# members #}
@@ -27,46 +43,56 @@ public: // WARNING: members are public because you have debug=True in your confi
 {% else %}
 protected:
 {% endif %}
-std::shared_ptr<👉context.schema_ns👈::👉 t.concrete.name 👈> m_inst;
+const std::shared_ptr<👉context.schema_ns👈::👉 t.concrete.name 👈> m_inst;
 {% for ref_field in t.references -%}
-👉ref_field.property_type👈 m_👉ref_field.name👈 = {};
+const 👉ref_field.property_type👈 m_👉ref_field.name👈 = {};
 {% endfor %}
 {%- for model_field in t.models -%}
 👉 model_field.property_type 👈 m_👉model_field.name👈;
 {% endfor %}
 
 public:
-👉 t.name 👈(QObject * parent,
-        const std::shared_ptr<👉 t.concrete.name 👈> &inst,
-        qtgql::bases::OperationMetadata & metadata): m_inst{inst}, QObject::QObject(parent){
-{% for field in t.fields -%}
-👉 macros.initialize_proxy_field(field) 👈
-{# updates logic -#}
-connect(m_inst.get(), &👉context.schema_ns👈::👉t.concrete.name👈::👉 field.definition.signal_name 👈, this,
-        [&](){emit 👉 field.definition.signal_name 👈();});
-{% endfor %}
-}
+👉 t.name 👈(👉 context.operation.name 👈 * operation, const std::shared_ptr<👉 t.concrete.name 👈> &inst);
+
 {%- for f in t.fields %}
-{% if f.type.is_object_type or f.type.is_model %}
-[[nodiscard]] inline const 👉 f.property_type 👈  👉 f.definition.getter_name 👈() const {
+{%- if f.type.is_object_type or f.type.is_model %}
+[[nodiscard]] inline const 👉 f.property_type 👈  👉 f.concrete.getter_name 👈() const {
     return m_👉f.name👈;
-{% else %}
-{# TODO: this is probably redundan #}
-[[nodiscard]] inline const 👉 f.property_type 👈 & 👉 f.definition.getter_name 👈() const {
-    {% if f.type.is_object_type %}
+{%- else -%}
+{#- TODO: find a better way to pass the object to QML -#}
+[[nodiscard]] inline const 👉 f.property_type 👈 & 👉 f.concrete.getter_name 👈() const {
+    {% if f.type.is_object_type -%}
     return *m_👉f.name👈;
-    {% else %}
-    return m_inst->👉 f.definition.getter_name 👈();
-    {% endif %}
-{% endif %}
+    {% else -%}
+    return m_inst->👉 f.concrete.getter_name 👈();
+    {% endif -%}
+{%- endif -%}
 };
 {% endfor -%}
 };
 {% endfor %}
-class 👉 context.operation.name 👈: public qtgql::gqlwstransport::OperationHandlerABC {
+
+struct 👉 context.operation.generated_variables_type 👈{
+{% for var in context.operation.variables -%}
+std::optional<👉 var.type.member_type 👈> 👉 var.name 👈 = {};
+{% endfor -%}
+
+    QJsonObject to_json() const{
+    QJsonObject ret;
+    {% for var in context.operation.variables -%}
+    if (👉 var.name 👈.has_value()){
+    ret.insert("👉 var.name 👈",  👉 var.json_repr() 👈);
+    }
+    {% endfor -%}
+    return ret;
+    }
+};
+
+class 👉 context.operation.name 👈: public qtgql::gqlwstransport::OperationHandlerABC{
     Q_OBJECT
 Q_PROPERTY(const 👉 context.operation.root_field.property_type 👈 data READ get_data NOTIFY dataChanged);
 
+👉 context.operation.generated_variables_type 👈 m_vars_inst;
 std::optional<👉 context.operation.root_field.property_type 👈> m_data = {};
 
 
@@ -75,12 +101,6 @@ inline const QString &ENV_NAME() override{
     static const auto ret = QString("👉 context.config.env_name 👈");
     return ret;
     }
-inline const qtgql::bases::SelectionsConfig & SELECTIONS_CONFIG() override{
-    static auto ret = qtgql::bases::SelectionsConfig(
-        {👉 context.operation.operation_config 👈}
-    );
-    return ret;
-}
 
 
 public:
@@ -93,11 +113,6 @@ m_message_template.op_id = m_operation_id;
 
 QTGQL_STATIC_MAKE_SHARED(👉 context.operation.name 👈)
 
-inline qtgql::bases::OperationMetadata operation_metadata() override{
-return {operation_id()};
-};
-
-
 inline const QUuid & operation_id() const override{
 return m_operation_id;
 }
@@ -106,13 +121,11 @@ return m_operation_id;
 void on_next(const QJsonObject &message) override{
     if (!m_data && message.contains("data")){
         auto data = message.value("data").toObject();
-        auto metadata = operation_metadata();
-        if (data.contains("👉 context.operation.root_field.definition.name 👈")){
-{%- set do_after_deserialized -%} 👉 macros.initialize_proxy_field(context.operation.root_field) 👈 {% endset -%}
-            👉 macros.deserialize_field(context.operation.root_field.definition,
-                                    "auto concrete", False,
-                                    "SELECTIONS_CONFIG()",
-                                    "metadata",
+        if (data.contains("👉 context.operation.root_field.concrete.name 👈")){
+{%- set do_after_deserialized -%} 👉 macros.initialize_proxy_field(context.operation.root_field, operation_pointer="this") 👈 {% endset -%}
+            👉 macros.deserialize_field(context.operation.root_field,
+                                    "auto concrete",
+                                    "this",
                                     do_after_deserialized,
                                     ) 👈
         }
@@ -123,22 +136,15 @@ inline const 👉 context.operation.root_field.property_type 👈 get_data(){
 }
 
 {% if context.operation.variables %}
-void set_variables(
-{% for var in context.operation.variables -%}
-const std::optional<👉 var.type.type_name 👈> & 👉 var.name 👈 {% if not loop.last %},{% endif %}
-{% endfor -%}){
-{% for var in context.operation.variables %}
-if (👉 var.name 👈.has_value()){
-    m_variables.insert("👉 var.name 👈",  👉 var.json_repr() 👈);
-}
-{% endfor %}
+void set_variables(👉 context.operation.generated_variables_type 👈 & vars)
+m_vars_inst = vars;
+m_variables = m_vars_inst.to_json();
 }
 {% endif %}
 
 signals:
 void dataChanged();
 
-};
 };
 };
 

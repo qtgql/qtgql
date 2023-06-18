@@ -11,8 +11,8 @@ from qtgqlcodegen.operation.template import OperationTemplateContext
 from qtgqlcodegen.schema.evaluation import evaluate_schema
 from qtgqlcodegen.schema.template import (
     SchemaTemplateContext,
-    operation_template,
-    schema_types_template_cpp,
+    operation_cpp_template,
+    operation_hpp_template,
     schema_types_template_hpp,
 )
 from qtgqlcodegen.types import BuiltinScalars
@@ -46,12 +46,8 @@ class SchemaGenerator:
             content=schema_types_template_hpp(context),
             path=self.config.generated_dir / "schema.hpp",
         )
-        schema_cpp = FileSpec(
-            content=schema_types_template_cpp(context),
-            path=self.config.generated_dir / "schema.cpp",
-        )
 
-        return [schema_hpp, schema_cpp, *operations]
+        return [schema_hpp, *operations]
 
     def _generate_operations(self) -> list[FileSpec]:
         operations_document = graphql.parse(self.config.operations_dir.read_text())
@@ -61,23 +57,30 @@ class SchemaGenerator:
             raise QtGqlException([error.formatted for error in errors])
 
         operations = evaluate_operations(operations_document, self.schema_type_info)
-
-        return [
-            FileSpec(
-                content=operation_template(
-                    OperationTemplateContext(
-                        operation=op,
-                        config=self.config,
-                        debug=self.config.debug,
-                    ),
-                ),
-                path=self.config.generated_dir / f"{op_name}.hpp",
+        ret: list[FileSpec] = []
+        for op_name, op in operations.items():
+            context = OperationTemplateContext(
+                operation=op,
+                config=self.config,
+                interfaces=list(self.schema_type_info.interfaces.values()),
+                debug=self.config.debug,
             )
-            for op_name, op in operations.items()
-        ]
+
+            ret.append(
+                FileSpec(
+                    content=operation_hpp_template(context=context),
+                    path=self.config.generated_dir / f"{op_name}.hpp",
+                ),
+            )
+            ret.append(
+                FileSpec(
+                    content=operation_cpp_template(context=context),
+                    path=self.config.generated_dir / f"{op_name}.cpp",
+                ),
+            )
+        return ret
 
     def dump(self):
-        """:param file: Path to the directory the codegen would dump to."""
         sources = self.generate()
 
         cmake = FileSpec(

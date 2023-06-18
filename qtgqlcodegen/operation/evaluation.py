@@ -25,7 +25,6 @@ from qtgqlcodegen.operation.definitions import (
     QtGqlQueriedField,
 )
 from qtgqlcodegen.schema.definitions import (
-    QtGqlFieldDefinition,
     QtGqlVariableDefinition,
     SchemaTypeInfo,
 )
@@ -34,6 +33,7 @@ from qtgqlcodegen.types import QtGqlQueriedObjectType
 from qtgqlcodegen.utils import UNSET, require
 
 if TYPE_CHECKING:
+    from qtgqlcodegen.core.cppref import CppAccessor
     from qtgqlcodegen.types import QtGqlObjectType, QtGqlTypeABC
 
 
@@ -44,28 +44,18 @@ def is_type_name_selection(field_node: gql_lang.FieldNode):
     return False
 
 
-def get_operation_root_field_name(operation_node: gql_lang.OperationDefinitionNode) -> str:
-    return operation_node.selection_set.selections[0].name.value  # type: ignore
+def _evaluate_field_arguments(type_info: OperationTypeInfo):
+    ...
 
 
-def _evaluate_field_from_node(
-    field_node: gql_lang.FieldNode,
-    field_type: QtGqlObjectType,
-    type_info: OperationTypeInfo,
-    parent_interface_field: QtGqlQueriedField | None = UNSET,
-) -> QtGqlQueriedField:
-    return _evaluate_field(
-        type_info=type_info,
-        field_definition=field_type.fields_dict[field_node.name.value],
-        selection_set=field_node.selection_set,
-        parent_interface_field=parent_interface_field,
-    )
+def _get_cpp_accessor_from_variable_use() -> CppAccessor:
+    ...
 
 
 def _evaluate_field(
     type_info: OperationTypeInfo,
-    field_definition: QtGqlFieldDefinition,
-    selection_set: gql_lang.SelectionSetNode | None,
+    field_type: QtGqlObjectType,
+    field_node: gql_lang.FieldNode,
     parent_interface_field: QtGqlQueriedField | None = UNSET,
     is_root: bool = False,
 ) -> QtGqlQueriedField:
@@ -74,29 +64,36 @@ def _evaluate_field(
 
     Any other fields should not have inner selections.
     """
+    concrete_field = field_type.fields_dict[field_node.name.value]
+    if field_node.arguments:
+        for arg in field_node.arguments:
+            index = concrete_field.index_for_argument(arg.name.value)
+        _get_cpp_accessor_from_variable_use()
     assert parent_interface_field is not UNSET
-    if not hasattr(selection_set, "selections"):
-        return QtGqlQueriedField(definition=field_definition, type_info=type_info, is_root=is_root)
-    assert selection_set
-    tp = field_definition.type
+
+    tp = concrete_field.type
     if tp.is_model:  # GraphQL's lists are basically the object beneath them in terms of selections.
         tp = tp.is_model
 
     tp_is_union = tp.is_union
 
+    selections_set = field_node.selection_set
+    if not selections_set:  # this is a scalar / enum field.
+        return QtGqlQueriedField(concrete=concrete_field, type_info=type_info, is_root=is_root)
     # inject id selection for types that supports it. unions are handled below.
-    if field_definition.can_select_id and not has_id_selection(selection_set):
-        inject_id_selection(selection_set)
+    if concrete_field.can_select_id and not has_id_selection(selections_set):
+        inject_id_selection(selections_set)
 
     selections: dict[str, QtGqlQueriedField] = {}
     choices: defaultdict[str, dict[str, QtGqlQueriedField]] = defaultdict(dict)
     narrowed_type: QtGqlQueriedObjectType | None = None
+
     # inject parent interface selections.
     if (tp.is_object_type or tp.is_interface) and parent_interface_field:
         selections.update({f.name: f for f in parent_interface_field.selections.values()})
 
     if tp_is_union:
-        for selection in selection_set.selections:
+        for selection in selections_set.selections:
             fragment = is_inline_fragment(selection)
             assert fragment
 
@@ -109,34 +106,34 @@ def _evaluate_field(
                 inject_id_selection(fragment.selection_set)
 
             for selection_node in fragment.selection_set.selections:
-                field_node = is_field_node(selection_node)
-                assert field_node
+                inner_field_node = is_field_node(selection_node)
+                assert inner_field_node
 
-                if not is_type_name_selection(field_node):
-                    __f = _evaluate_field_from_node(
-                        field_node,
-                        concrete,
+                if not is_type_name_selection(inner_field_node):
+                    __f = _evaluate_field(
                         type_info,
+                        concrete,
+                        inner_field_node,
                         parent_interface_field,
                     )
-                    choices[type_name][field_definition.name] = __f
+                    choices[type_name][concrete_field.name] = __f
 
     elif interface_def := tp.is_interface:
         # first get all linear selections.
-        for selection in selection_set.selections:
+        for selection in selections_set.selections:
             if not is_inline_fragment(selection):
-                field_node = is_field_node(selection)
-                assert field_node
-                if not is_type_name_selection(field_node):
-                    __f = _evaluate_field_from_node(
-                        field_node,
-                        interface_def,
+                inner_field_node = is_field_node(selection)
+                assert inner_field_node
+                if not is_type_name_selection(inner_field_node):
+                    __f = _evaluate_field(
                         type_info,
+                        interface_def,
+                        inner_field_node,
                         parent_interface_field,
                     )
                     selections[__f.name] = __f
 
-        for selection in selection_set.selections:
+        for selection in selections_set.selections:
             if inline_frag := is_inline_fragment(selection):
                 type_name = inline_frag.type_condition.name.value
                 # no need to validate inner types are implementation, graphql-core does this.
@@ -145,33 +142,33 @@ def _evaluate_field(
                 ) or type_info.schema_type_info.get_interface(type_name)
                 assert concrete
                 for inner_selection in inline_frag.selection_set.selections:
-                    field_node = is_field_node(inner_selection)
-                    assert field_node
-                    if not is_type_name_selection(field_node):
-                        __f = _evaluate_field_from_node(
-                            field_node,
-                            concrete,
+                    inner_field_node = is_field_node(inner_selection)
+                    assert inner_field_node
+                    if not is_type_name_selection(inner_field_node):
+                        __f = _evaluate_field(
                             type_info,
+                            concrete,
+                            inner_field_node,
                             parent_interface_field,
                         )
-                        choices[type_name][field_definition.name] = __f
+                        choices[type_name][concrete_field.name] = __f
 
     else:  # object types.
-        obj_def = tp.is_object_type
-        assert obj_def
-        for selection in selection_set.selections:
-            field_node = is_field_node(selection)
-            assert field_node
-            if not is_type_name_selection(field_node):
-                __f = _evaluate_field_from_node(
-                    field_node,
-                    obj_def,
+        concrete = tp.is_object_type
+        assert concrete
+        for selection in selections_set.selections:
+            inner_field_node = is_field_node(selection)
+            assert inner_field_node
+            if not is_type_name_selection(inner_field_node):
+                __f = _evaluate_field(
                     type_info,
+                    concrete,
+                    inner_field_node,
                     parent_interface_field,
                 )
                 selections[__f.name] = __f
         queried_obj = QtGqlQueriedObjectType(
-            concrete=obj_def,
+            concrete=concrete,
             fields_dict=selections,
         )
         type_info.narrowed_types_map[queried_obj.name] = queried_obj
@@ -183,7 +180,7 @@ def _evaluate_field(
         return dict(sorted(fields.items()))
 
     return QtGqlQueriedField(
-        definition=field_definition,
+        concrete=concrete_field,
         selections=sorted_distinct_fields(selections),
         choices=frozendict({k: sorted_distinct_fields(v) for k, v in choices.items()}),
         type_info=type_info,
@@ -237,8 +234,8 @@ def _evaluate_operation(
     assert root_type, f"Make sure you have {operation.operation.name} type defined in your schema"
     root_field = _evaluate_field(
         type_info,
-        root_type.fields_dict[get_operation_root_field_name(operation)],
-        root_field_def.selection_set,
+        root_type,
+        root_field_def,
         parent_interface_field=None,
         is_root=True,
     )

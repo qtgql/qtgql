@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import warnings
+from typing import NamedTuple
 
 import graphql
 from graphql import OperationType
@@ -117,16 +118,14 @@ def evaluate_field(
     name: str,
     field: gql_def.GraphQLField,
 ) -> QtGqlFieldDefinition:
-    ret = QtGqlFieldDefinition(
+    return QtGqlFieldDefinition(
         type=evaluate_graphql_type(type_info, field.type),
         name=name,
         description=field.description,
+        arguments_dict={
+            name: _evaluate_input_field(type_info, name, arg) for name, arg in field.args.items()
+        },
     )
-    ret.arguments = [
-        _evaluate_input_field(type_info, name, arg) for name, arg in field.args.items()
-    ]
-
-    return ret
 
 
 def _evaluate_input_field(
@@ -138,6 +137,37 @@ def _evaluate_input_field(
         type=evaluate_graphql_type(type_info, field.type),
         name=name,
         description=field.description,
+    )
+
+
+class InterfaceOptions(NamedTuple):
+    implements: tuple[QtGqlInterfaceDefinition, ...]
+    all_fields: dict[str, QtGqlFieldDefinition]
+    unique_fields: tuple[QtGqlFieldDefinition, ...]
+
+
+def _get_interface_options(
+    type_info: SchemaTypeInfo,
+    obj: gql_def.GraphQLObjectType | gql_def.GraphQLInterfaceType,
+) -> InterfaceOptions:
+    implements = tuple(
+        _evaluate_interface_type(type_info, interface) for interface in obj.interfaces
+    )
+    inherited_fields = {}
+    for i in implements:
+        inherited_fields.update(i.fields_dict)
+
+    self_fields: dict[str, QtGqlFieldDefinition] = {
+        name: evaluate_field(type_info, name, field)
+        for name, field in obj.fields.items()
+        if name not in inherited_fields.keys()
+    }
+
+    inherited_fields.update(self_fields)
+    return InterfaceOptions(
+        implements=implements,
+        all_fields=inherited_fields,
+        unique_fields=tuple(self_fields.values()),
     )
 
 
@@ -173,15 +203,14 @@ def evaluate_object_type(
                 f"type {type_} does not not define an id field.\n"
                 f"fields: {type_.fields}",
             )
-    implements = [_evaluate_interface_type(type_info, interface) for interface in type_.interfaces]
+    options = _get_interface_options(type_info, type_)
 
     ret = QtGqlObjectType(
         name=t_name,
-        interfaces_raw=implements,
+        interfaces_raw=options.implements,
         docstring=type_.description,
-        fields_dict={
-            name: evaluate_field(type_info, name, field) for name, field in type_.fields.items()
-        },
+        fields_dict=options.all_fields,
+        unique_fields=options.unique_fields,
     )
     type_info.set_objecttype(ret)
     for interface in type_.interfaces:
@@ -196,14 +225,13 @@ def _evaluate_interface_type(
 ) -> QtGqlInterfaceDefinition:
     if ret := type_info.interfaces.get(interface.name, None):
         return ret
-    implements = [_evaluate_interface_type(type_info, base) for base in interface.interfaces]
+    options = _get_interface_options(type_info, interface)
     ret = QtGqlInterfaceDefinition(
         name=interface.name,
-        interfaces_raw=implements,
+        interfaces_raw=options.implements,
         docstring=interface.description,
-        fields_dict={
-            name: evaluate_field(type_info, name, field) for name, field in interface.fields.items()
-        },
+        fields_dict=options.all_fields,
+        unique_fields=options.unique_fields,
     )
     type_info.interfaces[ret.name] = ret
     return ret
