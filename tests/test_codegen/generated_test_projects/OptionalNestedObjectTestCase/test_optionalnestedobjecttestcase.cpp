@@ -20,14 +20,14 @@ TEST_CASE("OptionalNestedObjectTestCase", "[generated-testcase]") {
       mq->set_variables({true});
       mq->fetch();
       test_utils::wait_for_completion(mq);
-      auto p = mq->get_data()->get_person();
+      auto p = mq->get_user()->get_person();
       REQUIRE(p == nullptr);
     };
     mq->set_variables({false});
     SECTION("returned value") {
       mq->fetch();
       test_utils::wait_for_completion(mq);
-      auto p = mq->get_data()->get_person();
+      auto p = mq->get_user()->get_person();
       REQUIRE(p->get_name() == "nir");
     };
   }
@@ -35,10 +35,10 @@ TEST_CASE("OptionalNestedObjectTestCase", "[generated-testcase]") {
   mq->fetch();
   test_utils::wait_for_completion(mq);
   SECTION("test updates") {
-    auto user = mq->get_data();
+    auto user = mq->get_user();
     auto change_user_name_op = updateusername::UpdateUserName::shared();
     QString new_name = "שלום";
-    change_user_name_op->set_variables(user->get_id(), new_name);
+    change_user_name_op->set_variables({user->get_id(), new_name});
     change_user_name_op->fetch();
     auto inner_person = user->get_person();
     auto catcher =
@@ -46,7 +46,7 @@ TEST_CASE("OptionalNestedObjectTestCase", "[generated-testcase]") {
     REQUIRE(catcher.wait());
 
     test_utils::wait_for_completion(change_user_name_op);
-    auto new_person = change_user_name_op->get_data()->get_person();
+    auto new_person = change_user_name_op->get_changeName()->get_person();
     REQUIRE(user->get_person()->get_id() == new_person->get_id());
     REQUIRE(user->get_person()->get_name() == new_name);
   }
