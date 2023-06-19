@@ -106,7 +106,7 @@ inline const QString &ENV_NAME() override{
 
 
 public:
-👉 context.operation.generated_variables_type 👈 m_vars_inst;
+👉 context.operation.generated_variables_type 👈 vars_inst;
 
 👉 context.operation.name 👈(): qtgql::gqlwstransport::OperationHandlerABC(qtgql::gqlwstransport::GqlWsTrnsMsgWithID(qtgql::gqlwstransport::OperationPayload(
         {%- for line in context.operation.query.splitlines() %}"👉 line 👈"{% endfor -%}
@@ -137,8 +137,8 @@ inline const 👉 context.operation.root_field.property_type 👈 👉 context.o
 
 {% if context.operation.variables %}
 void set_variables(👉 context.operation.generated_variables_type 👈 vars){
-m_vars_inst = vars;
-m_variables = m_vars_inst.to_json();
+vars_inst = vars;
+m_variables = vars_inst.to_json();
 }
 {% endif %}
 

@@ -48,8 +48,7 @@ if(cached_maybe.has_value()){
     👉 t.updater_name 👈(node, data, operation);
     return node;
 }
-{% endif %}
-
+{% endif -%}
 auto inst = std::make_shared<👉 t.concrete.name 👈>();
 {% for f in t.fields -%}
 {% set setter %}inst->👉 f.concrete.setter_name 👈{% endset %}

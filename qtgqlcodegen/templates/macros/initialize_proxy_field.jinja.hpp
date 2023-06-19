@@ -3,7 +3,7 @@
 {% if field.is_root -%}
 concrete
 {% else -%}
-m_inst->👉field.concrete.getter_name 👈()
+m_inst->👉field.concrete.getter_name 👈(👉field.build_variables_tuple_for_field_arguments 👈)
 {% endif -%}{% endset -%}
 
 {% if field.type.is_queried_object_type  and field.type.is_optional %}

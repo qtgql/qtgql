@@ -23,8 +23,10 @@ from qtgqlcodegen.operation.definitions import (
     OperationTypeInfo,
     QtGqlOperationDefinition,
     QtGqlQueriedField,
+    QtGqlVariableUse,
 )
 from qtgqlcodegen.schema.definitions import (
+    QtGqlFieldDefinition,
     QtGqlVariableDefinition,
     SchemaTypeInfo,
 )
@@ -33,7 +35,6 @@ from qtgqlcodegen.types import QtGqlQueriedInterface, QtGqlQueriedObjectType
 from qtgqlcodegen.utils import UNSET, require
 
 if TYPE_CHECKING:
-    from qtgqlcodegen.core.cppref import CppAccessor
     from qtgqlcodegen.types import QtGqlObjectType, QtGqlTypeABC
 
 
@@ -44,12 +45,22 @@ def is_type_name_selection(field_node: gql_lang.FieldNode):
     return False
 
 
-def _evaluate_field_arguments(type_info: OperationTypeInfo):
-    ...
-
-
-def _get_cpp_accessor_from_variable_use() -> CppAccessor:
-    ...
+def _evaluate_variable_uses(
+    type_info: OperationTypeInfo,
+    field: QtGqlFieldDefinition,
+    arguments: tuple[gql_lang.ArgumentNode, ...],
+) -> list[QtGqlVariableUse]:
+    ret: list[QtGqlVariableUse] = []
+    for arg in arguments:
+        index = field.index_for_argument(arg.name.value)
+        var_name = arg.value.name.value
+        for variable in type_info.variables:
+            if var_name == variable.name:
+                ret.append(
+                    QtGqlVariableUse(argument=(index, field.arguments[index]), variable=variable),
+                )
+    assert len(ret) == len(arguments), "could not find all variable uses"
+    return ret
 
 
 def _evaluate_interface(
@@ -103,10 +114,7 @@ def _evaluate_field(
     """
     concrete_field = parent_type.fields_dict[field_node.name.value]
     path += concrete_field.name
-    if field_node.arguments:
-        for arg in field_node.arguments:
-            index = concrete_field.index_for_argument(arg.name.value)
-        _get_cpp_accessor_from_variable_use()
+    variable_uses = _evaluate_variable_uses(type_info, concrete_field, field_node.arguments)
     assert parent_interface_field is not UNSET
 
     f_type = concrete_field.type
@@ -230,6 +238,7 @@ def _evaluate_field(
         type=overridden_field_type or f_type,
         selections=sorted_distinct_fields(selections),
         choices=frozendict({k: sorted_distinct_fields(v) for k, v in choices.items()}),
+        variable_uses=variable_uses,
         is_root=is_root,
     )
 

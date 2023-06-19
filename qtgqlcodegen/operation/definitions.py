@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from graphql.type import definition as gql_def
 
     from qtgqlcodegen.schema.definitions import (
+        QtGqlArgumentDefinition,
         QtGqlFieldDefinition,
         QtGqlVariableDefinition,
         SchemaTypeInfo,
@@ -33,6 +34,7 @@ class QtGqlQueriedField:
     concrete: QtGqlFieldDefinition
     choices: frozendict[str, dict[str, QtGqlQueriedField]] = attrs.Factory(frozendict)
     selections: dict[str, QtGqlQueriedField] = attrs.Factory(dict)
+    variable_uses: list[QtGqlVariableUse, ...] = attrs.Factory(list)
     is_root: bool = False
 
     @cached_property
@@ -65,6 +67,21 @@ class QtGqlQueriedField:
 
         return f"{self.type_name} &"
 
+    @cached_property
+    def build_variables_tuple_for_field_arguments(self) -> str:
+        if self.concrete.arguments:
+            return (
+                "{"
+                + ",".join(
+                    [
+                        f"operation->vars_inst.{arg.variable.name}.value()"
+                        for arg in self.variable_uses
+                    ],
+                )
+                + "}"
+            )
+        return ""
+
     @property
     def name(self) -> str:
         return self.concrete.name
@@ -95,3 +112,9 @@ class QtGqlOperationDefinition:
     @property
     def query(self) -> str:
         return graphql.print_ast(self.operation_def)
+
+
+@define(slots=False, repr=False)
+class QtGqlVariableUse:
+    argument: tuple[int, QtGqlArgumentDefinition]
+    variable: QtGqlVariableDefinition
