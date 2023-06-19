@@ -37,15 +37,14 @@ class ReleaseFile:
                 "Could not find `RELEASE.md`. Please provide a RELEASE.md file in the project root.",
             )
 
-        content = release_file.read_text().splitlines()
-        match = RELEASE_TYPE_REGEX.match(content[0])
+        changelog = release_file.read_text()
+        match = RELEASE_TYPE_REGEX.match(changelog.splitlines()[0])
 
         if not match:
             raise InvalidReleaseFileError("Could not find a valid release type")
 
         change_type_key = match.group(1)
         release_type = ReleaseType[change_type_key.upper()]
-        changelog = "".join(content).strip()
         return cls(
             release_type,
             changelog,
