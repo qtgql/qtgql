@@ -6,8 +6,10 @@ from typing import TYPE_CHECKING, NamedTuple
 import jinja2
 from attr import define
 
-from .ghub import get_current_pr
-from .releasefile import get_release_preview
+try:
+    from .releasefile import get_release_preview
+except ImportError:
+    from releasefile import get_release_preview
 
 if TYPE_CHECKING:
     from tests.test_codegen.testcases import QtGqlTestCase
@@ -101,6 +103,8 @@ def render(context: BotCommentContext) -> str:
 
 
 def create_or_update_bot_comment(content: str) -> None:
+    from .ghub import get_current_pr
+
     pr = get_current_pr()
     for cm in pr.get_issue_comments():
         if "878ae1db-766f-49c7-a1a8-59f7be1fee8f" in cm.body:
