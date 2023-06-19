@@ -117,8 +117,8 @@ def comment() -> None:
     )
     create_or_update_bot_comment(render(context))
     # fail workflow release file is not valid.
-    if not context.release_context.success:
-        raise FileNotFoundError("Could not find RELEASE.md or it is in bad format.")
+    if context.release_preview.error:
+        raise FileNotFoundError(context.release_preview.error)
 
 
 if __name__ == "__main__":
