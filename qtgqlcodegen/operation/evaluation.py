@@ -29,7 +29,7 @@ from qtgqlcodegen.schema.definitions import (
     SchemaTypeInfo,
 )
 from qtgqlcodegen.schema.evaluation import evaluate_graphql_type
-from qtgqlcodegen.types import QtGqlQueriedObjectType
+from qtgqlcodegen.types import QtGqlQueriedInterface, QtGqlQueriedObjectType
 from qtgqlcodegen.utils import UNSET, require
 
 if TYPE_CHECKING:
@@ -52,10 +52,47 @@ def _get_cpp_accessor_from_variable_use() -> CppAccessor:
     ...
 
 
+def _evaluate_interface(
+    type_info: OperationTypeInfo,
+    concrete: QtGqlObjectType,
+    fields: dict[str, QtGqlQueriedField],
+    path: str,
+) -> QtGqlQueriedInterface:
+    name = f"{concrete.name}__{path}"
+    if ret := type_info.narrowed_interfaces_map.get(name, None):
+        return ret
+    ret = QtGqlQueriedInterface(
+        name=name,
+        concrete=concrete,
+        fields_dict=fields,
+    )
+    type_info.narrowed_interfaces_map[name] = ret
+    return ret
+
+
+def _evaluate_object_type(
+    type_info: OperationTypeInfo,
+    concrete: QtGqlObjectType,
+    fields: dict[str, QtGqlQueriedField],
+    path: str,
+) -> QtGqlQueriedObjectType:
+    name = f"{concrete.name}__{path}"
+    if ret := type_info.narrowed_types_map.get(name, None):
+        return ret
+    ret = QtGqlQueriedObjectType(
+        name=name,
+        concrete=concrete,
+        fields_dict=fields,
+    )
+    type_info.narrowed_types_map[name] = ret
+    return ret
+
+
 def _evaluate_field(
     type_info: OperationTypeInfo,
-    field_type: QtGqlObjectType,
+    parent_type: QtGqlObjectType,
     field_node: gql_lang.FieldNode,
+    path: str,
     parent_interface_field: QtGqlQueriedField | None = UNSET,
     is_root: bool = False,
 ) -> QtGqlQueriedField:
@@ -64,32 +101,35 @@ def _evaluate_field(
 
     Any other fields should not have inner selections.
     """
-    concrete_field = field_type.fields_dict[field_node.name.value]
+    concrete_field = parent_type.fields_dict[field_node.name.value]
+    path += concrete_field.name
     if field_node.arguments:
         for arg in field_node.arguments:
             index = concrete_field.index_for_argument(arg.name.value)
         _get_cpp_accessor_from_variable_use()
     assert parent_interface_field is not UNSET
 
-    tp = concrete_field.type
-    if tp.is_model:  # GraphQL's lists are basically the object beneath them in terms of selections.
-        tp = tp.is_model
-
-    tp_is_union = tp.is_union
+    f_type = concrete_field.type
+    if (
+        f_type.is_model
+    ):  # GraphQL's lists are basically the object beneath them in terms of selections.
+        f_type = f_type.is_model
+    overridden_field_type: QtGqlTypeABC | None = None
+    tp_is_union = f_type.is_union
 
     selections_set = field_node.selection_set
     if not selections_set:  # this is a scalar / enum field.
-        return QtGqlQueriedField(concrete=concrete_field, type_info=type_info, is_root=is_root)
+        return QtGqlQueriedField(type=f_type, concrete=concrete_field, is_root=is_root)
     # inject id selection for types that supports it. unions are handled below.
     if concrete_field.can_select_id and not has_id_selection(selections_set):
         inject_id_selection(selections_set)
 
     selections: dict[str, QtGqlQueriedField] = {}
     choices: defaultdict[str, dict[str, QtGqlQueriedField]] = defaultdict(dict)
-    narrowed_type: QtGqlQueriedObjectType | None = None
 
     # inject parent interface selections.
-    if (tp.is_object_type or tp.is_interface) and parent_interface_field:
+    # TODO: I don't think that is relevant
+    if (f_type.is_object_type or f_type.is_interface) and parent_interface_field:
         selections.update({f.name: f for f in parent_interface_field.selections.values()})
 
     if tp_is_union:
@@ -114,11 +154,12 @@ def _evaluate_field(
                         type_info,
                         concrete,
                         inner_field_node,
+                        path,
                         parent_interface_field,
                     )
                     choices[type_name][concrete_field.name] = __f
 
-    elif interface_def := tp.is_interface:
+    elif interface_def := f_type.is_interface:
         # first get all linear selections.
         for selection in selections_set.selections:
             if not is_inline_fragment(selection):
@@ -129,6 +170,7 @@ def _evaluate_field(
                         type_info,
                         interface_def,
                         inner_field_node,
+                        path,
                         parent_interface_field,
                     )
                     selections[__f.name] = __f
@@ -149,12 +191,14 @@ def _evaluate_field(
                             type_info,
                             concrete,
                             inner_field_node,
+                            path,
                             parent_interface_field,
                         )
                         choices[type_name][concrete_field.name] = __f
+        _evaluate_interface(type_info, interface_def, selections, path)
 
     else:  # object types.
-        concrete = tp.is_object_type
+        concrete = f_type.is_object_type
         assert concrete
         for selection in selections_set.selections:
             inner_field_node = is_field_node(selection)
@@ -164,15 +208,17 @@ def _evaluate_field(
                     type_info,
                     concrete,
                     inner_field_node,
+                    path,
                     parent_interface_field,
                 )
                 selections[__f.name] = __f
-        queried_obj = QtGqlQueriedObjectType(
+        queried_obj = _evaluate_object_type(
+            type_info=type_info,
             concrete=concrete,
-            fields_dict=selections,
+            fields=selections,
+            path=path,
         )
-        type_info.narrowed_types_map[queried_obj.name] = queried_obj
-        narrowed_type = queried_obj
+        overridden_field_type = queried_obj
 
     def sorted_distinct_fields(
         fields: dict[str, QtGqlQueriedField],
@@ -181,10 +227,9 @@ def _evaluate_field(
 
     return QtGqlQueriedField(
         concrete=concrete_field,
+        type=overridden_field_type or f_type,
         selections=sorted_distinct_fields(selections),
         choices=frozendict({k: sorted_distinct_fields(v) for k, v in choices.items()}),
-        type_info=type_info,
-        narrowed_type=narrowed_type,
         is_root=is_root,
     )
 
@@ -236,6 +281,7 @@ def _evaluate_operation(
         type_info,
         root_type,
         root_field_def,
+        path="",
         parent_interface_field=None,
         is_root=True,
     )

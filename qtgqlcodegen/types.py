@@ -33,10 +33,6 @@ class QtGqlTypeABC(ABC):
         return None
 
     @property
-    def is_queried_object_type(self) -> QtGqlQueriedObjectType | None:
-        return None
-
-    @property
     def is_interface(self) -> QtGqlInterfaceDefinition | None:
         return None
 
@@ -58,6 +54,14 @@ class QtGqlTypeABC(ABC):
 
     @property
     def is_custom_scalar(self) -> CustomScalarDefinition | None:
+        return None
+
+    @property
+    def is_queried_object_type(self) -> QtGqlQueriedObjectType | None:
+        return None
+
+    @property
+    def is_queried_interface(self) -> QtGqlInterfaceDefinition | None:
         return None
 
     def json_repr(self, attr_name: str | None = None) -> str:
@@ -290,14 +294,6 @@ class QtGqlObjectType(BaseQtGqlObjectType):
         return self.name
 
     @property
-    def deserializer_name(self) -> str:
-        return f"deserializers::des_{self.name}"
-
-    @property
-    def updater_name(self) -> str:
-        return f"updaters::update_{self.name}"
-
-    @property
     def member_type(self) -> str:
         return f"std::shared_ptr<{self.type_name()}>"
 
@@ -309,47 +305,6 @@ class QtGqlObjectType(BaseQtGqlObjectType):
                 base.implementations[self.name] = self
 
 
-@define(slots=False, repr=False)
-class QtGqlQueriedObjectType(QtGqlTypeABC):
-    concrete: QtGqlObjectType = attrs.field(on_setattr=attrs.setters.frozen)
-    fields_dict: dict[str, QtGqlQueriedField] = attrs.Factory(dict)
-    is_root_field: bool = False
-
-    @property
-    def is_queried_object_type(self) -> QtGqlQueriedObjectType | None:
-        return self
-
-    @cached_property
-    def fields(self) -> tuple[QtGqlQueriedField, ...]:
-        return tuple(self.fields_dict.values())
-
-    @cached_property
-    def name(self) -> str:
-        return f"{self.concrete.name}__{'$'.join(sorted(self.fields_dict.keys()))}"
-
-    @cached_property
-    def doc_fields(self) -> str:
-        return "{} {{\n  {}\n}}".format(
-            self.concrete.name,
-            "\n   ".join(self.fields_dict.keys()),
-        )
-
-    def type_name(self) -> str:
-        return self.name
-
-    @cached_property
-    def references(self) -> list[QtGqlQueriedField]:
-        return [f for f in self.fields if f.type.is_object_type]
-
-    @cached_property
-    def models(self) -> list[QtGqlQueriedField]:
-        return [f for f in self.fields if f.type.is_model]
-
-    @cached_property
-    def private_name(self) -> str:
-        return f"m_{self.name}"
-
-
 @define
 class QtGqlDeferredType(QtGqlTypeABC):
     name: str
@@ -358,8 +313,11 @@ class QtGqlDeferredType(QtGqlTypeABC):
 
     def __getattr__(self, item):
         if not self.cached_:
-            self.cached_ = self.object_map__[self.name]  # alias everything.
-        return getattr(self.cached_, item)
+            self.cached_ = self.object_map__[self.name]
+        try:
+            return getattr(self.cached_, item)
+        except AttributeError:  # pragma: no cover
+            raise Exception(f"{self.cached_.__class__} has no attribute named {item}")
 
     def __getattribute__(self, name):
         if name not in ("resolve", "object_map__", "cached_", "name"):
@@ -446,6 +404,70 @@ class QtGqlEnumDefinition(QtGqlTypeABC):
 
     def json_repr(self, attr_name: str | None = None) -> str:
         return f"Enums::{self.map_name}::name_by_value({attr_name})"
+
+
+@define
+class QtGqlQueriedTypeABC:
+    concrete: QtGqlTypeABC
+
+    @property
+    def is_optional(self) -> bool:
+        return self.concrete.is_optional
+
+
+@define(slots=False, repr=False)
+class QtGqlQueriedObjectType(QtGqlQueriedTypeABC, QtGqlTypeABC):
+    name: str
+    concrete: QtGqlObjectType
+    fields_dict: dict[str, QtGqlQueriedField] = attrs.Factory(dict)
+
+    @property
+    def is_queried_object_type(self) -> QtGqlQueriedObjectType | None:
+        return self
+
+    @cached_property
+    def fields(self) -> tuple[QtGqlQueriedField, ...]:
+        return tuple(self.fields_dict.values())
+
+    @property
+    def deserializer_name(self) -> str:
+        return f"deserializers::des_{self.name}"
+
+    @property
+    def updater_name(self) -> str:
+        return f"updaters::update_{self.name}"
+
+    @cached_property
+    def doc_fields(self) -> str:
+        return "{} {{\n  {}\n}}".format(
+            self.concrete.name,
+            "\n   ".join(self.fields_dict.keys()),
+        )
+
+    def type_name(self) -> str:
+        return self.name
+
+    @cached_property
+    def references(self) -> list[QtGqlQueriedField]:
+        return [f for f in self.fields if f.type.is_queried_object_type]
+
+    @cached_property
+    def models(self) -> list[QtGqlQueriedField]:
+        return [f for f in self.fields if f.type.is_model]
+
+    @cached_property
+    def private_name(self) -> str:
+        return f"m_{self.name}"
+
+
+@define(slots=False, repr=False)
+class QtGqlQueriedInterface(QtGqlQueriedObjectType):
+    @property
+    def is_queried_object_type(self) -> QtGqlQueriedObjectType | None:
+        return None
+
+    def is_queried_interface(self) -> QtGqlQueriedInterface:
+        return self
 
 
 def ScalarsNs() -> CppAttribute:

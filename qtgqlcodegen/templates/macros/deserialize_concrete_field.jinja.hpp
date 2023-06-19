@@ -2,10 +2,10 @@
                            do_after_deserialized = "") -%}
 
 if (!data.value("👉proxy_field.name👈").isNull()){
-{% if proxy_field.type.is_object_type -%}
-👉 setter_name 👈(👉proxy_field.concrete.type.deserializer_name👈(data.value("👉proxy_field.name👈").toObject(), 👉operation_pointer👈));
+{% if proxy_field.type.is_queried_object_type -%}
+👉 setter_name 👈(👉proxy_field.type.deserializer_name👈(data.value("👉proxy_field.name👈").toObject(), 👉operation_pointer👈));
 
-{% elif proxy_field.type.is_interface -%}
+{% elif proxy_field.type.is_queried_interface -%}
 if field_data:
 👉 setter_name 👈(👉proxy_field.type.is_interface.name👈.from_dict(
         parent,

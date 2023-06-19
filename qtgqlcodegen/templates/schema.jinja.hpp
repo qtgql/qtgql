@@ -1,4 +1,4 @@
-{% import "macros.jinja.hpp" as macros -%}
+{%- from "macros/concrete_type_fields.jinja.hpp" import concrete_type_fields -%}
 #pragma once
 #include <QObject>
 #include <QJsonObject>
@@ -45,7 +45,7 @@ inline static const std::vector<std::pair<QString, 👉enum.name👈>> members =
 class 👉 interface.name 👈 {% for base in interface.bases %} {%if loop.first %}: {% endif %} public 👉 base.name 👈 {% if not loop.last %}, {% endif %}{% endfor %}{
 Q_OBJECT
 
-👉 macros.concrete_type_fields(interface) 👈
+👉 concrete_type_fields(interface) 👈
 
 {% if interface.is_node_interface -%}
 static auto & ENV_CACHE() {
@@ -62,7 +62,7 @@ static auto & ENV_CACHE() {
 class 👉 type.name 👈 {% for base in type.bases %}{%if loop.first%}: {% endif %} public 👉 base.name 👈 {% if not loop.last %}, {% endif %}{% endfor %}{
 Q_OBJECT
 
-👉 macros.concrete_type_fields(type) 👈
+👉 concrete_type_fields(type) 👈
 public:
 👉 type.name 👈()= default;
 

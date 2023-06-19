@@ -171,7 +171,7 @@ def _get_interface_options(
     )
 
 
-def evaluate_object_type(
+def _evaluate_object_type(
     type_info: SchemaTypeInfo,
     type_: gql_def.GraphQLObjectType,
 ) -> QtGqlObjectType | None:
@@ -212,7 +212,7 @@ def evaluate_object_type(
         fields_dict=options.all_fields,
         unique_fields=options.unique_fields,
     )
-    type_info.set_objecttype(ret)
+    type_info.add_objecttype(ret)
     for interface in type_.interfaces:
         qtgql_interface = _evaluate_interface_type(type_info, interface)
         qtgql_interface.implementations[type_.name] = ret
@@ -267,7 +267,7 @@ def evaluate_schema(
         if name.startswith("__"):
             continue
         if object_definition := is_object_definition(type_):
-            if object_type := evaluate_object_type(type_info, object_definition):
+            if object_type := _evaluate_object_type(type_info, object_definition):
                 if object_definition is type_info.schema_definition.query_type:
                     type_info.operation_types[OperationType.QUERY.value] = object_type
                 elif object_definition is type_info.schema_definition.mutation_type:

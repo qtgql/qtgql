@@ -62,7 +62,6 @@ class SchemaGenerator:
             context = OperationTemplateContext(
                 operation=op,
                 config=self.config,
-                interfaces=list(self.schema_type_info.interfaces.values()),
                 debug=self.config.debug,
             )
 

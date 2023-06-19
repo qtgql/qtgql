@@ -1,0 +1,13 @@
+interface Node {
+  id: ID!
+}
+
+type Query {
+  user(foo: Int! = 0): UserWithFriend!
+}
+
+type UserWithFriend implements Node {
+  id: ID!
+  name: String!
+  friend(connectedArg: Boolean!): UserWithFriend
+}

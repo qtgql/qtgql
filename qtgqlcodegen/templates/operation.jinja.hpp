@@ -1,5 +1,5 @@
-{%- import "macros.jinja.hpp" as macros -%}
-{%- from "deserialize_concrete_field.macro.jinja.hpp" import  deserialize_concrete_field -%}
+{%- from "macros/initialize_proxy_field.jinja.hpp" import initialize_proxy_field -%}
+{%- from "macros/deserialize_concrete_field.jinja.hpp" import  deserialize_concrete_field -%}
 #pragma once
 #include "./schema.hpp"
 #include <qtgql/gqlwstransport/gqlwstransport.hpp>
@@ -10,20 +10,21 @@ class 👉 context.operation.name 👈;
 
 namespace deserializers{
 {% for t in context.operation.narrowed_types -%}
-std::shared_ptr<👉 t.concrete.name 👈> des_👉 t.concrete.name 👈(const QJsonObject& data, const 👉 context.operation.name 👈 * operation);
+std::shared_ptr<👉 t.concrete.name 👈> des_👉 t.name 👈(const QJsonObject& data, const 👉 context.operation.name 👈 * operation);
 {% endfor -%}
-{% for t in context.interfaces -%}
-std::shared_ptr<👉 t.name 👈> des_👉 t.name 👈(const QJsonObject& data, const 👉 context.operation.name 👈 * operation);
+{% for t in context.operation.interfaces -%}
+std::shared_ptr<👉 t.concrete.name 👈> des_👉 t.name 👈(const QJsonObject& data, const 👉 context.operation.name 👈 * operation);
 {% endfor -%}
 };
 
 namespace updaters{
 {% for t in context.operation.narrowed_types -%}
-void update_👉 t.concrete.name 👈(👉 t.concrete.member_type 👈 &inst, const QJsonObject &data, const 👉 context.operation.name 👈 * operation);
+void update_👉 t.name 👈(👉 t.concrete.member_type 👈 &inst, const QJsonObject &data, const 👉 context.operation.name 👈 * operation);
 {% endfor -%}
 
 };
 
+// ------------ Narrowed Object types ------------
 {% for t in context.operation.narrowed_types %}
 class 👉 t.name 👈: public QObject{
 /*
@@ -55,14 +56,15 @@ const 👉ref_field.property_type👈 m_👉ref_field.name👈 = {};
 public:
 👉 t.name 👈(👉 context.operation.name 👈 * operation, const std::shared_ptr<👉 t.concrete.name 👈> &inst);
 
-{%- for f in t.fields %}
-{%- if f.type.is_object_type or f.type.is_model %}
+{% for f in t.fields -%}
+{%- if f.type.is_queried_object_type or f.type.is_model %}
 [[nodiscard]] inline const 👉 f.property_type 👈  👉 f.concrete.getter_name 👈() const {
     return m_👉f.name👈;
 {%- else -%}
 {#- TODO: find a better way to pass the object to QML -#}
-[[nodiscard]] inline const 👉 f.property_type 👈 & 👉 f.concrete.getter_name 👈() const {
-    {% if f.type.is_object_type -%}
+[[nodiscard]] inline const 👉 f.property_type 👈 👉 f.concrete.getter_name 👈() const {
+    {# TODO: is that require? -#}
+    {% if f.type.is_queried_object_type -%}
     return *m_👉f.name👈;
     {% else -%}
     return m_inst->👉 f.concrete.getter_name 👈();
@@ -93,7 +95,6 @@ class 👉 context.operation.name 👈: public qtgql::gqlwstransport::OperationH
     Q_OBJECT
 Q_PROPERTY(const 👉 context.operation.root_field.property_type 👈 data READ 👉 context.operation.root_field.concrete.getter_name 👈 NOTIFY 👉 context.operation.root_field.concrete.signal_name 👈);
 
-👉 context.operation.generated_variables_type 👈 m_vars_inst;
 std::optional<👉 context.operation.root_field.property_type 👈> 👉 context.operation.root_field.private_name 👈 = {};
 
 
@@ -105,6 +106,8 @@ inline const QString &ENV_NAME() override{
 
 
 public:
+👉 context.operation.generated_variables_type 👈 m_vars_inst;
+
 👉 context.operation.name 👈(): qtgql::gqlwstransport::OperationHandlerABC(qtgql::gqlwstransport::GqlWsTrnsMsgWithID(qtgql::gqlwstransport::OperationPayload(
         {%- for line in context.operation.query.splitlines() %}"👉 line 👈"{% endfor -%}
         ))){
@@ -123,7 +126,7 @@ void on_next(const QJsonObject &message) override{
     if (!👉 context.operation.root_field.private_name 👈  && message.contains("data")){
         auto data = message.value("data").toObject();
         {% set do_after_deserialized -%}
-        👉 macros.initialize_proxy_field(context.operation.root_field, operation_pointer="this") 👈
+        👉 initialize_proxy_field(context.operation.root_field, operation_pointer="this") 👈
         {%- endset -%}
         👉 deserialize_concrete_field(context.operation.root_field,  "auto concrete", "this", do_after_deserialized) 👈
     }

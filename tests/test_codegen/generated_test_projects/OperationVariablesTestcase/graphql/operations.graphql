@@ -1,0 +1,11 @@
+
+  query MainQuery($connectedVar: Boolean!) {
+    user {
+      id
+      name
+      friend(connectedArg: $connectedVar) {
+        id
+        name
+      }
+    }
+  }

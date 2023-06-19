@@ -211,8 +211,10 @@ ignore = [
     # https://beta.ruff.rs/docs/rules/#flake8-bandit-s
     "S603",
     "S607",
-
+    "TD002",
+    "TD003",
 ]
+
 fix = true
 src = ["qtgqlcodegen", "tests"]
 [tool.ruff.flake8-annotations]

@@ -134,7 +134,7 @@ class SchemaTypeInfo:
     def get_object_type(self, name: str) -> QtGqlObjectType | None:
         return self.object_types.get(name, None)
 
-    def set_objecttype(self, objecttype: QtGqlObjectType) -> None:
+    def add_objecttype(self, objecttype: QtGqlObjectType) -> None:
         self.object_types[objecttype.name] = objecttype
 
     @cached_property

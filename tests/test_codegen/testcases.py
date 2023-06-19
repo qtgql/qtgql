@@ -325,7 +325,7 @@ TimeScalarTestCase = QtGqlTestCase(
 OperationVariablesTestcase = QtGqlTestCase(
     schema=schemas.operation_variables.schema,
     operations="""
-  query UserQuery($connectedVar: Boolean!) {
+  query MainQuery($connectedVar: Boolean!) {
     user {
       id
       name
@@ -787,5 +787,5 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 if __name__ == "__main__":
     generate_testcases(
-        OptionalNestedObjectTestCase,
+        ScalarsTestCase,
     )

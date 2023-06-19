@@ -18,8 +18,8 @@ TEST_CASE("OperationVariablesTestcase", "[generated-testcase]") {
   test_utils::wait_for_completion(mq);
 
   SECTION("test deserialize") {
-    REQUIRE(!mq->get_data()->get_name().isEmpty());
-    REQUIRE(!mq->get_data()->get_friend()->get_name().isEmpty());
+    REQUIRE(!mq->get_user()->get_name().isEmpty());
+    REQUIRE(!mq->get_user()->get_friend()->get_name().isEmpty());
   };
   SECTION("test update") { REQUIRE(false); };
 }
