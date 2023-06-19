@@ -1,4 +1,6 @@
 {% import "macros.jinja.hpp" as macros -%}
+{%- from "deserialize_concrete_field.macro.jinja.hpp" import  deserialize_concrete_field -%}
+{%- from "update_concrete_field.macro.jinja.hpp" import  update_concrete_field -%}
 #include "./👉 context.operation.name 👈.hpp"
 
 namespace 👉 context.config.env_name 👈::👉context.ns👈{
@@ -43,7 +45,7 @@ if(cached_maybe.has_value()){
 auto inst = std::make_shared<👉 t.concrete.name 👈>();
 {% for f in t.fields -%}
 {% set setter %}inst->👉 f.concrete.setter_name 👈{% endset %}
-👉macros.deserialize_field(f, setter)👈
+👉deserialize_concrete_field(f, setter)👈
 {% endfor %}
 {% if t.concrete. implements_node %}
 👉 t.concrete.name 👈::ENV_CACHE()->add_node(inst);
@@ -54,7 +56,7 @@ return inst;
 void 👉 t.concrete.updater_name 👈(👉 t.concrete.member_type 👈 &inst, const QJsonObject &data, const 👉 context.operation.name 👈 * operation)
 {
 {%for f in t.fields -%}
-👉 macros.update_concrete_field(f,f.concrete, fset_name=f.concrete.setter_name, private_name=f.private_name, operation_pointer="operation") 👈
+👉update_concrete_field(f,f.concrete, fset_name=f.concrete.setter_name, private_name=f.private_name, operation_pointer="operation")👈
 {% endfor %}
 };
 {% endfor %}

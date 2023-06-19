@@ -186,22 +186,6 @@ ScalarsTestCase = QtGqlTestCase(
         """,
     test_name="ScalarsTestCase",
 )
-OperationVariablesTestcase = QtGqlTestCase(
-    schema=schemas.operation_variables.schema,
-    operations="""
-  query UserQuery($connectedVar: Boolean!) {
-    user {
-      id
-      name
-      friend(connectedArg: $connectedVar) {
-        id
-        name
-      }
-    }
-  }
-        """,
-    test_name="OperationVariablesTestcase",
-)
 
 OptionalScalarsTestCase = QtGqlTestCase(
     schema=schemas.object_with_optional_scalar.schema,
@@ -336,6 +320,23 @@ TimeScalarTestCase = QtGqlTestCase(
     metadata=TestCaseMetadata(
         should_test_garbage_collection=CUSTOM_SCALARS_DOESNT_CACHE,
     ),
+)
+
+OperationVariablesTestcase = QtGqlTestCase(
+    schema=schemas.operation_variables.schema,
+    operations="""
+  query UserQuery($connectedVar: Boolean!) {
+    user {
+      id
+      name
+      friend(connectedArg: $connectedVar) {
+        id
+        name
+      }
+    }
+  }
+        """,
+    test_name="OperationVariablesTestcase",
 )
 
 OperationErrorTestCase = QtGqlTestCase(
@@ -786,5 +787,5 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 if __name__ == "__main__":
     generate_testcases(
-        ScalarsTestCase,
+        OptionalScalarsTestCase,
     )

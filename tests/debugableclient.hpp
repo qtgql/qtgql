@@ -44,7 +44,7 @@ public:
   static DebugAbleClient *
   from_environment(std::shared_ptr<bases::Environment> env) {
     return dynamic_cast<DebugAbleClient *>(env->get_network_layer());
-  }
+  };
 };
 
 std::shared_ptr<DebugAbleClient> get_valid_client();

@@ -95,7 +95,11 @@ class QtGqlTypeABC(ABC):
         """
         return self.member_type
 
-    def __str__(self):
+    @property
+    def getter_is_constable(self) -> bool:
+        return True
+
+    def __str__(self) -> str:  # pragma: no cover
         raise RuntimeError("the template probobly tried to render this object")
 
 
@@ -202,6 +206,10 @@ class CustomScalarDefinition(QtGqlTypeABC):
     @property
     def fget_type(self) -> str:
         return self.to_qt_type
+
+    @property
+    def getter_is_constable(self) -> bool:
+        return False
 
 
 @define(slots=False)

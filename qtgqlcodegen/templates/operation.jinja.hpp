@@ -1,4 +1,5 @@
-{% import "macros.jinja.hpp" as macros -%}
+{%- import "macros.jinja.hpp" as macros -%}
+{%- from "deserialize_concrete_field.macro.jinja.hpp" import  deserialize_concrete_field -%}
 #pragma once
 #include "./schema.hpp"
 #include <qtgql/gqlwstransport/gqlwstransport.hpp>
@@ -124,7 +125,7 @@ void on_next(const QJsonObject &message) override{
         {% set do_after_deserialized -%}
         👉 macros.initialize_proxy_field(context.operation.root_field, operation_pointer="this") 👈
         {%- endset -%}
-        👉 macros.deserialize_field(context.operation.root_field,  "auto concrete", "this", do_after_deserialized) 👈
+        👉 deserialize_concrete_field(context.operation.root_field,  "auto concrete", "this", do_after_deserialized) 👈
     }
 }
 inline const 👉 context.operation.root_field.property_type 👈 👉 context.operation.root_field.concrete.getter_name 👈() const{
@@ -132,7 +133,7 @@ inline const 👉 context.operation.root_field.property_type 👈 👉 context.o
 }
 
 {% if context.operation.variables %}
-void set_variables(👉 context.operation.generated_variables_type 👈 & vars)
+void set_variables(👉 context.operation.generated_variables_type 👈 vars){
 m_vars_inst = vars;
 m_variables = m_vars_inst.to_json();
 }
