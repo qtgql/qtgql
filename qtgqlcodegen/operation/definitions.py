@@ -77,16 +77,12 @@ class QtGqlQueriedField:
 
         return self.type_name
 
-    @cached_property
+    @property
     def name(self) -> str:
-        if self.is_root:
-            return "data"
         return self.concrete.name
 
-    @cached_property
+    @property
     def private_name(self):
-        if self.is_root:
-            return f"m_{self.name}"
         return self.concrete.private_name
 
     def as_conf_string(self) -> str:

@@ -90,10 +90,10 @@ std::optional<👉 var.type.member_type 👈> 👉 var.name 👈 = {};
 
 class 👉 context.operation.name 👈: public qtgql::gqlwstransport::OperationHandlerABC{
     Q_OBJECT
-Q_PROPERTY(const 👉 context.operation.root_field.property_type 👈 data READ get_data NOTIFY dataChanged);
+Q_PROPERTY(const 👉 context.operation.root_field.property_type 👈 data READ 👉 context.operation.root_field.concrete.getter_name 👈 NOTIFY 👉 context.operation.root_field.concrete.signal_name 👈);
 
 👉 context.operation.generated_variables_type 👈 m_vars_inst;
-std::optional<👉 context.operation.root_field.property_type 👈> m_data = {};
+std::optional<👉 context.operation.root_field.property_type 👈> 👉 context.operation.root_field.private_name 👈 = {};
 
 
 
@@ -119,20 +119,16 @@ return m_operation_id;
 
 
 void on_next(const QJsonObject &message) override{
-    if (!m_data && message.contains("data")){
+    if (!👉 context.operation.root_field.private_name 👈  && message.contains("data")){
         auto data = message.value("data").toObject();
-        if (data.contains("👉 context.operation.root_field.concrete.name 👈")){
-{%- set do_after_deserialized -%} 👉 macros.initialize_proxy_field(context.operation.root_field, operation_pointer="this") 👈 {% endset -%}
-            👉 macros.deserialize_field(context.operation.root_field,
-                                    "auto concrete",
-                                    "this",
-                                    do_after_deserialized,
-                                    ) 👈
-        }
+        {% set do_after_deserialized -%}
+        👉 macros.initialize_proxy_field(context.operation.root_field, operation_pointer="this") 👈
+        {%- endset -%}
+        👉 macros.deserialize_field(context.operation.root_field,  "auto concrete", "this", do_after_deserialized) 👈
     }
 }
-inline const 👉 context.operation.root_field.property_type 👈 get_data(){
-    return m_data.value();
+inline const 👉 context.operation.root_field.property_type 👈 👉 context.operation.root_field.concrete.getter_name 👈() const{
+    return 👉 context.operation.root_field.concrete.private_name 👈.value();
 }
 
 {% if context.operation.variables %}
@@ -143,7 +139,7 @@ m_variables = m_vars_inst.to_json();
 {% endif %}
 
 signals:
-void dataChanged();
+void 👉 context.operation.root_field.concrete.signal_name 👈();
 
 };
 };
