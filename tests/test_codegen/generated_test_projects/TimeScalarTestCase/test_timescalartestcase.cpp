@@ -18,24 +18,25 @@ TEST_CASE("TimeScalarTestCase", "[generated-testcase]") {
   mq->fetch();
   test_utils::wait_for_completion(mq);
   SECTION("test deserialize") {
-    auto d = mq->get_data();
+    auto d = mq->get_user();
     auto now = QDateTime::currentDateTime(QTimeZone::utc()).time().toString();
     REQUIRE(d->get_lunchTime() == now);
   }
   SECTION("test update and as operation variables") {
-    auto user = mq->get_data();
+    auto user = mq->get_user();
     auto modified_user_op = updatelunchtime::UpdateLunchTime::shared();
     auto new_lunch_time =
         customscalars::TimeScalar(QTime::currentTime().addSecs(20));
     auto user_id = user->get_id();
-    modified_user_op->set_variables({new_lunch_time}, user_id);
+    modified_user_op->set_variables({{new_lunch_time}, user_id});
     auto catcher =
         test_utils::SignalCatcher({.source_obj = user, .only = "lunchTime"});
     modified_user_op->fetch();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(modified_user_op);
-    REQUIRE(user->get_id() == modified_user_op->get_data()->get_id());
-    REQUIRE(modified_user_op->get_data()->get_lunchTime() ==
+    REQUIRE(user->get_id() ==
+            modified_user_op->get_changeLunchTime()->get_id());
+    REQUIRE(modified_user_op->get_changeLunchTime()->get_lunchTime() ==
             new_lunch_time.to_qt());
     REQUIRE(user->get_lunchTime() == new_lunch_time.to_qt());
   };
