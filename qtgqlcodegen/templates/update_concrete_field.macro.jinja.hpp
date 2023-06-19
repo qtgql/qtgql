@@ -22,13 +22,13 @@ if (inst->👉private_name👈 && inst->👉private_name👈->get_id() == 👉f_
 👉f_concrete.type.updater_name👈(inst->👉private_name👈, 👉f_concrete.name👈_data,  👉operation_pointer👈);
 }
 else{
-inst->👉fset_name👈(👉proxy_field.type.is_object_type.name👈::from_json(
+inst->👉fset_name👈(👉proxy_field.type.deserializer_name👈(
 👉f_concrete.name👈_data,
 👉operation_pointer👈
 ));
 }
 {% endif %}
-inst->👉fset_name👈(👉proxy_field.type.is_object_type.name👈::from_json(
+inst->👉fset_name👈(👉proxy_field.type.deserializer_name👈(
         data.value("👉f_concrete.name👈").toObject(),
 👉operation_pointer👈
 ));
