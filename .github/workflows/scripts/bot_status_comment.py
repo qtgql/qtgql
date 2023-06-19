@@ -5,12 +5,14 @@ from typing import TYPE_CHECKING, NamedTuple
 
 import jinja2
 from attr import define
-from tests.conftest import PATHS
 
 from .ghub import get_current_pr
+from .releasefile import get_release_preview
 
 if TYPE_CHECKING:
     from tests.test_codegen.testcases import QtGqlTestCase
+
+    from .releasefile import ReleasePreview
 
 from tests.test_codegen.testcases import all_test_cases, implemented_testcases
 
@@ -25,7 +27,7 @@ BOT_COMMENT_TEMPLATE = template_env.get_template("bot_comment.jinja.md")
 @define
 class BotCommentContext:
     testcases_context: TstCaseImplementationStatusTemplateContext
-    release_context: ReleaseContext
+    release_preview: ReleasePreview
 
 
 class ImplementationStatus(NamedTuple):
@@ -56,12 +58,6 @@ class TstCaseStatus:
     # https://github.com/qtgql/qtgql/issues/266
     # since https://github.com/qtgql/qtgql/pull/253 this is redundant I think.
     garbage_collection: ImplementationStatus
-
-
-@define
-class ReleaseContext:
-    success: bool
-    content: str
 
 
 @define
@@ -100,16 +96,6 @@ def get_testcases_context() -> TstCaseImplementationStatusTemplateContext:
     )
 
 
-release_file = PATHS.PROJECT_ROOT / "RELEASE.md"
-
-
-def get_release_file_context() -> ReleaseContext:
-    if not release_file.exists():
-        return ReleaseContext(success=False, content="")
-    else:
-        return ReleaseContext(success=True, content=release_file.read_text())
-
-
 def render(context: BotCommentContext) -> str:
     return BOT_COMMENT_TEMPLATE.render(context=context)
 
@@ -126,7 +112,7 @@ def create_or_update_bot_comment(content: str) -> None:
 
 def comment() -> None:
     context = BotCommentContext(
-        release_context=get_release_file_context(),
+        release_preview=get_release_preview(),
         testcases_context=get_testcases_context(),
     )
     create_or_update_bot_comment(render(context))
