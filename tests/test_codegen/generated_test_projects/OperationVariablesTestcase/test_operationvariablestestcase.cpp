@@ -14,6 +14,7 @@ TEST_CASE("OperationVariablesTestcase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = mainquery::MainQuery::shared();
+  mq->set_variables({true});
   mq->fetch();
   test_utils::wait_for_completion(mq);
 

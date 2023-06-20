@@ -27,7 +27,7 @@ return 👉 f_private_name 👈;
 void 👉 f.setter_name 👈(const 👉 f.type.member_type 👈 &v {% if f.arguments %}, 👉 f.arguments_type 👈 args {% endif %})
 {
 {%- if f.arguments -%}
-{% set f_private_name %}👉 f.private_name 👈.at(args){% endset %}
+{% set f_private_name %}👉 f.private_name 👈[args]{% endset %}
 {% else -%}
 {% set f_private_name %}👉 f.private_name 👈{% endset %}
 {% endif -%}
