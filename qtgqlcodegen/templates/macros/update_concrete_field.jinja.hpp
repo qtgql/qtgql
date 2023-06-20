@@ -29,7 +29,7 @@ if (👉current👈 != new_👉proxy_field.name👈){
 inst->👉fset_name👈(new_👉f_concrete.name👈 👉 setter_end 👈);
 }
 {% elif proxy_field.type.is_queried_object_type %}
-{% if f_concrete.type.implements_node %}
+{% if f_concrete.implements_node %}
 auto 👉f_concrete.name👈_data = data.value("person").toObject();
 if (👉current👈 && 👉current👈->get_id() == 👉f_concrete.name👈_data.value("id").toString()){
 👉proxy_field.type.updater_name👈(👉current👈, 👉f_concrete.name👈_data,  👉operation_pointer👈);

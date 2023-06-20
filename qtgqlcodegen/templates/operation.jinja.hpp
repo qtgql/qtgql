@@ -27,9 +27,6 @@ void update_👉 t.name 👈(👉 t.concrete.member_type 👈 &inst, const QJson
 // ------------ Narrowed Object types ------------
 {% for t in context.operation.narrowed_types %}
 class 👉 t.name 👈: public QObject{
-/*
-👉 t.doc_fields 👈
- */
     Q_OBJECT
 {% for f in t.fields -%}
 Q_PROPERTY(const 👉 f.property_type 👈 👉 f.name 👈 READ 👉 f.concrete.getter_name 👈 NOTIFY 👉 f.concrete.signal_name 👈);

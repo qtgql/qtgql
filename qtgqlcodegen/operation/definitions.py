@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING
 import attrs
 import graphql
 from attr import define
-from frozendict import frozendict
 
 if TYPE_CHECKING:
     from graphql.type import definition as gql_def
@@ -32,9 +31,7 @@ class OperationTypeInfo:
 class QtGqlQueriedField:
     type: QtGqlTypeABC
     concrete: QtGqlFieldDefinition
-    choices: frozendict[str, dict[str, QtGqlQueriedField]] = attrs.Factory(frozendict)
-    selections: dict[str, QtGqlQueriedField] = attrs.Factory(dict)
-    variable_uses: list[QtGqlVariableUse, ...] = attrs.Factory(list)
+    variable_uses: list[QtGqlVariableUse] = attrs.Factory(list)
     is_root: bool = False
 
     @cached_property
@@ -61,9 +58,9 @@ class QtGqlQueriedField:
         if cs := tp.is_custom_scalar:
             return cs.to_qt_type
 
-        if model_of := tp.is_model:
-            if model_of.is_object_type:
-                return f"{self.type_name} *"
+        if model := tp.is_model:
+            if model.of_type.is_object_type:
+                return f"qtgql::bases::ListModelABC<{self.type_name}> *"
 
         return f"{self.type_name} &"
 

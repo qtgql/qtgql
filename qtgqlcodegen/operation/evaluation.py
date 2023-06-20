@@ -4,7 +4,6 @@ from collections import defaultdict
 from typing import TYPE_CHECKING
 
 import graphql
-from frozendict import frozendict
 from graphql import OperationDefinitionNode, OperationType, language as gql_lang
 from graphql.language import visitor
 
@@ -31,8 +30,15 @@ from qtgqlcodegen.schema.definitions import (
     SchemaTypeInfo,
 )
 from qtgqlcodegen.schema.evaluation import evaluate_graphql_type
-from qtgqlcodegen.types import QtGqlQueriedInterface, QtGqlQueriedObjectType
-from qtgqlcodegen.utils import UNSET, require
+from qtgqlcodegen.types import (
+    QtGqlInterface,
+    QtGqlList,
+    QtGqlQueriedInterface,
+    QtGqlQueriedObjectType,
+    QtGqlQueriedUnion,
+    QtGqlUnion,
+)
+from qtgqlcodegen.utils import require
 
 if TYPE_CHECKING:
     from qtgqlcodegen.types import QtGqlObjectType, QtGqlTypeABC
@@ -53,7 +59,7 @@ def _evaluate_variable_uses(
     ret: list[QtGqlVariableUse] = []
     for arg in arguments:
         index = field.index_for_argument(arg.name.value)
-        var_name = arg.value.name.value
+        var_name = arg.value.name.value  # type: ignore[attr-defined]
         for variable in type_info.variables:
             if var_name == variable.name:
                 ret.append(
@@ -61,191 +67,6 @@ def _evaluate_variable_uses(
                 )
     assert len(ret) == len(arguments), "could not find all variable uses"
     return ret
-
-
-def _evaluate_interface(
-    type_info: OperationTypeInfo,
-    concrete: QtGqlObjectType,
-    fields: dict[str, QtGqlQueriedField],
-    path: str,
-) -> QtGqlQueriedInterface:
-    name = f"{concrete.name}__{path}"
-    if ret := type_info.narrowed_interfaces_map.get(name, None):
-        return ret
-    ret = QtGqlQueriedInterface(
-        name=name,
-        concrete=concrete,
-        fields_dict=fields,
-    )
-    type_info.narrowed_interfaces_map[name] = ret
-    return ret
-
-
-def _evaluate_object_type(
-    type_info: OperationTypeInfo,
-    concrete: QtGqlObjectType,
-    fields: dict[str, QtGqlQueriedField],
-    path: str,
-) -> QtGqlQueriedObjectType:
-    name = f"{concrete.name}__{path}"
-    if ret := type_info.narrowed_types_map.get(name, None):
-        return ret
-    ret = QtGqlQueriedObjectType(
-        name=name,
-        concrete=concrete,
-        fields_dict=fields,
-    )
-    type_info.narrowed_types_map[name] = ret
-    return ret
-
-
-def _evaluate_field(
-    type_info: OperationTypeInfo,
-    parent_type: QtGqlObjectType,
-    field_node: gql_lang.FieldNode,
-    path: str,
-    parent_interface_field: QtGqlQueriedField | None = UNSET,
-    is_root: bool = False,
-) -> QtGqlQueriedField:
-    """Main purpose here is to find inner selections of fields, this could be
-    an object type, interface, union or a list.
-
-    Any other fields should not have inner selections.
-    """
-    concrete_field = parent_type.fields_dict[field_node.name.value]
-    path += concrete_field.name
-    variable_uses = _evaluate_variable_uses(type_info, concrete_field, field_node.arguments)
-    assert parent_interface_field is not UNSET
-
-    f_type = concrete_field.type
-    if (
-        f_type.is_model
-    ):  # GraphQL's lists are basically the object beneath them in terms of selections.
-        f_type = f_type.is_model
-    overridden_field_type: QtGqlTypeABC | None = None
-    tp_is_union = f_type.is_union
-
-    selections_set = field_node.selection_set
-    if not selections_set:  # this is a scalar / enum field.
-        return QtGqlQueriedField(
-            type=f_type,
-            concrete=concrete_field,
-            is_root=is_root,
-            variable_uses=variable_uses,
-        )
-    # inject id selection for types that supports it. unions are handled below.
-    if concrete_field.implements_node and not has_id_selection(selections_set):
-        inject_id_selection(selections_set)
-
-    selections: dict[str, QtGqlQueriedField] = {}
-    choices: defaultdict[str, dict[str, QtGqlQueriedField]] = defaultdict(dict)
-
-    # inject parent interface selections.
-    # TODO: I don't think that is relevant
-    if (f_type.is_object_type or f_type.is_interface) and parent_interface_field:
-        selections.update({f.name: f for f in parent_interface_field.selections.values()})
-
-    if tp_is_union:
-        for selection in selections_set.selections:
-            fragment = is_inline_fragment(selection)
-            assert fragment
-
-            type_name = fragment.type_condition.name.value
-            concrete = type_info.schema_type_info.get_object_type(type_name)
-            assert concrete
-            if not has_typename_selection(fragment.selection_set):
-                inject_typename_selection(fragment.selection_set)
-            if not has_id_selection(fragment.selection_set) and concrete.implements_node:
-                inject_id_selection(fragment.selection_set)
-
-            for selection_node in fragment.selection_set.selections:
-                inner_field_node = is_field_node(selection_node)
-                assert inner_field_node
-
-                if not is_type_name_selection(inner_field_node):
-                    __f = _evaluate_field(
-                        type_info,
-                        concrete,
-                        inner_field_node,
-                        path,
-                        parent_interface_field,
-                    )
-                    choices[type_name][concrete_field.name] = __f
-
-    elif interface_def := f_type.is_interface:
-        # first get all linear selections.
-        for selection in selections_set.selections:
-            if not is_inline_fragment(selection):
-                inner_field_node = is_field_node(selection)
-                assert inner_field_node
-                if not is_type_name_selection(inner_field_node):
-                    __f = _evaluate_field(
-                        type_info,
-                        interface_def,
-                        inner_field_node,
-                        path,
-                        parent_interface_field,
-                    )
-                    selections[__f.name] = __f
-
-        for selection in selections_set.selections:
-            if inline_frag := is_inline_fragment(selection):
-                type_name = inline_frag.type_condition.name.value
-                # no need to validate inner types are implementation, graphql-core does this.
-                concrete = type_info.schema_type_info.get_object_type(
-                    type_name,
-                ) or type_info.schema_type_info.get_interface(type_name)
-                assert concrete
-                for inner_selection in inline_frag.selection_set.selections:
-                    inner_field_node = is_field_node(inner_selection)
-                    assert inner_field_node
-                    if not is_type_name_selection(inner_field_node):
-                        __f = _evaluate_field(
-                            type_info,
-                            concrete,
-                            inner_field_node,
-                            path,
-                            parent_interface_field,
-                        )
-                        choices[type_name][concrete_field.name] = __f
-        _evaluate_interface(type_info, interface_def, selections, path)
-
-    else:  # object types.
-        concrete = f_type.is_object_type
-        assert concrete
-        for selection in selections_set.selections:
-            inner_field_node = is_field_node(selection)
-            assert inner_field_node
-            if not is_type_name_selection(inner_field_node):
-                __f = _evaluate_field(
-                    type_info,
-                    concrete,
-                    inner_field_node,
-                    path,
-                    parent_interface_field,
-                )
-                selections[__f.name] = __f
-        queried_obj = _evaluate_object_type(
-            type_info=type_info,
-            concrete=concrete,
-            fields=selections,
-            path=path,
-        )
-        overridden_field_type = queried_obj
-
-    def sorted_distinct_fields(
-        fields: dict[str, QtGqlQueriedField],
-    ) -> dict[str, QtGqlQueriedField]:
-        return dict(sorted(fields.items()))
-
-    return QtGqlQueriedField(
-        concrete=concrete_field,
-        type=overridden_field_type or f_type,
-        selections=sorted_distinct_fields(selections),
-        choices=frozendict({k: sorted_distinct_fields(v) for k, v in choices.items()}),
-        variable_uses=variable_uses,
-        is_root=is_root,
-    )
 
 
 def _evaluate_variable_node_type(
@@ -277,10 +98,225 @@ def _evaluate_variable(
     )
 
 
+def _evaluate_selection_set_type(
+    type_info: OperationTypeInfo,
+    concrete_type: QtGqlTypeABC,
+    selection_set_node: gql_lang.SelectionSetNode,
+    path: str,
+) -> QtGqlTypeABC:
+    if concrete_type.is_builtin_scalar or concrete_type.is_custom_scalar:
+        return concrete_type  # currently there is no need for a "proxied" type.
+    if obj_type := concrete_type.is_object_type:
+        return _evaluate_object_type(
+            type_info=type_info,
+            concrete=obj_type,
+            selection_set=selection_set_node,
+            path=path,
+        )
+    if lst := concrete_type.is_model:
+        return _evaluate_list(
+            type_info=type_info,
+            concrete=lst,
+            selection_set=selection_set_node,
+            path=path,
+        )
+    if interface := concrete_type.is_interface:
+        return _evaluate_interface(
+            type_info=type_info,
+            concrete=interface,
+            selection_set=selection_set_node,
+            path=path,
+        )
+    if is_union := concrete_type.is_union:
+        return _evaluate_union(
+            type_info=type_info,
+            concrete=is_union,
+            selection_set=selection_set_node,
+            path=path,
+        )
+
+
+def _evaluate_field(
+    type_info: OperationTypeInfo,
+    concrete_field: QtGqlFieldDefinition,
+    field_node: gql_lang.FieldNode,
+    path: str,
+    is_root: bool = False,
+) -> QtGqlQueriedField:
+    path += concrete_field.name
+    return QtGqlQueriedField(
+        type=_evaluate_selection_set_type(
+            type_info,
+            concrete_field.type,
+            field_node.selection_set,
+            path,
+        ),
+        concrete=concrete_field,
+        variable_uses=_evaluate_variable_uses(type_info, concrete_field, field_node.arguments),
+        is_root=is_root,
+    )
+
+
+def _evaluate_list(
+    type_info: OperationTypeInfo,
+    concrete: QtGqlList,
+    selection_set: gql_lang.SelectionSetNode,
+    path: str,
+) -> QtGqlList:
+    return QtGqlList(
+        of_type=_evaluate_selection_set_type(
+            type_info,
+            concrete_type=concrete.of_type,
+            selection_set_node=selection_set,
+            path=path,
+        ),
+    )
+
+
+def _evaluate_union(
+    type_info: OperationTypeInfo,
+    concrete: QtGqlUnion,
+    selection_set: gql_lang.SelectionSetNode,
+    path: str,
+) -> QtGqlQueriedUnion:
+    choices: defaultdict[str, dict[str, QtGqlQueriedField]] = defaultdict(dict)
+    for selection in selection_set.selections:
+        fragment = is_inline_fragment(selection)
+        assert fragment
+        type_name = fragment.type_condition.name.value
+        # unions support only object types http://spec.graphql.org/October2021/#sec-Unions
+        resolved_type = require(concrete.get_by_name(type_name))
+        if not has_typename_selection(fragment.selection_set):
+            inject_typename_selection(fragment.selection_set)
+        if not has_id_selection(fragment.selection_set) and resolved_type.implements_node:
+            inject_id_selection(fragment.selection_set)
+
+        for selection_node in fragment.selection_set.selections:
+            inner_field_node = require(is_field_node(selection_node))
+            if not is_type_name_selection(inner_field_node):
+                concrete_field = resolved_type.fields_dict[inner_field_node.name]
+                __f = _evaluate_field(
+                    type_info=type_info,
+                    concrete_field=concrete_field,
+                    field_node=inner_field_node,
+                    path=path,
+                )
+                choices[type_name][concrete_field.name] = __f
+
+    return QtGqlQueriedUnion(
+        concrete=concrete,
+        choices=choices,
+    )
+
+
+def _evaluate_interface(
+    type_info: OperationTypeInfo,
+    concrete: QtGqlInterface,
+    selection_set: gql_lang.SelectionSetNode,
+    path: str,  # current path in the query tree.
+) -> QtGqlQueriedInterface:
+    # first get all linear selections.
+    linear_fields: dict[str, QtGqlQueriedField] = {}
+    choices: defaultdict[str, dict[str, QtGqlQueriedField]] = defaultdict(dict)
+
+    for selection in selection_set.selections:
+        if not is_inline_fragment(selection):
+            inner_field_node = is_field_node(selection)
+            assert inner_field_node
+            if not is_type_name_selection(inner_field_node):
+                __f = _evaluate_field(
+                    type_info=type_info,
+                    concrete_field=concrete.fields_dict[inner_field_node.name],
+                    field_node=inner_field_node,
+                    path=path,
+                )
+                linear_fields[__f.name] = __f
+
+    # evaluate type conditions
+    for selection in selection_set.selections:
+        if inline_frag := is_inline_fragment(selection):
+            type_name = inline_frag.type_condition.name.value
+            # no need to validate inner types are implementation, graphql-core does this.
+            resolved_type = type_info.schema_type_info.get_object_type(
+                type_name,
+            ) or type_info.schema_type_info.get_interface(type_name)
+            assert resolved_type
+            for inner_selection in inline_frag.selection_set.selections:
+                inner_field_node = is_field_node(inner_selection)
+                assert inner_field_node
+                if not is_type_name_selection(inner_field_node):
+                    __f = _evaluate_field(
+                        type_info=type_info,
+                        concrete_field=resolved_type.fields_dict[inner_field_node.name],
+                        field_node=inner_field_node,
+                        path=path,
+                    )
+                    choices[type_name][inner_field_node.name] = __f
+    for choice in choices.values():
+        choice.update(linear_fields)
+
+    name = f"{concrete.name}__{path}"
+    if ret := type_info.narrowed_interfaces_map.get(
+        name,
+        None,
+    ):  # TODO: this is probably redundant
+        return ret
+    ret = QtGqlQueriedInterface(
+        name=name,
+        concrete=concrete,
+        choices=choices,
+        fields_dict=linear_fields,
+    )
+    type_info.narrowed_interfaces_map[name] = ret
+    return ret
+
+
+def _evaluate_object_type(
+    type_info: OperationTypeInfo,
+    concrete: QtGqlObjectType,
+    selection_set: gql_lang.SelectionSetNode,
+    path: str,  # current path in the query tree.
+) -> QtGqlQueriedObjectType:
+    # inject id selection for node implementors, it is required for caching purposes.
+    if concrete.implements_node and not has_id_selection(selection_set):
+        inject_id_selection(selection_set)
+
+    fields: dict[str, QtGqlQueriedField] = {}
+    for selection in selection_set.selections:
+        if f_node := is_field_node(selection):
+            concrete_field = concrete.fields_dict[f_node.name.value]
+            fields[f_node.name] = _evaluate_field(
+                type_info=type_info,
+                concrete_field=concrete_field,
+                field_node=f_node,
+                path=path,
+            )
+
+    name = f"{concrete.name}__{path}"
+    if ret := type_info.narrowed_types_map.get(name, None):
+        return ret
+    ret = QtGqlQueriedObjectType(
+        name=name,
+        concrete=concrete,
+        fields_dict=fields,
+    )
+    type_info.narrowed_types_map[name] = ret
+    return ret
+
+
 def _evaluate_operation(
     operation: OperationDefinitionNode,
     schema_type_info: SchemaTypeInfo,
 ) -> QtGqlOperationDefinition:
+    """Each operation generates a whole new "proxy" schema. That schema will
+    contain only the fields that are currently queried. The way we do that is
+    creating a so-called "proxy objects".
+
+    - Each proxy object mirrors a concrete object at schema level.
+    - Each proxy object contains only the fields that was queried for this field in the tree.
+
+    And because of that, one object type (at the concrete schema) might have many proxy objects.
+    """
     type_info = OperationTypeInfo(schema_type_info)
 
     # input variables
@@ -288,17 +324,17 @@ def _evaluate_operation(
         for var in variables_def:
             type_info.variables.append(_evaluate_variable(type_info.schema_type_info, var))
 
-    root_field_def = require(is_field_node(operation.selection_set.selections[0]))
+    selections = operation.selection_set
     root_type = type_info.schema_type_info.operation_types[operation.operation.value]
     assert root_type, f"Make sure you have {operation.operation.name} type defined in your schema"
-    root_field = _evaluate_field(
-        type_info,
-        root_type,
-        root_field_def,
+    root_proxy_type = _evaluate_object_type(
+        type_info=type_info,
+        concrete=root_type,
+        selection_set=selections,
         path="",
-        parent_interface_field=None,
-        is_root=True,
     )
+    assert len(root_proxy_type.fields) == 1
+    root_field = root_proxy_type.fields[0]
     return QtGqlOperationDefinition(
         root_field=root_field,
         operation_def=operation,

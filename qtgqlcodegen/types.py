@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from collections import defaultdict
 from functools import cached_property
 from typing import TYPE_CHECKING
 
@@ -13,8 +14,8 @@ if TYPE_CHECKING:
     from qtgqlcodegen.operation.definitions import QtGqlQueriedField
     from qtgqlcodegen.schema.definitions import (
         CustomScalarMap,
+        QtGqlArgumentDefinition,
         QtGqlFieldDefinition,
-        QtGqlInputFieldDefinition,
     )
 
 
@@ -33,7 +34,7 @@ class QtGqlTypeABC(ABC):
         return None
 
     @property
-    def is_interface(self) -> QtGqlInterfaceDefinition | None:
+    def is_interface(self) -> QtGqlInterface | None:
         return None
 
     @property
@@ -41,7 +42,7 @@ class QtGqlTypeABC(ABC):
         return None
 
     @property
-    def is_model(self) -> QtGqlTypeABC | None:
+    def is_model(self) -> QtGqlList | None:
         return None
 
     @property
@@ -61,7 +62,11 @@ class QtGqlTypeABC(ABC):
         return None
 
     @property
-    def is_queried_interface(self) -> QtGqlInterfaceDefinition | None:
+    def is_queried_interface(self) -> QtGqlQueriedInterface | None:
+        return None
+
+    @property
+    def is_queried_union(self) -> QtGqlQueriedUnion | None:
         return None
 
     def json_repr(self, attr_name: str | None = None) -> str:
@@ -133,13 +138,12 @@ class QtGqlList(QtGqlTypeABC):
     of_type: QtGqlTypeABC
 
     @property
-    def is_model(self) -> QtGqlTypeABC | None:
-        # scalars or unions are not supported in lists yet (valid graphql spec though)
-        return self.of_type
+    def is_model(self) -> QtGqlList | None:
+        return self
 
     @property
     def member_type(self) -> str:
-        return f"QMap<QUuid, QList<{self.of_type.member_type}>>"
+        return f"QList<{self.of_type.member_type}>"
 
     def type_name(self) -> str:
         raise NotImplementedError(
@@ -161,6 +165,11 @@ class QtGqlUnion(QtGqlTypeABC):
     @property
     def default_value(self) -> str:
         raise NotImplementedError
+
+    def get_by_name(self, name: str) -> QtGqlObjectType | None:
+        for possible in self.types:
+            if possible.name == name:
+                return possible
 
 
 @define
@@ -229,17 +238,17 @@ class BaseQtGqlObjectType(QtGqlTypeABC):
 
 @define(slots=False)
 class QtGqlObjectType(BaseQtGqlObjectType):
-    interfaces_raw: tuple[QtGqlInterfaceDefinition, ...] = attrs.Factory(tuple)
+    interfaces_raw: tuple[QtGqlInterface, ...] = attrs.Factory(tuple)
     unique_fields: tuple[QtGqlFieldDefinition, ...] = attrs.Factory(tuple)
 
-    def implements(self, interface: QtGqlInterfaceDefinition) -> bool:
+    def implements(self, interface: QtGqlInterface) -> bool:
         for m_interface in self.interfaces_raw:
             if interface is m_interface or m_interface.implements(interface):
                 return True
         return False
 
     @cached_property
-    def bases(self) -> list[QtGqlInterfaceDefinition]:
+    def bases(self) -> list[QtGqlInterface]:
         """
         returns only the top level interfaces that should be inherited.
         if i.e
@@ -260,7 +269,7 @@ class QtGqlObjectType(BaseQtGqlObjectType):
 
         If there are no interfaces returns only NodeInterfaceABC or ObjectTypeABC.
         """
-        not_unique_interfaces: list[QtGqlInterfaceDefinition] = []
+        not_unique_interfaces: list[QtGqlInterface] = []
 
         if not self.interfaces_raw:
             # TODO(nir): these are not really interfaces though they are inherited if there are no interfaces.
@@ -281,10 +290,7 @@ class QtGqlObjectType(BaseQtGqlObjectType):
 
     @cached_property
     def implements_node(self) -> bool:
-        if isinstance(self, QtGqlInterfaceDefinition):
-            return self.is_node_interface
-
-        return any(base.implements_node for base in self.bases)
+        return any(interface.is_node_interface for interface in self.interfaces_raw)
 
     @property
     def is_object_type(self) -> QtGqlObjectType | None:
@@ -330,7 +336,7 @@ class QtGqlDeferredType(QtGqlTypeABC):
 
 
 @define(slots=False, kw_only=True)
-class QtGqlInterfaceDefinition(QtGqlObjectType):
+class QtGqlInterface(QtGqlObjectType):
     implementations: dict[str, BaseQtGqlObjectType] = attrs.field(factory=dict)
 
     @cached_property
@@ -350,13 +356,13 @@ class QtGqlInterfaceDefinition(QtGqlObjectType):
         return None  # although interface extends object this might be confusing.
 
     @property
-    def is_interface(self) -> QtGqlInterfaceDefinition | None:
+    def is_interface(self) -> QtGqlInterface | None:
         return self
 
 
 @define(slots=False)
 class QtGqlInputObjectTypeDefinition(BaseQtGqlObjectType):
-    fields_dict: dict[str, QtGqlInputFieldDefinition] = attrs.field(factory=dict)  # type: ignore
+    fields_dict: dict[str, QtGqlArgumentDefinition] = attrs.field(factory=dict)  # type: ignore
 
     @property
     def is_input_object_type(self) -> QtGqlInputObjectTypeDefinition | None:
@@ -437,13 +443,6 @@ class QtGqlQueriedObjectType(QtGqlQueriedTypeABC, QtGqlTypeABC):
     def updater_name(self) -> str:
         return f"updaters::update_{self.name}"
 
-    @cached_property
-    def doc_fields(self) -> str:
-        return "{} {{\n  {}\n}}".format(
-            self.concrete.name,
-            "\n   ".join(self.fields_dict.keys()),
-        )
-
     def type_name(self) -> str:
         return self.name
 
@@ -462,12 +461,32 @@ class QtGqlQueriedObjectType(QtGqlQueriedTypeABC, QtGqlTypeABC):
 
 @define(slots=False, repr=False)
 class QtGqlQueriedInterface(QtGqlQueriedObjectType):
+    choices: defaultdict[str, dict[str, QtGqlQueriedField]] = attrs.Factory(
+        lambda: defaultdict(dict),
+    )
+
     @property
     def is_queried_object_type(self) -> QtGqlQueriedObjectType | None:
         return None
 
-    def is_queried_interface(self) -> QtGqlQueriedInterface:
+    @property
+    def is_queried_interface(self) -> QtGqlQueriedInterface | None:
         return self
+
+
+@define(slots=False, repr=False)
+class QtGqlQueriedUnion(QtGqlQueriedTypeABC, QtGqlTypeABC):
+    concrete: QtGqlUnion
+    choices: defaultdict[str, dict[str, QtGqlQueriedField]] = attrs.Factory(
+        lambda: defaultdict(dict),
+    )
+
+    @property
+    def is_queried_union(self) -> QtGqlQueriedUnion | None:
+        return self
+
+    def type_name(self) -> str:
+        return self.concrete.type_name()
 
 
 def ScalarsNs() -> CppAttribute:

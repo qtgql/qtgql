@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 import glob
+import re
 from typing import TYPE_CHECKING
 
 from tests.conftest import PATHS
 
 if TYPE_CHECKING:
     from pathlib import Path
+
+pattern = re.compile(r"\b(TODO|FIXME)\b")
 
 
 def check_todos() -> list:
@@ -22,8 +25,8 @@ def check_todos() -> list:
     errors: list[str] = []
     for file in files_grabbed:
         for line_num, line in enumerate(file.read_text().splitlines(), start=1):
-            if "TODO" in line:
-                errors.append(f"Found TODO in {file.as_posix()} ({line_num}): {line}")
+            if match := pattern.search(line):
+                errors.append(f"Found {match.group()} in {file.as_posix()} ({line_num}): {line}")
     if errors:
         raise Exception(errors)
 

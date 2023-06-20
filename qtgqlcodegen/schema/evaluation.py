@@ -20,8 +20,8 @@ from qtgqlcodegen.core.graphql_ref import (
 )
 from qtgqlcodegen.schema.definitions import (
     CustomScalarMap,
+    QtGqlArgumentDefinition,
     QtGqlFieldDefinition,
-    QtGqlInputFieldDefinition,
     SchemaTypeInfo,
 )
 from qtgqlcodegen.types import (
@@ -30,7 +30,7 @@ from qtgqlcodegen.types import (
     QtGqlDeferredType,
     QtGqlEnumDefinition,
     QtGqlInputObjectTypeDefinition,
-    QtGqlInterfaceDefinition,
+    QtGqlInterface,
     QtGqlList,
     QtGqlObjectType,
     QtGqlOptional,
@@ -49,7 +49,7 @@ def evaluate_input_type(
             name=type_.name,
             docstring=type_.description,
             fields_dict={
-                name: _evaluate_input_field(type_info, name, field)
+                name: _evaluate_argument_field(type_info, name, field)
                 for name, field in type_.fields.items()
             },
         )
@@ -123,33 +123,33 @@ def evaluate_field(
         name=name,
         description=field.description,
         arguments_dict={
-            name: _evaluate_input_field(type_info, name, arg) for name, arg in field.args.items()
+            name: _evaluate_argument_field(type_info, name, arg) for name, arg in field.args.items()
         },
     )
 
 
-def _evaluate_input_field(
+def _evaluate_argument_field(
     type_info: SchemaTypeInfo,
     name: str,
     field: gql_def.GraphQLInputField | gql_def.GraphQLArgument,
-) -> QtGqlInputFieldDefinition:
-    return QtGqlInputFieldDefinition(
+) -> QtGqlArgumentDefinition:
+    return QtGqlArgumentDefinition(
         type=evaluate_graphql_type(type_info, field.type),
         name=name,
         description=field.description,
     )
 
 
-class InterfaceOptions(NamedTuple):
-    implements: tuple[QtGqlInterfaceDefinition, ...]
+class InterfaceOrObjectOptions(NamedTuple):
+    implements: tuple[QtGqlInterface, ...]
     all_fields: dict[str, QtGqlFieldDefinition]
     unique_fields: tuple[QtGqlFieldDefinition, ...]
 
 
-def _get_interface_options(
+def _evaluate_object_fields(
     type_info: SchemaTypeInfo,
     obj: gql_def.GraphQLObjectType | gql_def.GraphQLInterfaceType,
-) -> InterfaceOptions:
+) -> InterfaceOrObjectOptions:
     implements = tuple(
         _evaluate_interface_type(type_info, interface) for interface in obj.interfaces
     )
@@ -164,7 +164,7 @@ def _get_interface_options(
     }
 
     inherited_fields.update(self_fields)
-    return InterfaceOptions(
+    return InterfaceOrObjectOptions(
         implements=implements,
         all_fields=inherited_fields,
         unique_fields=tuple(self_fields.values()),
@@ -203,7 +203,7 @@ def _evaluate_object_type(
                 f"type {type_} does not not define an id field.\n"
                 f"fields: {type_.fields}",
             )
-    options = _get_interface_options(type_info, type_)
+    options = _evaluate_object_fields(type_info, type_)
 
     ret = QtGqlObjectType(
         name=t_name,
@@ -222,11 +222,11 @@ def _evaluate_object_type(
 def _evaluate_interface_type(
     type_info: SchemaTypeInfo,
     interface: gql_def.GraphQLInterfaceType,
-) -> QtGqlInterfaceDefinition:
+) -> QtGqlInterface:
     if ret := type_info.interfaces.get(interface.name, None):
         return ret
-    options = _get_interface_options(type_info, interface)
-    ret = QtGqlInterfaceDefinition(
+    options = _evaluate_object_fields(type_info, interface)
+    ret = QtGqlInterface(
         name=interface.name,
         interfaces_raw=options.implements,
         docstring=interface.description,

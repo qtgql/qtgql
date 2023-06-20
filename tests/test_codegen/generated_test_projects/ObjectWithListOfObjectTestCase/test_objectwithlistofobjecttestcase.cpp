@@ -32,8 +32,8 @@ TEST_CASE(
   auto mq = std::make_shared<mainquery::MainQuery>();
   mq->fetch();
   test_utils::wait_for_completion(mq);
-  typedef qtgql::bases::ListModelABC<mainquery::Person__age$id$name> ModelType;
-  typedef mainquery::Person__age$id$name ObjectType;
+  typedef mainquery::Person__userfriends ObjectType;
+  typedef qtgql::bases::ListModelABC<ObjectType> ModelType;
 
   auto model_with_data = mq->get_user()->m_friends;
   auto raw_message = DebugAbleClient::from_environment(env)->m_current_message;
