@@ -70,13 +70,14 @@ class QtGqlQueriedField:
     @cached_property
     def build_variables_tuple_for_field_arguments(self) -> str:
         # operation might not use an argument that has default value, ignore what's ignored.
+        operation_pointer = "" if self.is_root else "operation->"
         if self.variable_uses:
             assert len(self.concrete.arguments) == len(self.variable_uses)
             return (
                 "{"
                 + ",".join(
                     [
-                        f"operation->vars_inst.{arg.variable.name}.value()"
+                        f"{operation_pointer}vars_inst.{arg.variable.name}.value()"
                         for arg in self.variable_uses
                     ],
                 )

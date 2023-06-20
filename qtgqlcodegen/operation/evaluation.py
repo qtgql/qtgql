@@ -134,7 +134,7 @@ def _evaluate_field(
             variable_uses=variable_uses,
         )
     # inject id selection for types that supports it. unions are handled below.
-    if concrete_field.can_select_id and not has_id_selection(selections_set):
+    if concrete_field.implements_node and not has_id_selection(selections_set):
         inject_id_selection(selections_set)
 
     selections: dict[str, QtGqlQueriedField] = {}

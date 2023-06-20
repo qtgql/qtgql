@@ -8,14 +8,6 @@ from .node_interface import Node
 friends: dict[UserWithFriend : tuple[UserWithFriend, UserWithFriend]] = {}
 
 
-def get_or_create_friends(inst: UserWithFriend) -> UserWithFriend:
-    ret = friends.get(inst)
-    if not ret:
-        ret = (UserWithFriend(), UserWithFriend())
-        friends[inst] = ret
-    return ret
-
-
 @strawberry.type()
 class UserWithFriend(Node):
     name: str = strawberry.field(default_factory=factory.person.name)
@@ -25,14 +17,14 @@ class UserWithFriend(Node):
         self,
         connected_arg: bool,
     ) -> UserWithFriend | None:
-        friends_ = get_or_create_friends(self)
         if connected_arg:
-            return friends_[0]
-
-        return UserWithFriend()
+            return CONNECTED_FRIEND
+        return DISCONNECTED_FRIENDS
 
 
 CONST_USER = UserWithFriend()
+CONNECTED_FRIEND = UserWithFriend()
+DISCONNECTED_FRIENDS = UserWithFriend()
 
 
 @strawberry.type()
@@ -42,4 +34,13 @@ class Query:
         return CONST_USER
 
 
-schema = strawberry.Schema(query=Query)
+@strawberry.type()
+class Mutation:
+    @strawberry.mutation
+    def change_friend_name(self, connected: bool, new_name: str) -> UserWithFriend:
+        f = CONST_USER.friend(connected)
+        f.name = new_name
+        return CONST_USER
+
+
+schema = strawberry.Schema(query=Query, mutation=Mutation)

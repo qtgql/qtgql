@@ -335,6 +335,14 @@ OperationVariablesTestcase = QtGqlTestCase(
       }
     }
   }
+
+  mutation ChangeFriendName($connected: Boolean!, $new_name: String!) {
+  changeFriendName(connected: $connected, newName: $new_name) {
+    friend(connectedArg: $connected) {
+      name
+    }
+  }
+}
         """,
     test_name="OperationVariablesTestcase",
 )

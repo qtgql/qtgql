@@ -1,4 +1,5 @@
 #include "debugableclient.hpp"
+#include "graphql/__generated__/ChangeFriendName.hpp"
 #include "graphql/__generated__/MainQuery.hpp"
 #include <QSignalSpy>
 #include <catch2/catch_test_macros.hpp>
@@ -7,7 +8,7 @@ namespace OperationVariablesTestcase {
 using namespace qtgql;
 
 auto ENV_NAME = QString("OperationVariablesTestcase");
-auto SCHEMA_ADDR = get_server_address("83890724");
+auto SCHEMA_ADDR = get_server_address("65996276");
 
 TEST_CASE("OperationVariablesTestcase", "[generated-testcase]") {
 
@@ -22,7 +23,16 @@ TEST_CASE("OperationVariablesTestcase", "[generated-testcase]") {
     REQUIRE(!mq->get_user()->get_name().isEmpty());
     REQUIRE(!mq->get_user()->get_friend()->get_name().isEmpty());
   };
-  SECTION("test update") { REQUIRE(false); };
+  SECTION("test update") {
+    auto change_name_mut = changefriendname::ChangeFriendName::shared();
+    change_name_mut->set_variables({true, "Yehoshua"});
+    test_utils::SignalCatcher catcher(
+        {.source_obj = mq->get_user()->get_friend(), .only = "name"});
+    change_name_mut->fetch();
+    REQUIRE(catcher.wait());
+    test_utils::wait_for_completion(change_name_mut);
+    REQUIRE(mq->get_user()->get_friend()->get_name() == "Yehoshua");
+  };
 }
 
 }; // namespace OperationVariablesTestcase

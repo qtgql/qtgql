@@ -96,16 +96,14 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
         return f"m_{self.name}"
 
     @cached_property
-    def can_select_id(self) -> QtGqlFieldDefinition | None:
-        """
-        :return: The id field of this field object/model type if implements `Node`
-        """
+    def implements_node(self) -> bool:
+        """Helper to check whether the underlying type implements node."""
         object_type = self.type.is_object_type or self.type.is_interface
         if not object_type:
             if self.type.is_model:
                 object_type = self.type.is_model.is_object_type
-        if object_type and object_type.implements_node:
-            return object_type.fields_dict["id"]
+        if object_type:
+            return object_type.implements_node
 
 
 EnumMap: TypeAlias = "dict[str, QtGqlEnumDefinition]"

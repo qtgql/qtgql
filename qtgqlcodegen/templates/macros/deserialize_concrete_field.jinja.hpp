@@ -1,7 +1,7 @@
 {% macro deserialize_concrete_field(proxy_field, setter_name, operation_pointer = "operation",
                            do_after_deserialized = "") -%}
 {% set setter_end -%}
-{% if proxy_field.variable_uses -%}
+{% if not proxy_field.is_root and proxy_field.variable_uses  -%}
 , 👉proxy_field.build_variables_tuple_for_field_arguments👈
 {% endif -%}
 {% endset -%}

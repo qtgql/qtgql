@@ -26,7 +26,7 @@ def wrap_curly_filter(v: str, ignore: bool = False) -> str:
 
 
 def debug_jinja(obj: Any):  # pragma: no cover
-    print(obj)  # noqa
+    raise Exception(obj)
 
 
 template_env.filters["wrapcurly"] = wrap_curly_filter
