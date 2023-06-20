@@ -1,13 +1,13 @@
 {% macro deserialize_concrete_field(proxy_field, setter_name, operation_pointer = "operation",
                            do_after_deserialized = "") -%}
 {% set setter_end -%}
-{% if proxy_field.concrete.arguments -%}
+{% if proxy_field.variable_uses -%}
 , 👉proxy_field.build_variables_tuple_for_field_arguments👈
 {% endif -%}
 {% endset -%}
 if (!data.value("👉proxy_field.name👈").isNull()){
 {% if proxy_field.type.is_queried_object_type -%}
-👉 setter_name 👈(👉proxy_field.type.deserializer_name👈(data.value("👉proxy_field.name👈").toObject(), 👉operation_pointer👈)👉 setter_end 👈);
+👉 setter_name 👈(👉proxy_field.type.deserializer_name👈(data.value("👉proxy_field.name👈").toObject(), 👉operation_pointer👈) 👉 setter_end 👈);
 
 {% elif proxy_field.type.is_queried_interface -%}
 if field_data:

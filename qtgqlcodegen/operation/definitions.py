@@ -69,7 +69,9 @@ class QtGqlQueriedField:
 
     @cached_property
     def build_variables_tuple_for_field_arguments(self) -> str:
-        if self.concrete.arguments:
+        # operation might not use an argument that has default value, ignore what's ignored.
+        if self.variable_uses:
+            assert len(self.concrete.arguments) == len(self.variable_uses)
             return (
                 "{"
                 + ",".join(

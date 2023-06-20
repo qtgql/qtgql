@@ -25,12 +25,12 @@ def wrap_curly_filter(v: str, ignore: bool = False) -> str:
     return "{" + v + "}"
 
 
-def debug(obj: Any):  # pragma: no cover
+def debug_jinja(obj: Any):  # pragma: no cover
     print(obj)  # noqa
 
 
 template_env.filters["wrapcurly"] = wrap_curly_filter
-template_env.globals.update(debug=debug)
+template_env.globals.update(debug_jinja=debug_jinja)
 
 CMAKE_TEMPLATE = template_env.get_template("CMakeLists.jinja.cmake")
 

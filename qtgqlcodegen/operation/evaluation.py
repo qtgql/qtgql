@@ -127,7 +127,12 @@ def _evaluate_field(
 
     selections_set = field_node.selection_set
     if not selections_set:  # this is a scalar / enum field.
-        return QtGqlQueriedField(type=f_type, concrete=concrete_field, is_root=is_root)
+        return QtGqlQueriedField(
+            type=f_type,
+            concrete=concrete_field,
+            is_root=is_root,
+            variable_uses=variable_uses,
+        )
     # inject id selection for types that supports it. unions are handled below.
     if concrete_field.can_select_id and not has_id_selection(selections_set):
         inject_id_selection(selections_set)
