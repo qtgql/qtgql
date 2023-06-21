@@ -17,9 +17,9 @@ TEST_CASE("InterfaceTestCase", "[generated-testcase]") {
   mq->fetch();
   test_utils::wait_for_completion(mq);
   SECTION("test deserialize") {
-    qDebug() << mq->get_data()->get_name();
-    REQUIRE(mq->get_data()->get_name() == "Patrick");
-    REQUIRE(mq->get_data()->get_age() == 100);
+    auto user = mq->data()->get_user();
+    REQUIRE(user->get_name() == "Patrick");
+    REQUIRE(user->get_age() == 100);
   };
 }
 
