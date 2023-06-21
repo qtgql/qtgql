@@ -58,9 +58,7 @@ public:
 [[nodiscard]] inline const 👉 f.property_type 👈  👉 f.concrete.getter_name 👈() const {
     return m_👉f.name👈;
 {%- else -%}
-{#- TODO: find a better way to pass the object to QML -#}
 [[nodiscard]] inline const 👉 f.property_type 👈 👉 f.concrete.getter_name 👈() const {
-    {# TODO: is that require? -#}
     {% if f.type.is_queried_object_type -%}
     return *m_👉f.name👈;
     {% else -%}
