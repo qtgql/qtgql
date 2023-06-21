@@ -46,7 +46,7 @@ pytest-cov = ">=4.1.0"
 mkdocs-material = "^9.0.5"
 mike = "^1.1.2"
 markdown-include = "^0.8.0"
-mkdocstrings = {extras = ["python"], version = ">=0.19.1,<0.22.0"}
+mkdocstrings = {extras = ["python"], version = ">=0.19.1,<0.23.0"}
 pygments = "^2.14.0"
 
 
