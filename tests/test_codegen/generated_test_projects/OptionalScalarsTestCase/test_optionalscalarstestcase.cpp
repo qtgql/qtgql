@@ -21,23 +21,25 @@ TEST_CASE("OptionalScalarsTestCase", "[generated-testcase]") {
       mq->set_variables({true});
       mq->fetch();
       test_utils::wait_for_completion(mq);
-      auto d = mq->get_user();
-      REQUIRE(d->get_age() == bases::DEFAULTS::INT);
-      REQUIRE(d->get_name() == bases::DEFAULTS::STRING);
-      REQUIRE(d->get_agePoint() == bases::DEFAULTS::FLOAT);
-      REQUIRE(d->get_uuid() == bases::DEFAULTS::UUID);
-      REQUIRE(d->get_birth() == qtgql::customscalars::DateTimeScalar().to_qt());
+      auto user = mq->data()->get_user();
+      REQUIRE(user->get_age() == bases::DEFAULTS::INT);
+      REQUIRE(user->get_name() == bases::DEFAULTS::STRING);
+      REQUIRE(user->get_agePoint() == bases::DEFAULTS::FLOAT);
+      REQUIRE(user->get_uuid() == bases::DEFAULTS::UUID);
+      REQUIRE(user->get_birth() ==
+              qtgql::customscalars::DateTimeScalar().to_qt());
     };
     SECTION("when not null") {
       mq->set_variables({false});
       mq->fetch();
       test_utils::wait_for_completion(mq);
-      auto d = mq->get_user();
-      REQUIRE(d->get_age() != bases::DEFAULTS::INT);
-      REQUIRE(d->get_name() != bases::DEFAULTS::STRING);
-      REQUIRE(d->get_agePoint() != bases::DEFAULTS::FLOAT);
-      REQUIRE(d->get_uuid() != bases::DEFAULTS::UUID);
-      REQUIRE(d->get_birth() != qtgql::customscalars::DateTimeScalar().to_qt());
+      auto user = mq->data()->get_user();
+      REQUIRE(user->get_age() != bases::DEFAULTS::INT);
+      REQUIRE(user->get_name() != bases::DEFAULTS::STRING);
+      REQUIRE(user->get_agePoint() != bases::DEFAULTS::FLOAT);
+      REQUIRE(user->get_uuid() != bases::DEFAULTS::UUID);
+      REQUIRE(user->get_birth() !=
+              qtgql::customscalars::DateTimeScalar().to_qt());
     }
   }
 
@@ -47,12 +49,13 @@ TEST_CASE("OptionalScalarsTestCase", "[generated-testcase]") {
     test_utils::wait_for_completion(mq);
     auto change_name_mutation = changename::ChangeName::shared();
     QString new_name = "Moise";
-    change_name_mutation->set_variables({mq->get_user()->get_id(), new_name});
-    auto catcher = test_utils::SignalCatcher({mq->get_user()});
+    auto user = mq->data()->get_user();
+    change_name_mutation->set_variables({user->get_id(), new_name});
+    auto catcher = test_utils::SignalCatcher({user});
     change_name_mutation->fetch();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(change_name_mutation);
-    REQUIRE(mq->get_user()->get_name() == "Moise");
+    REQUIRE(user->get_name() == "Moise");
   };
 }
 
