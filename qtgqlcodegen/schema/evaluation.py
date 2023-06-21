@@ -1,9 +1,7 @@
 from __future__ import annotations
 
-import warnings
 from typing import NamedTuple
 
-import graphql
 from graphql import OperationType
 from graphql.type import definition as gql_def
 
@@ -178,31 +176,7 @@ def _evaluate_object_type(
     t_name: str = type_.name
     if evaluated := type_info.get_object_type(t_name):
         return evaluated
-    if type_.name not in type_info.root_types_names:
-        # TODO(nir): remove this check.
-        # https://github.com/qtgql/qtgql/issues/265
-        try:
-            id_field = type_.fields["id"]
-            if nonull := is_non_null_definition(id_field.type):
-                id_scalar = graphql.type.scalars.GraphQLID
-                if nonull.of_type is not id_scalar:
-                    raise QtGqlException(
-                        f"id field type must be of the {id_scalar} scalar!"
-                        f"\n Got: {nonull.of_type}",
-                    )
-            else:
-                warnings.warn(
-                    stacklevel=2,
-                    message="It is best practice to have id field of type ID!"
-                    f"\ntype {type_} has: {id_field}",
-                )
-        except KeyError:
-            warnings.warn(
-                stacklevel=2,
-                message="QtGql enforces types to have ID field"
-                f"type {type_} does not not define an id field.\n"
-                f"fields: {type_.fields}",
-            )
+
     options = _evaluate_object_fields(type_info, type_)
 
     ret = QtGqlObjectType(
@@ -233,6 +207,13 @@ def _evaluate_interface_type(
         fields_dict=options.all_fields,
         unique_fields=options.unique_fields,
     )
+    if ret.name == "Node":
+        id_field = ret.fields[0]
+        if id_field.type != BuiltinScalars.ID or id_field.type.is_optional:
+            raise QtGqlException(
+                f"Node is a reserved type, id field on `Node` interface must be of type `ID!`"
+                f"\n Got: {interface.fields['id']}",
+            )
     type_info.interfaces[ret.name] = ret
     return ret
 

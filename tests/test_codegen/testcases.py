@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import contextlib
 import os
 import re
+import shutil
 from functools import cached_property
 from pathlib import Path
 from typing import TYPE_CHECKING, NamedTuple
@@ -75,6 +77,7 @@ class QtGqlTestCase:
     qml_file: str = ""
     needs_debug: bool = False
     metadata: TestCaseMetadata = attrs.Factory(TestCaseMetadata)
+    is_virtual_test: bool = False
 
     @cached_property
     def evaluator(self) -> SchemaGenerator:
@@ -131,6 +134,16 @@ class QtGqlTestCase:
     @cached_property
     def url_suffix(self):
         return str(hash_schema(self.schema))
+
+    @contextlib.contextmanager
+    def virtual_generate(self) -> None:
+        """Generates and deletes after done."""
+        assert self.is_virtual_test
+        try:
+            self.generate()
+        finally:
+            yield
+            shutil.rmtree(self.test_dir)
 
     def generate(self) -> None:
         self.config.env_name = self.test_name
