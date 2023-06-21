@@ -36,7 +36,6 @@ class SchemaGenerator:
                 t
                 for name, t in self.schema_type_info.object_types.items()
                 if name not in BuiltinScalars.keys
-                and name not in self.schema_type_info.root_types_names
             ],
             interfaces=list(self.schema_type_info.interfaces.values()),
             input_objects=list(self.schema_type_info.input_objects.values()),

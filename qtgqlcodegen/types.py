@@ -274,8 +274,9 @@ class QtGqlObjectType(BaseQtGqlObjectType):
         if not self.interfaces_raw:
             # TODO(nir): these are not really interfaces though they are inherited if there are no interfaces.
             # https://github.com/qtgql/qtgql/issues/267
-            if self.implements_node:
-                return [QtGqlTypes.NodeInterfaceABC]  # type: ignore
+            if interface := self.is_interface:
+                if interface.is_node_interface:
+                    return [QtGqlTypes.NodeInterfaceABC]  # type: ignore
 
             else:
                 return [QtGqlTypes.ObjectTypeABC]  # type: ignore
@@ -345,10 +346,7 @@ class QtGqlInterface(QtGqlObjectType):
         identification/#node-interface."""
         if self.name == "Node":
             id_field_maybe = self.fields[0]
-            return (
-                id_field_maybe.name == "id"
-                and id_field_maybe.type.is_builtin_scalar is BuiltinScalars.ID
-            )
+            return id_field_maybe.name == "id" and id_field_maybe.type is BuiltinScalars.ID
         return False
 
     @property

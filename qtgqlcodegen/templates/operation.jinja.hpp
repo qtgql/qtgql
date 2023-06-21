@@ -90,9 +90,9 @@ std::optional<👉 var.type.member_type 👈> 👉 var.name 👈 = {};
 
 class 👉 context.operation.name 👈: public qtgql::gqlwstransport::OperationHandlerABC{
     Q_OBJECT
-Q_PROPERTY(const 👉 context.operation.root_field.property_type 👈 data READ 👉 context.operation.root_field.concrete.getter_name 👈 NOTIFY 👉 context.operation.root_field.concrete.signal_name 👈);
+Q_PROPERTY(const 👉 context.operation.root_type.name 👈 * data READ data NOTIFY dataChanged);
 
-std::optional<👉 context.operation.root_field.property_type 👈> 👉 context.operation.root_field.private_name 👈 = {};
+std::optional<👉 context.operation.root_type.name 👈 *> m_data = {};
 
 
 
@@ -100,7 +100,8 @@ inline const QString &ENV_NAME() override{
     static const auto ret = QString("👉 context.config.env_name 👈");
     return ret;
     }
-
+signals:
+    void dataChanged();
 
 public:
 👉 context.operation.generated_variables_type 👈 vars_inst;
@@ -120,16 +121,21 @@ return m_operation_id;
 
 
 void on_next(const QJsonObject &message) override{
-    if (!👉 context.operation.root_field.private_name 👈  && message.contains("data")){
+    if (!m_data){
         auto data = message.value("data").toObject();
-        {% set do_after_deserialized -%}
-        👉 initialize_proxy_field(context.operation.root_field, operation_pointer="this") 👈
-        {%- endset -%}
-        👉 deserialize_concrete_field(context.operation.root_field,  "auto concrete", "this", do_after_deserialized) 👈
+        m_data = new 👉 context.operation.root_type.name👈(this, 👉 context.operation.root_type.deserializer_name 👈(data, this));
+        emit dataChanged();
+    }
+    else{
+    throw qtgql::exceptions::NotImplementedError({"Updates on root types is not implemented yet."});
     }
 }
-inline const 👉 context.operation.root_field.property_type 👈 👉 context.operation.root_field.concrete.getter_name 👈() const{
-    return 👉 context.operation.root_field.concrete.private_name 👈.value();
+
+inline const 👉 context.operation.root_type.name 👈 * data() const{
+    if (m_data){
+        return m_data.value();
+    }
+    return nullptr;
 }
 
 {% if context.operation.variables %}
@@ -138,9 +144,6 @@ vars_inst = vars;
 m_variables = vars_inst.to_json();
 }
 {% endif %}
-
-signals:
-void 👉 context.operation.root_field.concrete.signal_name 👈();
 
 };
 };

@@ -94,6 +94,7 @@ class QtGqlQueriedField:
 @define(slots=False, repr=False)
 class QtGqlOperationDefinition:
     operation_def: gql_def.OperationDefinitionNode
+    root_type: QtGqlQueriedObjectType
     root_field: QtGqlQueriedField
     fragments: list[str] = attrs.Factory(list)
     variables: list[QtGqlVariableDefinition] = attrs.Factory(list)

@@ -18,7 +18,7 @@ TEST_CASE("ScalarsTestCase", "[generated-testcase]") {
   mq->fetch();
   test_utils::wait_for_completion(mq);
   SECTION("test deserialize") {
-    auto d = mq->get_constUser();
+    auto d = mq->data()->get_constUser();
     REQUIRE(d->get_age() == 24);
     REQUIRE(d->get_agePoint() == 24.0f);
     REQUIRE(d->get_id() == "FakeID");
@@ -29,18 +29,19 @@ TEST_CASE("ScalarsTestCase", "[generated-testcase]") {
     REQUIRE(d->get_voidField() == qtgql::bases::DEFAULTS::VOID);
   };
   SECTION("test update") {
-    auto user = mq->get_constUser();
-    auto previous_name = mq->get_constUser()->get_name();
+    auto data = mq->data();
+    auto user = data->get_constUser();
+    auto previous_name = user->get_name();
     auto modified_user_op = userwithsameidanddifferentfieldsquery::
         UserWithSameIDAndDifferentFieldsQuery::shared();
     auto catcher = test_utils::SignalCatcher({user});
     modified_user_op->fetch();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(modified_user_op);
-    REQUIRE(user->get_id() ==
-            modified_user_op->get_constUserWithModifiedFields()->get_id());
-    auto new_name =
-        modified_user_op->get_constUserWithModifiedFields()->get_name();
+    auto modified_user =
+        modified_user_op->data()->get_constUserWithModifiedFields();
+    REQUIRE(user->get_id() == modified_user->get_id());
+    auto new_name = modified_user->get_name();
     REQUIRE(user->get_name() == new_name);
     REQUIRE(new_name != previous_name);
   };
@@ -50,7 +51,7 @@ std::shared_ptr<ScalarsTestCase::User> get_shared_user() {
   auto mq = std::make_shared<mainquery::MainQuery>();
   mq->fetch();
   test_utils::wait_for_completion(mq);
-  auto node_id = mq->get_constUser()->get_id();
+  auto node_id = mq->data()->get_constUser()->get_id();
   REQUIRE(mq.use_count() == 1);
   return ScalarsTestCase::User::get_node(node_id).value();
 }

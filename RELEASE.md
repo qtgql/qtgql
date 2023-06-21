@@ -5,6 +5,7 @@ Release type: minor
 Each operation will generate its own deserializers chain.
 - Refactor operation evaluation, uses similar technique that used by schema evaluations.
 Much more readable.
+- Move root field out of the operation handler, instead create root types as well.
 
 ### Features
 - Cache by arguments see #254

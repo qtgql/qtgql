@@ -1,10 +1,7 @@
 {% macro initialize_proxy_field(field, operation_pointer = "operation") -%}
 {%set instance_of_concrete -%}
-{% if field.is_root -%}
-concrete
-{% else -%}
 m_inst->👉field.concrete.getter_name 👈(👉field.build_variables_tuple_for_field_arguments 👈)
-{% endif -%}{% endset -%}
+{% endset -%}
 
 {% if field.type.is_queried_object_type  and field.type.is_optional %}
 if (👉 instance_of_concrete 👈){

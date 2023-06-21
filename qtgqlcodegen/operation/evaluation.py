@@ -134,6 +134,7 @@ def _evaluate_selection_set_type(
             selection_set=selection_set_node,
             path=path,
         )
+    raise NotImplementedError(concrete_type)  # pragma: no cover
 
 
 def _evaluate_field(
@@ -194,7 +195,7 @@ def _evaluate_union(
         for selection_node in fragment.selection_set.selections:
             inner_field_node = require(is_field_node(selection_node))
             if not is_type_name_selection(inner_field_node):
-                concrete_field = resolved_type.fields_dict[inner_field_node.name]
+                concrete_field = resolved_type.fields_dict[inner_field_node.name.value]
                 __f = _evaluate_field(
                     type_info=type_info,
                     concrete_field=concrete_field,
@@ -226,7 +227,7 @@ def _evaluate_interface(
             if not is_type_name_selection(inner_field_node):
                 __f = _evaluate_field(
                     type_info=type_info,
-                    concrete_field=concrete.fields_dict[inner_field_node.name],
+                    concrete_field=concrete.fields_dict[inner_field_node.name.value],
                     field_node=inner_field_node,
                     path=path,
                 )
@@ -247,11 +248,11 @@ def _evaluate_interface(
                 if not is_type_name_selection(inner_field_node):
                     __f = _evaluate_field(
                         type_info=type_info,
-                        concrete_field=resolved_type.fields_dict[inner_field_node.name],
+                        concrete_field=resolved_type.fields_dict[inner_field_node.name.value],
                         field_node=inner_field_node,
                         path=path,
                     )
-                    choices[type_name][inner_field_node.name] = __f
+                    choices[type_name][inner_field_node.name.value] = __f
     for choice in choices.values():
         choice.update(linear_fields)
 
@@ -285,16 +286,18 @@ def _evaluate_object_type(
     for selection in selection_set.selections:
         if f_node := is_field_node(selection):
             concrete_field = concrete.fields_dict[f_node.name.value]
-            fields[f_node.name] = _evaluate_field(
+            fields[concrete_field.name] = _evaluate_field(
                 type_info=type_info,
                 concrete_field=concrete_field,
                 field_node=f_node,
                 path=path,
+                is_root=concrete.name in type_info.schema_type_info.root_types_names,
             )
 
     name = f"{concrete.name}__{path}"
     if ret := type_info.narrowed_types_map.get(name, None):
         return ret
+
     ret = QtGqlQueriedObjectType(
         name=name,
         concrete=concrete,
@@ -337,6 +340,7 @@ def _evaluate_operation(
     root_field = root_proxy_type.fields[0]
     return QtGqlOperationDefinition(
         root_field=root_field,
+        root_type=root_proxy_type,
         operation_def=operation,
         variables=type_info.variables,
         narrowed_types=tuple(type_info.narrowed_types_map.values()),
