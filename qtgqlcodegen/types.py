@@ -414,10 +414,6 @@ class QtGqlEnumDefinition(QtGqlTypeABC):
 class QtGqlQueriedTypeABC:
     concrete: QtGqlTypeABC
 
-    @property
-    def is_optional(self) -> bool:
-        return self.concrete.is_optional
-
 
 @define(slots=False, repr=False)
 class QtGqlQueriedObjectType(QtGqlQueriedTypeABC, QtGqlTypeABC):

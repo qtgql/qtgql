@@ -15,7 +15,7 @@ TEST_CASE("OptionalScalarsTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME, DebugClientSettings{.print_debug = true,
                                     .prod_settings = {.url = SCHEMA_ADDR}});
-  auto mq = std::make_shared<mainquery::MainQuery>();
+  auto mq = mainquery::MainQuery::shared();
   SECTION("test deserialize") {
     SECTION("when null returns default values") {
       mq->set_variables({true});
