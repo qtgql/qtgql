@@ -19,24 +19,24 @@ TEST_CASE("DecimalTestCase", "[generated-testcase]") {
   test_utils::wait_for_completion(mq);
 
   SECTION("test deserialize") {
-    REQUIRE(!mq->get_user()->get_balance().isEmpty());
+    REQUIRE(!mq->data()->get_user()->get_balance().isEmpty());
   }
   SECTION("test update and as operation variable") {
-    auto user = mq->get_user();
+    auto old_user = mq->data()->get_user();
     auto modified_user_op = updatebalance::UpdateBalance::shared();
-    auto new_balance = customscalars::DecimalScalar(
-        mq->get_user()->get_balance() + "122121554545");
-    auto user_id = user->get_id();
+    auto new_balance =
+        customscalars::DecimalScalar(old_user->get_balance() + "122121554545");
+    auto user_id = old_user->get_id();
     modified_user_op->set_variables({{new_balance}, user_id});
     auto catcher =
-        test_utils::SignalCatcher({.source_obj = user, .only = "balance"});
+        test_utils::SignalCatcher({.source_obj = old_user, .only = "balance"});
     modified_user_op->fetch();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(modified_user_op);
-    REQUIRE(user->get_id() == modified_user_op->get_changeBalance()->get_id());
-    REQUIRE(modified_user_op->get_changeBalance()->get_balance() ==
-            new_balance.to_qt());
-    REQUIRE(user->get_balance() == new_balance.to_qt());
+    auto new_user = modified_user_op->data()->get_changeBalance();
+    REQUIRE(old_user->get_id() == new_user->get_id());
+    REQUIRE(new_user->get_balance() == new_balance.to_qt());
+    REQUIRE(old_user->get_balance() == new_balance.to_qt());
   };
 }
 
