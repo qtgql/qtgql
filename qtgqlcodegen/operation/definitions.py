@@ -16,7 +16,12 @@ if TYPE_CHECKING:
         QtGqlVariableDefinition,
         SchemaTypeInfo,
     )
-    from qtgqlcodegen.types import QtGqlQueriedInterface, QtGqlQueriedObjectType, QtGqlTypeABC
+    from qtgqlcodegen.types import (
+        QtGqlObjectType,
+        QtGqlQueriedInterface,
+        QtGqlQueriedObjectType,
+        QtGqlTypeABC,
+    )
 
 
 @attrs.define(slots=False)
@@ -30,9 +35,20 @@ class OperationTypeInfo:
 @attrs.define(frozen=True, slots=False, repr=False)
 class QtGqlQueriedField:
     type: QtGqlTypeABC
+    type_info: OperationTypeInfo
+    origin: QtGqlObjectType
     concrete: QtGqlFieldDefinition
     variable_uses: list[QtGqlVariableUse] = attrs.Factory(list)
-    is_root: bool = False
+
+    @cached_property
+    def cached_by_args(self) -> bool:
+        # if the origin implements node it's fields are cached by arguments
+        # if they have ones
+        return self.origin.implements_node and self.concrete.arguments
+
+    @cached_property
+    def is_root(self) -> bool:
+        return self.origin.name in self.type_info.schema_type_info.root_types_names
 
     @cached_property
     def type_name(self) -> str:
@@ -67,14 +83,14 @@ class QtGqlQueriedField:
     @cached_property
     def build_variables_tuple_for_field_arguments(self) -> str:
         # operation might not use an argument that has default value, ignore what's ignored.
-        operation_pointer = "" if self.is_root else "operation->"
-        if self.variable_uses:
+        # see https://github.com/qtgql/qtgql/issues/272 for more details.
+        if self.cached_by_args and self.variable_uses:
             assert len(self.concrete.arguments) == len(self.variable_uses)
             return (
                 "{"
                 + ",".join(
                     [
-                        f"{operation_pointer}vars_inst.{arg.variable.name}.value()"
+                        f"operation->vars_inst.{arg.variable.name}.value()"
                         for arg in self.variable_uses
                     ],
                 )

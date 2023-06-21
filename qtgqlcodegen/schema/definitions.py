@@ -65,16 +65,6 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
         return self.arguments.index(self.arguments_dict[arg])
 
     @cached_property
-    def type_with_args(self) -> str:
-        """
-
-        :return: if the field has args returns am map of <args_type>: <member_type> for caching purposes.
-        """
-        if self.arguments_dict:
-            return f"std::map<{self.arguments_type}, {self.type.member_type}>"
-        return self.type.member_type
-
-    @cached_property
     def getter_name(self) -> str:
         return f"get_{self.name}"
 

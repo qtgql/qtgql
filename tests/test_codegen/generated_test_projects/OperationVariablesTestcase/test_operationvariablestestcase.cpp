@@ -20,18 +20,20 @@ TEST_CASE("OperationVariablesTestcase", "[generated-testcase]") {
   test_utils::wait_for_completion(mq);
 
   SECTION("test deserialize") {
-    REQUIRE(!mq->get_user()->get_name().isEmpty());
-    REQUIRE(!mq->get_user()->get_friend()->get_name().isEmpty());
+    auto user = mq->data()->get_user();
+    REQUIRE(!user->get_name().isEmpty());
+    REQUIRE(!user->get_friend()->get_name().isEmpty());
   };
   SECTION("test update") {
+    auto user = mq->data()->get_user();
     auto change_name_mut = changefriendname::ChangeFriendName::shared();
     change_name_mut->set_variables({true, "Yehoshua"});
     test_utils::SignalCatcher catcher(
-        {.source_obj = mq->get_user()->get_friend(), .only = "name"});
+        {.source_obj = user->get_friend(), .only = "name"});
     change_name_mut->fetch();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(change_name_mut);
-    REQUIRE(mq->get_user()->get_friend()->get_name() == "Yehoshua");
+    REQUIRE(user->get_friend()->get_name() == "Yehoshua");
   };
 }
 

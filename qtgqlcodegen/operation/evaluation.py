@@ -101,10 +101,16 @@ def _evaluate_variable(
 def _evaluate_selection_set_type(
     type_info: OperationTypeInfo,
     concrete_type: QtGqlTypeABC,
-    selection_set_node: gql_lang.SelectionSetNode,
+    selection_set_node: gql_lang.SelectionSetNode | None,
     path: str,
 ) -> QtGqlTypeABC:
-    if concrete_type.is_builtin_scalar or concrete_type.is_custom_scalar:
+    if not selection_set_node:
+        # these types have no selections
+        assert (
+            concrete_type.is_builtin_scalar
+            or concrete_type.is_custom_scalar
+            or concrete_type.is_enum
+        )
         return concrete_type  # currently there is no need for a "proxied" type.
     if obj_type := concrete_type.is_object_type:
         return _evaluate_object_type(
@@ -142,7 +148,7 @@ def _evaluate_field(
     concrete_field: QtGqlFieldDefinition,
     field_node: gql_lang.FieldNode,
     path: str,
-    is_root: bool = False,
+    origin: QtGqlObjectType,
 ) -> QtGqlQueriedField:
     path += concrete_field.name
     return QtGqlQueriedField(
@@ -154,7 +160,8 @@ def _evaluate_field(
         ),
         concrete=concrete_field,
         variable_uses=_evaluate_variable_uses(type_info, concrete_field, field_node.arguments),
-        is_root=is_root,
+        origin=origin,
+        type_info=type_info,
     )
 
 
@@ -201,6 +208,7 @@ def _evaluate_union(
                     concrete_field=concrete_field,
                     field_node=inner_field_node,
                     path=path,
+                    origin=resolved_type,
                 )
                 choices[type_name][concrete_field.name] = __f
 
@@ -230,6 +238,7 @@ def _evaluate_interface(
                     concrete_field=concrete.fields_dict[inner_field_node.name.value],
                     field_node=inner_field_node,
                     path=path,
+                    origin=concrete,
                 )
                 linear_fields[__f.name] = __f
 
@@ -251,6 +260,7 @@ def _evaluate_interface(
                         concrete_field=resolved_type.fields_dict[inner_field_node.name.value],
                         field_node=inner_field_node,
                         path=path,
+                        origin=resolved_type,
                     )
                     choices[type_name][inner_field_node.name.value] = __f
     for choice in choices.values():
@@ -291,7 +301,7 @@ def _evaluate_object_type(
                 concrete_field=concrete_field,
                 field_node=f_node,
                 path=path,
-                is_root=concrete.name in type_info.schema_type_info.root_types_names,
+                origin=concrete,
             )
 
     name = f"{concrete.name}__{path}"
