@@ -18,7 +18,7 @@ type Query {
 
 type User implements Node {
   id: ID!
-  friends(first: Int! = 5): [Person!]!
+  friends: [Person!]!
 }
 
 """Represents NULL values"""

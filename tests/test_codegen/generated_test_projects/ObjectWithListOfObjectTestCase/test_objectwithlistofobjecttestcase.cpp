@@ -8,16 +8,17 @@
 namespace ObjectWithListOfObjectTestCase {
 using namespace qtgql;
 auto ENV_NAME = QString("ObjectWithListOfObjectTestCase");
-auto SCHEMA_ADDR = get_server_address("77804516");
+auto SCHEMA_ADDR = get_server_address("44829807");
 
 TEST_CASE("ObjectWithListOfObjectTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
-      ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
+      ENV_NAME, DebugClientSettings{.print_debug = true,
+                                    .prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = std::make_shared<mainquery::MainQuery>();
   mq->fetch();
   test_utils::wait_for_completion(mq);
   SECTION("test deserialize") {
-    auto friends = mq->get_user()->get_friends();
+    auto friends = mq->data()->get_user()->get_friends();
     auto p = friends->first();
     REQUIRE(p->get_name() != bases::DEFAULTS::STRING);
   }
@@ -35,7 +36,7 @@ TEST_CASE(
   typedef mainquery::Person__userfriends ObjectType;
   typedef qtgql::bases::ListModelABC<ObjectType> ModelType;
 
-  auto model_with_data = mq->get_user()->m_friends;
+  auto model_with_data = mq->data()->get_user()->m_friends;
   auto raw_message = DebugAbleClient::from_environment(env)->m_current_message;
   auto raw_friends_list = raw_message.value("data")
                               .toObject()
@@ -103,7 +104,7 @@ TEST_CASE(
   }
 
   SECTION("test append") {
-    auto new_obj = new mainquery::Person__age$id$name(mq.get(), {});
+    auto new_obj = new mainquery::Person__userfriends(mq.get(), {});
     auto before_count = model_with_data->rowCount();
     model_with_data->append(new_obj);
     insert_spy.validate();
@@ -112,7 +113,7 @@ TEST_CASE(
     REQUIRE(model_with_data->last() == new_obj);
   }
   SECTION("test insert") {
-    auto new_obj = new mainquery::Person__age$id$name(mq.get(), {});
+    auto new_obj = new mainquery::Person__userfriends(mq.get(), {});
     auto before_count = model_with_data->rowCount();
     model_with_data->insert(0, new_obj);
     insert_spy.validate();
@@ -122,7 +123,7 @@ TEST_CASE(
   }
   SECTION("test insert after max index") {
     QSignalSpy spy(model_with_data, &ModelType ::rowsAboutToBeInserted);
-    auto new_obj = new mainquery::Person__age$id$name(mq.get(), {});
+    auto new_obj = new mainquery::Person__userfriends(mq.get(), {});
     auto before_count = model_with_data->rowCount();
     model_with_data->insert(20000, new_obj);
     insert_spy.validate();

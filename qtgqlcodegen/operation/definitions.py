@@ -67,16 +67,17 @@ class QtGqlQueriedField:
 
         :return: C++ property type that will be exposed to QML.
         """
-        tp = self.concrete.type
-        if tp.is_object_type:
+        tp = self.type
+        if tp.is_queried_object_type:
             return f"{self.type_name} *"
 
         if cs := tp.is_custom_scalar:
             return cs.to_qt_type
 
         if model := tp.is_model:
-            if model.of_type.is_object_type:
-                return f"qtgql::bases::ListModelABC<{self.type_name}> *"
+            if model.of_type.is_queried_object_type:
+                return f"qtgql::bases::ListModelABC<{model.of_type.type_name()}> *"
+            raise NotImplementedError
 
         return f"{self.type_name} &"
 

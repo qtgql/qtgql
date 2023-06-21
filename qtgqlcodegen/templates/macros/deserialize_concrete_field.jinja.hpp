@@ -18,12 +18,12 @@ if field_data:
 👉operation_pointer👈,
 👉 setter_end 👈);
 {% elif proxy_field.type.is_model -%}
-{% if proxy_field.type.is_model.is_object_type -%}
-QList<👉proxy_field.type.is_model.member_type👈> obj_list;
+{% if proxy_field.type.is_model.of_type.is_queried_object_type -%}
+👉proxy_field.concrete.type.member_type👈 obj_list;
 for (const auto& node: data.value("👉proxy_field.name👈").toArray()){
-obj_list.append(👉 proxy_field.type.is_model.is_object_type.deserializer_name 👈(node.toObject(), 👉operation_pointer👈));
+obj_list.append(👉 proxy_field.type.is_model.of_type.is_queried_object_type.deserializer_name 👈(node.toObject(), 👉operation_pointer👈));
 };
-👉 setter_name 👈(👉operation_pointer👈.operation_id, obj_list👉 setter_end 👈);
+👉 setter_name 👈(obj_list👉 setter_end 👈);
 
 {% elif proxy_field.type.is_model.is_interface -%}
 👉 setter_name 👈(qtgql::ListModel(
