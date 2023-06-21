@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 import attrs
 from attr import define
@@ -169,7 +169,7 @@ class QtGqlUnion(QtGqlTypeABC):
     def get_by_name(self, name: str) -> QtGqlObjectType | None:
         for possible in self.types:
             if possible.name == name:
-                return possible
+                return cast(QtGqlObjectType, possible)
 
 
 @define

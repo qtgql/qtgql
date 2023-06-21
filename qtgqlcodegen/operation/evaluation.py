@@ -114,28 +114,29 @@ def _evaluate_selection_set_type(
             or concrete_type.is_enum
         )
         ret = concrete_type  # currently there is no need for a "proxied" type.
-    if obj_type := concrete_type.is_object_type:
+
+    elif obj_type := concrete_type.is_object_type:
         ret = _evaluate_object_type(
             type_info=type_info,
             concrete=obj_type,
             selection_set=selection_set_node,
             path=path,
         )
-    if lst := concrete_type.is_model:
+    elif lst := concrete_type.is_model:
         ret = _evaluate_list(
             type_info=type_info,
             concrete=lst,
             selection_set=selection_set_node,
             path=path,
         )
-    if interface := concrete_type.is_interface:
+    elif interface := concrete_type.is_interface:
         ret = _evaluate_interface(
             type_info=type_info,
             concrete=interface,
             selection_set=selection_set_node,
             path=path,
         )
-    if is_union := concrete_type.is_union:
+    elif is_union := concrete_type.is_union:
         ret = _evaluate_union(
             type_info=type_info,
             concrete=is_union,
