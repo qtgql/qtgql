@@ -764,6 +764,7 @@ all_test_cases = [
     NestedObjectTestCase,
     OptionalNestedObjectTestCase,
     ObjectWithListOfObjectTestCase,
+    OperationVariablesTestcase,
     InputTypeOperationVariableTestCase,
     InterfaceTestCase,
     UnionTestCase,
