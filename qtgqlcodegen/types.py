@@ -272,8 +272,7 @@ class QtGqlObjectType(BaseQtGqlObjectType):
         not_unique_interfaces: list[QtGqlInterface] = []
 
         if not self.interfaces_raw:
-            # TODO(nir): these are not really interfaces though they are inherited if there are no interfaces.
-            # https://github.com/qtgql/qtgql/issues/267
+            # TODO(https://github.com/qtgql/qtgql/issues/267): these are not really interfaces though they are inherited if there are no interfaces.
             if interface := self.is_interface:
                 if interface.is_node_interface:
                     return [QtGqlTypes.NodeInterfaceABC]  # type: ignore

@@ -275,11 +275,6 @@ def _evaluate_interface(
         choice.update(linear_fields)
 
     name = f"{concrete.name}__{path}"
-    if ret := type_info.narrowed_interfaces_map.get(
-        name,
-        None,
-    ):  # TODO: this is probably redundant
-        return ret
     ret = QtGqlQueriedInterface(
         name=name,
         concrete=concrete,

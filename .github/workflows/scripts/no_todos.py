@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 pattern = re.compile(r"\b(TODO|FIXME)\b")
+ALLOWED_TODO = re.compile("TODO\\((.+?)\\):\\s+(.*)")
 
 
 def check_todos() -> list:
@@ -26,7 +27,10 @@ def check_todos() -> list:
     for file in files_grabbed:
         for line_num, line in enumerate(file.read_text().splitlines(), start=1):
             if match := pattern.search(line):
-                errors.append(f"Found {match.group()} in {file.as_posix()} ({line_num}): {line}")
+                if not ALLOWED_TODO.search(line):
+                    errors.append(
+                        f"Found {match.group()} in {file.as_posix()} ({line_num}): {line}",
+                    )
     if errors:
         raise Exception(errors)
 
