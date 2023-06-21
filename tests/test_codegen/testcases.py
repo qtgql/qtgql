@@ -795,6 +795,7 @@ implemented_testcases = [
     ObjectWithListOfObjectTestCase,
     EnumTestCase,
     InterfaceTestCase,
+    OperationVariablesTestcase,
 ]
 
 
