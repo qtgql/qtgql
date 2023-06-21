@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import contextlib
 import os
 import re
+import shutil
 from functools import cached_property
 from pathlib import Path
 from typing import TYPE_CHECKING, NamedTuple
@@ -75,6 +77,7 @@ class QtGqlTestCase:
     qml_file: str = ""
     needs_debug: bool = False
     metadata: TestCaseMetadata = attrs.Factory(TestCaseMetadata)
+    is_virtual_test: bool = False
 
     @cached_property
     def evaluator(self) -> SchemaGenerator:
@@ -132,6 +135,16 @@ class QtGqlTestCase:
     def url_suffix(self):
         return str(hash_schema(self.schema))
 
+    @contextlib.contextmanager
+    def virtual_generate(self) -> None:
+        """Generates and deletes after done."""
+        assert self.is_virtual_test
+        try:
+            self.generate()
+        finally:
+            yield
+            shutil.rmtree(self.test_dir)
+
     def generate(self) -> None:
         self.config.env_name = self.test_name
         template_context = TstTemplateContext(
@@ -185,22 +198,6 @@ ScalarsTestCase = QtGqlTestCase(
         }
         """,
     test_name="ScalarsTestCase",
-)
-OperationVariablesTestcase = QtGqlTestCase(
-    schema=schemas.operation_variables.schema,
-    operations="""
-  query UserQuery($connectedVar: ConnectedInput!) {
-    user {
-      id
-      name
-      friend(connectedArg: $connectedVar) {
-        id
-        name
-      }
-    }
-  }
-        """,
-    test_name="OperationVariablesTestcase",
 )
 
 OptionalScalarsTestCase = QtGqlTestCase(
@@ -336,6 +333,31 @@ TimeScalarTestCase = QtGqlTestCase(
     metadata=TestCaseMetadata(
         should_test_garbage_collection=CUSTOM_SCALARS_DOESNT_CACHE,
     ),
+)
+
+OperationVariablesTestcase = QtGqlTestCase(
+    schema=schemas.operation_variables.schema,
+    operations="""
+  query MainQuery($connectedVar: Boolean!) {
+    user {
+      id
+      name
+      friend(connectedArg: $connectedVar) {
+        id
+        name
+      }
+    }
+  }
+
+  mutation ChangeFriendName($connected: Boolean!, $new_name: String!) {
+  changeFriendName(connected: $connected, newName: $new_name) {
+    friend(connectedArg: $connected) {
+      name
+    }
+  }
+}
+        """,
+    test_name="OperationVariablesTestcase",
 )
 
 OperationErrorTestCase = QtGqlTestCase(
@@ -526,9 +548,9 @@ ObjectsThatReferenceEachOtherTestCase = QtGqlTestCase(
 )
 
 CountryScalar = CustomScalarDefinition(
-    type_name="CountryScalar",
+    name="CountryScalar",
     graphql_name="Country",
-    type_for_proxy="QString",
+    to_qt_type="QString",
     deserialized_type="QString",
     include_path="NOT IMPLEMENTED",
 )
@@ -742,6 +764,7 @@ all_test_cases = [
     NestedObjectTestCase,
     OptionalNestedObjectTestCase,
     ObjectWithListOfObjectTestCase,
+    OperationVariablesTestcase,
     InputTypeOperationVariableTestCase,
     InterfaceTestCase,
     UnionTestCase,
@@ -773,6 +796,7 @@ implemented_testcases = [
     ObjectWithListOfObjectTestCase,
     EnumTestCase,
     InterfaceTestCase,
+    OperationVariablesTestcase,
 ]
 
 
@@ -785,6 +809,4 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 
 if __name__ == "__main__":
-    generate_testcases(
-        OptionalNestedObjectTestCase,
-    )
+    generate_testcases(EnumTestCase)

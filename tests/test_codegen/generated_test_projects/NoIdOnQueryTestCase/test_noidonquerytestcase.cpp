@@ -16,8 +16,7 @@ TEST_CASE("NoIdOnQueryTestCase", "[generated-testcase]") {
   mq->fetch();
   test_utils::wait_for_completion(mq);
   SECTION("test deserialize and appends ID selection to query") {
-    REQUIRE(mq->get_data()->get_id() != bases::DEFAULTS::ID);
-    REQUIRE(true);
+    REQUIRE(mq->data()->get_user()->get_id() != bases::DEFAULTS::ID);
   }
 }
 

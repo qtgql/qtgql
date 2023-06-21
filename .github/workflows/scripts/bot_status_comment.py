@@ -5,12 +5,16 @@ from typing import TYPE_CHECKING, NamedTuple
 
 import jinja2
 from attr import define
-from tests.conftest import PATHS
 
-from .ghub import get_current_pr
+try:
+    from .releasefile import get_release_preview
+except ImportError:
+    from releasefile import get_release_preview
 
 if TYPE_CHECKING:
     from tests.test_codegen.testcases import QtGqlTestCase
+
+    from .releasefile import ReleasePreview
 
 from tests.test_codegen.testcases import all_test_cases, implemented_testcases
 
@@ -25,7 +29,7 @@ BOT_COMMENT_TEMPLATE = template_env.get_template("bot_comment.jinja.md")
 @define
 class BotCommentContext:
     testcases_context: TstCaseImplementationStatusTemplateContext
-    release_context: ReleaseContext
+    release_preview: ReleasePreview
 
 
 class ImplementationStatus(NamedTuple):
@@ -56,12 +60,6 @@ class TstCaseStatus:
     # https://github.com/qtgql/qtgql/issues/266
     # since https://github.com/qtgql/qtgql/pull/253 this is redundant I think.
     garbage_collection: ImplementationStatus
-
-
-@define
-class ReleaseContext:
-    success: bool
-    content: str
 
 
 @define
@@ -100,21 +98,13 @@ def get_testcases_context() -> TstCaseImplementationStatusTemplateContext:
     )
 
 
-release_file = PATHS.PROJECT_ROOT / "RELEASE.md"
-
-
-def get_release_file_context() -> ReleaseContext:
-    if not release_file.exists():
-        return ReleaseContext(success=False, content="")
-    else:
-        return ReleaseContext(success=True, content=release_file.read_text())
-
-
 def render(context: BotCommentContext) -> str:
     return BOT_COMMENT_TEMPLATE.render(context=context)
 
 
 def create_or_update_bot_comment(content: str) -> None:
+    from .ghub import get_current_pr
+
     pr = get_current_pr()
     for cm in pr.get_issue_comments():
         if "878ae1db-766f-49c7-a1a8-59f7be1fee8f" in cm.body:
@@ -126,13 +116,13 @@ def create_or_update_bot_comment(content: str) -> None:
 
 def comment() -> None:
     context = BotCommentContext(
-        release_context=get_release_file_context(),
+        release_preview=get_release_preview(),
         testcases_context=get_testcases_context(),
     )
     create_or_update_bot_comment(render(context))
     # fail workflow release file is not valid.
-    if not context.release_context.success:
-        raise FileNotFoundError("Could not find RELEASE.md or it is in bad format.")
+    if context.release_preview.error:
+        raise FileNotFoundError(context.release_preview.error)
 
 
 if __name__ == "__main__":

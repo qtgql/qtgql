@@ -10,7 +10,7 @@ user_friends: dict[User, list[Person]] = {}
 @strawberry.type
 class User(Node):
     @strawberry.field()
-    def friends(self, first: int = 5) -> list[Person]:
+    def friends(self) -> list[Person]:
         if ret := user_friends.get(self, None):
             return ret
 

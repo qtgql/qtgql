@@ -15,7 +15,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.12"
-attrs = "^22.2.0"
+attrs = ">=22.2.0"
 # codegen
 graphql-core = "^3.2.3"
 jinja2 = {version = "^3.1.2", optional=true}
@@ -36,8 +36,9 @@ cmake = ">=3.25.0"
 pygithub = ">=1.58.2"
 githubrelease = ">=1.5.9"
 httpx = ">=0.18.2"
-autopub = ">=0.2.2"
+autopub = "0.3.0"
 mimesis = ">=10.1.0"
+pytest = "7.3.1"
 pytest-cov = ">=4.1.0"
 
 
@@ -211,8 +212,10 @@ ignore = [
     # https://beta.ruff.rs/docs/rules/#flake8-bandit-s
     "S603",
     "S607",
-
+    "TD002",
+    "TD003",
 ]
+
 fix = true
 src = ["qtgqlcodegen", "tests"]
 [tool.ruff.flake8-annotations]

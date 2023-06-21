@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from typing import TYPE_CHECKING, Any
 
 import jinja2
@@ -19,18 +20,12 @@ template_env = Environment(
 )
 
 
-def wrap_curly_filter(v: str, ignore: bool = False) -> str:
-    if ignore:
-        return v
-    return "{" + v + "}"
+def debug_jinja(obj: Any) -> None:  # pragma: no cover
+    warnings.warn("jinja debug is called", stacklevel=2)
+    return obj
 
 
-def debug(obj: Any):  # pragma: no cover
-    print(obj)  # noqa
-
-
-template_env.filters["wrapcurly"] = wrap_curly_filter
-template_env.globals.update(debug=debug)
+template_env.globals.update(debug_jinja=debug_jinja)
 
 CMAKE_TEMPLATE = template_env.get_template("CMakeLists.jinja.cmake")
 

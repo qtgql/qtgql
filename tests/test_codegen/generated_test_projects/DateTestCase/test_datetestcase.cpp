@@ -19,25 +19,26 @@ TEST_CASE("DateTestCase", "[generated-testcase]") {
   mq->fetch();
   test_utils::wait_for_completion(mq);
   SECTION("test deserialize") {
-    auto d = mq->get_data();
+    auto user = mq->data()->get_user();
     auto now = QDate::currentDate().toString("dd.MM.yyyy");
-    REQUIRE(d->get_birth() == now);
+    REQUIRE(user->get_birth() == now);
   }
   SECTION("test update and as operation variables") {
-    auto user = mq->get_data();
+    auto old_user = mq->data()->get_user();
     auto modified_user_op = changeuserbirth::ChangeUserBirth::shared();
     auto new_birth =
         customscalars::DateScalar(QDate::currentDate().addDays(12));
-    auto user_id = user->get_id();
-    modified_user_op->set_variables({new_birth}, user_id);
+    auto user_id = old_user->get_id();
+    modified_user_op->set_variables({{new_birth}, user_id});
     auto catcher =
-        test_utils::SignalCatcher({.source_obj = user, .only = "birth"});
+        test_utils::SignalCatcher({.source_obj = old_user, .only = "birth"});
     modified_user_op->fetch();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(modified_user_op);
-    REQUIRE(user->get_id() == modified_user_op->get_data()->get_id());
-    REQUIRE(modified_user_op->get_data()->get_birth() == new_birth.to_qt());
-    REQUIRE(user->get_birth() == new_birth.to_qt());
+    auto new_user = modified_user_op->data()->get_changeBirth();
+    REQUIRE(old_user->get_id() == new_user->get_id());
+    REQUIRE(new_user->get_birth() == new_birth.to_qt());
+    REQUIRE(old_user->get_birth() == new_birth.to_qt());
   };
 }
 

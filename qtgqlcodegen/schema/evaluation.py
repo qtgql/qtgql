@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-import warnings
+from typing import NamedTuple
 
-import graphql
 from graphql import OperationType
 from graphql.type import definition as gql_def
 
@@ -19,8 +18,8 @@ from qtgqlcodegen.core.graphql_ref import (
 )
 from qtgqlcodegen.schema.definitions import (
     CustomScalarMap,
+    QtGqlArgumentDefinition,
     QtGqlFieldDefinition,
-    QtGqlInputFieldDefinition,
     SchemaTypeInfo,
 )
 from qtgqlcodegen.types import (
@@ -29,7 +28,7 @@ from qtgqlcodegen.types import (
     QtGqlDeferredType,
     QtGqlEnumDefinition,
     QtGqlInputObjectTypeDefinition,
-    QtGqlInterfaceDefinition,
+    QtGqlInterface,
     QtGqlList,
     QtGqlObjectType,
     QtGqlOptional,
@@ -48,7 +47,7 @@ def evaluate_input_type(
             name=type_.name,
             docstring=type_.description,
             fields_dict={
-                name: _evaluate_input_field(type_info, name, field)
+                name: _evaluate_argument_field(type_info, name, field)
                 for name, field in type_.fields.items()
             },
         )
@@ -117,73 +116,77 @@ def evaluate_field(
     name: str,
     field: gql_def.GraphQLField,
 ) -> QtGqlFieldDefinition:
-    ret = QtGqlFieldDefinition(
+    return QtGqlFieldDefinition(
         type=evaluate_graphql_type(type_info, field.type),
         name=name,
         description=field.description,
+        arguments_dict={
+            name: _evaluate_argument_field(type_info, name, arg) for name, arg in field.args.items()
+        },
     )
-    ret.arguments = [
-        _evaluate_input_field(type_info, name, arg) for name, arg in field.args.items()
-    ]
-
-    return ret
 
 
-def _evaluate_input_field(
+def _evaluate_argument_field(
     type_info: SchemaTypeInfo,
     name: str,
     field: gql_def.GraphQLInputField | gql_def.GraphQLArgument,
-) -> QtGqlInputFieldDefinition:
-    return QtGqlInputFieldDefinition(
+) -> QtGqlArgumentDefinition:
+    return QtGqlArgumentDefinition(
         type=evaluate_graphql_type(type_info, field.type),
         name=name,
         description=field.description,
     )
 
 
-def evaluate_object_type(
+class InterfaceOrObjectOptions(NamedTuple):
+    implements: tuple[QtGqlInterface, ...]
+    all_fields: dict[str, QtGqlFieldDefinition]
+    unique_fields: tuple[QtGqlFieldDefinition, ...]
+
+
+def _evaluate_object_fields(
+    type_info: SchemaTypeInfo,
+    obj: gql_def.GraphQLObjectType | gql_def.GraphQLInterfaceType,
+) -> InterfaceOrObjectOptions:
+    implements = tuple(
+        _evaluate_interface_type(type_info, interface) for interface in obj.interfaces
+    )
+    inherited_fields = {}
+    for i in implements:
+        inherited_fields.update(i.fields_dict)
+
+    self_fields: dict[str, QtGqlFieldDefinition] = {
+        name: evaluate_field(type_info, name, field)
+        for name, field in obj.fields.items()
+        if name not in inherited_fields.keys()
+    }
+
+    inherited_fields.update(self_fields)
+    return InterfaceOrObjectOptions(
+        implements=implements,
+        all_fields=inherited_fields,
+        unique_fields=tuple(self_fields.values()),
+    )
+
+
+def _evaluate_object_type(
     type_info: SchemaTypeInfo,
     type_: gql_def.GraphQLObjectType,
 ) -> QtGqlObjectType | None:
     t_name: str = type_.name
     if evaluated := type_info.get_object_type(t_name):
         return evaluated
-    if type_.name not in type_info.root_types_names:
-        # TODO(nir): remove this check.
-        # https://github.com/qtgql/qtgql/issues/265
-        try:
-            id_field = type_.fields["id"]
-            if nonull := is_non_null_definition(id_field.type):
-                id_scalar = graphql.type.scalars.GraphQLID
-                if nonull.of_type is not id_scalar:
-                    raise QtGqlException(
-                        f"id field type must be of the {id_scalar} scalar!"
-                        f"\n Got: {nonull.of_type}",
-                    )
-            else:
-                warnings.warn(
-                    stacklevel=2,
-                    message="It is best practice to have id field of type ID!"
-                    f"\ntype {type_} has: {id_field}",
-                )
-        except KeyError:
-            warnings.warn(
-                stacklevel=2,
-                message="QtGql enforces types to have ID field"
-                f"type {type_} does not not define an id field.\n"
-                f"fields: {type_.fields}",
-            )
-    implements = [_evaluate_interface_type(type_info, interface) for interface in type_.interfaces]
+
+    options = _evaluate_object_fields(type_info, type_)
 
     ret = QtGqlObjectType(
         name=t_name,
-        interfaces_raw=implements,
+        interfaces_raw=options.implements,
         docstring=type_.description,
-        fields_dict={
-            name: evaluate_field(type_info, name, field) for name, field in type_.fields.items()
-        },
+        fields_dict=options.all_fields,
+        unique_fields=options.unique_fields,
     )
-    type_info.set_objecttype(ret)
+    type_info.add_objecttype(ret)
     for interface in type_.interfaces:
         qtgql_interface = _evaluate_interface_type(type_info, interface)
         qtgql_interface.implementations[type_.name] = ret
@@ -193,18 +196,24 @@ def evaluate_object_type(
 def _evaluate_interface_type(
     type_info: SchemaTypeInfo,
     interface: gql_def.GraphQLInterfaceType,
-) -> QtGqlInterfaceDefinition:
+) -> QtGqlInterface:
     if ret := type_info.interfaces.get(interface.name, None):
         return ret
-    implements = [_evaluate_interface_type(type_info, base) for base in interface.interfaces]
-    ret = QtGqlInterfaceDefinition(
+    options = _evaluate_object_fields(type_info, interface)
+    ret = QtGqlInterface(
         name=interface.name,
-        interfaces_raw=implements,
+        interfaces_raw=options.implements,
         docstring=interface.description,
-        fields_dict={
-            name: evaluate_field(type_info, name, field) for name, field in interface.fields.items()
-        },
+        fields_dict=options.all_fields,
+        unique_fields=options.unique_fields,
     )
+    if ret.name == "Node":
+        id_field = ret.fields[0]
+        if id_field.type != BuiltinScalars.ID or id_field.type.is_optional:
+            raise QtGqlException(
+                f"Node is a reserved type, id field on `Node` interface must be of type `ID!`"
+                f"\n Got: {interface.fields['id']}",
+            )
     type_info.interfaces[ret.name] = ret
     return ret
 
@@ -239,7 +248,7 @@ def evaluate_schema(
         if name.startswith("__"):
             continue
         if object_definition := is_object_definition(type_):
-            if object_type := evaluate_object_type(type_info, object_definition):
+            if object_type := _evaluate_object_type(type_info, object_definition):
                 if object_definition is type_info.schema_definition.query_type:
                     type_info.operation_types[OperationType.QUERY.value] = object_type
                 elif object_definition is type_info.schema_definition.mutation_type:

@@ -1,5 +1,5 @@
-input ConnectedInput {
-  boolVar: Boolean!
+type Mutation {
+  changeFriendName(connected: Boolean!, newName: String!): UserWithFriend!
 }
 
 interface Node {
@@ -13,5 +13,5 @@ type Query {
 type UserWithFriend implements Node {
   id: ID!
   name: String!
-  friend(connectedArg: ConnectedInput!): UserWithFriend
+  friend(connectedArg: Boolean!): UserWithFriend
 }

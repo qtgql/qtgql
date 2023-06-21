@@ -31,3 +31,20 @@ jobs:
         env:
           PR_NUMBER: ${{ github.event.number }}
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+
+  check_no_todos:
+    name: Check that PR has no TODO comments
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+      - name: setup poetry
+        run: |
+          pip install poetry
+          poetry install
+      - name: preform check
+        run: |
+          cd .github && poetry run python -m workflows.scripts.no_todos

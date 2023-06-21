@@ -1,5 +1,5 @@
 
-  query UserQuery($connectedVar: ConnectedInput!) {
+  query MainQuery($connectedVar: Boolean!) {
     user {
       id
       name
@@ -9,3 +9,11 @@
       }
     }
   }
+
+  mutation ChangeFriendName($connected: Boolean!, $new_name: String!) {
+  changeFriendName(connected: $connected, newName: $new_name) {
+    friend(connectedArg: $connected) {
+      name
+    }
+  }
+}

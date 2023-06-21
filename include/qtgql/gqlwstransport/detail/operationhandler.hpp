@@ -42,8 +42,9 @@ public:
 
 // NOTE: This class should not be defined in the .cpp since it is abstract.
 class OperationHandlerABC
-    : public bases::HandlerABC,
-      public _OperationHandlerABCSignals,
+    : public _OperationHandlerABCSignals,
+
+      public bases::HandlerABC,
       public std::enable_shared_from_this<OperationHandlerABC> {
 protected:
   QUuid m_operation_id = QUuid::createUuid();
@@ -61,8 +62,6 @@ public:
 
   // abstract functions.
   virtual const QString &ENV_NAME() = 0;
-  virtual bases::OperationMetadata operation_metadata() = 0;
-  virtual const qtgql::bases::SelectionsConfig &SELECTIONS_CONFIG() = 0;
   // end abstract functions.
 
   void fetch() {

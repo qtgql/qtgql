@@ -30,11 +30,6 @@ public:
   using ObjectTypeABC::ObjectTypeABC;
 
   [[nodiscard]] virtual const scalars::Id &get_id() const = 0;
-
-  // updates a node based on new GraphQL data.
-  virtual void update(const QJsonObject &data,
-                      const SelectionsConfig &selections,
-                      const OperationMetadata &metadata) = 0;
 };
 
 } // namespace bases

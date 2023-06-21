@@ -5,14 +5,18 @@ from typing import TYPE_CHECKING
 from attr import define
 
 from qtgqlcodegen.core.template import template_env
-from qtgqlcodegen.operation.template import OPERATION_TEMPLATE, OperationTemplateContext
+from qtgqlcodegen.operation.template import (
+    OPERATION_CPP_TEMPLATE,
+    OPERATION_HPP_TEMPLATE,
+    OperationTemplateContext,
+)
 
 if TYPE_CHECKING:
     from qtgqlcodegen.config import QtGqlConfig
     from qtgqlcodegen.types import (
         QtGqlEnumDefinition,
         QtGqlInputObjectTypeDefinition,
-        QtGqlInterfaceDefinition,
+        QtGqlInterface,
         QtGqlObjectType,
     )
 
@@ -21,7 +25,7 @@ if TYPE_CHECKING:
 class SchemaTemplateContext:
     enums: list[QtGqlEnumDefinition]
     types: list[QtGqlObjectType]
-    interfaces: list[QtGqlInterfaceDefinition]
+    interfaces: list[QtGqlInterface]
     input_objects: list[QtGqlInputObjectTypeDefinition]
     config: QtGqlConfig
 
@@ -42,13 +46,12 @@ def schema_types_template_hpp(context: SchemaTemplateContext) -> str:
     return SCHEMA_HPP_TEMPLATE.render(context=context)
 
 
-def schema_types_template_cpp(context: SchemaTemplateContext) -> str:
-    return SCHEMA_CPP_TEMPLATE.render(context=context)
+def operation_hpp_template(context: OperationTemplateContext) -> str:
+    return OPERATION_HPP_TEMPLATE.render(context=context)
 
 
-def operation_template(context: OperationTemplateContext) -> str:
-    return OPERATION_TEMPLATE.render(context=context)
+def operation_cpp_template(context: OperationTemplateContext) -> str:
+    return OPERATION_CPP_TEMPLATE.render(context=context)
 
 
 SCHEMA_HPP_TEMPLATE = template_env.get_template("schema.jinja.hpp")
-SCHEMA_CPP_TEMPLATE = template_env.get_template("schema.jinja.cpp")

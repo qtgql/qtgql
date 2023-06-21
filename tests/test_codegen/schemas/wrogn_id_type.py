@@ -4,8 +4,13 @@ import strawberry
 from tests.conftest import fake
 
 
+@strawberry.interface
+class Node:  # wrong node interface
+    id: int
+
+
 @strawberry.type
-class User:
+class User(Node):
     id: int
     name: str
     age: int
