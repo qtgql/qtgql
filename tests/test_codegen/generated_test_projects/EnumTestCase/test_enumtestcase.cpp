@@ -18,7 +18,8 @@ TEST_CASE("EnumTestCase", "[generated-testcase]") {
   mq->fetch();
   SECTION("test deserialize") {
     test_utils::wait_for_completion(mq);
-    REQUIRE(mq->get_data()->get_status() == EnumTestCase::Enums::Connected);
+    REQUIRE(mq->data()->get_user()->get_status() ==
+            EnumTestCase::Enums::Connected);
   }
 }
 

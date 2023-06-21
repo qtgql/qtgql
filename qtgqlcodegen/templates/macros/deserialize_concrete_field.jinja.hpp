@@ -52,7 +52,7 @@ auto new_👉proxy_field.name👈 = 👉 proxy_field.type.is_custom_scalar.type_
 new_👉proxy_field.name👈.deserialize(data.value("👉proxy_field.name👈"));
 👉 setter_name 👈(new_👉proxy_field.name👈 👉 setter_end 👈);
 {% elif proxy_field.type.is_enum -%}
-👉 setter_name 👈(Enums::👉proxy_field.type.is_enum.map_name👈::by_name(data.value("👉proxy_field.name👈").toString()👉 setter_end 👈);;
+👉 setter_name 👈(Enums::👉proxy_field.type.is_enum.map_name👈::by_name(data.value("👉proxy_field.name👈").toString())👉 setter_end 👈);
 {% elif proxy_field.type.is_union -%}
 type_name = field_data['__typename']
 choice = inner_👉config_name👈.choices[type_name]
