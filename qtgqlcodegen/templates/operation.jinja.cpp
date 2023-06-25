@@ -20,6 +20,11 @@ throw qtgql::exceptions::InterfaceDeserializationError(tp_name.toStdString());
 
 {% for t in context.operation.narrowed_types %}
 // Constructor
+{% if t.concrete.is_root %}
+👉 t.name 👈::👉 t.name 👈(👉 context.operation.name 👈 * operation): QObject::QObject(operation){
+    m_inst = 👉 t.concrete.name 👈::instance();
+}
+{% else %}
 👉 t.name 👈::👉 t.name 👈(👉 context.operation.name 👈 * operation, const std::shared_ptr<👉 t.concrete.name 👈> &inst)
 : m_inst{inst}, QObject::QObject(operation)
 {
@@ -35,7 +40,9 @@ throw qtgql::exceptions::InterfaceDeserializationError(tp_name.toStdString());
     {% endfor -%}
 
 }
+{% endif %}
 // Deserialzier
+{% if not t.concrete.is_root %}
 std::shared_ptr<👉 t.concrete.name 👈> 👉 t.deserializer_name 👈(const QJsonObject& data, const 👉 context.operation.name 👈 * operation){
 if (data.isEmpty()){
     return {};
@@ -48,7 +55,7 @@ if(cached_maybe.has_value()){
     return node;
 }
 {% endif -%}
-auto inst = std::make_shared<👉 t.concrete.name 👈>();
+auto inst = 👉 t.concrete.name 👈::shared();
 {% for f in t.fields -%}
 {% set setter %}inst->👉 f.concrete.setter_name 👈{% endset %}
 👉deserialize_concrete_field(f, setter)👈
@@ -58,8 +65,14 @@ auto inst = std::make_shared<👉 t.concrete.name 👈>();
 {% endif %}
 return inst;
 };
+{% endif %}
+
 // Updater
+{% if t.concrete.is_root %}
+void 👉 t.updater_name 👈(👉 t.concrete.member_type 👈 *inst, const QJsonObject &data, const 👉 context.operation.name 👈 * operation)
+{% else %}
 void 👉 t.updater_name 👈(👉 t.concrete.member_type 👈 &inst, const QJsonObject &data, const 👉 context.operation.name 👈 * operation)
+{% endif -%}
 {
 {%for f in t.fields -%}
 👉update_concrete_field(f,f.concrete, fset_name=f.concrete.setter_name, private_name=f.private_name, operation_pointer="operation")👈

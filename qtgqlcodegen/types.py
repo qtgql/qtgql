@@ -240,6 +240,7 @@ class BaseQtGqlObjectType(QtGqlTypeABC):
 class QtGqlObjectType(BaseQtGqlObjectType):
     interfaces_raw: tuple[QtGqlInterface, ...] = attrs.Factory(tuple)
     unique_fields: tuple[QtGqlFieldDefinition, ...] = attrs.Factory(tuple)
+    is_root: bool = False
 
     def implements(self, interface: QtGqlInterface) -> bool:
         for m_interface in self.interfaces_raw:
@@ -301,6 +302,8 @@ class QtGqlObjectType(BaseQtGqlObjectType):
 
     @property
     def member_type(self) -> str:
+        if self.is_root:
+            return self.type_name()  # root types are singletons
         return f"std::shared_ptr<{self.type_name()}>"
 
     def __attrs_post_init__(self):

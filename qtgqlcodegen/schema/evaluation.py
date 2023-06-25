@@ -185,6 +185,7 @@ def _evaluate_object_type(
         docstring=type_.description,
         fields_dict=options.all_fields,
         unique_fields=options.unique_fields,
+        is_root=t_name in type_info.root_types_names,
     )
     type_info.add_objecttype(ret)
     for interface in type_.interfaces:
