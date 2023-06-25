@@ -31,7 +31,7 @@ return 👉 f_private_name 👈.to_qt();
 return 👉 f_private_name 👈;
 {% endif -%}
 }
-void 👉 f.setter_name 👈(const 👉 f.type.member_type 👈 &v {% if f.arguments and type.implements_node %}, 👉 f.arguments_type 👈 args {% endif %})
+void 👉 f.setter_name 👈(const 👉 f.type.member_type_arg 👈 v {% if f.arguments and type.implements_node %}, 👉 f.arguments_type 👈 args {% endif %})
 {
 {%- if f.arguments and type.implements_node -%}
 {% set f_private_name %}👉 f.private_name 👈[args]{% endset %}

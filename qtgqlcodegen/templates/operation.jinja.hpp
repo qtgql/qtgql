@@ -9,7 +9,7 @@ namespace 👉 context.config.env_name 👈::👉context.ns👈{
 class 👉 context.operation.name 👈;
 
 namespace deserializers{
-{% for t in context.operation.narrowed_types -%}
+{% for t in context.operation.narrowed_types if not t.concrete.is_root -%}
 std::shared_ptr<👉 t.concrete.name 👈> des_👉 t.name 👈(const QJsonObject& data, const 👉 context.operation.name 👈 * operation);
 {% endfor -%}
 {% for t in context.operation.interfaces -%}
@@ -19,7 +19,7 @@ std::shared_ptr<👉 t.concrete.name 👈> des_👉 t.name 👈(const QJsonObjec
 
 namespace updaters{
 {% for t in context.operation.narrowed_types -%}
-void update_👉 t.name 👈(👉 t.concrete.member_type 👈 &inst, const QJsonObject &data, const 👉 context.operation.name 👈 * operation);
+void update_👉 t.name 👈(👉 t.concrete.member_type_arg 👈 inst, const QJsonObject &data, const 👉 context.operation.name 👈 * operation);
 {% endfor -%}
 
 };
@@ -42,7 +42,11 @@ public: // WARNING: members are public because you have debug=True in your confi
 {% else %}
 protected:
 {% endif %}
+{% if t.concrete.is_root %}
+👉context.schema_ns👈::👉 t.concrete.name 👈 * m_inst;
+{% else %}
 const std::shared_ptr<👉context.schema_ns👈::👉 t.concrete.name 👈> m_inst;
+{% endif %}
 {% for ref_field in t.references -%}
 const 👉ref_field.property_type👈 m_👉ref_field.name👈 = {};
 {% endfor %}
@@ -51,7 +55,11 @@ const 👉ref_field.property_type👈 m_👉ref_field.name👈 = {};
 {% endfor %}
 
 public:
+{% if t.concrete.is_root %}
+👉 t.name 👈(👉 context.operation.name 👈 * operation);
+{% else %}
 👉 t.name 👈(👉 context.operation.name 👈 * operation, const std::shared_ptr<👉 t.concrete.name 👈> &inst);
+{% endif %}
 
 {% for f in t.fields -%}
 {%- if f.type.is_queried_object_type or f.type.is_model %}
@@ -121,7 +129,8 @@ return m_operation_id;
 void on_next(const QJsonObject &message) override{
     if (!m_data){
         auto data = message.value("data").toObject();
-        m_data = new 👉 context.operation.root_type.name👈(this, 👉 context.operation.root_type.deserializer_name 👈(data, this));
+        👉 context.operation.root_type.updater_name👈(👉 context.operation.root_type.concrete.name👈::instance(), data, this);
+        m_data = new 👉 context.operation.root_type.name👈(this);
         emit dataChanged();
     }
     else{

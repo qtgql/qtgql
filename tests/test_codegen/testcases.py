@@ -171,6 +171,15 @@ class QtGqlTestCase:
         os.chdir(cwd)
 
 
+RootScalarTestCase = QtGqlTestCase(
+    schema=schemas.root_scalar.schema,
+    operations="""
+        query MainQuery {
+            name
+        }
+    """,
+    test_name="RootScalarTestCase",
+)
 ScalarsTestCase = QtGqlTestCase(
     schema=schemas.object_with_scalar.schema,
     operations="""
@@ -773,6 +782,7 @@ all_test_cases = [
     CustomUserScalarTestCase,
     ObjectsThatReferenceEachOtherTestCase,
     RootListOfTestCase,
+    RootScalarTestCase,
     TypeWithNoIDTestCase,
     TypeWithNullAbleIDTestCase,
     ListOfUnionTestCase,
@@ -797,6 +807,7 @@ implemented_testcases = [
     EnumTestCase,
     InterfaceTestCase,
     OperationVariablesTestcase,
+    RootScalarTestCase,
 ]
 
 
@@ -809,4 +820,4 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 
 if __name__ == "__main__":
-    generate_testcases(EnumTestCase)
+    generate_testcases(ScalarsTestCase)

@@ -24,7 +24,7 @@ inst->👉fset_name👈(new_👉f_concrete.name👈 👉 setter_end 👈);
 {% endif %}
 {% elif proxy_field.type.is_custom_scalar %}
 auto new_👉proxy_field.name👈 = 👉 proxy_field.type.is_custom_scalar.type_name() 👈();
-new_👉proxy_field.name👈.deserialize(data.value("👉proxy_field.name👈"));
+new_👉proxy_field.name👈.deserialize(data.value("👉f_concrete.name👈"));
 if (👉current👈 != new_👉proxy_field.name👈){
 inst->👉fset_name👈(new_👉f_concrete.name👈 👉 setter_end 👈);
 }
@@ -35,10 +35,9 @@ if (👉current👈 && 👉current👈->get_id() == 👉f_concrete.name👈_data
 👉proxy_field.type.updater_name👈(👉current👈, 👉f_concrete.name👈_data,  👉operation_pointer👈);
 }
 else{
-inst->👉fset_name👈(👉proxy_field.type.deserializer_name👈(👉f_concrete.name👈_data, 👉operation_pointer👈) 👉 setter_end 👈);
+inst->👉fset_name👈(👉proxy_field.type.deserializer_name👈(data.value("👉f_concrete.name👈").toObject(), 👉operation_pointer👈) 👉 setter_end 👈);
 }
 {% endif %}
-inst->👉fset_name👈(👉proxy_field.type.deserializer_name👈(data.value("👉f_concrete.name👈").toObject(), 👉operation_pointer👈) 👉 setter_end 👈);
 {% else %}
 throw qtgql::exceptions::NotImplementedError({"👉proxy_field.type.__class__.__name__👈 is not supporting updates ATM"});
 {% endif %}

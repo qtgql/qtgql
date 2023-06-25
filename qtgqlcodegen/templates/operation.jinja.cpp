@@ -20,22 +20,29 @@ throw qtgql::exceptions::InterfaceDeserializationError(tp_name.toStdString());
 
 {% for t in context.operation.narrowed_types %}
 // Constructor
+{% if t.concrete.is_root -%}
+👉 t.name 👈::👉 t.name 👈(👉 context.operation.name 👈 * operation): QObject::QObject(operation){
+    m_inst = 👉 t.concrete.name 👈::instance();
+    auto m_inst_ptr = m_inst;
+{% else -%}
 👉 t.name 👈::👉 t.name 👈(👉 context.operation.name 👈 * operation, const std::shared_ptr<👉 t.concrete.name 👈> &inst)
 : m_inst{inst}, QObject::QObject(operation)
 {
-    Q_ASSERT_X(m_inst, __FILE__, "Tried to instantiate a proxy object with an empty pointer!");
-    auto inst_ptr = m_inst.get();
+    auto m_inst_ptr = m_inst.get();
+    Q_ASSERT_X(m_inst_ptr, __FILE__, "Tried to instantiate a proxy object with an empty pointer!");
+    {% endif -%}
     {%- for field in t.fields -%}
     👉 initialize_proxy_field(field) 👈
     {% endfor -%}
     {#- connecting signals here, when the concrete changed it will be mirrored here. -#}
     {%- for field in t.fields -%}
-    connect(m_inst.get(), &👉context.schema_ns👈::👉t.concrete.name👈::👉 field.concrete.signal_name 👈, this,
+    connect(m_inst_ptr, &👉context.schema_ns👈::👉t.concrete.name👈::👉 field.concrete.signal_name 👈, this,
             [&](){emit 👉 field.concrete.signal_name 👈();});
     {% endfor -%}
 
 }
 // Deserialzier
+{% if not t.concrete.is_root %}
 std::shared_ptr<👉 t.concrete.name 👈> 👉 t.deserializer_name 👈(const QJsonObject& data, const 👉 context.operation.name 👈 * operation){
 if (data.isEmpty()){
     return {};
@@ -48,7 +55,7 @@ if(cached_maybe.has_value()){
     return node;
 }
 {% endif -%}
-auto inst = std::make_shared<👉 t.concrete.name 👈>();
+auto inst = 👉 t.concrete.name 👈::shared();
 {% for f in t.fields -%}
 {% set setter %}inst->👉 f.concrete.setter_name 👈{% endset %}
 👉deserialize_concrete_field(f, setter)👈
@@ -58,8 +65,10 @@ auto inst = std::make_shared<👉 t.concrete.name 👈>();
 {% endif %}
 return inst;
 };
+{% endif %}
+
 // Updater
-void 👉 t.updater_name 👈(👉 t.concrete.member_type 👈 &inst, const QJsonObject &data, const 👉 context.operation.name 👈 * operation)
+void 👉 t.updater_name 👈(👉 t.concrete.member_type_arg 👈 inst, const QJsonObject &data, const 👉 context.operation.name 👈 * operation)
 {
 {%for f in t.fields -%}
 👉update_concrete_field(f,f.concrete, fset_name=f.concrete.setter_name, private_name=f.private_name, operation_pointer="operation")👈

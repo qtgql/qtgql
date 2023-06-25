@@ -65,9 +65,17 @@ class 👉 type.name 👈;
 {%- set base_class -%}{% if type. implements_node %}NodeInterfaceABC{% else %}ObjectTypeABC{% endif %}{%- endset -%}
 class 👉 type.name 👈 {% for base in type.bases %}{%if loop.first%}: {% endif %} public 👉 base.name 👈 {% if not loop.last %}, {% endif %}{% endfor %}{
 Q_OBJECT
-
 👉 concrete_type_fields(type) 👈
 public:
+{% if type.is_root %} {# root types should be singletons #}
+[[nodiscard]] static 👉 type.name 👈* instance(){
+static 👉 type.name 👈 inst;
+return &inst;
+}
+{% else %}
+QTGQL_STATIC_MAKE_SHARED(👉 type.name 👈)
+{% endif %}
+
 👉 type.name 👈()= default;
 
 inline static const QString TYPE_NAME = "👉 type.name 👈";
