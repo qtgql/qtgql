@@ -19,11 +19,7 @@ std::shared_ptr<👉 t.concrete.name 👈> des_👉 t.name 👈(const QJsonObjec
 
 namespace updaters{
 {% for t in context.operation.narrowed_types -%}
-{% if t.concrete.is_root %}
-void update_👉 t.name 👈(👉 t.concrete.member_type 👈 *inst, const QJsonObject &data, const 👉 context.operation.name 👈 * operation);
-{% else %}
-void update_👉 t.name 👈(👉 t.concrete.member_type 👈 &inst, const QJsonObject &data, const 👉 context.operation.name 👈 * operation);
-{% endif %}
+void update_👉 t.name 👈(👉 t.concrete.member_type_arg 👈 inst, const QJsonObject &data, const 👉 context.operation.name 👈 * operation);
 {% endfor -%}
 
 };
@@ -46,7 +42,6 @@ public: // WARNING: members are public because you have debug=True in your confi
 {% else %}
 protected:
 {% endif %}
-{# TODO: //move this to QueriedObjectType.member_type #}
 {% if t.concrete.is_root %}
 👉context.schema_ns👈::👉 t.concrete.name 👈 * m_inst;
 {% else %}

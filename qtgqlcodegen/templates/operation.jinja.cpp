@@ -68,11 +68,7 @@ return inst;
 {% endif %}
 
 // Updater
-{% if t.concrete.is_root %}
-void 👉 t.updater_name 👈(👉 t.concrete.member_type 👈 *inst, const QJsonObject &data, const 👉 context.operation.name 👈 * operation)
-{% else %}
-void 👉 t.updater_name 👈(👉 t.concrete.member_type 👈 &inst, const QJsonObject &data, const 👉 context.operation.name 👈 * operation)
-{% endif -%}
+void 👉 t.updater_name 👈(👉 t.concrete.member_type_arg 👈 inst, const QJsonObject &data, const 👉 context.operation.name 👈 * operation)
 {
 {%for f in t.fields -%}
 👉update_concrete_field(f,f.concrete, fset_name=f.concrete.setter_name, private_name=f.private_name, operation_pointer="operation")👈
