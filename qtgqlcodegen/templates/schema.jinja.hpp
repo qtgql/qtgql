@@ -73,7 +73,7 @@ static 👉 type.name 👈 inst;
 return &inst;
 }
 {% else %}
-QTGQL_STATIC_MAKE_SHARED()
+QTGQL_STATIC_MAKE_SHARED(👉 type.name 👈)
 {% endif %}
 
 👉 type.name 👈()= default;

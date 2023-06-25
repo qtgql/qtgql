@@ -17,6 +17,7 @@ TEST_CASE("ScalarsTestCase", "[generated-testcase]") {
   auto mq = std::make_shared<mainquery::MainQuery>();
   mq->fetch();
   test_utils::wait_for_completion(mq);
+
   SECTION("test deserialize") {
     auto d = mq->data()->get_constUser();
     REQUIRE(d->get_age() == 24);
@@ -29,6 +30,7 @@ TEST_CASE("ScalarsTestCase", "[generated-testcase]") {
     REQUIRE(d->get_voidField() == qtgql::bases::DEFAULTS::VOID);
   };
   SECTION("test update") {
+
     auto data = mq->data();
     auto user = data->get_constUser();
     auto previous_name = user->get_name();
@@ -68,6 +70,7 @@ TEST_CASE("Test Garbage collection") {
                               }},
       100ms);
   std::weak_ptr<ScalarsTestCase::User> weak_user = get_shared_user();
+  ScalarsTestCase::Query::instance()->m_constUser = {};
   // at map
   REQUIRE(weak_user.use_count() == 1);
   REQUIRE(QTest::qWaitFor([&]() { return weak_user.use_count() == 0; }));
