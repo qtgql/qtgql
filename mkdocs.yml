@@ -53,7 +53,7 @@ nav:
         - Custom Scalars: ./codegen/scalars/custom_scalars.md
         - Create a Scalar: ./codegen/scalars/create_scalar.md
       - Contributing: ./contributing.md
-
+      - Server requirements: ./server-requirements.md
 
 markdown_extensions:
   - def_list
