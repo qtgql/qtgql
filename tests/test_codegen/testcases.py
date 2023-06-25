@@ -65,7 +65,6 @@ class BoolWithReason:
 
 class TestCaseMetadata(NamedTuple):
     should_test_updates: BoolWithReason = BoolWithReason.true("")
-    should_test_garbage_collection: BoolWithReason = BoolWithReason.true("")
 
 
 @define(slots=False, kw_only=True)
@@ -249,12 +248,10 @@ NoIdOnQueryTestCase = QtGqlTestCase(
         }""",
     test_name="NoIdOnQueryTestCase",
     metadata=TestCaseMetadata(
-        BoolWithReason.false("nothing special here in that context"),
-        BoolWithReason.false("nothing special here in that context"),
+        should_test_updates=BoolWithReason.false("nothing special here in that context"),
     ),
 )
 
-CUSTOM_SCALARS_DOESNT_CACHE = BoolWithReason.false("custom scalars doesnt use cache")
 DateTimeTestCase = QtGqlTestCase(
     schema=schemas.object_with_datetime.schema,
     operations="""
@@ -275,9 +272,6 @@ mutation ChangeUserBirth($new_birth: DateTime!, $nodeId: ID!) {
 }
         """,
     test_name="DateTimeTestCase",
-    metadata=TestCaseMetadata(
-        should_test_garbage_collection=CUSTOM_SCALARS_DOESNT_CACHE,
-    ),
 )
 
 DecimalTestCase = QtGqlTestCase(
@@ -297,9 +291,6 @@ DecimalTestCase = QtGqlTestCase(
         }
     """,
     test_name="DecimalTestCase",
-    metadata=TestCaseMetadata(
-        should_test_garbage_collection=CUSTOM_SCALARS_DOESNT_CACHE,
-    ),
 )
 DateTestCase = QtGqlTestCase(
     schema=schemas.object_with_date.schema,
@@ -318,9 +309,6 @@ DateTestCase = QtGqlTestCase(
         }
         """,
     test_name="DateTestCase",
-    metadata=TestCaseMetadata(
-        should_test_garbage_collection=CUSTOM_SCALARS_DOESNT_CACHE,
-    ),
 )
 TimeScalarTestCase = QtGqlTestCase(
     schema=schemas.object_with_time_scalar.schema,
@@ -339,9 +327,6 @@ TimeScalarTestCase = QtGqlTestCase(
         }
         """,
     test_name="TimeScalarTestCase",
-    metadata=TestCaseMetadata(
-        should_test_garbage_collection=CUSTOM_SCALARS_DOESNT_CACHE,
-    ),
 )
 
 OperationVariablesTestcase = QtGqlTestCase(

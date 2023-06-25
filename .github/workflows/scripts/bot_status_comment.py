@@ -56,10 +56,6 @@ class TstCaseStatus:
     implemented: ImplementationStatus
     deserialization: ImplementationStatus
     update: ImplementationStatus
-    # TODO(nir): replace with "test in operation variable"?
-    # https://github.com/qtgql/qtgql/issues/266
-    # since https://github.com/qtgql/qtgql/pull/253 this is redundant I think.
-    garbage_collection: ImplementationStatus
 
 
 @define
