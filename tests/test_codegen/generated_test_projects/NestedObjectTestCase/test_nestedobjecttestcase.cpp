@@ -37,7 +37,6 @@ TEST_CASE("NestedObjectTestCase", "[generated-testcase]") {
     REQUIRE(old_user->get_person()->get_id() == new_person->get_id());
     REQUIRE(old_user->get_person()->get_name() == new_name);
   }
-  //  TODO: add test where the new user has different ID.
 }
 
 }; // namespace NestedObjectTestCase
