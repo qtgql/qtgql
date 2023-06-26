@@ -818,4 +818,4 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 
 if __name__ == "__main__":
-    generate_testcases(NestedObjectTestCase)
+    generate_testcases(ObjectWithListOfObjectTestCase)

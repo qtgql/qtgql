@@ -55,11 +55,12 @@ const 👉ref_field.property_type👈 m_👉ref_field.name👈 = {};
 {% endfor %}
 
 public:
-{% if t.concrete.is_root %}
+{% if t.concrete.is_root -%}
 👉 t.name 👈(👉 context.operation.name 👈 * operation);
-{% else %}
+{% else -%}
 👉 t.name 👈(👉 context.operation.name 👈 * operation, const std::shared_ptr<👉 t.concrete.name 👈> &inst);
-{% endif %}
+{% endif -%}
+
 
 {% for f in t.fields -%}
 {%- if f.type.is_queried_object_type or f.type.is_model %}
