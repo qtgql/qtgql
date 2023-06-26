@@ -1,3 +1,4 @@
+{%- from "macros/deserialize_concrete_field.jinja.hpp" import  deserialize_concrete_field -%}
 {% macro update_concrete_field(proxy_field,f_concrete, fset_name, private_name, operation_pointer="operation") -%}
 {% set current -%}
 {% if not proxy_field.is_root and proxy_field.variable_uses  -%}
@@ -38,6 +39,9 @@ else{
 inst->👉fset_name👈(👉proxy_field.type.deserializer_name👈(data.value("👉f_concrete.name👈").toObject(), 👉operation_pointer👈) 👉 setter_end 👈);
 }
 {% endif %}
+{% elif proxy_field.type.is_model %}
+{% set setter %}inst->👉 proxy_field.concrete.setter_name 👈{% endset %}
+👉deserialize_concrete_field(proxy_field, setter)👈
 {% else %}
 throw qtgql::exceptions::NotImplementedError({"👉proxy_field.type.__class__.__name__👈 is not supporting updates ATM"});
 {% endif %}

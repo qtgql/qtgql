@@ -8,5 +8,10 @@
         }
     }
     mutation AddFriend ($userId: ID!, $name: String!) {
-      addFriend(userId: $userId, name: $name)
+    addFriend(userId: $userId, name: $name){
+       friends{
+            name
+            age
+            }
+        }
     }

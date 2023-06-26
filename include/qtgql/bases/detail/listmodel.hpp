@@ -156,8 +156,9 @@ public:
     }
   }
 
-  // if count == 0 nothing would be removed.
-  // rows count starts from 0, for [1, 2, 3] removeRows(1, 2) would cause [1, ].
+  /* if count == 0 nothing would be removed.
+   rows count starts from 0, for [1, 2, 3] removeRows(1, 2) would cause [1, ].
+   */
   bool removeRows(int row, int count,
                   const QModelIndex &parent = QModelIndex()) override {
     if ((row + count) <= m_count) {

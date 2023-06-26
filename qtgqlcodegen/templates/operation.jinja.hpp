@@ -42,7 +42,7 @@ public: // WARNING: members are public because you have debug=True in your confi
 {% else %}
 protected:
 {% endif %}
-{% if t.concrete.is_root %}
+{% if t.concrete.is_root %} {# // root types are singletons, no need for shared ptr -#}
 👉context.schema_ns👈::👉 t.concrete.name 👈 * m_inst;
 {% else %}
 const std::shared_ptr<👉context.schema_ns👈::👉 t.concrete.name 👈> m_inst;
@@ -51,7 +51,7 @@ const std::shared_ptr<👉context.schema_ns👈::👉 t.concrete.name 👈> m_in
 const 👉ref_field.property_type👈 m_👉ref_field.name👈 = {};
 {% endfor %}
 {%- for model_field in t.models -%}
-👉 model_field.property_type 👈 m_👉model_field.name👈;
+👉 model_field.property_type 👈 👉model_field.private_name👈;
 {% endfor %}
 
 public:

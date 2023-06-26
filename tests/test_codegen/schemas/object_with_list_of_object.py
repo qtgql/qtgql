@@ -34,9 +34,10 @@ class Query:
 @strawberry.type()
 class Mutation:
     @strawberry.mutation()
-    def add_friend(self, user_id: strawberry.ID, name: str) -> None:
+    def add_friend(self, user_id: strawberry.ID, name: str) -> User:
         u: User = NODE_DB.get(user_id)
-        u.friends.append(Person(name=name))
+        u.friends().append(Person(name=name))
+        return u
 
 
 schema = strawberry.Schema(query=Query, mutation=Mutation)

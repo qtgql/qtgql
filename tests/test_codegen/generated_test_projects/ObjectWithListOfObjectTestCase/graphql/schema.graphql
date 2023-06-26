@@ -1,5 +1,5 @@
 type Mutation {
-  addFriend(userId: ID!, name: String!): Void
+  addFriend(userId: ID!, name: String!): User!
 }
 
 interface Node {
@@ -20,6 +20,3 @@ type User implements Node {
   id: ID!
   friends: [Person!]!
 }
-
-"""Represents NULL values"""
-scalar Void

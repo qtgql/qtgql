@@ -423,7 +423,12 @@ ObjectWithListOfObjectTestCase = QtGqlTestCase(
         }
     }
     mutation AddFriend ($userId: ID!, $name: String!) {
-      addFriend(userId: $userId, name: $name)
+    addFriend(userId: $userId, name: $name){
+       friends{
+            name
+            age
+            }
+        }
     }
     """,
     test_name="ObjectWithListOfObjectTestCase",
@@ -805,4 +810,4 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 
 if __name__ == "__main__":
-    generate_testcases(ScalarsTestCase)
+    generate_testcases(ObjectWithListOfObjectTestCase)

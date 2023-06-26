@@ -82,10 +82,6 @@ def get_testcases_context() -> TstCaseImplementationStatusTemplateContext:
                     "test update" in tst_content,
                     ignored=not tc.metadata.should_test_updates,
                 ),
-                garbage_collection=ImplementationStatus(
-                    "test in operation variable" in tst_content,
-                    ignored=not tc.metadata.should_test_garbage_collection,
-                ),
             ),
         )
 
