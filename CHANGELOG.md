@@ -1,6 +1,19 @@
 CHANGELOG
 =========
 
+0.120.2 - 2023-06-26
+--------------------
+
+This release adds support for updates of list of nodes.
+
+When operation X queries for list of nodes, the list would
+get deserialized and each proxy that contains that list would update it's model based on the new data.
+if the node itself has changed the changed fields would emit their own signals
+to indicate the UI for updates.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #284](https://github.com/qtgql/qtgql/pull/284/)
+
+
 0.120.1 - 2023-06-25
 --------------------
 
