@@ -806,6 +806,7 @@ implemented_testcases = [
     InterfaceTestCase,
     OperationVariablesTestcase,
     RootScalarTestCase,
+    NonNodeTypeTestCase,
 ]
 
 
