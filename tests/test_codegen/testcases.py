@@ -583,7 +583,7 @@ TypeWithNoIDTestCase = QtGqlTestCase(
     test_name="TypeWithNoIDTestCase",
 )
 
-RootTypeNoIDTestCase = QtGqlTestCase(
+NonNodeTypeTestCase = QtGqlTestCase(
     schema=schemas.root_type_no_id.schema,
     operations="""
     query MainQuery {
@@ -592,7 +592,7 @@ RootTypeNoIDTestCase = QtGqlTestCase(
             age
         }
     }""",
-    test_name="RootTypeNoIDTestCase",
+    test_name="NonNodeTypeTestCase",
 )
 
 TypeWithNullAbleIDTestCase = QtGqlTestCase(
@@ -784,7 +784,7 @@ all_test_cases = [
     TypeWithNoIDTestCase,
     TypeWithNullAbleIDTestCase,
     ListOfUnionTestCase,
-    RootTypeNoIDTestCase,
+    NonNodeTypeTestCase,
 ]
 custom_scalar_testcases = [
     (DateTimeTestCase, DateTimeScalarDefinition, "birth"),
@@ -818,4 +818,4 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 
 if __name__ == "__main__":
-    generate_testcases(ObjectWithListOfObjectTestCase)
+    generate_testcases(NonNodeTypeTestCase)
