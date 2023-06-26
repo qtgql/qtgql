@@ -3,12 +3,13 @@
 
 #include "debugableclient.hpp"
 #include "graphql/__generated__/MainQuery.hpp"
+#include "graphql/__generated__/ReplacePerson.hpp"
 #include "graphql/__generated__/UpdateUserName.hpp"
 
 namespace NestedObjectTestCase {
 using namespace qtgql;
 auto ENV_NAME = QString("NestedObjectTestCase");
-auto SCHEMA_ADDR = get_server_address("34284866");
+auto SCHEMA_ADDR = get_server_address("9416609");
 
 TEST_CASE("NestedObjectTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
@@ -36,6 +37,22 @@ TEST_CASE("NestedObjectTestCase", "[generated-testcase]") {
         change_user_name_op->data()->get_changeName()->get_person();
     REQUIRE(old_user->get_person()->get_id() == new_person->get_id());
     REQUIRE(old_user->get_person()->get_name() == new_name);
+  }
+  SECTION("test update returned entirely new node") {
+    auto old_user = mq->data()->get_user();
+    auto replace_person_op = replaceperson::ReplacePerson::shared();
+    replace_person_op->set_variables({old_user->get_id()});
+    replace_person_op->fetch();
+    auto catcher =
+        test_utils::SignalCatcher({.source_obj = old_user, .only = "person"});
+    REQUIRE(catcher.wait());
+
+    test_utils::wait_for_completion(replace_person_op);
+    auto new_person =
+        replace_person_op->data()->get_replacePerson()->get_person();
+
+    REQUIRE(old_user->get_person()->get_id() == new_person->get_id());
+    REQUIRE(old_user->get_person()->get_name() == new_person->get_name());
   }
 }
 

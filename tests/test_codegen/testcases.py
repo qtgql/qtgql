@@ -386,6 +386,14 @@ NestedObjectTestCase = QtGqlTestCase(
         }
       }
     }
+
+    mutation ReplacePerson($nodeId: ID!){
+    replacePerson(nodeId: $nodeId){
+        person {
+          name
+        }
+      }
+    }
     """,
     test_name="NestedObjectTestCase",
 )
@@ -810,4 +818,4 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 
 if __name__ == "__main__":
-    generate_testcases(ObjectWithListOfObjectTestCase)
+    generate_testcases(NestedObjectTestCase)

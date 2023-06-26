@@ -15,3 +15,11 @@
         }
       }
     }
+
+    mutation ReplacePerson($nodeId: ID!){
+    replacePerson(nodeId: $nodeId){
+        person {
+          name
+        }
+      }
+    }
