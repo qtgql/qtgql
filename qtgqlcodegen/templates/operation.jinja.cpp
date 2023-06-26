@@ -43,16 +43,17 @@ throw qtgql::exceptions::InterfaceDeserializationError(tp_name.toStdString());
             {#- // the nodes themselves are updated as per normal (via deserializers) and here we only need
                 // to set the nodes at the correct index and append them if they weren't existed so far.
             -#}
-            auto new_data = &m_inst->👉field.concrete.private_name👈;
-            auto new_len = new_data->size();
+            auto operation = qobject_cast<👉context.operation.name👈*>(this->parent());
+            auto new_data = m_inst->👉field.concrete.getter_name👈(👉field.build_variables_tuple_for_field_arguments 👈);
+            auto new_len = new_data.size();
             auto prev_len = 👉field.private_name👈->rowCount();
             if (new_len < prev_len){
                 👉field.private_name👈->removeRows(prev_len - 1, prev_len - new_len);
             }
             for (int i = 0; i < new_len; i++){
-                auto concrete = new_data->at(i);
+                auto concrete = new_data.at(i);
                 if (i > prev_len - 1  || 👉field.private_name👈->get(i)->get_id() != concrete->m_id){
-                    👉field.private_name👈->insert(i, new 👉field.type.of_type.name👈(qobject_cast<👉context.operation.name👈*>(this->parent()), concrete));
+                    👉field.private_name👈->insert(i, new 👉field.type.of_type.name👈(operation, concrete));
                 }
             }
         }
