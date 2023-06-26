@@ -46,6 +46,9 @@ public:
   bool operator!=(const CustomScalarABC &other) const {
     return !(operator==(other));
   }
+  bool operator<(const CustomScalarABC &other) const {
+    return m_value < other.m_value;
+  }
 };
 }; // namespace customscalars
 }; // namespace qtgql

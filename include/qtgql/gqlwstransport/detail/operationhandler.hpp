@@ -60,6 +60,7 @@ public:
   explicit OperationHandlerABC(GqlWsTrnsMsgWithID message)
       : _OperationHandlerABCSignals(), m_message_template(std::move(message)) {}
 
+  QJsonObject variables() const { return m_variables; }
   // abstract functions.
   virtual const QString &ENV_NAME() = 0;
   // end abstract functions.

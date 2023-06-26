@@ -1,22 +1,30 @@
 {%- from "macros/deserialize_concrete_field.jinja.hpp" import  deserialize_concrete_field -%}
 {% macro update_concrete_field(proxy_field,f_concrete, private_name, operation_pointer="operation") -%}
+{% if proxy_field.variable_uses  -%}
+👉f_concrete.arguments_type👈 👉private_name👈_args = 👉proxy_field.build_variables_tuple_for_field_arguments👈;
+{% endif %}
 {%- set current -%}
-{% if not proxy_field.is_root and proxy_field.variable_uses  -%}
-inst->👉private_name👈.at(👉proxy_field.build_variables_tuple_for_field_arguments👈)
+{% if proxy_field.variable_uses  -%}
+inst->👉private_name👈.at(👉private_name👈_args)
 {%- else -%}
 inst->👉private_name👈
 {%- endif -%}
 {%- endset -%}
 {% set setter_end -%}
 {% if proxy_field.variable_uses -%}
-, 👉proxy_field.build_variables_tuple_for_field_arguments👈
+, 👉private_name👈_args
 {% endif -%}
 {%- endset -%}
 {%- set setter_name -%}inst->👉 proxy_field.concrete.setter_name 👈{% endset -%}
 
 {%- if proxy_field.is_root and f_concrete.type.is_object_type -%}
 {#- // root fields that has no default value might not have value even if they are not optional -#}
-if (!👉current👈){
+{% if proxy_field.variable_uses  -%}
+if (!inst->👉private_name👈.contains(👉private_name👈_args))
+{% else -%}
+if (!👉current👈)
+{% endif %}
+{
     👉deserialize_concrete_field(proxy_field, setter_name)👈
 }
 else
