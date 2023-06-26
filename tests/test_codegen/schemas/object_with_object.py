@@ -32,5 +32,11 @@ class Mutation:
         user.person.name = new_name
         return user
 
+    @strawberry.field()
+    def replace_person(self, node_id: strawberry.ID) -> User:
+        user: User = NODE_DB.get(node_id)
+        user.person = Person(name=fake.name(), age=fake.pyint())
+        return user
+
 
 schema = strawberry.Schema(query=Query, mutation=Mutation)

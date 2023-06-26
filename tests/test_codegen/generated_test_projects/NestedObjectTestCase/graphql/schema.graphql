@@ -1,5 +1,6 @@
 type Mutation {
   changeName(nodeId: ID!, newName: String!): User!
+  replacePerson(nodeId: ID!): User!
 }
 
 interface Node {

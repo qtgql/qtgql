@@ -386,6 +386,14 @@ NestedObjectTestCase = QtGqlTestCase(
         }
       }
     }
+
+    mutation ReplacePerson($nodeId: ID!){
+    replacePerson(nodeId: $nodeId){
+        person {
+          name
+        }
+      }
+    }
     """,
     test_name="NestedObjectTestCase",
 )
