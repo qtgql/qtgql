@@ -8,7 +8,7 @@ inst->👉private_name👈
 {%- endif -%}
 {%- endset -%}
 {% set setter_end -%}
-{% if not proxy_field.is_root and proxy_field.variable_uses  -%} // TODO: I think this is redundant and might cause bugs.
+{% proxy_field.variable_uses -%}
 , 👉proxy_field.build_variables_tuple_for_field_arguments👈
 {% endif -%}
 {%- endset -%}
