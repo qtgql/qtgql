@@ -14,7 +14,8 @@ inst->👉private_name👈
 {%- endset -%}
 {%- set setter_name -%}inst->👉 proxy_field.concrete.setter_name 👈{% endset -%}
 
-{%- if proxy_field.is_root -%} {# // root fields might not have value even if they are not optional -#}
+{%- if proxy_field.is_root and f_concrete.type.is_object_type -%}
+{#- // root fields that has no default value might not have value even if they are not optional -#}
 if (!👉current👈){
     👉deserialize_concrete_field(proxy_field, setter_name)👈
 }
