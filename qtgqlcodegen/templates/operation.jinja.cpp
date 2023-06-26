@@ -36,8 +36,34 @@ throw qtgql::exceptions::InterfaceDeserializationError(tp_name.toStdString());
     {% endfor -%}
     {#- connecting signals here, when the concrete changed it will be mirrored here. -#}
     {%- for field in t.fields -%}
+    {% if field.type.is_model -%}
+    connect(m_inst_ptr, &👉context.schema_ns👈::👉t.concrete.name👈::👉 field.concrete.signal_name 👈, this,
+        [&](){
+            {% if field.type.of_type.is_queried_object_type and field.type.of_type.concrete.implements_node -%}
+            {#- // the nodes themselves are updated as per normal (via deserializers) and here we only need
+                // to set the nodes at the correct index and append them if they weren't existed so far.
+            -#}
+            auto new_data = &m_inst->👉field.concrete.private_name👈;
+            auto new_len = new_data->size();
+            auto prev_len = 👉field.private_name👈->rowCount();
+            if (new_len < prev_len){
+                👉field.private_name👈->removeRows(prev_len - 1, prev_len - new_len);
+            }
+            for (int i = 0; i < new_len; i++){
+                auto concrete = new_data->at(i);
+                if (i > prev_len - 1  || 👉field.private_name👈->get(i)->get_id() != concrete->m_id){
+                    👉field.private_name👈->insert(i, new 👉field.type.of_type.name👈(qobject_cast<👉context.operation.name👈*>(this->parent()), concrete));
+                }
+            }
+        }
+        {% else %}
+        throw qtgql::excepctions::NotImplementedError({"can't update this model type ATM"});
+        {% endif %}
+    );
+    {% else -%}
     connect(m_inst_ptr, &👉context.schema_ns👈::👉t.concrete.name👈::👉 field.concrete.signal_name 👈, this,
             [&](){emit 👉 field.concrete.signal_name 👈();});
+    {% endif -%}
     {% endfor -%}
 
 }
