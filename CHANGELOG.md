@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+0.120.3 - 2023-06-26
+--------------------
+
+This release fixed an edge case where nested object would not update the nested object
+if the nested object itself has changed.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #288](https://github.com/qtgql/qtgql/pull/288/)
+
+
 0.120.2 - 2023-06-26
 --------------------
 
