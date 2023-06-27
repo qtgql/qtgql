@@ -101,7 +101,7 @@ class QtGqlTypeABC(ABC):
 
         :return: The C++ member_type if it was passed in argument to somewhere.
         """
-        return self.member_type
+        return f"const {self.member_type} &"
 
     @property
     def fget_type(self) -> str:
@@ -316,8 +316,9 @@ class QtGqlObjectType(BaseQtGqlObjectType):
 
     @property
     def member_type_arg(self) -> str:
-        pointer_type = "*" if self.is_root else "&"
-        return f"{self.member_type} {pointer_type}"
+        if self.is_root:
+            return f"{self.member_type} *"
+        return f"const {self.member_type} &"
 
     def __attrs_post_init__(self):
         # inject this object type to the interface.

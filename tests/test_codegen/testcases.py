@@ -629,52 +629,17 @@ ListOfUnionTestCase = QtGqlTestCase(
 InputTypeOperationVariableTestCase = QtGqlTestCase(
     schema=schemas.input_type.schema,
     operations="""
-    query MainQuery {
-      post {
-        header
-        comments {
-          content
-          commenter
-        }
-        createdAt
-      }
-    }
-
-    mutation changePostHeaderMutation($postID: ID!, $newHeader: String!) {
-      changePostHeader(newHeader: $newHeader, postId: $postID) {
-        header
-      }
-    }
-
     mutation CreatePost($input: CreatePostInput!) {
       createPost(input: $input) {
-        content
         header
-        createdAt
-        id
-        comments {
-          id
-          commenter
-          content
-        }
+        content
       }
     }
 
-    query GetPostById($id: ID!) {
-      getPostById(id: $id) {
+    mutation UpdatePostContent($input: ModifyPostContentInput!) {
+      modifyPostContent(input_: $input) {
         content
-        header
-        createdAt
-        id
-        comments {
-          id
-          commenter
-          content
-        }
       }
-    }
-    query EnumNameQuery ($enumVar: SampleEnum! ){
-      getEnumName(enumInput: $enumVar)
     }
     """,
     test_name="InputTypeOperationVariableTestCase",
@@ -810,6 +775,7 @@ implemented_testcases = [
     OperationVariablesTestcase,
     RootScalarTestCase,
     NonNodeTypeTestCase,
+    InputTypeOperationVariableTestCase,
 ]
 
 
@@ -822,4 +788,4 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 
 if __name__ == "__main__":
-    generate_testcases(EnumTestCase)
+    generate_testcases(InputTypeOperationVariableTestCase)

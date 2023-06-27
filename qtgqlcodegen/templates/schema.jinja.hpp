@@ -40,6 +40,38 @@ inline static const std::vector<std::pair<QString, 👉enum.name👈>> members =
 };
 {% endif %}
 
+// ---------- INPUT OBJECTS ----------
+{% for type in context.input_objects -%}
+/*
+ * 👉 type.docstring 👈
+ */
+struct 👉type.name👈{
+
+public:
+{# // this is doubtfully needed, but std::map requires comparison for ordering. #}
+bool operator<(const 👉type.name👈& other) const {
+    {% for f in type.fields -%}
+    if(👉f.name👈 < other.👉f.name👈){
+        return true;
+    }
+    {% endfor -%}
+    return false;
+}
+{% for f in type.fields -%}
+std::optional<👉f.type.member_type👈> 👉f.name👈 = {};
+{% endfor %}
+[[nodiscard]] QJsonObject to_json() const{
+    auto ret = QJsonObject();
+    {% for f in type.fields %}{% set attr_name %}👉f.name👈{% endset %}
+    if (👉attr_name👈.has_value()){
+        ret.insert("👉f.name👈", 👉f.json_repr(attr_name)👈);
+    }
+    {% endfor %}
+    return ret;
+}
+};
+{% endfor %}
+
 // ---------- Interfaces ----------
 {% for interface in context.interfaces -%}
 class 👉 interface.name 👈 {% for base in interface.bases %} {%if loop.first %}: {% endif %} public 👉 base.name 👈 {% if not loop.last %}, {% endif %}{% endfor %}{
@@ -57,7 +89,8 @@ static auto & ENV_CACHE() {
 {% endfor %}
 
 // ---------- Object Types ----------
-{% for type in context.types -%} {# forward references -#}
+{# forward references -#}
+{% for type in context.types -%}
 class 👉 type.name 👈;
 {% endfor %}
 
@@ -89,36 +122,6 @@ static std::optional<std::shared_ptr<👉 type.name 👈>> get_node(const QStrin
     return {};
 }
 {% endif %}
-};
-{% endfor %}
-
-// ---------- INPUT OBJECTS ----------
-
-{% for type in context.input_objects %}
-/*
- * 👉 type.docstring 👈
- */
-struct 👉type.name👈: QObject{
-Q_OBJECT
-
-public:
-{% for f in type.fields %}
-std::optional<👉f.type.member_type👈> 👉f.name👈 = {};
-{% endfor -%}
-👉type.name👈(QObject* parent, {% for f in type.fields %} std::optional<👉f.type.member_type👈> &👉f.name👈{% if not loop.last %},{% endif %} {% endfor %}): QObject::QObject(parent){
-    {% for f in type.fields -%}
-    👉f.name👈 = 👉f.name👈;
-    {% endfor %}
-};
-QJsonObject to_json() const{
-    auto ret = QJsonObject();
-    {% for f in type.fields %}{% set attr_name %}👉f.name👈{% endset %}
-    if (👉attr_name👈.has_value()){
-    ret.insert("👉f.name👈", 👉f.json_repr(attr_name)👈);
-    }
-    {% endfor %}
-    return ret;
-}
 };
 {% endfor %}
 
