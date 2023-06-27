@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+0.122.0 - 2023-06-27
+--------------------
+
+This release adds support for input types as operation variables.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #292](https://github.com/qtgql/qtgql/pull/292/)
+
+
 0.121.1 - 2023-06-27
 --------------------
 
