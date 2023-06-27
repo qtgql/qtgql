@@ -1,3 +1,7 @@
+type Mutation {
+  updateStatus(userId: ID!, status: Status!): User!
+}
+
 interface Node {
   id: ID!
 }

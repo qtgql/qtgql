@@ -1,7 +1,7 @@
 from enum import Enum, auto
 
 import strawberry
-from tests.test_codegen.schemas.node_interface import Node
+from tests.test_codegen.schemas.node_interface import NODE_DB, Node
 
 
 @strawberry.enum
@@ -25,7 +25,16 @@ class Query:
         return User(name="Patrick", age=100)
 
 
-schema = strawberry.Schema(query=Query)
+@strawberry.type()
+class Mutation:
+    @strawberry.field()
+    def update_status(self, user_id: strawberry.ID, status: Status) -> User:
+        u: User = NODE_DB.get(user_id)
+        u.status = status
+        return u
+
+
+schema = strawberry.Schema(query=Query, mutation=Mutation)
 
 if __name__ == "__main__":
     ...
