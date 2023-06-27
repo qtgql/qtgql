@@ -2,7 +2,7 @@
 public:
 {% for f in type.unique_fields -%}
 {% set f_member_type -%}
-{% if type.implements_node and f.arguments -%}
+{% if f.arguments -%}
 std::map<👉f.arguments_type👈, 👉f.type.member_type👈>
 {% else -%}
 👉f.type.member_type👈
@@ -18,9 +18,9 @@ void 👉 f.signal_name 👈();
 public:
 {%for f in type.unique_fields %}
 [[nodiscard]] const 👉 f.type.fget_type 👈 &👉 f.getter_name 👈(
-{%- if f.arguments and type.implements_node -%}👉 f.arguments_type 👈 args {% endif -%}
+{%- if f.arguments -%}👉 f.arguments_type 👈 args {% endif -%}
 ) {%- if f.type.getter_is_constable -%}const{% endif %}{
-{%- if f.arguments and type.implements_node -%}
+{%- if f.arguments -%}
 {% set f_private_name %}👉 f.private_name 👈.at(args){% endset %}
 {% else -%}
 {% set f_private_name %}👉 f.private_name 👈{% endset %}
@@ -31,9 +31,9 @@ return 👉 f_private_name 👈.to_qt();
 return 👉 f_private_name 👈;
 {% endif -%}
 }
-void 👉 f.setter_name 👈(const 👉 f.type.member_type_arg 👈 v {% if f.arguments and type.implements_node %}, 👉 f.arguments_type 👈 args {% endif %})
+void 👉 f.setter_name 👈(const 👉 f.type.member_type_arg 👈 v {% if f.arguments %}, 👉 f.arguments_type 👈 args {% endif %})
 {
-{%- if f.arguments and type.implements_node -%}
+{%- if f.arguments -%}
 {% set f_private_name %}👉 f.private_name 👈[args]{% endset %}
 {% else -%}
 {% set f_private_name %}👉 f.private_name 👈{% endset %}

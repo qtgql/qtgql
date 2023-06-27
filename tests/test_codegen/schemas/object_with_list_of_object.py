@@ -27,7 +27,7 @@ class Person(Node):
 @strawberry.type
 class Query:
     @strawberry.field
-    def user(self, id: strawberry.ID | None = None) -> User:
+    def user(self) -> User:
         return User()
 
 

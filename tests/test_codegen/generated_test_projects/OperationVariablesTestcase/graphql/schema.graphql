@@ -7,7 +7,7 @@ interface Node {
 }
 
 type Query {
-  user(foo: Int! = 0): UserWithFriend!
+  user: UserWithFriend!
 }
 
 type UserWithFriend implements Node {

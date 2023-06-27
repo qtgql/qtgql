@@ -13,7 +13,7 @@ type Person implements Node {
 }
 
 type Query {
-  user(id: ID = null): User!
+  user: User!
 }
 
 type User implements Node {

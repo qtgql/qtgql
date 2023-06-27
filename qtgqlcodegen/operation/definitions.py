@@ -44,7 +44,7 @@ class QtGqlQueriedField:
     def cached_by_args(self) -> bool:
         # if the origin implements node it's fields are cached by arguments
         # if they have ones
-        return bool(self.origin.implements_node and self.concrete.arguments)
+        return bool(self.concrete.arguments)
 
     @cached_property
     def is_root(self) -> bool:

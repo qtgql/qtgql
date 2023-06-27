@@ -30,7 +30,7 @@ DISCONNECTED_FRIENDS = UserWithFriend()
 @strawberry.type()
 class Query:
     @strawberry.field()
-    def user(self, foo: int = 0) -> UserWithFriend:
+    def user(self) -> UserWithFriend:
         return CONST_USER
 
 

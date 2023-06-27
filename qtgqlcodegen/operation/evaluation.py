@@ -67,7 +67,7 @@ def _evaluate_variable_uses(
                     QtGqlVariableUse(argument=(index, field.arguments[index]), variable=variable),
                 )
     assert len(ret) == len(arguments), "could not find all variable uses"
-    return ret
+    return sorted(ret, key=lambda v: v.argument[0])
 
 
 def _evaluate_variable_node_type(

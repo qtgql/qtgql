@@ -8,7 +8,7 @@ namespace OperationVariablesTestcase {
 using namespace qtgql;
 
 auto ENV_NAME = QString("OperationVariablesTestcase");
-auto SCHEMA_ADDR = get_server_address("65996276");
+auto SCHEMA_ADDR = get_server_address("95188754");
 
 TEST_CASE("OperationVariablesTestcase", "[generated-testcase]") {
 
