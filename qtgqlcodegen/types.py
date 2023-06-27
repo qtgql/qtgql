@@ -101,7 +101,7 @@ class QtGqlTypeABC(ABC):
 
         :return: The C++ member_type if it was passed in argument to somewhere.
         """
-        return self.member_type
+        return self.member_type  # TODO: make const reference by default.
 
     @property
     def fget_type(self) -> str:

@@ -1,0 +1,13 @@
+
+    mutation CreatePost($input: CreatePostInput!) {
+      createPost(input: $input) {
+        header
+        content
+      }
+    }
+
+    mutation UpdatePostContent($input: ModifyPostContentInput!) {
+      modifyPostContent(input_: $input) {
+        content
+      }
+    }
