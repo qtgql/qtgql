@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+0.121.0 - 2023-06-27
+--------------------
+
+This release adds support for update&deserialize types that
+does not implement `Node` interface.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #289](https://github.com/qtgql/qtgql/pull/289/)
+
+
 0.120.3 - 2023-06-26
 --------------------
 
