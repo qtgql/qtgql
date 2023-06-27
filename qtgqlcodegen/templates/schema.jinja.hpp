@@ -55,6 +55,7 @@ bool operator<(const 👉type.name👈& other) const {
         return true;
     }
     {% endfor -%}
+    return false;
 }
 {% for f in type.fields -%}
 std::optional<👉f.type.member_type👈> 👉f.name👈 = {};

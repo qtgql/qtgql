@@ -29,6 +29,11 @@ file(GLOB_RECURSE QTGQL_HEADERS "include/*.hpp")
 add_library(${PROJECT_NAME} SHARED ${QTGQL_SOURCES})
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
+find_program(iwyu_path NAMES include-what-you-use iwyu REQUIRED)
+
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_INCLUDE_WHAT_YOU_USE ${iwyu_path})
+
+
 target_link_libraries(
         ${PROJECT_NAME}
         PUBLIC

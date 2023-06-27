@@ -1,10 +1,5 @@
 #pragma once
-#include <QAbstractListModel>
-#include <QJsonArray>
-#include <QJsonObject>
-#include <QJsonValue>
 #include <QRegularExpression>
-#include <functional>
 
 namespace qtgql {
 namespace utils {
