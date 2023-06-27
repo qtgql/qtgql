@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+0.121.1 - 2023-06-27
+--------------------
+
+This release adds support for enums updates and enums as operation variables.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #291](https://github.com/qtgql/qtgql/pull/291/)
+
+
 0.121.0 - 2023-06-27
 --------------------
 
