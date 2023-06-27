@@ -59,6 +59,11 @@ if (👉current👈 != new_👉proxy_field.name👈){
     {% endif %}
 {% elif proxy_field.type.is_model %}
 👉deserialize_concrete_field(proxy_field, setter_name)👈
+{% elif proxy_field.type.is_enum %}
+auto new_👉f_concrete.name👈= Enums::👉proxy_field.type.is_enum.map_name👈::by_name(data.value("👉proxy_field.name👈").toString());
+if (👉current👈 != new_👉f_concrete.name👈){
+👉 setter_name 👈(new_👉f_concrete.name👈 👉 setter_end 👈);
+}
 {% else %}
 throw qtgql::exceptions::NotImplementedError({"👉proxy_field.type.__class__.__name__👈 is not supporting updates ATM"});
 {% endif %}

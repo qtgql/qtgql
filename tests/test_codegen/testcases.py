@@ -15,7 +15,7 @@ from attr import define
 from qtgqlcodegen.cli import app
 from qtgqlcodegen.config import QtGqlConfig
 from qtgqlcodegen.generator import SchemaGenerator
-from qtgqlcodegen.types import CustomScalarDefinition, DateTimeScalarDefinition
+from qtgqlcodegen.types import CustomScalarDefinition
 from tests.conftest import hash_schema
 from tests.test_codegen import schemas
 from typer.testing import CliRunner
@@ -525,6 +525,12 @@ EnumTestCase = QtGqlTestCase(
             status
           }
         }
+
+        mutation UpdateUserStatus($user_id: ID!, $status: Status!) {
+            updateStatus(userId:$user_id, status: $status){
+                status
+            }
+        }
         """,
     test_name="EnumTestCase",
 )
@@ -577,14 +583,8 @@ CustomUserScalarTestCase = QtGqlTestCase(
     """,
 )
 
-TypeWithNoIDTestCase = QtGqlTestCase(
-    schema=schemas.type_with_no_id.schema,
-    operations="""query MainQuery {users{name}}""",
-    test_name="TypeWithNoIDTestCase",
-)
-
 NonNodeTypeTestCase = QtGqlTestCase(
-    schema=schemas.root_type_no_id.schema,
+    schema=schemas.non_node_type.schema,
     operations="""
     query MainQuery {
         user{
@@ -594,6 +594,13 @@ NonNodeTypeTestCase = QtGqlTestCase(
     }""",
     test_name="NonNodeTypeTestCase",
 )
+
+ListOfNonNodeType = QtGqlTestCase(
+    schema=schemas.list_of_non_node.schema,
+    operations="""query MainQuery {users{name}}""",
+    test_name="ListOfNonNodeType",
+)
+
 
 TypeWithNullAbleIDTestCase = QtGqlTestCase(
     schema=schemas.type_with_nullable_id.schema,
@@ -772,23 +779,19 @@ all_test_cases = [
     OptionalNestedObjectTestCase,
     ObjectWithListOfObjectTestCase,
     OperationVariablesTestcase,
+    EnumTestCase,
+    RootScalarTestCase,
+    NonNodeTypeTestCase,
     InputTypeOperationVariableTestCase,
     InterfaceTestCase,
     UnionTestCase,
     ListOfObjectWithUnionTestCase,
-    EnumTestCase,
     CustomUserScalarTestCase,
     ObjectsThatReferenceEachOtherTestCase,
     RootListOfTestCase,
-    RootScalarTestCase,
-    TypeWithNoIDTestCase,
+    ListOfNonNodeType,
     TypeWithNullAbleIDTestCase,
     ListOfUnionTestCase,
-    NonNodeTypeTestCase,
-]
-custom_scalar_testcases = [
-    (DateTimeTestCase, DateTimeScalarDefinition, "birth"),
-    (CustomUserScalarTestCase, CountryScalar, "country"),
 ]
 
 implemented_testcases = [
@@ -819,4 +822,4 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 
 if __name__ == "__main__":
-    generate_testcases(ObjectWithListOfObjectTestCase)
+    generate_testcases(EnumTestCase)

@@ -6,3 +6,9 @@
             status
           }
         }
+
+        mutation UpdateUserStatus($user_id: ID!, $status: Status!) {
+            updateStatus(userId:$user_id, status: $status){
+                status
+            }
+        }
