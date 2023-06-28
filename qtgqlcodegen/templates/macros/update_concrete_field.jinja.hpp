@@ -17,7 +17,7 @@ inst->👉private_name👈
 {%- endset -%}
 {%- set setter_name -%}inst->👉 proxy_field.concrete.setter_name 👈{% endset -%}
 
-{%- if proxy_field.is_root and f_concrete.type.is_object_type -%}
+{%- if proxy_field.is_root and f_concrete.type.is_object_type or f_concrete.type.is_interface -%}
 {#- // root fields that has no default value might not have value even if they are not optional -#}
 {% if proxy_field.variable_uses  -%}
 if (!inst->👉private_name👈.contains(👉private_name👈_args))
@@ -25,7 +25,7 @@ if (!inst->👉private_name👈.contains(👉private_name👈_args))
 if (!👉current👈)
 {% endif %}
 {
-    👉deserialize_concrete_field(proxy_field, setter_name)👈
+    👉deserialize_concrete_field(proxy_field, setter_name)👈 // TODO: can this use deserializer_name?
 }
 else
 {% endif -%}
@@ -64,6 +64,14 @@ auto new_👉f_concrete.name👈= Enums::👉proxy_field.type.is_enum.map_name�
 if (👉current👈 != new_👉f_concrete.name👈){
 👉 setter_name 👈(new_👉f_concrete.name👈 👉 setter_end 👈);
 }
+{% elif proxy_field.type.is_queried_interface %}
+auto 👉f_concrete.name👈_data = data.value("👉f_concrete.name👈").toObject();
+auto 👉f_concrete.name👈_typename  = 👉f_concrete.name👈_data.value("__typename").toString();
+{% for choice in proxy_field.type.choices %}
+if (👉f_concrete.name👈_typename == "👉choice.concrete.name👈"){
+    👉choice.updater_name👈(std::static_pointer_cast<👉choice.concrete.name👈>(👉current👈), 👉f_concrete.name👈_data,  👉operation_pointer👈);
+}
+{% endfor %}
 {% else %}
 throw qtgql::exceptions::NotImplementedError({"👉proxy_field.type.__class__.__name__👈 is not supporting updates ATM"});
 {% endif %}

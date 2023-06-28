@@ -20,9 +20,9 @@ init_list_👉 field.name 👈->append(new 👉field.type.of_type.name👈(👉o
 👉field.private_name👈 = new qtgql::bases::ListModelABC<👉 field.type.of_type.name 👈>(this, std::move(init_list_👉 field.name 👈));
 {% elif field.type.is_queried_interface %}
 auto concrete_👉field.name👈 = 👉 instance_of_concrete 👈;
-auto type_name = concrete_👉field.name👈->TYPE_NAME();
-{% for choice in field.type.choices -%}
-if (type_name == "👉 choice.concrete.name 👈"){
+auto 👉field.name👈_typename = concrete_👉field.name👈->TYPE_NAME();
+{% for choice in field.type.choices -%} // TODO: use a macro for these iterations they are quite common.
+if (👉field.name👈_typename == "👉 choice.concrete.name 👈"){
 👉field.private_name👈 = qobject_cast<👉 field.type.name 👈*>(new 👉choice.type_name()👈(👉operation_pointer👈, std::static_pointer_cast<👉 choice.concrete.name 👈>(concrete_👉field.name👈)));
 }
 {% endfor %}

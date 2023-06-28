@@ -10,14 +10,13 @@ if (!data.value("👉proxy_field.name👈").isNull()){
 👉 setter_name 👈(👉proxy_field.type.deserializer_name👈(data.value("👉proxy_field.name👈").toObject(), 👉operation_pointer👈) 👉 setter_end 👈);
 
 {% elif proxy_field.type.is_queried_interface -%}
-auto type_name = data.value("__typename").toString();
-switch(type_name){
-    {% for name, choice in proxy_field.type.choices.items() -%}
-    case 👉 choice.concrete.name 👈::TYPE_NAME:
-        👉 choice.deserializer_name 👈...
-        break;
-    {% endfor -%}
+auto 👉proxy_field.name👈_data = data.value("👉proxy_field.name👈").toObject();
+auto 👉proxy_field.name👈_typename  = 👉proxy_field.name👈_data.value("__typename").toString();
+{% for choice in proxy_field.type.choices %}
+if (👉proxy_field.name👈_typename == "👉choice.concrete.name👈"){ // TODO: add gql_name on queried_object
+    👉 setter_name 👈(👉choice.deserializer_name👈(👉proxy_field.name👈_data, 👉operation_pointer👈) 👉 setter_end 👈);
 }
+{% endfor %} // TODO: add else if  and final else throw exception if type name is not valid.
 {% elif proxy_field.type.is_model -%}
 {% if proxy_field.type.is_model.of_type.is_queried_object_type -%}
 👉proxy_field.concrete.type.member_type👈 obj_list;

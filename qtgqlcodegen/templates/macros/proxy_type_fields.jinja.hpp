@@ -25,19 +25,4 @@ const 👉ref_field.property_type👈 m_👉ref_field.name👈 = {};
 {%- for model_field in t.models -%}
 👉 model_field.property_type 👈 👉model_field.private_name👈;
 {% endfor %}
-public:
-{% for f in t.fields -%}
-{%- if f.type.is_queried_object_type or f.type.is_model or f.type.is_queried_interface %}
-[[nodiscard]] inline const 👉 f.property_type 👈  👉 f.concrete.getter_name 👈() const {
-return m_👉f.name👈;
-{%- else -%}
-[[nodiscard]] inline const 👉 f.property_type 👈 👉 f.concrete.getter_name 👈() const {
-{% if f.type.is_queried_object_type -%}
-return *m_👉f.name👈; // TODO: I think this is redundant.
-{% else -%}
-return m_inst->👉 f.concrete.getter_name 👈();
-{% endif -%}
-{%- endif -%}
-};
-{% endfor -%}
 {% endmacro %}

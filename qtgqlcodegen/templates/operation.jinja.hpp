@@ -30,19 +30,39 @@ class 👉 t.name 👈: public QObject{
 👉 proxy_type_fields(t, context) 👈
 public:
     using QObject::QObject;
+{% for f in t.fields -%}
+[[nodiscard]] inline virtual const 👉 f.property_type 👈  👉 f.concrete.getter_name 👈() const {
+throw qtgql::exceptions::InterfaceDirectAccessError("👉t.concrete.name👈");
+}
+{% endfor %}
 };
 {% endfor %}
 // ------------ Narrowed Object types ------------
 {% for t in context.operation.narrowed_types %}
 class 👉 t.name 👈: public 👉 "QObject" if not t.base_interface else t.base_interface.name 👈{
 👉 proxy_type_fields(t, context) 👈
-
 public:
 {% if t.concrete.is_root -%}
 👉 t.name 👈(👉 context.operation.name 👈 * operation);
 {% else -%}
 👉 t.name 👈(👉 context.operation.name 👈 * operation, const std::shared_ptr<👉 t.concrete.name 👈> &inst);
 {% endif %}
+public:
+{% for f in t.fields -%}
+{%- if f.type.is_queried_object_type or f.type.is_model or f.type.is_queried_interface %}
+[[nodiscard]] inline const 👉 f.property_type 👈  👉 f.concrete.getter_name 👈() const {
+return m_👉f.name👈;
+{%- else -%}
+[[nodiscard]] inline const 👉 f.property_type 👈 👉 f.concrete.getter_name 👈() const {
+{% if f.type.is_queried_object_type -%}
+return *m_👉f.name👈; // TODO: I think this is redundant.
+{% else -%}
+return m_inst->👉 f.concrete.getter_name 👈();
+{% endif -%}
+{%- endif -%}
+};
+{% endfor -%}
+
 };
 {% endfor %}
 
