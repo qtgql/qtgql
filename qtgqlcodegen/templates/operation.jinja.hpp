@@ -1,5 +1,6 @@
 {%- from "macros/initialize_proxy_field.jinja.hpp" import initialize_proxy_field -%}
 {%- from "macros/deserialize_concrete_field.jinja.hpp" import  deserialize_concrete_field -%}
+{%- from "macros/proxy_type_fields.jinja.hpp" import  proxy_type_fields -%}
 #pragma once
 #include "./schema.hpp"
 #include <qtgql/gqlwstransport/gqlwstransport.hpp>
@@ -12,7 +13,7 @@ namespace deserializers{
 {% for t in context.operation.narrowed_types if not t.concrete.is_root -%}
 std::shared_ptr<👉 t.concrete.name 👈> des_👉 t.name 👈(const QJsonObject& data, const 👉 context.operation.name 👈 * operation);
 {% endfor -%}
-{% for t in context.operation.interfaces -%}
+{% for t in context.operation.interfaces -%} // TODO: can that be combined with object types?
 std::shared_ptr<👉 t.concrete.name 👈> des_👉 t.name 👈(const QJsonObject& data, const 👉 context.operation.name 👈 * operation);
 {% endfor -%}
 };
@@ -24,35 +25,17 @@ void update_👉 t.name 👈(👉 t.concrete.member_type_arg 👈 inst, const QJ
 
 };
 
+// ------------ Narrowed Interfaces ------------
+{% for t in context.operation.interfaces -%}
+class 👉 t.name 👈: public QObject{
+👉 proxy_type_fields(t) 👈
+}
 // ------------ Narrowed Object types ------------
 {% for t in context.operation.narrowed_types %}
 class 👉 t.name 👈: public QObject{
     Q_OBJECT
-{% for f in t.fields -%}
-Q_PROPERTY(const 👉 f.property_type 👈 👉 f.name 👈 READ 👉 f.concrete.getter_name 👈 NOTIFY 👉 f.concrete.signal_name 👈);
-{% endfor %}
-signals:
-{%for f in t.fields -%}
-void 👉 f.concrete.signal_name 👈();
-{% endfor %}
 
-{# members #}
-{% if context.debug -%}
-public: // WARNING: members are public because you have debug=True in your config file.
-{% else %}
-protected:
-{% endif %}
-{% if t.concrete.is_root %} {# // root types are singletons, no need for shared ptr -#}
-👉context.schema_ns👈::👉 t.concrete.name 👈 * m_inst;
-{% else %}
-const std::shared_ptr<👉context.schema_ns👈::👉 t.concrete.name 👈> m_inst;
-{% endif %}
-{% for ref_field in t.references -%}
-const 👉ref_field.property_type👈 m_👉ref_field.name👈 = {};
-{% endfor %}
-{%- for model_field in t.models -%}
-👉 model_field.property_type 👈 👉model_field.private_name👈;
-{% endfor %}
+👉 proxy_type_fields(t) 👈
 
 public:
 {% if t.concrete.is_root -%}
@@ -62,20 +45,7 @@ public:
 {% endif -%}
 
 
-{% for f in t.fields -%}
-{%- if f.type.is_queried_object_type or f.type.is_model %}
-[[nodiscard]] inline const 👉 f.property_type 👈  👉 f.concrete.getter_name 👈() const {
-    return m_👉f.name👈;
-{%- else -%}
-[[nodiscard]] inline const 👉 f.property_type 👈 👉 f.concrete.getter_name 👈() const {
-    {% if f.type.is_queried_object_type -%}
-    return *m_👉f.name👈;
-    {% else -%}
-    return m_inst->👉 f.concrete.getter_name 👈();
-    {% endif -%}
-{%- endif -%}
-};
-{% endfor -%}
+
 };
 {% endfor %}
 

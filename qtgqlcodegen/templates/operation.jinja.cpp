@@ -5,15 +5,16 @@
 
 namespace 👉 context.config.env_name 👈::👉context.ns👈{
 
+// Interfaces
 {% for interface in context.operation.interfaces -%}
 std::shared_ptr<👉 interface.concrete.name 👈> 👉 interface.deserializer_name 👈(const QJsonObject& data, const 👉 context.operation.name 👈 * operation){
-auto tp_name = data["__typename"].toString();
-{% for impl in interface.implementations.values() -%}
-if ("👉 impl.name 👈" == tp_name){
-return std::static_pointer_cast<👉 interface.name 👈>(👉 impl.deserializer_name 👈(data, operation));
+auto type_name = data.value("__typename").toString();
+{% for choice in interface.choices.values() -%}
+if (type_name == "👉 choice.concrete.type_name 👈"){
+    return std::static_pointer_cast<👉 interface.concrete.name 👈>(👉 choice.deserializer_name 👈(data, operation));
 }
-{% endfor %}
-throw qtgql::exceptions::InterfaceDeserializationError(tp_name.toStdString());
+{% endfor -%}
+throw qtgql::exceptions::InterfaceDeserializationError(type_name.toStdString());
 }
 {% endfor %}
 

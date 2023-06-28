@@ -1,7 +1,16 @@
 
-    query MainQuery {
+    query GetUser {
         user{
             name
             age
         }
+    }
+    query NodeForUser($userId: ID!) {
+      node(userId: $userId) {
+        id
+        ... on User {
+          id
+          name
+        }
+      }
     }

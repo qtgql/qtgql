@@ -10,13 +10,14 @@ if (!data.value("👉proxy_field.name👈").isNull()){
 👉 setter_name 👈(👉proxy_field.type.deserializer_name👈(data.value("👉proxy_field.name👈").toObject(), 👉operation_pointer👈) 👉 setter_end 👈);
 
 {% elif proxy_field.type.is_queried_interface -%}
-if field_data:
-👉 setter_name 👈(👉proxy_field.type.is_interface.name👈.from_dict(
-        parent,
-        field_data,
-        inner_config,
-👉operation_pointer👈,
-👉 setter_end 👈);
+auto type_name = data.value("__typename").toString();
+switch(type_name){
+    {% for name, choice in proxy_field.type.choices.items() -%}
+    case 👉 choice.concrete.name 👈::TYPE_NAME:
+        👉 choice.deserializer_name 👈...
+        break;
+    {% endfor -%}
+}
 {% elif proxy_field.type.is_model -%}
 {% if proxy_field.type.is_model.of_type.is_queried_object_type -%}
 👉proxy_field.concrete.type.member_type👈 obj_list;

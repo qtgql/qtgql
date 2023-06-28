@@ -459,11 +459,20 @@ RootListOfTestCase = QtGqlTestCase(
 InterfaceTestCase = QtGqlTestCase(
     schema=schemas.object_with_interface.schema,
     operations="""
-    query MainQuery {
+    query GetUser {
         user{
             name
             age
         }
+    }
+    query NodeForUser($userId: ID!) {
+      node(userId: $userId) {
+        id
+        ... on User {
+          id
+          name
+        }
+      }
     }
     """,
     test_name="InterfaceTestCase",
@@ -788,4 +797,4 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 
 if __name__ == "__main__":
-    generate_testcases(InputTypeOperationVariableTestCase)
+    generate_testcases(InterfaceTestCase)

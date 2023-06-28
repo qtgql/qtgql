@@ -8,7 +8,7 @@ if (👉 instance_of_concrete 👈){
 👉field.private_name👈 = new 👉field.type_name👈(👉operation_pointer👈, 👉 instance_of_concrete 👈);
 }
 else{
-👉field.private_name👈 = nullptr;
+👉field.private_name👈 = nullptr; // TODO: this is probably redundant
 }
 {% elif field.type.is_queried_object_type %}
 👉field.private_name👈 = new 👉field.type_name👈(👉operation_pointer👈, 👉 instance_of_concrete 👈);
@@ -18,5 +18,13 @@ for (const auto & node: 👉 instance_of_concrete 👈){
 init_list_👉 field.name 👈->append(new 👉field.type.of_type.name👈(👉operation_pointer👈, node));
 }
 👉field.private_name👈 = new qtgql::bases::ListModelABC<👉 field.type.of_type.name 👈>(this, std::move(init_list_👉 field.name 👈));
+{% elif field.type.is_queried_interface %}
+auto concrete_👉field.name👈 = 👉 instance_of_concrete 👈;
+auto type_name = concrete_👉field.name👈->TYPE_NAME;
+{% for choice in field.type.choices.values() -%}
+if (type_name == "👉 choice.concrete.name 👈"){
+return std::static_pointer_cast<👉 field.type.name 👈>(new 👉choice.type_name()👈(👉operation_pointer👈, 👉 instance_of_concrete 👈));
+}
+{% endfor %}
 {% endif -%}
 {% endmacro -%}

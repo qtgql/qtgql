@@ -436,6 +436,7 @@ class QtGqlQueriedObjectType(QtGqlQueriedTypeABC, QtGqlTypeABC):
     name: str
     concrete: QtGqlObjectType
     fields_dict: dict[str, QtGqlQueriedField] = attrs.Factory(dict)
+    base_interface: QtGqlQueriedInterface | None = None  # I think that there could be only one
 
     @property
     def is_queried_object_type(self) -> QtGqlQueriedObjectType | None:
@@ -471,9 +472,7 @@ class QtGqlQueriedObjectType(QtGqlQueriedTypeABC, QtGqlTypeABC):
 
 @define(slots=False, repr=False)
 class QtGqlQueriedInterface(QtGqlQueriedObjectType):
-    choices: defaultdict[str, dict[str, QtGqlQueriedField]] = attrs.Factory(
-        lambda: defaultdict(dict),
-    )
+    choices: list[QtGqlQueriedObjectType] = attrs.Factory(list)
 
     @property
     def is_queried_object_type(self) -> QtGqlQueriedObjectType | None:

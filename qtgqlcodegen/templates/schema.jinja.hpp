@@ -85,6 +85,11 @@ static auto & ENV_CACHE() {
         return cache;
 }
 {% endif %}
+public:
+inline virtual const QString & TYPE_NAME(){
+    static const QString ret = "👉 interface.name 👈";
+    return ret;
+};
 };
 {% endfor %}
 
@@ -111,7 +116,10 @@ QTGQL_STATIC_MAKE_SHARED(👉 type.name 👈)
 
 👉 type.name 👈()= default;
 
-inline static const QString TYPE_NAME = "👉 type.name 👈";
+inline const QString & TYPE_NAME() final{
+    static const QString ret = "👉 type.name 👈";
+    return ret;
+};
 
 {% if type.implements_node -%}
 static std::optional<std::shared_ptr<👉 type.name 👈>> get_node(const QString & id){
