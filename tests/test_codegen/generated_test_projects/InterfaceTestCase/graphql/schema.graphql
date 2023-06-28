@@ -1,20 +1,33 @@
-interface Node {
-  id: ID!
+interface AnimalInterface {
+  kind: AnimalKind!
+  gender: Gender!
+  age: Int!
+}
+
+enum AnimalKind {
+  PERSON
+  DOG
+}
+
+type Dog implements AnimalInterface {
+  kind: AnimalKind!
+  gender: Gender!
+  age: Int!
+  furColor: String!
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+type Person implements AnimalInterface {
+  kind: AnimalKind!
+  gender: Gender!
+  age: Int!
+  language: String!
 }
 
 type Query {
-  node(userId: ID!): Node!
-  user: User!
-}
-
-type User implements UserInterface & Node {
-  id: ID!
-  name: String!
-  age: Int!
-}
-
-interface UserInterface implements Node {
-  id: ID!
-  name: String!
-  age: Int!
+  animal(kind: AnimalKind!): AnimalInterface!
 }

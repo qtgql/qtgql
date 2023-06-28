@@ -285,7 +285,7 @@ class QtGqlObjectType(BaseQtGqlObjectType):
             if interface := self.is_interface:
                 if interface.is_node_interface:
                     return [QtGqlTypes.NodeInterfaceABC]  # type: ignore
-
+                return [QtGqlTypes.ObjectTypeABC]
             else:
                 return [QtGqlTypes.ObjectTypeABC]  # type: ignore
 

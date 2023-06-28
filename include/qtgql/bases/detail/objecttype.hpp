@@ -13,14 +13,13 @@ class ObjectTypeABC : public QObject {
 
   Q_PROPERTY(QString __typeName READ TYPE_NAME CONSTANT)
 
-private:
+public:
+  using QObject::QObject;
+
   [[nodiscard]] inline virtual const QString &TYPE_NAME() {
     throw exceptions::NotImplementedError(
         {"Derived classes must override this method."});
   }
-
-public:
-  using QObject::QObject;
 };
 
 class NodeInterfaceABC;

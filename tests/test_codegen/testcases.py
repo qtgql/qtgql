@@ -459,18 +459,16 @@ RootListOfTestCase = QtGqlTestCase(
 InterfaceTestCase = QtGqlTestCase(
     schema=schemas.object_with_interface.schema,
     operations="""
-    query GetUser {
-        user{
-            name
-            age
+    query AnimalQuery($kind: AnimalKind!) {
+      animal(kind: $kind) {
+        kind
+        gender
+        age
+        ... on Person {
+          language
         }
-    }
-    query NodeForUser($userId: ID!) {
-      node(userId: $userId) {
-        id
-        ... on User {
-          id
-          name
+        ... on Dog {
+          furColor
         }
       }
     }

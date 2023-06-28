@@ -85,11 +85,6 @@ static auto & ENV_CACHE() {
         return cache;
 }
 {% endif %}
-public:
-inline virtual const QString & TYPE_NAME(){
-    static const QString ret = "👉 interface.name 👈";
-    return ret;
-};
 };
 {% endfor %}
 
