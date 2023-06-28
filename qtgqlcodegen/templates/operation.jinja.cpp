@@ -9,7 +9,7 @@ namespace 👉 context.config.env_name 👈::👉context.ns👈{
 {% for interface in context.operation.interfaces -%}
 std::shared_ptr<👉 interface.concrete.name 👈> 👉 interface.deserializer_name 👈(const QJsonObject& data, const 👉 context.operation.name 👈 * operation){
 auto type_name = data.value("__typename").toString();
-{% for choice in interface.choices.values() -%}
+{% for choice in interface.choices -%}
 if (type_name == "👉 choice.concrete.type_name 👈"){
     return std::static_pointer_cast<👉 interface.concrete.name 👈>(👉 choice.deserializer_name 👈(data, operation));
 }

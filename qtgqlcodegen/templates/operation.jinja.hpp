@@ -28,14 +28,15 @@ void update_👉 t.name 👈(👉 t.concrete.member_type_arg 👈 inst, const QJ
 // ------------ Narrowed Interfaces ------------
 {% for t in context.operation.interfaces -%}
 class 👉 t.name 👈: public QObject{
-👉 proxy_type_fields(t) 👈
+👉 proxy_type_fields(t, context) 👈
 }
+{% endfor %}
 // ------------ Narrowed Object types ------------
 {% for t in context.operation.narrowed_types %}
 class 👉 t.name 👈: public QObject{
     Q_OBJECT
 
-👉 proxy_type_fields(t) 👈
+👉 proxy_type_fields(t, context) 👈
 
 public:
 {% if t.concrete.is_root -%}
