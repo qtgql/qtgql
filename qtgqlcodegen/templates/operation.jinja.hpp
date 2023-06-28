@@ -22,20 +22,19 @@ namespace updaters{
 {% for t in context.operation.narrowed_types -%}
 void update_👉 t.name 👈(👉 t.concrete.member_type_arg 👈 inst, const QJsonObject &data, const 👉 context.operation.name 👈 * operation);
 {% endfor -%}
-
 };
 
 // ------------ Narrowed Interfaces ------------
 {% for t in context.operation.interfaces -%}
 class 👉 t.name 👈: public QObject{
 👉 proxy_type_fields(t, context) 👈
-}
+public:
+    using QObject::QObject;
+};
 {% endfor %}
 // ------------ Narrowed Object types ------------
 {% for t in context.operation.narrowed_types %}
-class 👉 t.name 👈: public QObject{
-    Q_OBJECT
-
+class 👉 t.name 👈: public 👉 "QObject" if not t.base_interface else t.base_interface.name 👈{
 👉 proxy_type_fields(t, context) 👈
 
 public:
@@ -43,10 +42,7 @@ public:
 👉 t.name 👈(👉 context.operation.name 👈 * operation);
 {% else -%}
 👉 t.name 👈(👉 context.operation.name 👈 * operation, const std::shared_ptr<👉 t.concrete.name 👈> &inst);
-{% endif -%}
-
-
-
+{% endif %}
 };
 {% endfor %}
 

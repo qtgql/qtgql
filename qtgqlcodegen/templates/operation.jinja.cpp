@@ -21,13 +21,16 @@ throw qtgql::exceptions::InterfaceDeserializationError(type_name.toStdString());
 
 {% for t in context.operation.narrowed_types -%}
 // Constructor
+{% set base_name -%}
+👉 "QObject" if not t.base_interface else t.base_interface.name 👈
+{% endset -%}
 {% if t.concrete.is_root -%}
-👉 t.name 👈::👉 t.name 👈(👉 context.operation.name 👈 * operation): QObject::QObject(operation){
+👉 t.name 👈::👉 t.name 👈(👉 context.operation.name 👈 * operation): 👉 base_name 👈::👉 base_name 👈(operation){
     m_inst = 👉 t.concrete.name 👈::instance();
     auto m_inst_ptr = m_inst;
 {% else -%}
     👉 t.name 👈::👉 t.name 👈(👉 context.operation.name 👈 * operation, const std::shared_ptr<👉 t.concrete.name 👈> &inst)
-: m_inst{inst}, QObject::QObject(operation)
+: m_inst{inst}, 👉 base_name 👈::👉 base_name 👈(operation)
 {
     auto m_inst_ptr = m_inst.get();
     Q_ASSERT_X(m_inst_ptr, __FILE__, "Tried to instantiate a proxy object with an empty pointer!");

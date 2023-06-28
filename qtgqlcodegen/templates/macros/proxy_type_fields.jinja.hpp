@@ -1,4 +1,5 @@
 {% macro proxy_type_fields(t, context) -%}
+Q_OBJECT
 
 {% for f in t.fields -%}
 Q_PROPERTY(const 👉 f.property_type 👈 👉 f.name 👈 READ 👉 f.concrete.getter_name 👈 NOTIFY 👉 f.concrete.signal_name 👈);
@@ -7,25 +8,23 @@ signals:
 {%for f in t.fields -%}
 void 👉 f.concrete.signal_name 👈();
 {% endfor %}
-
-{# members #}
+{# members -#}
 {% if context.debug -%}
 public: // WARNING: members are public because you have debug=True in your config file.
-{% else %}
+{% else -%}
 protected:
-{% endif %}
-{% if t.concrete.is_root %} {# // root types are singletons, no need for shared ptr -#}
+{% endif -%}
+{% if t.concrete.is_root -%} {# // root types are singletons, no need for shared ptr -#}
 👉context.schema_ns👈::👉 t.concrete.name 👈 * m_inst;
-{% else %}
+{% else -%}
 const std::shared_ptr<👉context.schema_ns👈::👉 t.concrete.name 👈> m_inst;
-{% endif %}
+{% endif -%}
 {% for ref_field in t.references -%}
 const 👉ref_field.property_type👈 m_👉ref_field.name👈 = {};
 {% endfor %}
 {%- for model_field in t.models -%}
 👉 model_field.property_type 👈 👉model_field.private_name👈;
 {% endfor %}
-
 public:
 {% for f in t.fields -%}
 {%- if f.type.is_queried_object_type or f.type.is_model or f.type.is_queried_interface %}

@@ -459,7 +459,9 @@ class QtGqlQueriedObjectType(QtGqlQueriedTypeABC, QtGqlTypeABC):
 
     @cached_property
     def references(self) -> list[QtGqlQueriedField]:
-        return [f for f in self.fields if f.type.is_queried_object_type]
+        return [
+            f for f in self.fields if f.type.is_queried_object_type or f.type.is_queried_interface
+        ]
 
     @cached_property
     def models(self) -> list[QtGqlQueriedField]:

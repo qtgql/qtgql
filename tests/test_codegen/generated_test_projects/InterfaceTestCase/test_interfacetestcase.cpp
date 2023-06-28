@@ -23,7 +23,7 @@ TEST_CASE("InterfaceTestCase", "[generated-testcase]") {
     node_query->set_variables({user->get_id()});
     node_query->fetch();
     test_utils::wait_for_completion(node_query);
-    REQUIRE(node_query->data()->get_node())
+    REQUIRE(node_query->data()->get_node());
   };
 }
 
