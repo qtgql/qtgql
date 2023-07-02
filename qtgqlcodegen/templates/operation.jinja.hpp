@@ -1,4 +1,3 @@
-{%- from "macros/initialize_proxy_field.jinja.hpp" import initialize_proxy_field -%}
 {%- from "macros/deserialize_concrete_field.jinja.hpp" import  deserialize_concrete_field -%}
 {%- from "macros/proxy_type_fields.jinja.hpp" import  proxy_type_fields -%}
 #pragma once
@@ -115,14 +114,14 @@ return m_operation_id;
 
 
 void on_next(const QJsonObject &message) override{
+    auto data = message.value("data").toObject();
     if (!m_data){
-        auto data = message.value("data").toObject();
         👉 context.operation.root_type.updater_name👈(👉 context.operation.root_type.concrete.name👈::instance(), data, this);
         m_data = new 👉 context.operation.root_type.name👈(this);
         emit dataChanged();
     }
     else{
-    throw qtgql::exceptions::NotImplementedError({"Updates on root types is not implemented yet."});
+        👉 context.operation.root_type.updater_name👈(👉 context.operation.root_type.concrete.name👈::instance(), data, this);
     }
 }
 

@@ -1,6 +1,8 @@
 {%- from "macros/initialize_proxy_field.jinja.hpp" import initialize_proxy_field -%}
 {%- from "macros/deserialize_concrete_field.jinja.hpp" import  deserialize_concrete_field -%}
 {%- from "macros/update_concrete_field.jinja.hpp" import  update_concrete_field -%}
+{%- from "macros/update_proxy_field.jinja.cpp" import  update_proxy_field -%}
+
 #include "./👉 context.operation.name 👈.hpp"
 
 namespace 👉 context.config.env_name 👈::👉context.ns👈{
@@ -40,46 +42,10 @@ throw qtgql::exceptions::InterfaceDeserializationError(type_name.toStdString());
     {% endfor -%}
     {#- connecting signals here, when the concrete changed it will be mirrored here. -#}
     {%- for field in t.fields -%}
-    {% if field.type.is_model -%}
     connect(m_inst_ptr, &👉context.schema_ns👈::👉t.concrete.name👈::👉 field.concrete.signal_name 👈, this,
     [&](){
-        {% if field.type.of_type.is_queried_object_type and field.type.of_type.concrete.implements_node -%}
-        {#- // the nodes themselves are updated as per normal (via deserializers) and here we only need
-            // to set the nodes at the correct index and append them if they weren't existed so far.
-        -#}
-        auto operation = qobject_cast<👉context.operation.name👈*>(this->parent());
-        auto new_data = m_inst->👉field.concrete.getter_name👈(👉field.build_variables_tuple_for_field_arguments 👈);
-        auto new_len = new_data.size();
-        auto prev_len = 👉field.private_name👈->rowCount();
-        if (new_len < prev_len){
-            👉field.private_name👈->removeRows(prev_len - 1, prev_len - new_len);
-        }
-        for (int i = 0; i < new_len; i++){
-            auto concrete = new_data.at(i);
-            if (i > prev_len - 1){
-                👉field.private_name👈->insert(i, new 👉field.type.of_type.name👈(operation, concrete));
-            }
-            else if (👉field.private_name👈->get(i)->get_id() != concrete->m_id){
-                delete 👉field.private_name👈->get(i);
-                👉field.private_name👈->insert(i, new 👉field.type.of_type.name👈(operation, concrete));
-            }
-        }
-        {% else %}
-        throw qtgql::excepctions::NotImplementedError({"can't update this model type ATM"});
-        {% endif %}
+    👉update_proxy_field(field, context.operation)👈
     });
-    {% elif field.type.is_queried_object_type -%}
-    connect(m_inst_ptr, &👉context.schema_ns👈::👉t.concrete.name👈::👉 field.concrete.signal_name 👈, this,
-    [&](){
-        auto operation = qobject_cast<👉context.operation.name👈*>(this->parent());
-        auto concrete = m_inst->👉field.concrete.getter_name👈(👉field.build_variables_tuple_for_field_arguments 👈);
-        delete 👉field.private_name👈;
-        👉field.private_name👈 = new 👉field.type.name👈(operation, concrete);
-    });
-    {% else -%}
-    connect(m_inst_ptr, &👉context.schema_ns👈::👉t.concrete.name👈::👉 field.concrete.signal_name 👈, this,
-            [&](){emit 👉 field.concrete.signal_name 👈();});
-    {% endif -%}
     {% endfor -%}
 }
 

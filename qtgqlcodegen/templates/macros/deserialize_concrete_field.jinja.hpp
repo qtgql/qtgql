@@ -1,5 +1,6 @@
 {% macro deserialize_concrete_field(proxy_field, setter_name, operation_pointer = "operation",
                            do_after_deserialized = "") -%}
+{# // TODO: remove setter_name? #}
 {% set setter_end -%}
 {% if proxy_field.cached_by_args %}
 , 👉proxy_field.build_variables_tuple_for_field_arguments👈

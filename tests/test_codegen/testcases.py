@@ -464,12 +464,28 @@ InterfaceTestCase = QtGqlTestCase(
         kind
         gender
         age
+        id
         ... on Person {
           language
         }
         ... on Dog {
           furColor
         }
+      }
+    }
+
+    mutation ChangeAgeMutation($id: ID!, $newAge: Int!) {
+      changeAge(animalId: $id, newAge: $newAge) {
+        age
+        gender
+        id
+        ... on Person {
+          language
+        }
+        ... on Dog {
+          furColor
+        }
+        kind
       }
     }
     """,
