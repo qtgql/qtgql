@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import glob
+import pprint
 import re
 from typing import TYPE_CHECKING
 
@@ -32,7 +33,7 @@ def check_todos() -> list:
                         f"Found {match.group()} in {file.as_posix()} ({line_num}): {line}",
                     )
     if errors:
-        raise Exception(errors)
+        raise Exception(pprint.pformat(errors))
 
 
 if __name__ == "__main__":

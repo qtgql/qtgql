@@ -25,7 +25,7 @@ if (!inst->👉private_name👈.contains(👉private_name👈_args))
 if (!👉current👈)
 {% endif %}
 {
-    👉deserialize_concrete_field(proxy_field, setter_name)👈 // TODO: can this use deserializer_name?
+    👉deserialize_concrete_field(proxy_field)👈 // TODO: can this use deserializer_name?
 }
 else
 {% endif -%}
@@ -58,7 +58,7 @@ if (👉current👈 != new_👉proxy_field.name👈){
     👉proxy_field.type.updater_name👈(👉current👈, 👉f_concrete.name👈_data,  👉operation_pointer👈);
     {% endif %}
 {% elif proxy_field.type.is_model %}
-👉deserialize_concrete_field(proxy_field, setter_name)👈
+👉deserialize_concrete_field(proxy_field)👈
 {% elif proxy_field.type.is_enum %}
 auto new_👉f_concrete.name👈= Enums::👉proxy_field.type.is_enum.map_name👈::by_name(data.value("👉proxy_field.name👈").toString());
 if (👉current👈 != new_👉f_concrete.name👈){
