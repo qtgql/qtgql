@@ -1,4 +1,5 @@
 {%- from "macros/deserialize_concrete_field.jinja.hpp" import  deserialize_concrete_field -%}
+{%- from "macros/iterate_type_condition.jinja.hpp" import  iterate_type_condition -%}
 {% macro update_concrete_field(proxy_field,f_concrete, private_name, operation_pointer="operation") -%}
 {% if proxy_field.variable_uses  -%}
 👉f_concrete.arguments_type👈 👉private_name👈_args = 👉proxy_field.build_variables_tuple_for_field_arguments👈;
@@ -25,7 +26,8 @@ if (!inst->👉private_name👈.contains(👉private_name👈_args))
 if (!👉current👈)
 {% endif %}
 {
-    👉deserialize_concrete_field(proxy_field)👈 // TODO: can this use deserializer_name?
+    {#- // Note: we can't use deserializer name since it might not be an object type. -#}
+    👉deserialize_concrete_field(proxy_field)👈
 }
 else
 {% endif -%}
@@ -67,10 +69,12 @@ if (👉current👈 != new_👉f_concrete.name👈){
 {% elif proxy_field.type.is_queried_interface %}
 auto 👉f_concrete.name👈_data = data.value("👉f_concrete.name👈").toObject();
 auto 👉f_concrete.name👈_typename  = 👉f_concrete.name👈_data.value("__typename").toString();
+{%set type_cond -%}👉f_concrete.name👈_typename{% endset -%}
 {% for choice in proxy_field.type.choices %}
-if (👉f_concrete.name👈_typename == "👉choice.concrete.name👈"){
-    👉choice.updater_name👈(std::static_pointer_cast<👉choice.concrete.name👈>(👉current👈), 👉f_concrete.name👈_data,  👉operation_pointer👈);
-}
+{% set do_on_meets -%}
+👉choice.updater_name👈(std::static_pointer_cast<👉choice.concrete.name👈>(👉current👈), 👉f_concrete.name👈_data,  👉operation_pointer👈);
+{% endset -%}
+👉iterate_type_condition(choice,type_cond, do_on_meets, loop)👈
 {% endfor %}
 {% else %}
 throw qtgql::exceptions::NotImplementedError({"👉proxy_field.type.__class__.__name__👈 is not supporting updates ATM"});

@@ -1,3 +1,4 @@
+{%- from "macros/iterate_type_condition.jinja.hpp" import  iterate_type_condition -%}
 {% macro update_proxy_field(field, operation) -%}
 {% set new_concrete -%}
 m_inst->👉field.concrete.getter_name👈(👉field.build_variables_tuple_for_field_arguments 👈)
@@ -38,11 +39,13 @@ emit 👉 field.concrete.signal_name 👈();
 auto operation = qobject_cast<👉operation.name👈*>(this->parent());
 auto concrete = 👉new_concrete👈;
 delete 👉field.private_name👈;
-auto type_name = concrete->TYPE_NAME();
-{% for choice in field.type.choices %} // TODO: use the choice macro here
-if (type_name == "👉choice.concrete.name👈"){
+auto 👉field.name👈_typename = concrete->TYPE_NAME();
+{%set type_cond -%}👉field.name👈_typename{% endset -%}
+{% for choice in field.type.choices %}
+{% set do_on_meets -%}
 👉field.private_name👈 = qobject_cast<const 👉field.type.name👈 *>(new 👉choice.name👈(operation, std::static_pointer_cast<👉choice.concrete.name👈>(concrete)));
-}
+{% endset -%}
+👉iterate_type_condition(choice,type_cond, do_on_meets, loop)👈
 {% endfor %}
 emit 👉 field.concrete.signal_name 👈();
 {% else -%}

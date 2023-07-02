@@ -2,6 +2,7 @@
 {%- from "macros/deserialize_concrete_field.jinja.hpp" import  deserialize_concrete_field -%}
 {%- from "macros/update_concrete_field.jinja.hpp" import  update_concrete_field -%}
 {%- from "macros/update_proxy_field.jinja.cpp" import  update_proxy_field -%}
+{%- from "macros/iterate_type_condition.jinja.hpp" import  iterate_type_condition -%}
 
 #include "./👉 context.operation.name 👈.hpp"
 
@@ -12,9 +13,10 @@ namespace 👉 context.config.env_name 👈::👉context.ns👈{
 std::shared_ptr<👉 interface.concrete.name 👈> 👉 interface.deserializer_name 👈(const QJsonObject& data, const 👉 context.operation.name 👈 * operation){
 auto type_name = data.value("__typename").toString();
 {% for choice in interface.choices -%}
-if (type_name == "👉 choice.concrete.type_name 👈"){
-    return std::static_pointer_cast<👉 interface.concrete.name 👈>(👉 choice.deserializer_name 👈(data, operation));
-}
+{% set do_on_meets -%}
+return std::static_pointer_cast<👉 interface.concrete.name 👈>(👉 choice.deserializer_name 👈(data, operation));
+{% endset -%}
+👉iterate_type_condition(choice,"type_name", do_on_meets, loop)👈
 {% endfor -%}
 throw qtgql::exceptions::InterfaceDeserializationError(type_name.toStdString());
 }

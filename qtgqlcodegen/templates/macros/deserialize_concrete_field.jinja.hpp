@@ -1,3 +1,4 @@
+{%- from "macros/iterate_type_condition.jinja.hpp" import  iterate_type_condition -%}
 {% macro deserialize_concrete_field(proxy_field, operation_pointer = "operation",
                            do_after_deserialized = "") -%}
 {% set setter_name %}inst->👉 proxy_field.concrete.setter_name 👈{% endset %}
@@ -13,11 +14,13 @@ if (!data.value("👉proxy_field.name👈").isNull()){
 {% elif proxy_field.type.is_queried_interface -%}
 auto 👉proxy_field.name👈_data = data.value("👉proxy_field.name👈").toObject();
 auto 👉proxy_field.name👈_typename  = 👉proxy_field.name👈_data.value("__typename").toString();
-{% for choice in proxy_field.type.choices %}
-if (👉proxy_field.name👈_typename == "👉choice.concrete.name👈"){ // TODO: add gql_name on queried_object
-    👉 setter_name 👈(👉choice.deserializer_name👈(👉proxy_field.name👈_data, 👉operation_pointer👈) 👉 setter_end 👈);
-}
-{% endfor %} // TODO: add else if  and final else throw exception if type name is not valid.
+{%set type_cond -%}👉proxy_field.name👈_typename{% endset -%}
+{% for choice in proxy_field.type.choices -%}
+{% set do_on_meets -%}
+👉 setter_name 👈(👉choice.deserializer_name👈(👉proxy_field.name👈_data, 👉operation_pointer👈) 👉 setter_end 👈);
+{% endset -%}
+👉iterate_type_condition(choice,type_cond, do_on_meets, loop)👈
+{% endfor %}
 {% elif proxy_field.type.is_model -%}
 {% if proxy_field.type.is_model.of_type.is_queried_object_type -%}
 👉proxy_field.concrete.type.member_type👈 obj_list;
