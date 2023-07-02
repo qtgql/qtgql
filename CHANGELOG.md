@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+0.123.0 - 2023-07-02
+--------------------
+
+Initial support for interfaces.
+Currently only interfaces there is no support for
+node interfaces.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #294](https://github.com/qtgql/qtgql/pull/294/)
+
+
 0.122.0 - 2023-06-27
 --------------------
 
