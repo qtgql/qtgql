@@ -68,7 +68,7 @@ class QtGqlQueriedField:
         :return: C++ property type that will be exposed to QML.
         """
         tp = self.type
-        if tp.is_queried_object_type:
+        if tp.is_queried_object_type or tp.is_queried_interface:
             return f"{self.type_name} *"
 
         if cs := tp.is_custom_scalar:

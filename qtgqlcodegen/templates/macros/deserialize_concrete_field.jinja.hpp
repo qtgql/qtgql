@@ -1,5 +1,7 @@
-{% macro deserialize_concrete_field(proxy_field, setter_name, operation_pointer = "operation",
+{%- from "macros/iterate_type_condition.jinja.hpp" import  iterate_type_condition -%}
+{% macro deserialize_concrete_field(proxy_field, operation_pointer = "operation",
                            do_after_deserialized = "") -%}
+{% set setter_name %}inst->👉 proxy_field.concrete.setter_name 👈{% endset %}
 {% set setter_end -%}
 {% if proxy_field.cached_by_args %}
 , 👉proxy_field.build_variables_tuple_for_field_arguments👈
@@ -10,13 +12,15 @@ if (!data.value("👉proxy_field.name👈").isNull()){
 👉 setter_name 👈(👉proxy_field.type.deserializer_name👈(data.value("👉proxy_field.name👈").toObject(), 👉operation_pointer👈) 👉 setter_end 👈);
 
 {% elif proxy_field.type.is_queried_interface -%}
-if field_data:
-👉 setter_name 👈(👉proxy_field.type.is_interface.name👈.from_dict(
-        parent,
-        field_data,
-        inner_config,
-👉operation_pointer👈,
-👉 setter_end 👈);
+auto 👉proxy_field.name👈_data = data.value("👉proxy_field.name👈").toObject();
+auto 👉proxy_field.name👈_typename  = 👉proxy_field.name👈_data.value("__typename").toString();
+{%set type_cond -%}👉proxy_field.name👈_typename{% endset -%}
+{% for choice in proxy_field.type.choices -%}
+{% set do_on_meets -%}
+👉 setter_name 👈(👉choice.deserializer_name👈(👉proxy_field.name👈_data, 👉operation_pointer👈) 👉 setter_end 👈);
+{% endset -%}
+👉iterate_type_condition(choice,type_cond, do_on_meets, loop)👈
+{% endfor %}
 {% elif proxy_field.type.is_model -%}
 {% if proxy_field.type.is_model.of_type.is_queried_object_type -%}
 👉proxy_field.concrete.type.member_type👈 obj_list;

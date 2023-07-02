@@ -459,11 +459,34 @@ RootListOfTestCase = QtGqlTestCase(
 InterfaceTestCase = QtGqlTestCase(
     schema=schemas.object_with_interface.schema,
     operations="""
-    query MainQuery {
-        user{
-            name
-            age
+    query AnimalQuery($kind: AnimalKind!) {
+      animal(kind: $kind) {
+        kind
+        gender
+        age
+        id
+        ... on Person {
+          language
         }
+        ... on Dog {
+          furColor
+        }
+      }
+    }
+
+    mutation ChangeAgeMutation($id: ID!, $newAge: Int!) {
+      changeAge(animalId: $id, newAge: $newAge) {
+        age
+        gender
+        id
+        ... on Person {
+          language
+        }
+        ... on Dog {
+          furColor
+        }
+        kind
+      }
     }
     """,
     test_name="InterfaceTestCase",
@@ -788,4 +811,4 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 
 if __name__ == "__main__":
-    generate_testcases(InputTypeOperationVariableTestCase)
+    generate_testcases(InterfaceTestCase)

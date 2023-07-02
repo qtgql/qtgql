@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import glob
+import pprint
 import re
 from typing import TYPE_CHECKING
 
@@ -29,10 +30,10 @@ def check_todos() -> list:
             if match := pattern.search(line):
                 if not ALLOWED_TODO.search(line):
                     errors.append(
-                        f"Found {match.group()} in {file.as_posix()} ({line_num}): {line}",
+                        f"{match.group()} at {file.as_posix()} ({line_num}): {line}",
                     )
     if errors:
-        raise Exception(errors)
+        raise Exception(f"Number of todos: {len(errors)} \n", pprint.pformat(errors))
 
 
 if __name__ == "__main__":

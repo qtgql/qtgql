@@ -1,32 +1,40 @@
 {%- from "macros/initialize_proxy_field.jinja.hpp" import initialize_proxy_field -%}
 {%- from "macros/deserialize_concrete_field.jinja.hpp" import  deserialize_concrete_field -%}
 {%- from "macros/update_concrete_field.jinja.hpp" import  update_concrete_field -%}
+{%- from "macros/update_proxy_field.jinja.cpp" import  update_proxy_field -%}
+{%- from "macros/iterate_type_condition.jinja.hpp" import  iterate_type_condition -%}
+
 #include "./👉 context.operation.name 👈.hpp"
 
 namespace 👉 context.config.env_name 👈::👉context.ns👈{
 
+// Interfaces
 {% for interface in context.operation.interfaces -%}
 std::shared_ptr<👉 interface.concrete.name 👈> 👉 interface.deserializer_name 👈(const QJsonObject& data, const 👉 context.operation.name 👈 * operation){
-auto tp_name = data["__typename"].toString();
-{% for impl in interface.implementations.values() -%}
-if ("👉 impl.name 👈" == tp_name){
-return std::static_pointer_cast<👉 interface.name 👈>(👉 impl.deserializer_name 👈(data, operation));
-}
-{% endfor %}
-throw qtgql::exceptions::InterfaceDeserializationError(tp_name.toStdString());
+auto type_name = data.value("__typename").toString();
+{% for choice in interface.choices -%}
+{% set do_on_meets -%}
+return std::static_pointer_cast<👉 interface.concrete.name 👈>(👉 choice.deserializer_name 👈(data, operation));
+{% endset -%}
+👉iterate_type_condition(choice,"type_name", do_on_meets, loop)👈
+{% endfor -%}
+throw qtgql::exceptions::InterfaceDeserializationError(type_name.toStdString());
 }
 {% endfor %}
 
 
 {% for t in context.operation.narrowed_types -%}
 // Constructor
+{% set base_name -%}
+👉 "QObject" if not t.base_interface else t.base_interface.name 👈
+{% endset -%}
 {% if t.concrete.is_root -%}
-👉 t.name 👈::👉 t.name 👈(👉 context.operation.name 👈 * operation): QObject::QObject(operation){
+👉 t.name 👈::👉 t.name 👈(👉 context.operation.name 👈 * operation): 👉 base_name 👈::👉 base_name 👈(operation){
     m_inst = 👉 t.concrete.name 👈::instance();
     auto m_inst_ptr = m_inst;
 {% else -%}
     👉 t.name 👈::👉 t.name 👈(👉 context.operation.name 👈 * operation, const std::shared_ptr<👉 t.concrete.name 👈> &inst)
-: m_inst{inst}, QObject::QObject(operation)
+: m_inst{inst}, 👉 base_name 👈::👉 base_name 👈(operation)
 {
     auto m_inst_ptr = m_inst.get();
     Q_ASSERT_X(m_inst_ptr, __FILE__, "Tried to instantiate a proxy object with an empty pointer!");
@@ -36,46 +44,10 @@ throw qtgql::exceptions::InterfaceDeserializationError(tp_name.toStdString());
     {% endfor -%}
     {#- connecting signals here, when the concrete changed it will be mirrored here. -#}
     {%- for field in t.fields -%}
-    {% if field.type.is_model -%}
     connect(m_inst_ptr, &👉context.schema_ns👈::👉t.concrete.name👈::👉 field.concrete.signal_name 👈, this,
     [&](){
-        {% if field.type.of_type.is_queried_object_type and field.type.of_type.concrete.implements_node -%}
-        {#- // the nodes themselves are updated as per normal (via deserializers) and here we only need
-            // to set the nodes at the correct index and append them if they weren't existed so far.
-        -#}
-        auto operation = qobject_cast<👉context.operation.name👈*>(this->parent());
-        auto new_data = m_inst->👉field.concrete.getter_name👈(👉field.build_variables_tuple_for_field_arguments 👈);
-        auto new_len = new_data.size();
-        auto prev_len = 👉field.private_name👈->rowCount();
-        if (new_len < prev_len){
-            👉field.private_name👈->removeRows(prev_len - 1, prev_len - new_len);
-        }
-        for (int i = 0; i < new_len; i++){
-            auto concrete = new_data.at(i);
-            if (i > prev_len - 1){
-                👉field.private_name👈->insert(i, new 👉field.type.of_type.name👈(operation, concrete));
-            }
-            else if (👉field.private_name👈->get(i)->get_id() != concrete->m_id){
-                delete 👉field.private_name👈->get(i);
-                👉field.private_name👈->insert(i, new 👉field.type.of_type.name👈(operation, concrete));
-            }
-        }
-        {% else %}
-        throw qtgql::excepctions::NotImplementedError({"can't update this model type ATM"});
-        {% endif %}
+    👉update_proxy_field(field, context.operation)👈
     });
-    {% elif field.type.is_queried_object_type -%}
-    connect(m_inst_ptr, &👉context.schema_ns👈::👉t.concrete.name👈::👉 field.concrete.signal_name 👈, this,
-    [&](){
-        auto operation = qobject_cast<👉context.operation.name👈*>(this->parent());
-        auto concrete = m_inst->👉field.concrete.getter_name👈(👉field.build_variables_tuple_for_field_arguments 👈);
-        delete 👉field.private_name👈;
-        👉field.private_name👈 = new 👉field.type.name👈(operation, concrete);
-    });
-    {% else -%}
-    connect(m_inst_ptr, &👉context.schema_ns👈::👉t.concrete.name👈::👉 field.concrete.signal_name 👈, this,
-            [&](){emit 👉 field.concrete.signal_name 👈();});
-    {% endif -%}
     {% endfor -%}
 }
 
@@ -96,8 +68,7 @@ if(cached_maybe.has_value()){
 {% endif -%}
 auto inst = 👉 t.concrete.name 👈::shared();
 {% for f in t.fields -%}
-{% set setter %}inst->👉 f.concrete.setter_name 👈{% endset %}
-👉deserialize_concrete_field(f, setter)👈
+👉deserialize_concrete_field(f)👈
 {% endfor %}
 {% if t.concrete. implements_node %}
 👉 t.concrete.name 👈::ENV_CACHE()->add_node(inst);

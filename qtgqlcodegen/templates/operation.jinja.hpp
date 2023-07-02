@@ -1,5 +1,5 @@
-{%- from "macros/initialize_proxy_field.jinja.hpp" import initialize_proxy_field -%}
 {%- from "macros/deserialize_concrete_field.jinja.hpp" import  deserialize_concrete_field -%}
+{%- from "macros/proxy_type_fields.jinja.hpp" import  proxy_type_fields -%}
 #pragma once
 #include "./schema.hpp"
 #include <qtgql/gqlwstransport/gqlwstransport.hpp>
@@ -21,61 +21,42 @@ namespace updaters{
 {% for t in context.operation.narrowed_types -%}
 void update_👉 t.name 👈(👉 t.concrete.member_type_arg 👈 inst, const QJsonObject &data, const 👉 context.operation.name 👈 * operation);
 {% endfor -%}
-
 };
 
+// ------------ Narrowed Interfaces ------------
+{% for t in context.operation.interfaces -%}
+class 👉 t.name 👈: public QObject{
+👉 proxy_type_fields(t, context) 👈
+public:
+    using QObject::QObject;
+{% for f in t.fields -%}
+[[nodiscard]] inline virtual const 👉 f.property_type 👈  👉 f.concrete.getter_name 👈() const {
+throw qtgql::exceptions::InterfaceDirectAccessError("👉t.concrete.name👈");
+}
+{% endfor %}
+};
+{% endfor %}
 // ------------ Narrowed Object types ------------
 {% for t in context.operation.narrowed_types %}
-class 👉 t.name 👈: public QObject{
-    Q_OBJECT
-{% for f in t.fields -%}
-Q_PROPERTY(const 👉 f.property_type 👈 👉 f.name 👈 READ 👉 f.concrete.getter_name 👈 NOTIFY 👉 f.concrete.signal_name 👈);
-{% endfor %}
-signals:
-{%for f in t.fields -%}
-void 👉 f.concrete.signal_name 👈();
-{% endfor %}
-
-{# members #}
-{% if context.debug -%}
-public: // WARNING: members are public because you have debug=True in your config file.
-{% else %}
-protected:
-{% endif %}
-{% if t.concrete.is_root %} {# // root types are singletons, no need for shared ptr -#}
-👉context.schema_ns👈::👉 t.concrete.name 👈 * m_inst;
-{% else %}
-const std::shared_ptr<👉context.schema_ns👈::👉 t.concrete.name 👈> m_inst;
-{% endif %}
-{% for ref_field in t.references -%}
-const 👉ref_field.property_type👈 m_👉ref_field.name👈 = {};
-{% endfor %}
-{%- for model_field in t.models -%}
-👉 model_field.property_type 👈 👉model_field.private_name👈;
-{% endfor %}
-
+class 👉 t.name 👈: public 👉 "QObject" if not t.base_interface else t.base_interface.name 👈{
+👉 proxy_type_fields(t, context) 👈
 public:
 {% if t.concrete.is_root -%}
 👉 t.name 👈(👉 context.operation.name 👈 * operation);
 {% else -%}
 👉 t.name 👈(👉 context.operation.name 👈 * operation, const std::shared_ptr<👉 t.concrete.name 👈> &inst);
-{% endif -%}
-
-
+{% endif %}
+public:
 {% for f in t.fields -%}
-{%- if f.type.is_queried_object_type or f.type.is_model %}
 [[nodiscard]] inline const 👉 f.property_type 👈  👉 f.concrete.getter_name 👈() const {
-    return m_👉f.name👈;
+{%- if f.type.is_queried_object_type or f.type.is_model or f.type.is_queried_interface %}
+return m_👉f.name👈;
 {%- else -%}
-[[nodiscard]] inline const 👉 f.property_type 👈 👉 f.concrete.getter_name 👈() const {
-    {% if f.type.is_queried_object_type -%}
-    return *m_👉f.name👈;
-    {% else -%}
-    return m_inst->👉 f.concrete.getter_name 👈();
-    {% endif -%}
+return m_inst->👉 f.concrete.getter_name 👈();
 {%- endif -%}
 };
 {% endfor -%}
+
 };
 {% endfor %}
 
@@ -128,14 +109,14 @@ return m_operation_id;
 
 
 void on_next(const QJsonObject &message) override{
+    auto data = message.value("data").toObject();
     if (!m_data){
-        auto data = message.value("data").toObject();
         👉 context.operation.root_type.updater_name👈(👉 context.operation.root_type.concrete.name👈::instance(), data, this);
         m_data = new 👉 context.operation.root_type.name👈(this);
         emit dataChanged();
     }
     else{
-    throw qtgql::exceptions::NotImplementedError({"Updates on root types is not implemented yet."});
+        👉 context.operation.root_type.updater_name👈(👉 context.operation.root_type.concrete.name👈::instance(), data, this);
     }
 }
 

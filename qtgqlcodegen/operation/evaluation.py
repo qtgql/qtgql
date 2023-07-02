@@ -232,47 +232,46 @@ def _evaluate_interface(
     selection_set: gql_lang.SelectionSetNode,
     path: str,  # current path in the query tree.
 ) -> QtGqlQueriedInterface:
-    # first get all linear selections.
+    choices: list[QtGqlQueriedObjectType] = []
+
+    # first get all linear selections, these are selection that can be applied to
+    # any of the interface implementors
+    inline_fragments: list[gql_lang.InlineFragmentNode] = []
     linear_fields: dict[str, QtGqlQueriedField] = {}
-    choices: defaultdict[str, dict[str, QtGqlQueriedField]] = defaultdict(dict)
-
-    for selection in selection_set.selections:
-        if not is_inline_fragment(selection):
-            inner_field_node = is_field_node(selection)
-            assert inner_field_node
-            if not is_type_name_selection(inner_field_node):
-                __f = _evaluate_field(
-                    type_info=type_info,
-                    concrete_field=concrete.fields_dict[inner_field_node.name.value],
-                    field_node=inner_field_node,
-                    path=path,
-                    origin=concrete,
-                )
-                linear_fields[__f.name] = __f
-
+    for field_or_frag in selection_set.selections:
+        if inline_frag := is_inline_fragment(field_or_frag):
+            inline_fragments.append(inline_frag)
+        else:
+            field_node = is_field_node(field_or_frag)
+            assert field_node
+            __f = _evaluate_field(
+                type_info=type_info,
+                concrete_field=concrete.fields_dict[field_node.name.value],
+                field_node=field_node,
+                path=path,
+                origin=concrete,
+            )
+            linear_fields[__f.name] = __f
     # evaluate type conditions
-    for selection in selection_set.selections:
-        if inline_frag := is_inline_fragment(selection):
-            type_name = inline_frag.type_condition.name.value
-            # no need to validate inner types are implementation, graphql-core does this.
-            resolved_type = type_info.schema_type_info.get_object_type(
-                type_name,
-            ) or type_info.schema_type_info.get_interface(type_name)
-            assert resolved_type
-            for inner_selection in inline_frag.selection_set.selections:
-                inner_field_node = is_field_node(inner_selection)
-                assert inner_field_node
-                if not is_type_name_selection(inner_field_node):
-                    __f = _evaluate_field(
-                        type_info=type_info,
-                        concrete_field=resolved_type.fields_dict[inner_field_node.name.value],
-                        field_node=inner_field_node,
-                        path=path,
-                        origin=resolved_type,
-                    )
-                    choices[type_name][inner_field_node.name.value] = __f
-    for choice in choices.values():
-        choice.update(linear_fields)
+    for inline_frag in inline_fragments:
+        type_name = inline_frag.type_condition.name.value
+        # no need to validate inner types are implementation, graphql-core does this.
+        concrete_choice = type_info.schema_type_info.get_object_type(
+            type_name,
+        ) or type_info.schema_type_info.get_interface(type_name)
+        assert concrete_choice
+        choices.append(
+            _evaluate_object_type(
+                type_info=type_info,
+                concrete=concrete_choice,
+                selection_set=inline_frag.selection_set,
+                path=path,
+            ),
+        )
+
+        # inject __type_name selection, we'll use this to deserialize correctly.
+        if not has_typename_selection(inline_frag.selection_set):
+            inject_typename_selection(inline_frag.selection_set)
 
     name = f"{concrete.name}__{path}"
     ret = QtGqlQueriedInterface(
@@ -281,6 +280,9 @@ def _evaluate_interface(
         choices=choices,
         fields_dict=linear_fields,
     )
+    for choice in choices:
+        choice.base_interface = ret
+        choice.fields_dict.update(linear_fields)
     type_info.narrowed_interfaces_map[name] = ret
     return ret
 
@@ -298,6 +300,8 @@ def _evaluate_object_type(
     fields: dict[str, QtGqlQueriedField] = {}
     for selection in selection_set.selections:
         if f_node := is_field_node(selection):
+            if is_type_name_selection(f_node):
+                continue  # __type_name selection is handled with special care.
             concrete_field = concrete.fields_dict[f_node.name.value]
             fields[concrete_field.name] = _evaluate_field(
                 type_info=type_info,
@@ -357,6 +361,7 @@ def _evaluate_operation(
         operation_def=operation,
         variables=type_info.variables,
         narrowed_types=tuple(type_info.narrowed_types_map.values()),
+        interfaces=tuple(type_info.narrowed_interfaces_map.values()),
     )
 
 

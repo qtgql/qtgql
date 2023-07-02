@@ -18,7 +18,15 @@ public:
       : std::logic_error("type: " + type_name +
                          " Could not be resolved to any known concrete"){};
 };
-
+class InterfaceDirectAccessError : public std::logic_error {
+public:
+  explicit InterfaceDirectAccessError(const std::string &interface_name)
+      : std::logic_error(
+            "You have tried to interact with interface: " + interface_name +
+            " directly"
+            "This is an unwanted behaviour, interfaces should only be accessed "
+            "via a concrete type"){};
+};
 class EnvironmentNotFoundError : public std::logic_error {
 public:
   explicit EnvironmentNotFoundError(const std::string &env_name)

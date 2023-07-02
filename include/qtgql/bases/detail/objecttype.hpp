@@ -11,16 +11,15 @@ namespace bases {
 class ObjectTypeABC : public QObject {
   Q_OBJECT
 
-  Q_PROPERTY(QString __typeName READ getTypeName CONSTANT)
-  inline static QString __TYPE_NAME = "__NOT_IMPLEMENTED__";
-
-private:
-  [[nodiscard]] inline virtual const QString &getTypeName() const {
-    return __TYPE_NAME;
-  }
+  Q_PROPERTY(QString __typeName READ TYPE_NAME CONSTANT)
 
 public:
   using QObject::QObject;
+
+  [[nodiscard]] inline virtual const QString &TYPE_NAME() {
+    throw exceptions::NotImplementedError(
+        {"Derived classes must override this method."});
+  }
 };
 
 class NodeInterfaceABC;
