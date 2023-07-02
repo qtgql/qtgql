@@ -12,7 +12,7 @@ namespace deserializers{
 {% for t in context.operation.narrowed_types if not t.concrete.is_root -%}
 std::shared_ptr<👉 t.concrete.name 👈> des_👉 t.name 👈(const QJsonObject& data, const 👉 context.operation.name 👈 * operation);
 {% endfor -%}
-{% for t in context.operation.interfaces -%} // TODO: can that be combined with object types?
+{% for t in context.operation.interfaces -%}
 std::shared_ptr<👉 t.concrete.name 👈> des_👉 t.name 👈(const QJsonObject& data, const 👉 context.operation.name 👈 * operation);
 {% endfor -%}
 };
@@ -48,16 +48,11 @@ public:
 {% endif %}
 public:
 {% for f in t.fields -%}
-{%- if f.type.is_queried_object_type or f.type.is_model or f.type.is_queried_interface %}
 [[nodiscard]] inline const 👉 f.property_type 👈  👉 f.concrete.getter_name 👈() const {
+{%- if f.type.is_queried_object_type or f.type.is_model or f.type.is_queried_interface %}
 return m_👉f.name👈;
 {%- else -%}
-[[nodiscard]] inline const 👉 f.property_type 👈 👉 f.concrete.getter_name 👈() const {
-{% if f.type.is_queried_object_type -%}
-return *m_👉f.name👈; // TODO: I think this is redundant.
-{% else -%}
 return m_inst->👉 f.concrete.getter_name 👈();
-{% endif -%}
 {%- endif -%}
 };
 {% endfor -%}
