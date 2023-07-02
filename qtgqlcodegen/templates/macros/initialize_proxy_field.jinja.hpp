@@ -8,9 +8,6 @@ m_inst->👉field.concrete.getter_name 👈(👉field.build_variables_tuple_for_
 if (👉 instance_of_concrete 👈){
 👉field.private_name👈 = new 👉field.type_name👈(👉operation_pointer👈, 👉 instance_of_concrete 👈);
 }
-else{
-👉field.private_name👈 = nullptr; // TODO: this is probably redundant
-}
 {% elif field.type.is_queried_object_type %}
 👉field.private_name👈 = new 👉field.type_name👈(👉operation_pointer👈, 👉 instance_of_concrete 👈);
 {% elif field.type.is_model and field.type.is_model.of_type.is_queried_object_type %}
