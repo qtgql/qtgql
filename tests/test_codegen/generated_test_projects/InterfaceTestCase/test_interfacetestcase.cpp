@@ -48,10 +48,12 @@ TEST_CASE("InterfaceTestCase", "[generated-testcase]") {
     test_utils::wait_for_completion(change_age_mut);
     // now we can test the update.
     int new_age = 2223432;
+    test_utils::SignalCatcher catcher(
+        {.source_obj = change_age_mut->data(), .only = "changeAge"});
     change_age_mut->set_variables({animal_id, new_age});
     change_age_mut->refetch();
+    REQUIRE(catcher.wait());
     test_utils::wait_for_completion(change_age_mut);
-    // TODO: check signals emission here...
     REQUIRE(change_age_mut->data()->get_changeAge()->get_age() == new_age);
   }
 }
