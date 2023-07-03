@@ -4,14 +4,15 @@ import logging
 import subprocess
 from functools import cached_property
 from pathlib import Path
+from typing import ClassVar
 
 from conan import ConanFile
 from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
 
 
 class PATHS:
-    PROJECT_ROOT = Path(__file__).parent
-    QTGQL_TEST_TARGET = PROJECT_ROOT / "tests" / "build"
+    PROJECT_ROOT: ClassVar[Path] = Path(__file__).parent
+    QTGQL_TEST_TARGET: ClassVar[Path] = PROJECT_ROOT / "tests" / "build"
 
 
 ConanBool = [True, False]
@@ -35,8 +36,8 @@ class QtGqlRecipe(ConanFile):
     topics = ("GraphQL", "Qt", "codegen")
     version = get_version_from_poetry()
     build_policy = "missing"
-    options = {"qt_version": ["6.5.0"], "verbose": ConanBool, "test": ConanBool}
-    default_options = {
+    options = {"qt_version": ["6.5.0"], "verbose": ConanBool, "test": ConanBool}  # noqa
+    default_options = {  # noqa
         "verbose": False,
         "qt_version": "6.5.0",
         "test": False,

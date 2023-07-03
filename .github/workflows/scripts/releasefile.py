@@ -12,7 +12,7 @@ no_release_file = PATHS.PROJECT_ROOT / "NORELEASE.md"
 # Shamelessly copied from strawberry
 # https://github.com/strawberry-graphql/strawberry/blob/main/.github/release-check-action/release.py
 
-RELEASE_TYPE_REGEX = re.compile(r"^[Rr]elease [Tt]ype: (major|minor|patch)$")
+RELEASE_TYPE_REGEX = re.compile(r"^[Rr]release [Tt]ype: (major|minor|patch)$")
 
 
 class InvalidReleaseFileError(Exception):
