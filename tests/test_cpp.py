@@ -17,6 +17,6 @@ def test_generated_tests(ctest_command: CtestTestCommand, schemas_server: MiniSe
     ctest_command.run()
     if log_file := ctest_command.failed_log:
         if "All tests passed" not in log_file:
-            pytest.fail(  # noqa: PT016
+            pytest.fail(
                 reason=f"\n {'-'*8} Test {ctest_command.test_name} Failed {'-'*8} \n {log_file}",
             )

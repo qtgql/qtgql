@@ -11,8 +11,8 @@ from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
 
 class helloTestConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
-    options = {"qt_version": ["6.5.0"]}
-    default_options = {
+    options = {"qt_version": ["6.5.0"]}  # noqa
+    default_options = {  # noqa
         "qt_version": "6.5.0",
     }
 

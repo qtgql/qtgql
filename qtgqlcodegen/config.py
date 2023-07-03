@@ -2,7 +2,7 @@ from functools import cached_property
 from pathlib import Path
 
 import graphql
-from attrs import define
+from attrs import Factory, define
 
 from qtgqlcodegen.generator import SchemaGenerator
 from qtgqlcodegen.schema.definitions import CustomScalarMap
@@ -25,8 +25,8 @@ class QtGqlConfig:
 
     Also the generated QML imports would fall under this namespace.
     """
-    custom_scalars: CustomScalarMap = {}
-    """mapping of custom scalars, respected by the schema evaluator."""
+    custom_scalars: CustomScalarMap = Factory(dict)
+    """Mapping of custom scalars, respected by the schema evaluator."""
     debug: bool = False
     """Templates would render some additional helpers for testing."""
 
