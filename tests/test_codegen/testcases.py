@@ -456,8 +456,8 @@ RootListOfTestCase = QtGqlTestCase(
     test_name="RootListOfTestCase",
 )
 
-InterfaceTestCase = QtGqlTestCase(
-    schema=schemas.object_with_interface.schema,
+NonNodeInterfaceTestCase = QtGqlTestCase(
+    schema=schemas.non_node_interface_field.schema,
     operations="""
     query AnimalQuery($kind: AnimalKind!) {
       animal(kind: $kind) {
@@ -489,7 +489,7 @@ InterfaceTestCase = QtGqlTestCase(
       }
     }
     """,
-    test_name="InterfaceTestCase",
+    test_name="NonNodeInterfaceTestCase",
 )
 UnionTestCase = QtGqlTestCase(
     schema=schemas.object_with_union.schema,
@@ -625,12 +625,6 @@ ListOfNonNodeType = QtGqlTestCase(
 )
 
 
-TypeWithNullAbleIDTestCase = QtGqlTestCase(
-    schema=schemas.type_with_nullable_id.schema,
-    operations="""query MainQuery {users{name}}""",
-    test_name="TypeWithNullAbleIDTestCase",
-)
-
 ListOfUnionTestCase = QtGqlTestCase(
     schema=schemas.list_of_union.schema,
     operations="""
@@ -755,6 +749,7 @@ ListOfInterfaceTestcase = QtGqlTestCase(
     operations=InterfaceFieldTestCase.operations,
     test_name="ListOfInterfaceTestcase",
 )
+
 all_test_cases = [
     ScalarsTestCase,
     OptionalScalarsTestCase,
@@ -771,14 +766,13 @@ all_test_cases = [
     RootScalarTestCase,
     NonNodeTypeTestCase,
     InputTypeOperationVariableTestCase,
-    InterfaceTestCase,
+    NonNodeInterfaceTestCase,
     UnionTestCase,
     ListOfObjectWithUnionTestCase,
     CustomUserScalarTestCase,
     ObjectsThatReferenceEachOtherTestCase,
     RootListOfTestCase,
     ListOfNonNodeType,
-    TypeWithNullAbleIDTestCase,
     ListOfUnionTestCase,
 ]
 
@@ -794,7 +788,7 @@ implemented_testcases = [
     OptionalNestedObjectTestCase,
     ObjectWithListOfObjectTestCase,
     EnumTestCase,
-    InterfaceTestCase,
+    NonNodeInterfaceTestCase,
     OperationVariablesTestcase,
     RootScalarTestCase,
     NonNodeTypeTestCase,
@@ -811,4 +805,4 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 
 if __name__ == "__main__":
-    generate_testcases(InterfaceTestCase)
+    generate_testcases(NonNodeInterfaceTestCase)
