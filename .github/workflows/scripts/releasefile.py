@@ -40,11 +40,9 @@ class ReleaseFile:
         match = RELEASE_TYPE_REGEX.match(changelog.splitlines()[0])
 
         # if not match:
-
-        change_type_key = match.group(1)
-        release_type = ReleaseType[change_type_key.upper()]
+        #
         return cls(
-            release_type,
+            "release_type",
             changelog,
         )
 
