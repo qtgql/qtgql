@@ -40,6 +40,7 @@ class ReleaseFile:
         match = RELEASE_TYPE_REGEX.match(changelog.splitlines()[0])
 
         if not match:
+            print(release_file.read_text())  # noqa
             raise InvalidReleaseFileError("Could not find a valid release type")
 
         change_type_key = match.group(1)
