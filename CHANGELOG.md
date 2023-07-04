@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+0.124.0 - 2023-07-04
+--------------------
+
+Support `Node` interface on interfaces selections.
+when a node is deserialized,
+if it was found in the cache it would get updated
+all over the schema.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #297](https://github.com/qtgql/qtgql/pull/297/)
+
+
 0.123.0 - 2023-07-02
 --------------------
 
