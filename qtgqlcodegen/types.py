@@ -397,7 +397,7 @@ class QtGqlInputObjectTypeDefinition(BaseQtGqlObjectType):
 
 @define
 class EnumValue:
-    """encapsulates enumValues from introspection, maps to an Enum member."""
+    """Encapsulates enumValues from introspection, maps to an Enum member."""
 
     name: str
     index: int

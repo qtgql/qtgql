@@ -951,14 +951,14 @@ packaging = ">=20.9"
 
 [[package]]
 name = "exceptiongroup"
-version = "1.1.2"
+version = "1.1.1"
 description = "Backport of PEP 654 (exception groups)"
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "exceptiongroup-1.1.2-py3-none-any.whl", hash = "sha256:e346e69d186172ca7cf029c8c1d16235aa0e04035e5750b4b95039e65204328f"},
-    {file = "exceptiongroup-1.1.2.tar.gz", hash = "sha256:12c3e887d6485d16943a309616de20ae5582633e0a2eda17f4e10fd61c1e8af5"},
+    {file = "exceptiongroup-1.1.1-py3-none-any.whl", hash = "sha256:232c37c63e4f682982c8b6459f33a8981039e5fb8756b2074364e5055c498c9e"},
+    {file = "exceptiongroup-1.1.1.tar.gz", hash = "sha256:d484c3090ba2889ae2928419117447a14daf3c1231d5e30d0aae34f354f01785"},
 ]
 
 [package.extras]
@@ -1172,14 +1172,14 @@ files = [
 
 [[package]]
 name = "griffe"
-version = "0.31.0"
+version = "0.30.1"
 description = "Signatures for entire Python programs. Extract the structure, the frame, the skeleton of your project, to generate API documentation or find breaking changes in your API."
 category = "dev"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.7"
 files = [
-    {file = "griffe-0.31.0-py3-none-any.whl", hash = "sha256:de6e659487497c0e73459d370f40bfda7d6f9f6cec43a687de8a110ec72a2c4f"},
-    {file = "griffe-0.31.0.tar.gz", hash = "sha256:b51f6e9541ce9cb9c08580917971cd4b76b6d88e2469822d612b614fb96be776"},
+    {file = "griffe-0.30.1-py3-none-any.whl", hash = "sha256:b2f3df6952995a6bebe19f797189d67aba7c860755d3d21cc80f64d076d0154c"},
+    {file = "griffe-0.30.1.tar.gz", hash = "sha256:007cc11acd20becf1bb8f826419a52b9d403bbad9d8c8535699f5440ddc0a109"},
 ]
 
 [package.dependencies]
@@ -1700,14 +1700,14 @@ mkdocs = ">=1.1"
 
 [[package]]
 name = "mkdocs-material"
-version = "9.1.18"
+version = "9.1.17"
 description = "Documentation that simply works"
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "mkdocs_material-9.1.18-py3-none-any.whl", hash = "sha256:5bcf8fb79ac2f253c0ffe93fa181cba87718c6438f459dc4180ac7418cc9a450"},
-    {file = "mkdocs_material-9.1.18.tar.gz", hash = "sha256:981dd39979723d4cda7cfc77bbbe5e54922d5761a7af23fb8ba9edb52f114b13"},
+    {file = "mkdocs_material-9.1.17-py3-none-any.whl", hash = "sha256:809ed68427fbab0330b0b07bc93175824c3b98f4187060a5c7b46aa8ae398a75"},
+    {file = "mkdocs_material-9.1.17.tar.gz", hash = "sha256:5a076524625047bf4ee4da1509ec90626f8fce915839dc07bdae6b59ff4f36f9"},
 ]
 
 [package.dependencies]
@@ -2999,14 +2999,14 @@ files = [
 
 [[package]]
 name = "strawberry-graphql"
-version = "0.192.2"
+version = "0.192.1"
 description = "A library for creating GraphQL APIs"
 category = "dev"
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "strawberry_graphql-0.192.2-py3-none-any.whl", hash = "sha256:ea38f69ff098ba9ade4d9b23aa16240fd68b0beddd6cd9aabf878bacde1e3d9e"},
-    {file = "strawberry_graphql-0.192.2.tar.gz", hash = "sha256:c768cde1720714b161e47180e3ed34ac74e8bf10368db21d37f9e3e875840e11"},
+    {file = "strawberry_graphql-0.192.1-py3-none-any.whl", hash = "sha256:d389936fa353691fd05385860934b9b5ecb0e6127426ce48006c6719571bda91"},
+    {file = "strawberry_graphql-0.192.1.tar.gz", hash = "sha256:00f8d922aad72997766622c939b57a12720f4208b46d3a258993f305757d3b92"},
 ]
 
 [package.dependencies]

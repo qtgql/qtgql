@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING, NamedTuple
 import attrs
 import graphql
 import jinja2
-from attr import define
+from attr import Factory, define
 from qtgqlcodegen.cli import app
 from qtgqlcodegen.config import QtGqlConfig
 from qtgqlcodegen.generator import SchemaGenerator
@@ -72,7 +72,7 @@ class QtGqlTestCase:
     operations: str
     schema: Schema
     test_name: str
-    custom_scalars: dict = {}
+    custom_scalars: dict = Factory(dict)
     qml_file: str = ""
     needs_debug: bool = False
     metadata: TestCaseMetadata = attrs.Factory(TestCaseMetadata)
