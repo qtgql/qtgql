@@ -39,10 +39,13 @@ class ReleaseFile:
         changelog = release_file.read_text()
         match = RELEASE_TYPE_REGEX.match(changelog.splitlines()[0])
 
-        # if not match:
-        #
+        if not match:
+            raise InvalidReleaseFileError("Could not find a valid release type")
+
+        change_type_key = match.group(1)
+        release_type = ReleaseType[change_type_key.upper()]
         return cls(
-            "release_type",
+            release_type,
             changelog,
         )
 
