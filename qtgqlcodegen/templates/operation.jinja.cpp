@@ -14,6 +14,14 @@ std::shared_ptr<👉 interface.concrete.name 👈> 👉 interface.deserializer_n
 auto type_name = data.value("__typename").toString();
 {% for choice in interface.choices -%}
 {% set do_on_meets -%}
+{% if interface.concrete.implements_node %}
+auto cached_maybe = 👉 interface.concrete.name 👈::get_node(data.value("id").toString());
+if(cached_maybe.has_value()){
+auto node = cached_maybe.value();
+👉 interface.updater_name 👈(node, data, operation);
+return std::static_pointer_cast<👉 interface.concrete.name 👈>(node);
+}
+{% endif -%}
 return std::static_pointer_cast<👉 interface.concrete.name 👈>(👉 choice.deserializer_name 👈(data, operation));
 {% endset -%}
 👉iterate_type_condition(choice,"type_name", do_on_meets, loop)👈

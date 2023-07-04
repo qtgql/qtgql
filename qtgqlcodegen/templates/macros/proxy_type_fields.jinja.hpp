@@ -25,4 +25,8 @@ const 👉ref_field.property_type👈 m_👉ref_field.name👈 = {};
 {%- for model_field in t.models -%}
 👉 model_field.property_type 👈 👉model_field.private_name👈;
 {% endfor %}
+public:
+const QString & __type_name() const{
+    return m_inst->TYPE_NAME();
+}
 {% endmacro %}

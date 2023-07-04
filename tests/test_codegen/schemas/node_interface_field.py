@@ -2,7 +2,7 @@ from enum import Enum
 
 import strawberry
 from tests.conftest import fake
-from tests.test_codegen.schemas.node_interface import Node
+from tests.test_codegen.schemas.node_interface import NODE_DB, Node
 
 
 @strawberry.interface
@@ -45,4 +45,13 @@ class Query:
         return User()
 
 
-schema = strawberry.Schema(query=Query)
+@strawberry.type()
+class Mutation:
+    @strawberry.field()
+    def modify_name(self, node_id: strawberry.ID, new_name: str) -> Node:
+        node: HasNameAgeInterface = NODE_DB.get(node_id)
+        node.name = new_name
+        return node
+
+
+schema = strawberry.Schema(query=Query, mutation=Mutation, types=[Dog, User])

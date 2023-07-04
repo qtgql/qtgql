@@ -75,10 +75,10 @@ def selection_set_search_factory(
     selection_name: str,
 ) -> Callable[[gql_lang.SelectionSetNode], bool]:
     def factory(selection_set: gql_lang.SelectionSetNode):
-        for field in selection_set.selections:
-            assert isinstance(field, gql_lang.FieldNode), f"{field} is not a field"
-            if field.name.value == selection_name:
-                return True
+        for field_or_frag in selection_set.selections:
+            if field := is_field_node(field_or_frag):
+                if field.name.value == selection_name:
+                    return True
         return False
 
     return factory

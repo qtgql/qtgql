@@ -491,6 +491,41 @@ NonNodeInterfaceTestCase = QtGqlTestCase(
     """,
     test_name="NonNodeInterfaceTestCase",
 )
+
+
+NodeInterfaceFieldTestCase = QtGqlTestCase(
+    schema=schemas.node_interface_field.schema,
+    operations="""
+    query MainQuery ($ret: TypesEnum!) {
+      node(ret: $ret) {
+        id
+        __typename
+        ... on HasNameAgeInterface {
+          name
+          age
+        }
+        ... on User {
+          password
+        }
+        ... on Dog {
+          barks
+        }
+      }
+    }
+
+    mutation ChangeName($node_id: ID!, $new_name: String!){
+        modifyName(nodeId: $node_id, newName: $new_name){
+            ...on HasNameAgeInterface
+            {
+            name
+            }
+        }
+    }
+    """,
+    test_name="NodeInterfaceFieldTestCase",
+)
+
+
 UnionTestCase = QtGqlTestCase(
     schema=schemas.object_with_union.schema,
     operations="""
@@ -721,32 +756,9 @@ SubscriptionTestCase = QtGqlTestCase(
     test_name="SubscriptionTestCase",
 )
 
-InterfaceFieldTestCase = QtGqlTestCase(
-    schema=schemas.interface_field.schema,
-    operations="""
-    query MainQuery ($ret: TypesEnum! = Dog) {
-      node(ret: $ret) {
-        id
-        __typename
-        ... on HasNameAgeInterface {
-          name
-          age
-        }
-        ... on User {
-          password
-        }
-        ... on Dog {
-          barks
-        }
-      }
-    }
-    """,
-    test_name="InterfaceFieldTestCase",
-)
-
 ListOfInterfaceTestcase = QtGqlTestCase(
     schema=schemas.list_of_interface.schema,
-    operations=InterfaceFieldTestCase.operations,
+    operations=NodeInterfaceFieldTestCase.operations,
     test_name="ListOfInterfaceTestcase",
 )
 
@@ -767,6 +779,7 @@ all_test_cases = [
     NonNodeTypeTestCase,
     InputTypeOperationVariableTestCase,
     NonNodeInterfaceTestCase,
+    NodeInterfaceFieldTestCase,
     UnionTestCase,
     ListOfObjectWithUnionTestCase,
     CustomUserScalarTestCase,
@@ -793,6 +806,7 @@ implemented_testcases = [
     RootScalarTestCase,
     NonNodeTypeTestCase,
     InputTypeOperationVariableTestCase,
+    NodeInterfaceFieldTestCase,
 ]
 
 
@@ -805,4 +819,4 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 
 if __name__ == "__main__":
-    generate_testcases(NonNodeInterfaceTestCase)
+    generate_testcases(NodeInterfaceFieldTestCase)

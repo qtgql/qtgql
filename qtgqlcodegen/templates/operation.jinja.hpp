@@ -66,13 +66,13 @@ std::optional<👉 var.type.member_type 👈> 👉 var.name 👈 = {};
 {% endfor -%}
 
     QJsonObject to_json() const{
-    QJsonObject ret;
+    QJsonObject __ret;
     {% for var in context.operation.variables -%}
     if (👉 var.name 👈.has_value()){
-    ret.insert("👉 var.name 👈",  👉 var.json_repr() 👈);
+    __ret.insert("👉 var.name 👈",  👉 var.json_repr() 👈);
     }
     {% endfor -%}
-    return ret;
+    return __ret;
     }
 };
 

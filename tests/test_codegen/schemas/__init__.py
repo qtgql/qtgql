@@ -1,11 +1,11 @@
 from . import (
     custom_scalar_input_schema,
     input_type,
-    interface_field,
     list_of_interface,
     list_of_non_node,
     list_of_union,
     mutation_schema,
+    node_interface_field,
     non_node_interface_field,
     non_node_type,
     object_reference_each_other,
@@ -62,6 +62,6 @@ __all__ = [  # noqa: PLE0604
     mutation_schema,
     operation_error,
     subscription_schema,
-    interface_field,
+    node_interface_field,
     list_of_interface,
 ]
