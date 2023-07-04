@@ -230,8 +230,8 @@ def _unwrap_interface_fragments(
     type_info: SchemaTypeInfo,
     parent_concrete: QtGqlObjectType | QtGqlInterface,
     selection_set: gql_lang.SelectionSetNode,
-    res: dict[QtGqlObjectType | QtGqlInterface, list[gql_lang.FieldNode]] | None = None,
-) -> dict[QtGqlObjectType | QtGqlInterface, list[gql_lang.FieldNode]]:
+    initial: dict[str, list[gql_lang.FieldNode]],
+) -> dict[str, list[gql_lang.FieldNode]]:
     """Fragments can be nested, i.e node{ id.
 
         ...on SomeFrag{
@@ -243,11 +243,7 @@ def _unwrap_interface_fragments(
     }
     :returns: all of the inline fragments as a flat list.
     """
-    if not res:
-        res: defaultdict[QtGqlObjectType | QtGqlInterface, list[gql_lang.FieldNode]] = defaultdict(
-            list,
-        )
-
+    fields_for_concrete: list[gql_lang.FieldNode] = []
     for field_or_frag in selection_set.selections:
         if inline_frag := is_inline_fragment(field_or_frag):
             type_name = inline_frag.type_condition.name.value
@@ -256,14 +252,19 @@ def _unwrap_interface_fragments(
                 type_name,
             ) or type_info.get_interface(type_name)
             assert concrete_choice
-            _unwrap_interface_fragments(type_info, concrete_choice, inline_frag.selection_set, res)
+            _unwrap_interface_fragments(
+                type_info,
+                concrete_choice,
+                inline_frag.selection_set,
+                initial,
+            )
         else:
             field_node = is_field_node(field_or_frag)
             assert field_node
             if field_node.name.value != "__typename":
-                res[parent_concrete].append(field_node)
-
-    return res
+                fields_for_concrete.append(field_node)
+    initial[parent_concrete.name] = fields_for_concrete
+    return initial
 
 
 def _evaluate_interface(
@@ -274,19 +275,24 @@ def _evaluate_interface(
 ) -> QtGqlQueriedInterface:
     choices: list[QtGqlQueriedObjectType] = []
 
-    # first get all linear selections, these are selection that can be applied to
-    # any of the interface implementors
     raw_fields_map = _unwrap_interface_fragments(
         type_info.schema_type_info,
         concrete,
         selection_set,
+        {},
     )
+    # dispatch fragmented fields where they are needed.
     for resolve_able in concrete.implementations.values():
         if concrete_choice := resolve_able.is_object_type:
             fields_for_obj = []
-            for base in concrete_choice.bases:
-                if fields_for_base := raw_fields_map.get(base):
-                    fields_for_base.extend(fields_for_obj)
+            # collect fields from bases.
+            for base in concrete_choice.interfaces_raw:
+                if fields_for_base := raw_fields_map.get(base.name, None):
+                    fields_for_obj.extend(fields_for_base)
+
+            # append fields of the choice itself
+            if choice_fields := raw_fields_map.get(concrete_choice.name, None):
+                fields_for_obj.extend(choice_fields)
             ss = gql_lang.SelectionSetNode(selections=tuple(fields_for_obj))
             choices.append(
                 _evaluate_object_type(  # TODO: can that be optimized?
@@ -314,7 +320,7 @@ def _evaluate_interface(
                 field_node=field,
                 origin=concrete,
             )
-            for field in raw_fields_map[concrete]
+            for field in raw_fields_map[concrete.name]
         },
     )
     for choice in choices:

@@ -1,4 +1,5 @@
 #include "debugableclient.hpp"
+#include "graphql/__generated__/ChangeName.hpp"
 #include "graphql/__generated__/MainQuery.hpp"
 #include <QSignalSpy>
 #include <catch2/catch_test_macros.hpp>
@@ -18,8 +19,13 @@ TEST_CASE("NodeInterfaceFieldTestCase", "[generated-testcase]") {
   test_utils::wait_for_completion(mq);
   SECTION("test deserialize") {
     REQUIRE(mq->data()->get_node()->__typename() == "User");
+    auto user =
+        qobject_cast<const mainquery::User__node *>(mq->data()->get_node());
+    REQUIRE(!user->get_password().isEmpty());
   };
-  SECTION("test update") { REQUIRE(false); };
+  SECTION("test update") {
+    auto user =
+        qobject_cast<const mainquery::User__node *>(mq->data()->get_node());
+  };
 }
-
 }; // namespace NodeInterfaceFieldTestCase
