@@ -18,12 +18,12 @@ TEST_CASE("NodeInterfaceFieldTestCase", "[generated-testcase]") {
   mq->fetch();
   test_utils::wait_for_completion(mq);
   SECTION("test deserialize") {
-    REQUIRE(mq->data()->get_node()->__typename() == "User");
+    REQUIRE(mq->data()->get_node()->property("__typeName") == "User");
     auto user =
         qobject_cast<const mainquery::User__node *>(mq->data()->get_node());
     REQUIRE(!user->get_password().isEmpty());
   };
-  SECTION("test update") {
+  SECTION("test updates same id other operation") {
     auto user =
         qobject_cast<const mainquery::User__node *>(mq->data()->get_node());
     auto change_name_mut = changename::ChangeName::shared();
@@ -35,6 +35,21 @@ TEST_CASE("NodeInterfaceFieldTestCase", "[generated-testcase]") {
     test_utils::wait_for_completion(change_name_mut);
 
     REQUIRE(user->get_name().toStdString() == new_name.toStdString());
+  };
+
+  SECTION("test updates different id same type") {
+    auto mq2 = mainquery::MainQuery::shared();
+    test_utils::SignalCatcher catcher(
+        {.source_obj = mq->data(), .only = "node"});
+    mq2->set_variables({NodeInterfaceFieldTestCase::Enums::TypesEnum::User});
+    mq2->fetch();
+    REQUIRE(catcher.wait());
+    test_utils::wait_for_completion(mq2);
+    auto user1 =
+        qobject_cast<const mainquery::User__node *>(mq->data()->get_node());
+    auto user2 =
+        qobject_cast<const mainquery::User__node *>(mq2->data()->get_node());
+    REQUIRE(user1->get_password() == user2->get_password());
   };
 }
 }; // namespace NodeInterfaceFieldTestCase
