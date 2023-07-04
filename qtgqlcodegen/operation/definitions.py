@@ -52,13 +52,6 @@ class QtGqlQueriedField:
 
     @cached_property
     def type_name(self) -> str:
-        if self.type.is_object_type:
-            return self.type.type_name()
-
-        if model_of := self.type.is_model:
-            if model_of.is_object_type:
-                return f"qtgql::bases::ListModelABC<{self.type.type_name()}>"
-
         return self.type.member_type
 
     @cached_property

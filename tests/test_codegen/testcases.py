@@ -575,9 +575,11 @@ ListOfObjectWithUnionTestCase = QtGqlTestCase(
 )
 EnumTestCase = QtGqlTestCase(
     schema=schemas.object_with_enum.schema,
+    # __typename selection here has no value but to check durability.
     operations="""
         query MainQuery {
           user {
+            __typename
             name
             age
             status

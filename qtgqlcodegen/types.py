@@ -327,9 +327,6 @@ class QtGqlObjectType(BaseQtGqlObjectType):
             if not base.implementations.get(self.name):
                 base.implementations[self.name] = self
 
-    def __hash__(self) -> int:
-        return hash(self.name)
-
 
 @define
 class QtGqlDeferredType(QtGqlTypeABC):
@@ -375,9 +372,6 @@ class QtGqlInterface(QtGqlObjectType):
     @property
     def is_interface(self) -> QtGqlInterface | None:
         return self
-
-    def __hash__(self) -> int:
-        return hash(self.name)
 
 
 @define(slots=False)

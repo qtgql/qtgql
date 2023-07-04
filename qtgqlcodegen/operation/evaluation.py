@@ -349,7 +349,7 @@ def _evaluate_object_type(
     for selection in selection_set.selections:
         if f_node := is_field_node(selection):
             if is_type_name_selection(f_node):
-                continue  # __type_name selection is handled with special care.
+                continue  # __typename selection is handled with special care.
             concrete_field = concrete.fields_dict[f_node.name.value]
             fields[concrete_field.name] = _evaluate_field(
                 type_info=type_info,
