@@ -3,11 +3,10 @@ from __future__ import annotations
 import re
 from enum import Enum
 
-from attr import define
+from attrs import define
 from tests.conftest import PATHS
 
 release_file = PATHS.PROJECT_ROOT / "RELEASE.md"
-no_release_file = PATHS.PROJECT_ROOT / "NORELEASE.md"
 
 # Shamelessly copied from strawberry
 # https://github.com/strawberry-graphql/strawberry/blob/main/.github/release-check-action/release.py
@@ -40,8 +39,7 @@ class ReleaseFile:
         changelog = release_file.read_text()
         match = RELEASE_TYPE_REGEX.match(changelog.splitlines()[0])
 
-        if not match:
-            raise InvalidReleaseFileError("Could not find a valid release type")
+        # if not match:
 
         change_type_key = match.group(1)
         release_type = ReleaseType[change_type_key.upper()]
