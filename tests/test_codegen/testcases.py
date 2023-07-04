@@ -456,8 +456,8 @@ RootListOfTestCase = QtGqlTestCase(
     test_name="RootListOfTestCase",
 )
 
-InterfaceTestCase = QtGqlTestCase(
-    schema=schemas.object_with_interface.schema,
+NonNodeInterfaceTestCase = QtGqlTestCase(
+    schema=schemas.non_node_interface_field.schema,
     operations="""
     query AnimalQuery($kind: AnimalKind!) {
       animal(kind: $kind) {
@@ -489,8 +489,43 @@ InterfaceTestCase = QtGqlTestCase(
       }
     }
     """,
-    test_name="InterfaceTestCase",
+    test_name="NonNodeInterfaceTestCase",
 )
+
+
+NodeInterfaceFieldTestCase = QtGqlTestCase(
+    schema=schemas.node_interface_field.schema,
+    operations="""
+    query MainQuery ($ret: TypesEnum!) {
+      node(ret: $ret) {
+        id
+        __typename
+        ... on HasNameAgeInterface {
+          name
+          age
+        }
+        ... on User {
+          password
+        }
+        ... on Dog {
+          barks
+        }
+      }
+    }
+
+    mutation ChangeName($node_id: ID!, $new_name: String!){
+        modifyName(nodeId: $node_id, newName: $new_name){
+            ...on HasNameAgeInterface
+            {
+            name
+            }
+        }
+    }
+    """,
+    test_name="NodeInterfaceFieldTestCase",
+)
+
+
 UnionTestCase = QtGqlTestCase(
     schema=schemas.object_with_union.schema,
     operations="""
@@ -540,9 +575,11 @@ ListOfObjectWithUnionTestCase = QtGqlTestCase(
 )
 EnumTestCase = QtGqlTestCase(
     schema=schemas.object_with_enum.schema,
+    # __typename selection here has no value but to check durability.
     operations="""
         query MainQuery {
           user {
+            __typename
             name
             age
             status
@@ -624,12 +661,6 @@ ListOfNonNodeType = QtGqlTestCase(
     test_name="ListOfNonNodeType",
 )
 
-
-TypeWithNullAbleIDTestCase = QtGqlTestCase(
-    schema=schemas.type_with_nullable_id.schema,
-    operations="""query MainQuery {users{name}}""",
-    test_name="TypeWithNullAbleIDTestCase",
-)
 
 ListOfUnionTestCase = QtGqlTestCase(
     schema=schemas.list_of_union.schema,
@@ -727,34 +758,12 @@ SubscriptionTestCase = QtGqlTestCase(
     test_name="SubscriptionTestCase",
 )
 
-InterfaceFieldTestCase = QtGqlTestCase(
-    schema=schemas.interface_field.schema,
-    operations="""
-    query MainQuery ($ret: TypesEnum! = Dog) {
-      node(ret: $ret) {
-        id
-        __typename
-        ... on HasNameAgeInterface {
-          name
-          age
-        }
-        ... on User {
-          password
-        }
-        ... on Dog {
-          barks
-        }
-      }
-    }
-    """,
-    test_name="InterfaceFieldTestCase",
-)
-
 ListOfInterfaceTestcase = QtGqlTestCase(
     schema=schemas.list_of_interface.schema,
-    operations=InterfaceFieldTestCase.operations,
+    operations=NodeInterfaceFieldTestCase.operations,
     test_name="ListOfInterfaceTestcase",
 )
+
 all_test_cases = [
     ScalarsTestCase,
     OptionalScalarsTestCase,
@@ -771,14 +780,14 @@ all_test_cases = [
     RootScalarTestCase,
     NonNodeTypeTestCase,
     InputTypeOperationVariableTestCase,
-    InterfaceTestCase,
+    NonNodeInterfaceTestCase,
+    NodeInterfaceFieldTestCase,
     UnionTestCase,
     ListOfObjectWithUnionTestCase,
     CustomUserScalarTestCase,
     ObjectsThatReferenceEachOtherTestCase,
     RootListOfTestCase,
     ListOfNonNodeType,
-    TypeWithNullAbleIDTestCase,
     ListOfUnionTestCase,
 ]
 
@@ -794,11 +803,12 @@ implemented_testcases = [
     OptionalNestedObjectTestCase,
     ObjectWithListOfObjectTestCase,
     EnumTestCase,
-    InterfaceTestCase,
+    NonNodeInterfaceTestCase,
     OperationVariablesTestcase,
     RootScalarTestCase,
     NonNodeTypeTestCase,
     InputTypeOperationVariableTestCase,
+    NodeInterfaceFieldTestCase,
 ]
 
 
@@ -811,4 +821,4 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 
 if __name__ == "__main__":
-    generate_testcases(InterfaceTestCase)
+    generate_testcases(NodeInterfaceFieldTestCase)

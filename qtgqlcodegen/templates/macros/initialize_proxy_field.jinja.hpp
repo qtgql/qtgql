@@ -18,7 +18,7 @@ init_list_👉 field.name 👈->append(new 👉field.type.of_type.name👈(👉o
 👉field.private_name👈 = new qtgql::bases::ListModelABC<👉 field.type.of_type.name 👈>(this, std::move(init_list_👉 field.name 👈));
 {% elif field.type.is_queried_interface %}
 auto concrete_👉field.name👈 = 👉 instance_of_concrete 👈;
-auto 👉field.name👈_typename = concrete_👉field.name👈->TYPE_NAME();
+auto 👉field.name👈_typename = concrete_👉field.name👈->__typename();
 {%set type_cond -%}👉field.name👈_typename{% endset -%}
 {% for choice in field.type.choices -%}
 {% set do_on_meets -%}

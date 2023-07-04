@@ -1,5 +1,6 @@
 {% macro proxy_type_fields(t, context) -%}
 Q_OBJECT
+Q_PROPERTY(QString  __typeName READ __typename CONSTANT)
 
 {% for f in t.fields -%}
 Q_PROPERTY(const 👉 f.property_type 👈 👉 f.name 👈 READ 👉 f.concrete.getter_name 👈 NOTIFY 👉 f.concrete.signal_name 👈);

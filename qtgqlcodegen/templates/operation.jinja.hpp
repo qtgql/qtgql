@@ -34,6 +34,10 @@ public:
 throw qtgql::exceptions::InterfaceDirectAccessError("👉t.concrete.name👈");
 }
 {% endfor %}
+public:
+[[nodiscard]] virtual const QString & __typename() const{
+    throw qtgql::exceptions::InterfaceDirectAccessError("👉t.concrete.name👈");
+}
 };
 {% endfor %}
 // ------------ Narrowed Object types ------------
@@ -56,7 +60,10 @@ return m_inst->👉 f.concrete.getter_name 👈();
 {%- endif -%}
 };
 {% endfor -%}
-
+public:
+[[nodiscard]] const QString & __typename() const {% if t.base_interface -%}final{% endif %}{
+    return m_inst->__typename();
+}
 };
 {% endfor %}
 
@@ -64,15 +71,14 @@ struct 👉 context.operation.generated_variables_type 👈{
 {% for var in context.operation.variables -%}
 std::optional<👉 var.type.member_type 👈> 👉 var.name 👈 = {};
 {% endfor -%}
-
     QJsonObject to_json() const{
-    QJsonObject ret;
+    QJsonObject __ret;
     {% for var in context.operation.variables -%}
     if (👉 var.name 👈.has_value()){
-    ret.insert("👉 var.name 👈",  👉 var.json_repr() 👈);
+    __ret.insert("👉 var.name 👈",  👉 var.json_repr() 👈);
     }
     {% endfor -%}
-    return ret;
+    return __ret;
     }
 };
 

@@ -3,16 +3,15 @@ from __future__ import annotations
 import re
 from enum import Enum
 
-from attr import define
+from attrs import define
 from tests.conftest import PATHS
 
 release_file = PATHS.PROJECT_ROOT / "RELEASE.md"
-no_release_file = PATHS.PROJECT_ROOT / "NORELEASE.md"
 
 # Shamelessly copied from strawberry
 # https://github.com/strawberry-graphql/strawberry/blob/main/.github/release-check-action/release.py
 
-RELEASE_TYPE_REGEX = re.compile(r"^[Rr]release [Tt]ype: (major|minor|patch)$")
+RELEASE_TYPE_REGEX = re.compile(r"(?i)Release type: (minor|major|patch)$")
 
 
 class InvalidReleaseFileError(Exception):
@@ -41,6 +40,7 @@ class ReleaseFile:
         match = RELEASE_TYPE_REGEX.match(changelog.splitlines()[0])
 
         if not match:
+            print(release_file.read_text())  # noqa
             raise InvalidReleaseFileError("Could not find a valid release type")
 
         change_type_key = match.group(1)

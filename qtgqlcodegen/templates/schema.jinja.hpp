@@ -111,20 +111,11 @@ QTGQL_STATIC_MAKE_SHARED(👉 type.name 👈)
 
 👉 type.name 👈()= default;
 
-inline const QString & TYPE_NAME() final{
-    static const QString ret = "👉 type.name 👈";
-    return ret;
+public:
+inline const QString & __typename() final{
+static const QString ret = "👉 type.name 👈";
+return ret;
 };
-
-{% if type.implements_node -%}
-static std::optional<std::shared_ptr<👉 type.name 👈>> get_node(const QString & id){
-    auto node = ENV_CACHE()->get_node(id);
-    if (node.has_value()){
-        return std::static_pointer_cast<👉 type.name 👈>(node.value());
-    }
-    return {};
-}
-{% endif %}
 };
 {% endfor %}
 

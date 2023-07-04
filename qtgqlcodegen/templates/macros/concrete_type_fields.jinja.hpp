@@ -42,5 +42,15 @@ void 👉 f.setter_name 👈(👉 f.type.member_type_arg 👈 v{% if f.arguments
 emit 👉 f.signal_name 👈();
 };
 {% endfor %}
+{% if type.implements_node -%}
+public:
+static std::optional<std::shared_ptr<👉 type.name 👈>> get_node(const QString & id){
+    auto node = ENV_CACHE()->get_node(id);
+    if (node.has_value()){
+        return std::static_pointer_cast<👉 type.name 👈>(node.value());
+    }
+    return {};
+}
+{% endif %}
 {% endmacro -%}
 
