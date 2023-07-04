@@ -231,6 +231,7 @@ def _unwrap_interface_fragments(
     parent_concrete: QtGqlObjectType | QtGqlInterface,
     selection_set: gql_lang.SelectionSetNode,
     initial: dict[str, list[gql_lang.FieldNode]],
+    id_was_selected: bool = False,
 ) -> dict[str, list[gql_lang.FieldNode]]:
     """Fragments can be nested, i.e node{ id.
 
@@ -244,6 +245,9 @@ def _unwrap_interface_fragments(
     :returns: all of the inline fragments as a flat list.
     """
     fields_for_concrete: list[gql_lang.FieldNode] = []
+    if not has_id_selection(selection_set) and not id_was_selected:
+        id_was_selected = True
+        inject_id_selection(selection_set)
     for field_or_frag in selection_set.selections:
         if inline_frag := is_inline_fragment(field_or_frag):
             type_name = inline_frag.type_condition.name.value
@@ -257,12 +261,14 @@ def _unwrap_interface_fragments(
                 concrete_choice,
                 inline_frag.selection_set,
                 initial,
+                id_was_selected,
             )
         else:
             field_node = is_field_node(field_or_frag)
             assert field_node
             if field_node.name.value != "__typename":
                 fields_for_concrete.append(field_node)
+
     initial[parent_concrete.name] = fields_for_concrete
     return initial
 

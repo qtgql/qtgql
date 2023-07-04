@@ -445,6 +445,10 @@ class QtGqlQueriedObjectType(QtGqlQueriedTypeABC, QtGqlTypeABC):
     base_interface: QtGqlQueriedInterface | None = None  # I think that there could be only one
 
     @property
+    def implements_node(self) -> bool:
+        return self.concrete.implements_node
+
+    @property
     def is_queried_object_type(self) -> QtGqlQueriedObjectType | None:
         return self
 

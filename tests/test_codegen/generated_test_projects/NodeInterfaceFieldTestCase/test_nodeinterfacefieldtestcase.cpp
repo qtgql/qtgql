@@ -26,6 +26,15 @@ TEST_CASE("NodeInterfaceFieldTestCase", "[generated-testcase]") {
   SECTION("test update") {
     auto user =
         qobject_cast<const mainquery::User__node *>(mq->data()->get_node());
+    auto change_name_mut = changename::ChangeName::shared();
+    QString new_name("Alfonso");
+    change_name_mut->set_variables({user->get_id(), new_name});
+    test_utils::SignalCatcher catcher({.source_obj = user, .only = "name"});
+    change_name_mut->fetch();
+    REQUIRE(catcher.wait());
+    test_utils::wait_for_completion(change_name_mut);
+
+    REQUIRE(user->get_name().toStdString() == new_name.toStdString());
   };
 }
 }; // namespace NodeInterfaceFieldTestCase

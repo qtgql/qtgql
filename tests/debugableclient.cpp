@@ -91,6 +91,7 @@ SignalCatcher::SignalCatcher(const SignalCatcherParams &params) {
   m_excludes = params.excludes;
   if (params.exclude_id) {
     m_excludes.insert("id");
+    m_excludes.insert("__typeName");
   }
   auto mo = params.source_obj->metaObject();
   for (int i = mo->propertyOffset(); i < mo->propertyCount(); ++i) {
