@@ -301,7 +301,9 @@ def _evaluate_interface(
                 fields_for_obj.extend(choice_fields)
             ss = gql_lang.SelectionSetNode(selections=tuple(fields_for_obj))
             choices.append(
-                _evaluate_object_type(  # TODO: can that be optimized?
+                # This could probably be more optimized though, currently
+                # this would suffice to reduce complexity.
+                _evaluate_object_type(
                     type_info=type_info,
                     concrete=concrete_choice,
                     selection_set=ss,

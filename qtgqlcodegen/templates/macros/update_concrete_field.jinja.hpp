@@ -79,7 +79,7 @@ if (👉current👈 && 👉current👈->get_id() == 👉f_concrete.name👈_data
 else{
 👉 setter_name 👈(👉choice.deserializer_name👈(👉proxy_field.name👈_data, 👉operation_pointer👈) 👉 setter_end 👈);
 }
-{% else %} // TODO: shouldn't that be setter_name here?
+{% else %}
 👉choice.updater_name👈(std::static_pointer_cast<👉choice.concrete.name👈>(👉current👈), 👉f_concrete.name👈_data,  👉operation_pointer👈);
 {% endif %}
 {% endset -%}
