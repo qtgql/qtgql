@@ -317,6 +317,8 @@ def _evaluate_interface(
             for field in raw_fields_map[concrete]
         },
     )
+    for choice in choices:
+        choice.base_interface = ret
     type_info.narrowed_interfaces_map[name] = ret
     return ret
 

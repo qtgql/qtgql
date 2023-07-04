@@ -39,7 +39,7 @@ emit 👉 field.concrete.signal_name 👈();
 auto operation = qobject_cast<👉operation.name👈*>(this->parent());
 auto concrete = 👉new_concrete👈;
 delete 👉field.private_name👈;
-auto 👉field.name👈_typename = concrete->TYPE_NAME();
+auto 👉field.name👈_typename = concrete->__typename();
 {%set type_cond -%}👉field.name👈_typename{% endset -%}
 {% for choice in field.type.choices %}
 {% set do_on_meets -%}

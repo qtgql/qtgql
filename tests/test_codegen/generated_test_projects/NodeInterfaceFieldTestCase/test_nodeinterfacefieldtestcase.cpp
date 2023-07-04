@@ -17,7 +17,7 @@ TEST_CASE("NodeInterfaceFieldTestCase", "[generated-testcase]") {
   mq->fetch();
   test_utils::wait_for_completion(mq);
   SECTION("test deserialize") {
-    REQUIRE(mq->data()->get_node()->__type_name() == "User");
+    REQUIRE(mq->data()->get_node()->__typename() == "User");
   };
   SECTION("test update") { REQUIRE(false); };
 }
