@@ -7,8 +7,6 @@ import attrs
 import graphql
 from attr import define
 
-from qtgqlcodegen.core.cppref import QtGqlTypes
-
 if TYPE_CHECKING:
     from graphql.type import definition as gql_def
 
@@ -55,29 +53,6 @@ class QtGqlQueriedField:
     @cached_property
     def type_name(self) -> str:
         return self.type.member_type
-
-    @cached_property
-    def property_type(self) -> str:
-        """
-
-        :return: C++ property type that will be exposed to QML.
-        """
-        # TODO: move this to queried types.
-        tp = self.type
-        if tp.is_queried_object_type or tp.is_queried_interface:
-            return f"{self.type_name} *"
-
-        if cs := tp.is_custom_scalar:
-            return cs.to_qt_type
-
-        if model := tp.is_model:
-            if model.of_type.is_queried_object_type:
-                return f"qtgql::bases::ListModelABC<{model.of_type.type_name()}> *"
-            raise NotImplementedError
-        if tp.is_queried_union:
-            return f"{QtGqlTypes.ObjectTypeABC.name} *"
-
-        return f"{self.type_name} &"
 
     @cached_property
     def build_variables_tuple_for_field_arguments(self) -> str:

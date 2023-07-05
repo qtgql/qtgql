@@ -79,6 +79,13 @@ class QtGqlTypeABC(ABC):
         raise NotImplementedError
 
     @property
+    def property_type(self) -> str:
+        """
+        :return: The QProperty type, usually will lay in the proxy.
+        """
+        return f"{self.type_name()} &"  # default for scalars this should suffice.
+
+    @property
     def default_value(self) -> str:
         """
 
@@ -157,6 +164,12 @@ class QtGqlList(QtGqlTypeABC):
             "models have no valid type for schema concretes, call member_type",
         )
 
+    @property
+    def property_type(self) -> str:
+        if self.of_type.is_queried_object_type:
+            return f"qtgql::bases::ListModelABC<{self.of_type.type_name()}> *"
+        raise NotImplementedError
+
 
 @define
 class QtGqlUnion(QtGqlTypeABC):
@@ -234,6 +247,10 @@ class CustomScalarDefinition(QtGqlTypeABC):
     @property
     def getter_is_constable(self) -> bool:
         return False
+
+    @property
+    def property_type(self) -> str:
+        return self.to_qt_type
 
 
 @define(slots=False)
@@ -430,7 +447,7 @@ class QtGqlEnumDefinition(QtGqlTypeABC):
 
 
 @define
-class QtGqlQueriedTypeABC:
+class QtGqlQueriedTypeABC(ABC):
     concrete: QtGqlTypeABC
 
 
@@ -463,6 +480,10 @@ class QtGqlQueriedObjectType(QtGqlQueriedTypeABC, QtGqlTypeABC):
 
     def type_name(self) -> str:
         return self.name
+
+    @property
+    def property_type(self) -> str:
+        return f"{self.type_name()} *"
 
     @cached_property
     def references(self) -> list[QtGqlQueriedField]:
@@ -513,6 +534,10 @@ class QtGqlQueriedUnion(QtGqlQueriedTypeABC, QtGqlTypeABC):
 
     def type_name(self) -> str:
         return self.concrete.type_name()
+
+    @property
+    def property_type(self) -> str:
+        return f"{QtGqlTypes.ObjectTypeABC.name} *"
 
 
 def ScalarsNs() -> CppAttribute:

@@ -30,7 +30,7 @@ class 👉 t.name 👈: public 👉 context.qtgql_types.ObjectTypeABC.name 👈{
 public:
     using 👉 context.qtgql_types.ObjectTypeABC.name 👈::👉 context.qtgql_types.ObjectTypeABC.name 👈;
 {% for f in t.fields -%}
-[[nodiscard]] inline virtual const 👉 f.property_type 👈  👉 f.concrete.getter_name 👈() const {
+[[nodiscard]] inline virtual const 👉 f.type.property_type 👈  👉 f.concrete.getter_name 👈() const {
 throw qtgql::exceptions::InterfaceDirectAccessError("👉t.concrete.name👈");
 }
 {% endfor %}
@@ -52,7 +52,7 @@ public:
 {% endif %}
 public:
 {% for f in t.fields -%}
-[[nodiscard]] inline const 👉 f.property_type 👈  👉 f.concrete.getter_name 👈() const {
+[[nodiscard]] inline const 👉 f.type.property_type 👈  👉 f.concrete.getter_name 👈() const {
 {% if f.type.is_queried_object_type or f.type.is_model or f.type.is_queried_interface or f.type.is_queried_union %}
 // TODO: rename this to private name
 return m_👉f.name👈;

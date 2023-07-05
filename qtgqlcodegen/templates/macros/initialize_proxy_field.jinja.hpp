@@ -22,7 +22,7 @@ auto 👉field.name👈_typename = concrete_👉field.name👈->__typename();
 {%set type_cond -%}👉field.name👈_typename{% endset -%}
 {% for choice in field.type.choices -%}
 {% set do_on_meets -%}
-👉field.private_name👈 = qobject_cast<👉 field.property_type 👈>(new 👉choice.type_name()👈(👉operation_pointer👈, std::static_pointer_cast<👉 choice.concrete.name 👈>(concrete_👉field.name👈)));
+👉field.private_name👈 = qobject_cast<👉 field.type.property_type 👈>(new 👉choice.type_name()👈(👉operation_pointer👈, std::static_pointer_cast<👉 choice.concrete.name 👈>(concrete_👉field.name👈)));
 {% endset -%}
 👉iterate_type_condition(choice,type_cond, do_on_meets, loop)👈
 {% endfor %}
