@@ -530,8 +530,7 @@ NonNodeUnionTestCase = QtGqlTestCase(
     schema=schemas.object_with_union.schema,
     operations="""
     query MainQuery($choice: UnionChoice!) {
-      user(choice: $choice) {
-        whoAmI {
+        whoAmI(choice: $choice) {
           __typename
           ... on Frog {
             name
@@ -543,7 +542,6 @@ NonNodeUnionTestCase = QtGqlTestCase(
           }
         }
       }
-    }
     """,
     test_name="NonNodeUnionTestCase",
 )

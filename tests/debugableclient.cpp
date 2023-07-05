@@ -103,12 +103,19 @@ SignalCatcher::SignalCatcher(const SignalCatcherParams &params) {
       if (params.only.has_value() && params.only.value() != prop_name) {
         continue;
       }
-      m_spys.emplace_front(std::make_unique<QSignalSpy>(
-                               params.source_obj, property.notifySignal()),
-                           prop_name);
+      auto spy = new QSignalSpy(params.source_obj, property.notifySignal());
+      if (!spy->isValid()) {
+        throw std::runtime_error("spy for property " + prop_name.toStdString() +
+                                 " is not valid");
+      }
+      m_spys.emplace_front(spy, prop_name);
     }
   }
   if (params.only.has_value() && m_spys.empty()) {
+    if (m_excludes.contains(params.only.value())) {
+      throw std::runtime_error(params.only.value().toStdString() +
+                               " is excluded and cannot be included");
+    }
     throw std::runtime_error("could not find property signal for " +
                              params.only.value().toStdString());
   }
@@ -119,11 +126,13 @@ SignalCatcher::SignalCatcher(const SignalCatcherParams &params) {
  */
 bool SignalCatcher::wait(int timeout) {
   for (const auto &spy_pair : m_spys) {
-    if (!QTest::qWaitFor([&]() -> bool { return spy_pair.first->isEmpty(); },
+    if (!QTest::qWaitFor([&]() -> bool { return spy_pair.first->count() != 0; },
                          timeout)) {
       qDebug() << "Signal " << spy_pair.second << " wasn't caught.";
       return false;
     }
+    qDebug() << spy_pair.second.toStdString()
+             << "was fired:" << spy_pair.first->count() << " times.";
   };
   return true;
 }

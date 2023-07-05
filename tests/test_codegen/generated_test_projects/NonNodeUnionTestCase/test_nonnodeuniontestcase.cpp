@@ -7,7 +7,7 @@ namespace NonNodeUnionTestCase {
 using namespace qtgql;
 
 auto ENV_NAME = QString("NonNodeUnionTestCase");
-auto SCHEMA_ADDR = get_server_address("3652353");
+auto SCHEMA_ADDR = get_server_address("48912056");
 
 TEST_CASE("NonNodeUnionTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
@@ -17,24 +17,24 @@ TEST_CASE("NonNodeUnionTestCase", "[generated-testcase]") {
   mq->fetch();
   test_utils::wait_for_completion(mq);
   SECTION("test deserialize") {
-    auto raw_ptr = mq->data()->get_user()->get_whoAmI();
+    auto raw_ptr = mq->data()->get_whoAmI();
     REQUIRE(raw_ptr->property("__typeName").toString().toStdString() ==
             "Person");
-    auto p = qobject_cast<const mainquery::Person__userwhoAmI *>(raw_ptr);
+    auto p = qobject_cast<const mainquery::Person__whoAmI *>(raw_ptr);
     REQUIRE(!p->get_name().isEmpty());
   };
   SECTION("test update same type") {
-    auto user = mq->data()->get_user();
-    auto prev_name =
-        mq->data()->get_user()->get_whoAmI()->property("name").toString();
+    auto person = qobject_cast<const mainquery::Person__whoAmI *>(
+        mq->data()->get_whoAmI());
+    auto prev_name = mq->data()->get_whoAmI()->property("name").toString();
     auto mq2 = mainquery::MainQuery::shared();
-    test_utils::SignalCatcher catcher({.source_obj = user, .only = "whoAmI"});
+    test_utils::SignalCatcher catcher({.source_obj = person, .only = "name"});
     mq2->set_variables({NonNodeUnionTestCase::Enums::UnionChoice::PERSON});
     mq2->fetch();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(mq2);
-    REQUIRE(mq2->data()
-                ->get_user()
+    REQUIRE(mq->data()
+
                 ->get_whoAmI()
                 ->property("name")
                 .toString()

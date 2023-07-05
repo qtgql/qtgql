@@ -5,25 +5,16 @@ type Frog {
 
 union FrogPerson = Frog | Person
 
-interface Node {
-  id: ID!
-}
-
 type Person {
   name: String!
   age: Int!
 }
 
 type Query {
-  user(choice: UnionChoice! = PERSON): User!
+  whoAmI(choice: UnionChoice! = PERSON): FrogPerson!
 }
 
 enum UnionChoice {
   PERSON
   FROG
-}
-
-type User implements Node {
-  id: ID!
-  whoAmI: FrogPerson!
 }

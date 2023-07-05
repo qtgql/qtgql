@@ -82,7 +82,7 @@ get_or_create_env(const QString &env_name, const DebugClientSettings &settings,
                   std::chrono::milliseconds cache_dur = 5s);
 
 class SignalCatcher {
-  std::list<std::pair<std::unique_ptr<QSignalSpy>, QString>> m_spys = {};
+  std::list<std::pair<QSignalSpy *, QString>> m_spys = {};
   QSet<QString> m_excludes = {};
 
 public:
