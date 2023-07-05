@@ -28,7 +28,7 @@ void update_👉 t.name 👈(👉 t.concrete.member_type_arg 👈 inst, const QJ
 class 👉 t.name 👈: public 👉 context.qtgql_types.ObjectTypeABC.name 👈{
 👉 proxy_type_fields(t, context) 👈
 public:
-    using 👉 context.qtgql_types.ObjectTypeABC.name 👈::👉 context.qtgql_types.ObjectTypeABC.name 👈;
+    using 👉 context.qtgql_types.ObjectTypeABC.name 👈::👉 context.qtgql_types.ObjectTypeABC.last 👈;
 {% for f in t.fields -%}
 [[nodiscard]] inline virtual const 👉 f.type.property_type 👈  👉 f.concrete.getter_name 👈() const {
 throw qtgql::exceptions::InterfaceDirectAccessError("👉t.concrete.name👈");
