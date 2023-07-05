@@ -14,6 +14,7 @@ This library is an attempt to provide a high-level graphql client to the QT worl
     - [x] Custom scalar
     - [x] Union
     - [x] Interface
+      - [x] [Node Interface](./server-requirements.md#node-interface)
     - List of:
         - [x] Object Type
         - [ ] Scalar
