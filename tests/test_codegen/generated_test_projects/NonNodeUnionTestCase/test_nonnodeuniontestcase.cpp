@@ -40,6 +40,17 @@ TEST_CASE("NonNodeUnionTestCase", "[generated-testcase]") {
                 .toString()
                 .toStdString() != prev_name.toStdString());
   };
+  SECTION("test update different type") {
+    auto root = mq->data();
+    test_utils::SignalCatcher catcher({.source_obj = root, .only = "whoAmI"});
+    mq->set_variables({NonNodeUnionTestCase::Enums::UnionChoice::FROG});
+    mq->refetch();
+    REQUIRE(catcher.wait());
+    test_utils::wait_for_completion(mq);
+    REQUIRE(!qobject_cast<const mainquery::Frog__whoAmI *>(root->get_whoAmI())
+                 ->get_color()
+                 .isEmpty());
+  }
 }
 
 }; // namespace NonNodeUnionTestCase
