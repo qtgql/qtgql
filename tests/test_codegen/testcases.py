@@ -531,7 +531,6 @@ NonNodeUnionTestCase = QtGqlTestCase(
     operations="""
     query MainQuery($choice: UnionChoice!) {
         whoAmI(choice: $choice) {
-          __typename
           ... on Frog {
             name
             color
