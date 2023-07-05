@@ -21,7 +21,7 @@ protected:
 const std::shared_ptr<👉context.schema_ns👈::👉 t.concrete.name 👈> m_inst;
 {% endif -%}
 {% for ref_field in t.references -%}
-const 👉ref_field.type.property_type👈 m_👉ref_field.name👈 = {};
+const 👉ref_field.type.property_type👈 👉ref_field.private_name👈 = {};
 {% endfor %}
 {%- for model_field in t.models -%}
 👉 model_field.type.property_type 👈 👉model_field.private_name👈;

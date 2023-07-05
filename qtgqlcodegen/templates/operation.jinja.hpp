@@ -54,8 +54,7 @@ public:
 {% for f in t.fields -%}
 [[nodiscard]] inline const 👉 f.type.property_type 👈  👉 f.concrete.getter_name 👈() const {
 {% if f.type.is_queried_object_type or f.type.is_model or f.type.is_queried_interface or f.type.is_queried_union %}
-// TODO: rename this to private name
-return m_👉f.name👈;
+return 👉f.private_name👈;
 {%- else -%}
 return m_inst->👉 f.concrete.getter_name 👈();
 {%- endif -%}
