@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+0.125.0 - 2023-07-05
+--------------------
+
+Initial support for unions.
+currently unions are represented as a `ObjectType *`
+and user would need to cast it based on the `__typeName()` property.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #299](https://github.com/qtgql/qtgql/pull/299/)
+
+
 0.124.0 - 2023-07-04
 --------------------
 
