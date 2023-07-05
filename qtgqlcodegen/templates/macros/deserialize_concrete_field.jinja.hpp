@@ -11,7 +11,7 @@ if (!data.value("👉proxy_field.name👈").isNull()){
 {% if proxy_field.type.is_queried_object_type -%}
 👉 setter_name 👈(👉proxy_field.type.deserializer_name👈(data.value("👉proxy_field.name👈").toObject(), 👉operation_pointer👈) 👉 setter_end 👈);
 
-{% elif proxy_field.type.is_queried_interface -%}
+{% elif proxy_field.type.is_queried_interface or  proxy_field.type.is_queried_union -%}
 auto 👉proxy_field.name👈_data = data.value("👉proxy_field.name👈").toObject();
 auto 👉proxy_field.name👈_typename  = 👉proxy_field.name👈_data.value("__typename").toString();
 {%set type_cond -%}👉proxy_field.name👈_typename{% endset -%}
@@ -28,7 +28,6 @@ for (const auto& node: data.value("👉proxy_field.name👈").toArray()){
 obj_list.append(👉 proxy_field.type.is_model.of_type.is_queried_object_type.deserializer_name 👈(node.toObject(), 👉operation_pointer👈));
 };
 👉 setter_name 👈(obj_list👉 setter_end 👈);
-
 {% elif proxy_field.type.is_model.is_interface -%}
 👉 setter_name 👈(qtgql::ListModel(
         parent=parent,
@@ -57,10 +56,6 @@ new_👉proxy_field.name👈.deserialize(data.value("👉proxy_field.name👈"))
 👉 setter_name 👈(new_👉proxy_field.name👈 👉 setter_end 👈);
 {% elif proxy_field.type.is_enum -%}
 👉 setter_name 👈(Enums::👉proxy_field.type.is_enum.map_name👈::by_name(data.value("👉proxy_field.name👈").toString())👉 setter_end 👈);
-{% elif proxy_field.type.is_union -%}
-type_name = field_data['__typename']
-choice = inner_👉config_name👈.choices[type_name]
-👉 setter_name 👈(__TYPE_MAP__[type_name].from_dict(parent, field_data, choice, 👉operation_pointer👈)👉 setter_end 👈);;
 {% endif -%} 👉 do_after_deserialized 👈
 };
 {%- endmacro %}

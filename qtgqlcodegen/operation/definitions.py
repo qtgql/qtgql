@@ -60,6 +60,7 @@ class QtGqlQueriedField:
 
         :return: C++ property type that will be exposed to QML.
         """
+        # TODO: move this to queried types.
         tp = self.type
         if tp.is_queried_object_type or tp.is_queried_interface:
             return f"{self.type_name} *"
@@ -71,6 +72,9 @@ class QtGqlQueriedField:
             if model.of_type.is_queried_object_type:
                 return f"qtgql::bases::ListModelABC<{model.of_type.type_name()}> *"
             raise NotImplementedError
+        if tp.is_queried_union:
+            # TODO: Make this a more narrowed type
+            return "QObject *"
 
         return f"{self.type_name} &"
 

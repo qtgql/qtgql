@@ -7,7 +7,7 @@ from tests.test_codegen.schemas.node_interface import Node
 
 
 @strawberry.type()
-class Frog(Node):
+class Frog:
     name: str = "Kermit"
     color: str = "green"
 
@@ -23,7 +23,7 @@ class UnionChoice(enum.Enum):
 
 
 @strawberry.type()
-class Person(Node):
+class Person:
     name: str = "Nir"
     age: int = 24
 

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from collections import defaultdict
 from functools import cached_property
 from typing import TYPE_CHECKING, cast
 
@@ -168,11 +167,15 @@ class QtGqlUnion(QtGqlTypeABC):
         return self
 
     def type_name(self) -> str:
-        raise NotImplementedError
+        return f"{QtGqlTypes.ObjectTypeABC.name}"
+
+    @property
+    def member_type(self) -> str:
+        return f"std::shared_ptr<{self.type_name()}>"
 
     @property
     def default_value(self) -> str:
-        raise NotImplementedError
+        return "{}"
 
     def get_by_name(self, name: str) -> QtGqlObjectType | None:
         for possible in self.types:
@@ -463,8 +466,18 @@ class QtGqlQueriedObjectType(QtGqlQueriedTypeABC, QtGqlTypeABC):
 
     @cached_property
     def references(self) -> list[QtGqlQueriedField]:
+        """
+        :return: Fields that should be treated with special care by the operation.
+        They can't just return the field of the concrete.
+        """
         return [
-            f for f in self.fields if f.type.is_queried_object_type or f.type.is_queried_interface
+            f
+            for f in self.fields
+            if (
+                f.type.is_queried_object_type
+                or f.type.is_queried_interface
+                or f.type.is_queried_union
+            )
         ]
 
     @cached_property
@@ -492,9 +505,7 @@ class QtGqlQueriedInterface(QtGqlQueriedObjectType):
 @define(slots=False, repr=False)
 class QtGqlQueriedUnion(QtGqlQueriedTypeABC, QtGqlTypeABC):
     concrete: QtGqlUnion
-    choices: defaultdict[str, dict[str, QtGqlQueriedField]] = attrs.Factory(
-        lambda: defaultdict(dict),
-    )
+    choices: tuple[QtGqlQueriedObjectType]
 
     @property
     def is_queried_union(self) -> QtGqlQueriedUnion | None:

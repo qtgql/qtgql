@@ -1,0 +1,29 @@
+type Frog {
+  name: String!
+  color: String!
+}
+
+union FrogPerson = Frog | Person
+
+interface Node {
+  id: ID!
+}
+
+type Person {
+  name: String!
+  age: Int!
+}
+
+type Query {
+  user(choice: UnionChoice! = PERSON): User!
+}
+
+enum UnionChoice {
+  PERSON
+  FROG
+}
+
+type User implements Node {
+  id: ID!
+  whoAmI: FrogPerson!
+}
