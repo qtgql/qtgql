@@ -505,7 +505,7 @@ class QtGqlQueriedInterface(QtGqlQueriedObjectType):
 @define(slots=False, repr=False)
 class QtGqlQueriedUnion(QtGqlQueriedTypeABC, QtGqlTypeABC):
     concrete: QtGqlUnion
-    choices: tuple[QtGqlQueriedObjectType]
+    choices: tuple[QtGqlQueriedObjectType, ...]
 
     @property
     def is_queried_union(self) -> QtGqlQueriedUnion | None:

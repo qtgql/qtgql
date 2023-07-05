@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from attr import define
 
@@ -17,7 +17,7 @@ class OperationTemplateContext:
     operation: QtGqlOperationDefinition
     config: QtGqlConfig
     debug: bool = False
-    qtgql_types: QtGqlTypes = QtGqlTypes
+    qtgql_types: ClassVar[type[QtGqlTypes]] = QtGqlTypes
 
     @property
     def ns(self) -> str:
