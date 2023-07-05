@@ -8,19 +8,20 @@ This library is an attempt to provide a high-level graphql client to the QT worl
 - [apollo-client](https://www.apollographql.com/docs/react/)
 
 ## Features - TBD
-!!! success "[Codegen (introspection compiler)](./codegen/tutorial.md)"
-    - [x] Object types, for each field there is a corresponding `Q_PROPERTY`
-    - [x] Enums
-    - [ ] Custom scalars
-    - [ ] Unions
-    - [ ] interfaces
-    - [ ] Garbage collection
-    - [ ] Type-safe operation handlers
-        - [x] Query.
-        - [ ] Mutations.
-        - [ ] Subscriptions.
-    - [ ] Query updates: fetch the same query multiple times would not instantiate everything from scratch
-    - [ ] Fully typed input variables.
-
-!!! success "Network layer"
-    - [x] Native-Qt client implementation of "[graphql-transport-ws](https://github.com/enisdenjo/graphql-ws/blob/master/PROTOCOL.md)" protocol (supports subscriptions) - You can provide your own network layer though.
+- types:
+    - [x] Object Type
+    - [x] Enum
+    - [x] Custom scalar
+    - [x] Union
+    - [x] Interface
+    - List of:
+        - [x] Object Type
+        - [ ] Scalar
+        - [ ] custom scalar
+        - [ ] Interface
+        - [ ] Union
+        - [ ] Enum
+- [x] *Garbage collection.* (partially, [see](https://github.com/qtgql/qtgql/issues/277))
+- [x] Operation handlers (queries the server and deserialize data) for Query / Mutation / Subscription.
+- [x] *Fully typed operation variables.* (partially, [see](https://github.com/qtgql/qtgql/issues/272))
+- [x] Native-Qt client implementation of "[graphql-transport-ws](https://github.com/enisdenjo/graphql-ws/blob/master/PROTOCOL.md)" protocol (supports subscriptions) - You can provide your own network layer though.
