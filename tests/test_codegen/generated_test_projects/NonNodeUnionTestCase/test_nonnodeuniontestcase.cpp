@@ -47,7 +47,9 @@ TEST_CASE("NonNodeUnionTestCase", "[generated-testcase]") {
     mq->refetch();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(mq);
-    REQUIRE(!qobject_cast<const mainquery::Frog__whoAmI *>(root->get_whoAmI())
+    auto frog_maybe = root->get_whoAmI();
+    REQUIRE(frog_maybe->__typename().toStdString() == "Frog");
+    REQUIRE(!qobject_cast<const mainquery::Frog__whoAmI *>(frog_maybe)
                  ->get_color()
                  .isEmpty());
   }

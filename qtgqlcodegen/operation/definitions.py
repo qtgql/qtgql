@@ -7,6 +7,8 @@ import attrs
 import graphql
 from attr import define
 
+from qtgqlcodegen.core.cppref import QtGqlTypes
+
 if TYPE_CHECKING:
     from graphql.type import definition as gql_def
 
@@ -73,8 +75,7 @@ class QtGqlQueriedField:
                 return f"qtgql::bases::ListModelABC<{model.of_type.type_name()}> *"
             raise NotImplementedError
         if tp.is_queried_union:
-            # TODO: Make this a more narrowed type
-            return "QObject *"
+            return f"{QtGqlTypes.ObjectTypeABC.name} *"
 
         return f"{self.type_name} &"
 

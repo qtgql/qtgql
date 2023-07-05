@@ -25,10 +25,10 @@ void update_👉 t.name 👈(👉 t.concrete.member_type_arg 👈 inst, const QJ
 
 // ------------ Narrowed Interfaces ------------
 {% for t in context.operation.interfaces -%}
-class 👉 t.name 👈: public QObject{
+class 👉 t.name 👈: public 👉 context.qtgql_types.ObjectTypeABC.name 👈{
 👉 proxy_type_fields(t, context) 👈
 public:
-    using QObject::QObject;
+    using 👉 context.qtgql_types.ObjectTypeABC.name 👈::👉 context.qtgql_types.ObjectTypeABC.name 👈;
 {% for f in t.fields -%}
 [[nodiscard]] inline virtual const 👉 f.property_type 👈  👉 f.concrete.getter_name 👈() const {
 throw qtgql::exceptions::InterfaceDirectAccessError("👉t.concrete.name👈");
@@ -42,7 +42,7 @@ public:
 {% endfor %}
 // ------------ Narrowed Object types ------------
 {% for t in context.operation.narrowed_types %}
-class 👉 t.name 👈: public 👉 "QObject" if not t.base_interface else t.base_interface.name 👈{
+class 👉 t.name 👈: public 👉 context.qtgql_types.ObjectTypeABC.name if not t.base_interface else t.base_interface.name 👈{
 👉 proxy_type_fields(t, context) 👈
 public:
 {% if t.concrete.is_root -%}

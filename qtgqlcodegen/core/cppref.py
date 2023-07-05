@@ -47,6 +47,12 @@ class CppAttribute:
     def name(self) -> str:
         return self.build()
 
+    @cached_property
+    def last(self) -> str:
+        if self.inner:
+            return self.inner.attr.last
+        return self.attr
+
 
 def QtGqlNs() -> CppAttribute:
     return CppAttribute(

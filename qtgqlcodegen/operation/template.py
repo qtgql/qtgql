@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from attr import define
 
+from qtgqlcodegen.core.cppref import QtGqlTypes
 from qtgqlcodegen.core.template import template_env
 
 if TYPE_CHECKING:
@@ -16,6 +17,7 @@ class OperationTemplateContext:
     operation: QtGqlOperationDefinition
     config: QtGqlConfig
     debug: bool = False
+    qtgql_types: QtGqlTypes = QtGqlTypes
 
     @property
     def ns(self) -> str:
