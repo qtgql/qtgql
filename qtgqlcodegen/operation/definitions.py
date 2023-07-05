@@ -55,26 +55,6 @@ class QtGqlQueriedField:
         return self.type.member_type
 
     @cached_property
-    def property_type(self) -> str:
-        """
-
-        :return: C++ property type that will be exposed to QML.
-        """
-        tp = self.type
-        if tp.is_queried_object_type or tp.is_queried_interface:
-            return f"{self.type_name} *"
-
-        if cs := tp.is_custom_scalar:
-            return cs.to_qt_type
-
-        if model := tp.is_model:
-            if model.of_type.is_queried_object_type:
-                return f"qtgql::bases::ListModelABC<{model.of_type.type_name()}> *"
-            raise NotImplementedError
-
-        return f"{self.type_name} &"
-
-    @cached_property
     def build_variables_tuple_for_field_arguments(self) -> str:
         # operation might not use an argument that has default value, ignore what's ignored.
         # see https://github.com/qtgql/qtgql/issues/272 for more details.

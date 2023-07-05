@@ -1,0 +1,14 @@
+
+    query MainQuery($choice: UnionChoice!) {
+        whoAmI(choice: $choice) {
+          __typename
+          ... on Frog {
+            name
+            color
+          }
+          ... on Person {
+            name
+            age
+          }
+        }
+      }

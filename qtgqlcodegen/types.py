@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from collections import defaultdict
 from functools import cached_property
 from typing import TYPE_CHECKING, cast
 
@@ -78,6 +77,13 @@ class QtGqlTypeABC(ABC):
         :returns: The C++ "real" type mostly this would be the member type as well.
         """
         raise NotImplementedError
+
+    @property
+    def property_type(self) -> str:
+        """
+        :return: The QProperty type, usually will lay in the proxy.
+        """
+        return f"{self.type_name()} &"  # default for scalars this should suffice.
 
     @property
     def default_value(self) -> str:
@@ -158,6 +164,12 @@ class QtGqlList(QtGqlTypeABC):
             "models have no valid type for schema concretes, call member_type",
         )
 
+    @property
+    def property_type(self) -> str:
+        if self.of_type.is_queried_object_type:
+            return f"qtgql::bases::ListModelABC<{self.of_type.type_name()}> *"
+        raise NotImplementedError
+
 
 @define
 class QtGqlUnion(QtGqlTypeABC):
@@ -168,11 +180,15 @@ class QtGqlUnion(QtGqlTypeABC):
         return self
 
     def type_name(self) -> str:
-        raise NotImplementedError
+        return f"{QtGqlTypes.ObjectTypeABC.name}"
+
+    @property
+    def member_type(self) -> str:
+        return f"std::shared_ptr<{self.type_name()}>"
 
     @property
     def default_value(self) -> str:
-        raise NotImplementedError
+        return "{}"
 
     def get_by_name(self, name: str) -> QtGqlObjectType | None:
         for possible in self.types:
@@ -231,6 +247,10 @@ class CustomScalarDefinition(QtGqlTypeABC):
     @property
     def getter_is_constable(self) -> bool:
         return False
+
+    @property
+    def property_type(self) -> str:
+        return self.to_qt_type
 
 
 @define(slots=False)
@@ -427,7 +447,7 @@ class QtGqlEnumDefinition(QtGqlTypeABC):
 
 
 @define
-class QtGqlQueriedTypeABC:
+class QtGqlQueriedTypeABC(ABC):
     concrete: QtGqlTypeABC
 
 
@@ -461,10 +481,24 @@ class QtGqlQueriedObjectType(QtGqlQueriedTypeABC, QtGqlTypeABC):
     def type_name(self) -> str:
         return self.name
 
+    @property
+    def property_type(self) -> str:
+        return f"{self.type_name()} *"
+
     @cached_property
     def references(self) -> list[QtGqlQueriedField]:
+        """
+        :return: Fields that should be treated with special care by the operation.
+        They can't just return the field of the concrete.
+        """
         return [
-            f for f in self.fields if f.type.is_queried_object_type or f.type.is_queried_interface
+            f
+            for f in self.fields
+            if (
+                f.type.is_queried_object_type
+                or f.type.is_queried_interface
+                or f.type.is_queried_union
+            )
         ]
 
     @cached_property
@@ -492,9 +526,7 @@ class QtGqlQueriedInterface(QtGqlQueriedObjectType):
 @define(slots=False, repr=False)
 class QtGqlQueriedUnion(QtGqlQueriedTypeABC, QtGqlTypeABC):
     concrete: QtGqlUnion
-    choices: defaultdict[str, dict[str, QtGqlQueriedField]] = attrs.Factory(
-        lambda: defaultdict(dict),
-    )
+    choices: tuple[QtGqlQueriedObjectType, ...]
 
     @property
     def is_queried_union(self) -> QtGqlQueriedUnion | None:
@@ -502,6 +534,10 @@ class QtGqlQueriedUnion(QtGqlQueriedTypeABC, QtGqlTypeABC):
 
     def type_name(self) -> str:
         return self.concrete.type_name()
+
+    @property
+    def property_type(self) -> str:
+        return f"{QtGqlTypes.ObjectTypeABC.name} *"
 
 
 def ScalarsNs() -> CppAttribute:

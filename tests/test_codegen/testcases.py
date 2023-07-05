@@ -526,27 +526,23 @@ NodeInterfaceFieldTestCase = QtGqlTestCase(
 )
 
 
-UnionTestCase = QtGqlTestCase(
+NonNodeUnionTestCase = QtGqlTestCase(
     schema=schemas.object_with_union.schema,
     operations="""
-        query MainQuery {
-          user (choice: FROG){
-            whoAmI {
-              ... on Frog {
-                __typename
-                name
-                color
-              }
-              ... on Person {
-                __typename
-                name
-                age
-              }
-            }
+    query MainQuery($choice: UnionChoice!) {
+        whoAmI(choice: $choice) {
+          ... on Frog {
+            name
+            color
+          }
+          ... on Person {
+            name
+            age
           }
         }
+      }
     """,
-    test_name="UnionTestCase",
+    test_name="NonNodeUnionTestCase",
 )
 ListOfObjectWithUnionTestCase = QtGqlTestCase(
     schema=schemas.object_with_list_of_type_with_union.schema,
@@ -782,7 +778,7 @@ all_test_cases = [
     InputTypeOperationVariableTestCase,
     NonNodeInterfaceTestCase,
     NodeInterfaceFieldTestCase,
-    UnionTestCase,
+    NonNodeUnionTestCase,
     ListOfObjectWithUnionTestCase,
     CustomUserScalarTestCase,
     ObjectsThatReferenceEachOtherTestCase,
@@ -809,6 +805,7 @@ implemented_testcases = [
     NonNodeTypeTestCase,
     InputTypeOperationVariableTestCase,
     NodeInterfaceFieldTestCase,
+    NonNodeUnionTestCase,
 ]
 
 
@@ -821,4 +818,4 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 
 if __name__ == "__main__":
-    generate_testcases(NodeInterfaceFieldTestCase)
+    generate_testcases(NonNodeInterfaceTestCase)

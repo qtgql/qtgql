@@ -25,12 +25,12 @@ void update_👉 t.name 👈(👉 t.concrete.member_type_arg 👈 inst, const QJ
 
 // ------------ Narrowed Interfaces ------------
 {% for t in context.operation.interfaces -%}
-class 👉 t.name 👈: public QObject{
+class 👉 t.name 👈: public 👉 context.qtgql_types.ObjectTypeABC.name 👈{
 👉 proxy_type_fields(t, context) 👈
 public:
-    using QObject::QObject;
+    using 👉 context.qtgql_types.ObjectTypeABC.name 👈::👉 context.qtgql_types.ObjectTypeABC.last 👈;
 {% for f in t.fields -%}
-[[nodiscard]] inline virtual const 👉 f.property_type 👈  👉 f.concrete.getter_name 👈() const {
+[[nodiscard]] inline virtual const 👉 f.type.property_type 👈  👉 f.concrete.getter_name 👈() const {
 throw qtgql::exceptions::InterfaceDirectAccessError("👉t.concrete.name👈");
 }
 {% endfor %}
@@ -42,7 +42,7 @@ public:
 {% endfor %}
 // ------------ Narrowed Object types ------------
 {% for t in context.operation.narrowed_types %}
-class 👉 t.name 👈: public 👉 "QObject" if not t.base_interface else t.base_interface.name 👈{
+class 👉 t.name 👈: public 👉 context.qtgql_types.ObjectTypeABC.name if not t.base_interface else t.base_interface.name 👈{
 👉 proxy_type_fields(t, context) 👈
 public:
 {% if t.concrete.is_root -%}
@@ -52,9 +52,9 @@ public:
 {% endif %}
 public:
 {% for f in t.fields -%}
-[[nodiscard]] inline const 👉 f.property_type 👈  👉 f.concrete.getter_name 👈() const {
-{%- if f.type.is_queried_object_type or f.type.is_model or f.type.is_queried_interface %}
-return m_👉f.name👈;
+[[nodiscard]] inline const 👉 f.type.property_type 👈  👉 f.concrete.getter_name 👈() const {
+{% if f.type.is_queried_object_type or f.type.is_model or f.type.is_queried_interface or f.type.is_queried_union %}
+return 👉f.private_name👈;
 {%- else -%}
 return m_inst->👉 f.concrete.getter_name 👈();
 {%- endif -%}

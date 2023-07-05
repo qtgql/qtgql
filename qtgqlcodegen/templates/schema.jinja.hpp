@@ -112,7 +112,7 @@ QTGQL_STATIC_MAKE_SHARED(👉 type.name 👈)
 👉 type.name 👈()= default;
 
 public:
-inline const QString & __typename() final{
+inline const QString & __typename() const final{
 static const QString ret = "👉 type.name 👈";
 return ret;
 };

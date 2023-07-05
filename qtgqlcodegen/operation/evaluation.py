@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from collections import defaultdict
 from typing import TYPE_CHECKING
 
 import graphql
@@ -195,34 +194,27 @@ def _evaluate_union(
     selection_set: gql_lang.SelectionSetNode,
     path: str,
 ) -> QtGqlQueriedUnion:
-    choices: defaultdict[str, dict[str, QtGqlQueriedField]] = defaultdict(dict)
+    choices: dict[str, QtGqlQueriedObjectType] = {}
+    if not has_typename_selection(selection_set):
+        inject_typename_selection(selection_set)
     for selection in selection_set.selections:
+        if is_field_node(selection):
+            continue  # __typename selection
         fragment = is_inline_fragment(selection)
         assert fragment
         type_name = fragment.type_condition.name.value
         # unions support only object types http://spec.graphql.org/October2021/#sec-Unions
         resolved_type = require(concrete.get_by_name(type_name))
-        if not has_typename_selection(fragment.selection_set):
-            inject_typename_selection(fragment.selection_set)
-        if not has_id_selection(fragment.selection_set) and resolved_type.implements_node:
-            inject_id_selection(fragment.selection_set)
-
-        for selection_node in fragment.selection_set.selections:
-            inner_field_node = require(is_field_node(selection_node))
-            if not is_type_name_selection(inner_field_node):
-                concrete_field = resolved_type.fields_dict[inner_field_node.name.value]
-                __f = _evaluate_field(
-                    type_info=type_info,
-                    concrete_field=concrete_field,
-                    field_node=inner_field_node,
-                    path=path,
-                    origin=resolved_type,
-                )
-                choices[type_name][concrete_field.name] = __f
+        choices[type_name] = _evaluate_object_type(
+            type_info=type_info,
+            concrete=resolved_type,
+            selection_set=fragment.selection_set,
+            path=path,
+        )
 
     return QtGqlQueriedUnion(
         concrete=concrete,
-        choices=choices,
+        choices=tuple(choices.values()),
     )
 
 

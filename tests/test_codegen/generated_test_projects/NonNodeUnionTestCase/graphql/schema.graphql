@@ -1,0 +1,20 @@
+type Frog {
+  name: String!
+  color: String!
+}
+
+union FrogPerson = Frog | Person
+
+type Person {
+  name: String!
+  age: Int!
+}
+
+type Query {
+  whoAmI(choice: UnionChoice! = PERSON): FrogPerson!
+}
+
+enum UnionChoice {
+  PERSON
+  FROG
+}

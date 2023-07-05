@@ -3,18 +3,13 @@ from __future__ import annotations
 import enum
 
 import strawberry
-from tests.test_codegen.schemas.node_interface import Node
+from tests.conftest import factory
 
 
 @strawberry.type()
-class Frog(Node):
-    name: str = "Kermit"
-    color: str = "green"
-
-
-@strawberry.type
-class User(Node):
-    who_am_i: Frog | Person
+class Frog:
+    name: str = strawberry.field(default_factory=factory.person.name)
+    color: str = strawberry.field(default_factory=factory.text.color)
 
 
 @strawberry.enum()
@@ -23,18 +18,18 @@ class UnionChoice(enum.Enum):
 
 
 @strawberry.type()
-class Person(Node):
-    name: str = "Nir"
-    age: int = 24
+class Person:
+    name: str = strawberry.field(default_factory=factory.person.name)
+    age: int = strawberry.field(default_factory=factory.person.age)
 
 
 @strawberry.type
 class Query:
     @strawberry.field
-    def user(self, choice: UnionChoice = UnionChoice.PERSON) -> User:
+    def who_am_i(self, choice: UnionChoice = UnionChoice.PERSON) -> Frog | Person:
         if choice is UnionChoice.PERSON:
-            return User(who_am_i=Person())
-        return User(who_am_i=Frog())
+            return Person()
+        return Frog()
 
 
 schema = strawberry.Schema(query=Query)
