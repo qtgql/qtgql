@@ -21,9 +21,25 @@ TEST_CASE("NonNodeUnionTestCase", "[generated-testcase]") {
     REQUIRE(raw_ptr->property("__typeName").toString().toStdString() ==
             "Person");
     auto p = qobject_cast<const mainquery::Person__userwhoAmI *>(raw_ptr);
-    REQUIRE(p->get_name().toStdString() == "Nir");
+    REQUIRE(!p->get_name().isEmpty());
   };
-  SECTION("test update") { REQUIRE(false); };
+  SECTION("test update same type") {
+    auto user = mq->data()->get_user();
+    auto prev_name =
+        mq->data()->get_user()->get_whoAmI()->property("name").toString();
+    auto mq2 = mainquery::MainQuery::shared();
+    test_utils::SignalCatcher catcher({.source_obj = user, .only = "whoAmI"});
+    mq2->set_variables({NonNodeUnionTestCase::Enums::UnionChoice::PERSON});
+    mq2->fetch();
+    REQUIRE(catcher.wait());
+    test_utils::wait_for_completion(mq2);
+    REQUIRE(mq2->data()
+                ->get_user()
+                ->get_whoAmI()
+                ->property("name")
+                .toString()
+                .toStdString() != prev_name.toStdString());
+  };
 }
 
 }; // namespace NonNodeUnionTestCase
