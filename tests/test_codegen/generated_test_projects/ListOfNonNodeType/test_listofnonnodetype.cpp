@@ -24,7 +24,7 @@ TEST_CASE("ListOfNonNodeType", "[generated-testcase]") {
   SECTION("test update - modify attributes at index") {
     auto user = mq->data()->get_users()->first();
     auto prev_name = user->get_name();
-    QString new_name("Ma");
+    QString new_name("Yeshayahu Leibowitz");
     REQUIRE(prev_name != new_name);
     auto change_username_mut = changeusername::ChangeUserName::shared();
     change_username_mut->set_variables({0, new_name});
@@ -36,6 +36,19 @@ TEST_CASE("ListOfNonNodeType", "[generated-testcase]") {
     test_utils::wait_for_completion(mq);
     REQUIRE(user->get_name().toStdString() == new_name.toStdString());
   };
+  SECTION("test update - insert new object at index") {
+    auto model = mq->data()->get_users();
+    auto prev_len = model->rowCount();
+    auto insert_user = insertuser::InsertUser::shared();
+    QString user_name("fobar");
+    insert_user->set_variables({3, user_name});
+    insert_user->fetch();
+    test_utils::wait_for_completion(insert_user);
+    mq->refetch();
+    test_utils::wait_for_completion(mq);
+    REQUIRE(model->rowCount() == prev_len + 1);
+    REQUIRE(model->get(3)->get_name().toStdString() == user_name.toStdString());
+  }
 }
 
 }; // namespace ListOfNonNodeType
