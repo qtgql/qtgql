@@ -109,7 +109,7 @@ void 👉 t.updater_name 👈(👉 t.concrete.member_type_arg 👈 inst, const Q
 {% if f.type.is_queried_object_type or f.type.is_model or f.type.is_queried_interface or f.type.is_queried_union %}
 return 👉f.private_name👈;
 {% else -%}
-return m_inst->👉 f.concrete.getter_name 👈(👉f.build_variables_tuple_for_field_arguments👈);
+return m_inst->👉 f.concrete.getter_name 👈(👉f.build_variables_tuple_for_field_arguments.replace("operation", "m_operation")👈);
 {%- endif -%}
 };
 {% endfor %}
