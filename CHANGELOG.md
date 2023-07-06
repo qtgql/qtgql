@@ -1,6 +1,22 @@
 CHANGELOG
 =========
 
+0.126.0 - 2023-07-06
+--------------------
+
+### Features
+- Support "non-node" objects on lists.
+
+### Refactor
+- When updating a proxy object field, instead of deleting it and creating a new one,
+replace it with the new concrete and emit only the signals that are needed.
+
+### Bug fixed
+- Arguments not supported on scalar types.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #302](https://github.com/qtgql/qtgql/pull/302/)
+
+
 0.125.0 - 2023-07-05
 --------------------
 
