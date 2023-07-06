@@ -3,13 +3,12 @@
 {% set new_concrete -%}
 m_inst->👉field.concrete.getter_name👈(👉field.build_variables_tuple_for_field_arguments 👈)
 {%- endset -%}
-
+auto operation = m_operation;
 {% if field.type.is_model -%}
     {% if field.type.of_type.is_queried_object_type -%}
     {#- // the nodes themselves are updated as per normal (via deserializers) and here we only need
         // to set the nodes at the correct index and append them if they weren't existed so far.
     -#}
-    auto operation = qobject_cast<👉operation.name👈*>(this->parent());
     auto new_data = 👉new_concrete👈;
     auto new_len = new_data.size();
     auto prev_len = 👉field.private_name👈->rowCount();
@@ -35,7 +34,6 @@ m_inst->👉field.concrete.getter_name👈(👉field.build_variables_tuple_for_f
     throw qtgql::exceptions::NotImplementedError({"can't update model of 👉field.type.of_type.__class__👈"});
     {% endif %}
 {% elif field.type.is_queried_object_type -%}
-auto operation = qobject_cast<👉operation.name👈*>(this->parent());
 auto concrete = 👉new_concrete👈;
 if (👉field.private_name👈){
     👉field.private_name👈->qtgql_replace_concrete(concrete);
@@ -45,7 +43,6 @@ else{
     emit 👉 field.concrete.signal_name 👈();
 }
 {% elif field.type.is_queried_interface or field.type.is_queried_union -%}
-auto operation = qobject_cast<👉operation.name👈*>(this->parent());
 auto concrete = 👉new_concrete👈;
 auto 👉field.name👈_typename = concrete->__typename();
 {%set type_cond -%}👉field.name👈_typename{% endset -%}

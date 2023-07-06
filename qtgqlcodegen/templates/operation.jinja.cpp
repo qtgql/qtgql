@@ -45,6 +45,7 @@ throw qtgql::exceptions::InterfaceDeserializationError(type_name.toStdString());
 : m_inst{inst}, 👉 base_name 👈::👉 base_name 👈(operation)
 {
     {% endif -%}
+    m_operation = operation;
     {%- for field in t.fields -%}
     👉 initialize_proxy_field(field) 👈
     {% endfor -%}
@@ -107,10 +108,8 @@ void 👉 t.updater_name 👈(👉 t.concrete.member_type_arg 👈 inst, const Q
 [[nodiscard]] const 👉 f.type.property_type 👈  👉 t.name 👈::👉 f.concrete.getter_name 👈() const {
 {% if f.type.is_queried_object_type or f.type.is_model or f.type.is_queried_interface or f.type.is_queried_union %}
 return 👉f.private_name👈;
-{%- else -%}
-// TODO: remove the redundant cast here.
-auto operation = qobject_cast<👉 context.ns 👈::👉 context.operation.name 👈 *>(parent());
-return m_inst->👉 f.concrete.getter_name 👈(👉f.build_variables_tuple_for_field_arguments 👈);
+{% else -%}
+return m_inst->👉 f.concrete.getter_name 👈(👉f.build_variables_tuple_for_field_arguments👈);
 {%- endif -%}
 };
 {% endfor %}
