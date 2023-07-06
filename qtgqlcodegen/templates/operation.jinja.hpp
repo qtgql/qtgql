@@ -1,5 +1,6 @@
 {%- from "macros/deserialize_concrete_field.jinja.hpp" import  deserialize_concrete_field -%}
 {%- from "macros/proxy_type_fields.jinja.hpp" import  proxy_type_fields -%}
+{%- from "macros/update_proxy_field.jinja.cpp" import  update_proxy_field -%}
 #pragma once
 #include "./schema.hpp"
 #include <qtgql/gqlwstransport/gqlwstransport.hpp>
@@ -50,6 +51,23 @@ public:
 {% else -%}
 👉 t.name 👈(👉 context.operation.name 👈 * operation, const std::shared_ptr<👉 t.concrete.name 👈> &inst);
 {% endif %}
+{% if  not t.concrete.is_root -%}
+void qtgql_replace_concrete(const std::shared_ptr<👉 t.concrete.name 👈> & new_inst){
+    if (new_inst == m_inst){
+    return;
+    }
+    m_inst->disconnect(this);
+    {% for field in t.fields -%}
+    if(m_inst->👉 field.private_name 👈 != new_inst->👉 field.private_name 👈){
+    👉update_proxy_field(field, context.operation)👈
+    };
+    {% endfor -%}
+    m_inst = new_inst;
+    qtgql_connect_signals();
+};
+{% endif %}
+protected:
+    void qtgql_connect_signals();
 public:
 {% for f in t.fields -%}
 [[nodiscard]] inline const 👉 f.type.property_type 👈  👉 f.concrete.getter_name 👈() const {

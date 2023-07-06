@@ -779,11 +779,11 @@ all_test_cases = [
     NonNodeInterfaceTestCase,
     NodeInterfaceFieldTestCase,
     NonNodeUnionTestCase,
+    ListOfNonNodeType,
     ListOfObjectWithUnionTestCase,
     CustomUserScalarTestCase,
     ObjectsThatReferenceEachOtherTestCase,
     RootListOfTestCase,
-    ListOfNonNodeType,
     ListOfUnionTestCase,
 ]
 
@@ -806,6 +806,7 @@ implemented_testcases = [
     InputTypeOperationVariableTestCase,
     NodeInterfaceFieldTestCase,
     NonNodeUnionTestCase,
+    ListOfNonNodeType,
 ]
 
 
@@ -818,4 +819,4 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 
 if __name__ == "__main__":
-    generate_testcases(NonNodeInterfaceTestCase)
+    generate_testcases(ListOfNonNodeType)

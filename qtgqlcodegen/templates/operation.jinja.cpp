@@ -44,21 +44,28 @@ throw qtgql::exceptions::InterfaceDeserializationError(type_name.toStdString());
     👉 t.name 👈::👉 t.name 👈(👉 context.operation.name 👈 * operation, const std::shared_ptr<👉 t.concrete.name 👈> &inst)
 : m_inst{inst}, 👉 base_name 👈::👉 base_name 👈(operation)
 {
-    auto m_inst_ptr = m_inst.get();
-    Q_ASSERT_X(m_inst_ptr, __FILE__, "Tried to instantiate a proxy object with an empty pointer!");
     {% endif -%}
     {%- for field in t.fields -%}
     👉 initialize_proxy_field(field) 👈
     {% endfor -%}
-    {#- connecting signals here, when the concrete changed it will be mirrored here. -#}
-    {%- for field in t.fields -%}
-    connect(m_inst_ptr, &👉context.schema_ns👈::👉t.concrete.name👈::👉 field.concrete.signal_name 👈, this,
-    [&](){
-    👉update_proxy_field(field, context.operation)👈
-    });
-    {% endfor -%}
+    qtgql_connect_signals();
 }
 
+void 👉 t.name 👈::qtgql_connect_signals(){
+{# connecting signals here, when the concrete changed it will be mirrored here. -#}
+{% if t.concrete.is_root -%}
+auto m_inst_ptr = m_inst;
+{% else %}
+auto m_inst_ptr = m_inst.get();
+{% endif -%}
+Q_ASSERT_X(m_inst_ptr, __FILE__, "Tried to instantiate a proxy object with an empty pointer!");
+{% for field in t.fields -%}
+connect(m_inst_ptr, &👉context.schema_ns👈::👉t.concrete.name👈::👉 field.concrete.signal_name 👈, this,
+[&](){
+👉update_proxy_field(field, context.operation)👈
+});
+{% endfor -%}
+};
 
 // Deserialzier
 {% if not t.concrete.is_root %}

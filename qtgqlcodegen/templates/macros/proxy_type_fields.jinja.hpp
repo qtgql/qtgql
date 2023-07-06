@@ -18,7 +18,7 @@ protected:
 {% if t.concrete.is_root -%} {# // root types are singletons, no need for shared ptr -#}
 👉context.schema_ns👈::👉 t.concrete.name 👈 * m_inst;
 {% else -%}
-const std::shared_ptr<👉context.schema_ns👈::👉 t.concrete.name 👈> m_inst;
+std::shared_ptr<const 👉context.schema_ns👈::👉 t.concrete.name 👈> m_inst;
 {% endif -%}
 {% for ref_field in t.references -%}
 const 👉ref_field.type.property_type👈 👉ref_field.private_name👈 = {};
