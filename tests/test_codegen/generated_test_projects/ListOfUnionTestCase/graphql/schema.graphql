@@ -1,0 +1,34 @@
+type Frog implements Node {
+  id: ID!
+  name: String!
+  color: String!
+}
+
+union FrogPerson = Frog | Person
+
+type Mutation {
+  insertToList(at: Int!, name: String!, type: UnionTypes!): Void
+  modifyName(at: Int!, name: String!): Void
+}
+
+interface Node {
+  id: ID!
+}
+
+type Person implements Node {
+  id: ID!
+  name: String!
+  age: Int!
+}
+
+type Query {
+  usersAndFrogs: [FrogPerson!]!
+}
+
+enum UnionTypes {
+  PERSON
+  FROG
+}
+
+"""Represents NULL values"""
+scalar Void

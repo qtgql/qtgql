@@ -673,7 +673,7 @@ ListOfUnionTestCase = QtGqlTestCase(
     operations="""
        query MainQuery {
           usersAndFrogs {
-            ... on User {
+            ... on Person {
               name
               age
             }
@@ -817,6 +817,7 @@ implemented_testcases = [
     NodeInterfaceFieldTestCase,
     NonNodeUnionTestCase,
     ListOfNonNodeType,
+    ListOfUnionTestCase,
 ]
 
 
@@ -829,4 +830,6 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 
 if __name__ == "__main__":
-    generate_testcases(NonNodeUnionTestCase)
+    generate_testcases(
+        ListOfUnionTestCase,
+    )

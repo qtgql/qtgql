@@ -1,0 +1,13 @@
+
+       query MainQuery {
+          usersAndFrogs {
+            ... on Person {
+              name
+              age
+            }
+            ... on Frog {
+              name
+              color
+            }
+          }
+        }
