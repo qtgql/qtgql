@@ -85,11 +85,17 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
         """Helper to check whether the field type implements node."""
         object_type = self.type.is_object_type or self.type.is_interface
         if not object_type:
-            if self.type.is_model:
-                object_type = self.type.is_model.of_type.is_object_type
+            raise NotImplementedError
+
         if object_type:
             return object_type.implements_node
         return False
+
+    @property
+    def default_value(self) -> str:
+        if self.arguments:
+            return "{}"
+        return self.type.default_value
 
 
 EnumMap: TypeAlias = "dict[str, QtGqlEnumDefinition]"

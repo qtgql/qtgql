@@ -653,7 +653,17 @@ NonNodeTypeTestCase = QtGqlTestCase(
 
 ListOfNonNodeType = QtGqlTestCase(
     schema=schemas.list_of_non_node.schema,
-    operations="""query MainQuery {users{name}}""",
+    operations="""
+    query MainQuery {users{name}}
+
+    mutation ChangeUserName($at: Int!, $name: String!) {
+      modifyUser(at: $at, name: $name)
+    }
+
+    mutation InsertUser($at: Int!, $name: String!) {
+      insertUser(at: $at, name: $name)
+    }
+    """,
     test_name="ListOfNonNodeType",
 )
 
@@ -779,11 +789,11 @@ all_test_cases = [
     NonNodeInterfaceTestCase,
     NodeInterfaceFieldTestCase,
     NonNodeUnionTestCase,
+    ListOfNonNodeType,
     ListOfObjectWithUnionTestCase,
     CustomUserScalarTestCase,
     ObjectsThatReferenceEachOtherTestCase,
     RootListOfTestCase,
-    ListOfNonNodeType,
     ListOfUnionTestCase,
 ]
 
@@ -806,6 +816,7 @@ implemented_testcases = [
     InputTypeOperationVariableTestCase,
     NodeInterfaceFieldTestCase,
     NonNodeUnionTestCase,
+    ListOfNonNodeType,
 ]
 
 
@@ -818,4 +829,4 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 
 if __name__ == "__main__":
-    generate_testcases(NonNodeInterfaceTestCase)
+    generate_testcases(NonNodeUnionTestCase)

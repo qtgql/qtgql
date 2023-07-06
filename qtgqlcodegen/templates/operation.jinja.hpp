@@ -1,5 +1,6 @@
 {%- from "macros/deserialize_concrete_field.jinja.hpp" import  deserialize_concrete_field -%}
 {%- from "macros/proxy_type_fields.jinja.hpp" import  proxy_type_fields -%}
+{%- from "macros/update_proxy_field.jinja.cpp" import  update_proxy_field -%}
 #pragma once
 #include "./schema.hpp"
 #include <qtgql/gqlwstransport/gqlwstransport.hpp>
@@ -43,6 +44,9 @@ public:
 // ------------ Narrowed Object types ------------
 {% for t in context.operation.narrowed_types %}
 class 👉 t.name 👈: public 👉 context.qtgql_types.ObjectTypeABC.name if not t.base_interface else t.base_interface.name 👈{
+
+👉context.operation.name👈* m_operation;
+
 👉 proxy_type_fields(t, context) 👈
 public:
 {% if t.concrete.is_root -%}
@@ -50,15 +54,14 @@ public:
 {% else -%}
 👉 t.name 👈(👉 context.operation.name 👈 * operation, const std::shared_ptr<👉 t.concrete.name 👈> &inst);
 {% endif %}
+{% if  not t.concrete.is_root -%}
+void qtgql_replace_concrete(const std::shared_ptr<👉 t.concrete.name 👈> & new_inst);
+{% endif %}
+protected:
+    void qtgql_connect_signals();
 public:
 {% for f in t.fields -%}
-[[nodiscard]] inline const 👉 f.type.property_type 👈  👉 f.concrete.getter_name 👈() const {
-{% if f.type.is_queried_object_type or f.type.is_model or f.type.is_queried_interface or f.type.is_queried_union %}
-return 👉f.private_name👈;
-{%- else -%}
-return m_inst->👉 f.concrete.getter_name 👈();
-{%- endif -%}
-};
+[[nodiscard]] const 👉 f.type.property_type 👈  👉 f.concrete.getter_name 👈() const;
 {% endfor -%}
 public:
 [[nodiscard]] const QString & __typename() const {% if t.base_interface -%}final{% endif %}{

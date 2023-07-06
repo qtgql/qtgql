@@ -1,0 +1,16 @@
+type Mutation {
+  insertUser(name: String!, at: Int!): Void
+  modifyUser(at: Int!, name: String!): Void
+}
+
+type Query {
+  users: [User!]!
+}
+
+type User {
+  name: String!
+  age: Int!
+}
+
+"""Represents NULL values"""
+scalar Void

@@ -114,7 +114,7 @@ public:
 
   T_QObject *last() const { return m_data->last(); }
 
-  int rowCount(const QModelIndex &parent = QModelIndex()) const override final {
+  int rowCount(const QModelIndex &parent = {}) const override {
     return m_count;
   }
 
