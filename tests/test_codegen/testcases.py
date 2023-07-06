@@ -829,4 +829,4 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 
 if __name__ == "__main__":
-    generate_testcases(ListOfNonNodeType)
+    generate_testcases(NonNodeUnionTestCase)

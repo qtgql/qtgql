@@ -51,10 +51,11 @@ auto 👉field.name👈_typename = concrete->__typename();
 {%set type_cond -%}👉field.name👈_typename{% endset -%}
 {% for choice in field.type.choices %}
 {% set do_on_meets -%}
-if (👉field.private_name👈){
+if (👉field.private_name👈 && 👉field.private_name👈->__typename() == "👉choice.concrete.name👈"){
 qobject_cast<👉choice.property_type👈>(👉field.private_name👈)->qtgql_replace_concrete(std::static_pointer_cast<👉choice.concrete.name👈>(concrete));
 }
 else{
+    delete 👉field.private_name👈; {# // might have been optional or the type_name changed #}
     👉field.private_name👈 = qobject_cast<👉field.type.property_type👈>(new 👉choice.name👈(operation, std::static_pointer_cast<👉choice.concrete.name👈>(concrete)));
 }
 {% endset -%}
