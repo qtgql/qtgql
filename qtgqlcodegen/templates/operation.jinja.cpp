@@ -102,7 +102,7 @@ void 👉 t.updater_name 👈(👉 t.concrete.member_type_arg 👈 inst, const Q
 
 
 
-// Getters
+// 👉 t.name 👈 Getters
 {%for f in t.fields -%}
 [[nodiscard]] const 👉 f.type.property_type 👈  👉 t.name 👈::👉 f.concrete.getter_name 👈() const {
 {% if f.type.is_queried_object_type or f.type.is_model or f.type.is_queried_interface or f.type.is_queried_union %}
@@ -114,5 +114,22 @@ return m_inst->👉 f.concrete.getter_name 👈(👉f.build_variables_tuple_for_
 {%- endif -%}
 };
 {% endfor %}
+
+
+{% if  not t.concrete.is_root -%}
+void 👉 t.name 👈::qtgql_replace_concrete(const std::shared_ptr<👉 t.concrete.name 👈> & new_inst){
+    if (new_inst == m_inst){
+    return;
+    }
+    m_inst->disconnect(this);
+    {% for field in t.fields -%}
+    if(m_inst->👉 field.private_name 👈 != new_inst->👉 field.private_name 👈){
+    👉update_proxy_field(field, context.operation)👈
+    };
+    {% endfor -%}
+    m_inst = new_inst;
+    qtgql_connect_signals();
+};
+{% endif -%}
 {% endfor %}
 }

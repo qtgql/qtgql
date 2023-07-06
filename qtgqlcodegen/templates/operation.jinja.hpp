@@ -52,19 +52,7 @@ public:
 👉 t.name 👈(👉 context.operation.name 👈 * operation, const std::shared_ptr<👉 t.concrete.name 👈> &inst);
 {% endif %}
 {% if  not t.concrete.is_root -%}
-void qtgql_replace_concrete(const std::shared_ptr<👉 t.concrete.name 👈> & new_inst){
-    if (new_inst == m_inst){
-    return;
-    }
-    m_inst->disconnect(this);
-    {% for field in t.fields -%}
-    if(m_inst->👉 field.private_name 👈 != new_inst->👉 field.private_name 👈){
-    👉update_proxy_field(field, context.operation)👈
-    };
-    {% endfor -%}
-    m_inst = new_inst;
-    qtgql_connect_signals();
-};
+void qtgql_replace_concrete(const std::shared_ptr<👉 t.concrete.name 👈> & new_inst);
 {% endif %}
 protected:
     void qtgql_connect_signals();
