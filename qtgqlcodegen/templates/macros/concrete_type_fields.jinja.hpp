@@ -8,7 +8,7 @@ std::map<👉f.arguments_type👈, 👉f.type.member_type👈>
 👉f.type.member_type👈
 {% endif -%}
 {%- endset -%}
-👉 f_member_type 👈 👉 f.private_name 👈 = 👉 f.type.default_value 👈;
+👉 f_member_type 👈 👉 f.private_name 👈 = 👉 f.default_value 👈;
 {% endfor %}
 signals:
 {%for f in type.unique_fields -%}

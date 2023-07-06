@@ -91,6 +91,12 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
             return object_type.implements_node
         return False
 
+    @property
+    def default_value(self) -> str:
+        if self.arguments:
+            return "{}"
+        return self.type.default_value
+
 
 EnumMap: TypeAlias = "dict[str, QtGqlEnumDefinition]"
 ObjectTypeMap: TypeAlias = "dict[str, QtGqlObjectType]"

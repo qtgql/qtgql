@@ -70,13 +70,7 @@ protected:
     void qtgql_connect_signals();
 public:
 {% for f in t.fields -%}
-[[nodiscard]] inline const 👉 f.type.property_type 👈  👉 f.concrete.getter_name 👈() const {
-{% if f.type.is_queried_object_type or f.type.is_model or f.type.is_queried_interface or f.type.is_queried_union %}
-return 👉f.private_name👈;
-{%- else -%}
-return m_inst->👉 f.concrete.getter_name 👈();
-{%- endif -%}
-};
+[[nodiscard]] const 👉 f.type.property_type 👈  👉 f.concrete.getter_name 👈() const;
 {% endfor -%}
 public:
 [[nodiscard]] const QString & __typename() const {% if t.base_interface -%}final{% endif %}{

@@ -653,7 +653,17 @@ NonNodeTypeTestCase = QtGqlTestCase(
 
 ListOfNonNodeType = QtGqlTestCase(
     schema=schemas.list_of_non_node.schema,
-    operations="""query MainQuery {users{name}}""",
+    operations="""
+    query MainQuery {users{name}}
+
+    mutation ChangeUserName($at: Int!, $name: String!) {
+      modifyUser(at: $at, name: $name)
+    }
+
+    mutation InsertUser($at: Int!, $name: String!) {
+      insertUser(at: $at, name: $name)
+    }
+    """,
     test_name="ListOfNonNodeType",
 )
 
