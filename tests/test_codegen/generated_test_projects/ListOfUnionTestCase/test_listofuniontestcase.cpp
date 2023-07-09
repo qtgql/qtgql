@@ -1,5 +1,6 @@
 #include "debugableclient.hpp"
 #include "graphql/__generated__/MainQuery.hpp"
+#include "graphql/__generated__/ModifyName.hpp"
 #include "graphql/__generated__/RemoveAt.hpp"
 #include <QSignalSpy>
 #include <catch2/catch_test_macros.hpp>
@@ -42,6 +43,17 @@ TEST_CASE("ListOfUnionTestCase", "[generated-testcase]") {
     REQUIRE(model->get(3)->property("name").toString().toStdString() !=
             name_for_third_item.toStdString());
   };
+  SECTION("test update modify") {
+    auto modify_mut = modifyname::ModifyName::shared();
+    auto person = mq->data()->get_randPerson();
+    auto model = person->get_pets();
+    QString new_name("Frank Zappa");
+    modify_mut->set_variables({person->get_id(), 3, new_name});
+    modify_mut->fetch();
+    test_utils::wait_for_completion(modify_mut);
+    REQUIRE(model->get(3)->property("name").toString().toStdString() ==
+            new_name.toStdString());
+  }
 }
 
 }; // namespace ListOfUnionTestCase
