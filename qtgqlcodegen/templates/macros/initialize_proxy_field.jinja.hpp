@@ -19,7 +19,7 @@ if (👉 instance_of_concrete 👈){
     👉field.private_name👈 = new qtgql::bases::ListModelABC<👉 field.type.of_type.name 👈>(this, std::move(init_list_👉 field.name 👈));
     {% elif field.type.is_model.of_type.is_queried_union %}
     auto init_list_👉 field.name 👈 =  std::make_unique<QList<👉field.type.of_type.property_type👈>>();
-    for (const auto & node: 👉 instance_of_concrete 👈){ // TODO: remove duplication here.
+    for (const auto & node: 👉 instance_of_concrete 👈){
         auto 👉field.name👈_typename = node->__typename();
         {%set type_cond -%}👉field.name👈_typename{% endset -%}
         {% for choice in field.type.of_type.choices -%}
