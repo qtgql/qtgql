@@ -5,10 +5,6 @@ m_inst->👉field.concrete.getter_name👈(👉field.build_variables_tuple_for_f
 {%- endset -%}
 auto operation = m_operation;
 {% if field.type.is_model -%}
-    {% if field.type.of_type.is_queried_object_type -%}
-    {#- // the nodes themselves are updated as per normal (via deserializers) and here we only need
-        // to set the nodes at the correct index and append them if they weren't existed so far.
-    -#}
     auto new_data = 👉new_concrete👈;
     auto new_len = new_data.size();
     auto prev_len = 👉field.private_name👈->rowCount();
@@ -17,6 +13,7 @@ auto operation = m_operation;
     }
     for (int i = 0; i < new_len; i++){
         auto concrete = new_data.at(i);
+    {% if field.type.of_type.is_queried_object_type -%}
         if (i > prev_len - 1){
             👉field.private_name👈->insert(i, new 👉field.type.of_type.name👈(operation, concrete));
         }
@@ -29,10 +26,34 @@ auto operation = m_operation;
                 👉field.private_name👈->insert(i, new 👉field.type.of_type.name👈(operation, concrete));
             }
         }
-    }
+
+    {% elif field.type.of_type.is_queried_union %}
+        auto 👉field.name👈_typename = concrete->__typename();
+        {%set type_cond -%}👉field.name👈_typename{% endset -%}
+        {% for choice in field.type.of_type.choices %}
+        {% set do_on_meets -%}
+        if (i > prev_len - 1){
+            👉field.private_name👈->insert(i, new 👉choice.name👈(operation, std::static_pointer_cast<👉choice.concrete.name👈>(concrete)));
+        }
+        else{
+            auto proxy_to_update = 👉field.private_name👈->get(i);
+            if (proxy_to_update && proxy_to_update->__typename() == "👉choice.concrete.name👈"){
+                qobject_cast<👉choice.property_type👈>(👉field.private_name👈)->qtgql_replace_concrete(std::static_pointer_cast<👉choice.concrete.name👈>(concrete));
+            }
+            else{
+                delete proxy_to_update; {# // might have been optional or the type_name changed #}
+                👉field.private_name👈->insert(i, new 👉choice.name👈(operation, std::static_pointer_cast<👉choice.concrete.name👈>(concrete)));
+            }
+
+        }
+
+        {% endset %}
+        👉iterate_type_condition(choice,type_cond, do_on_meets, loop)👈
+        {% endfor %}
     {% else %}
     throw qtgql::exceptions::NotImplementedError({"can't update model of 👉field.type.of_type.__class__👈"});
     {% endif %}
+    }
 {% elif field.type.is_queried_object_type -%}
 auto concrete = 👉new_concrete👈;
 if (👉field.private_name👈){

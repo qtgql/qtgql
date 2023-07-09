@@ -20,7 +20,7 @@ This library is an attempt to provide a high-level graphql client to the QT worl
         - [ ] Scalar
         - [ ] custom scalar
         - [ ] Interface
-        - [ ] Union
+        - [x] Union
         - [ ] Enum
 - [x] *Garbage collection.* (partially, [see](https://github.com/qtgql/qtgql/issues/277))
 - [x] Operation handlers (queries the server and deserialize data) for Query / Mutation / Subscription.

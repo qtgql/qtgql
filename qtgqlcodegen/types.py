@@ -169,7 +169,7 @@ class QtGqlList(QtGqlTypeABC):
         if self.of_type.is_queried_object_type:
             return f"qtgql::bases::ListModelABC<{self.of_type.type_name()}> *"
         if self.of_type.is_queried_union:
-            return f"qtgql::bases::ListModelABC<{QtGqlTypes.ObjectTypeABC.name}> *"
+            return f"qtgql::bases::ListModelABC<{self.of_type.is_queried_union.type_name()}> *"
 
 
 @define
