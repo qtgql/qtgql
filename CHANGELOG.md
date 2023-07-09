@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+0.127.0 - 2023-07-09
+--------------------
+
+This release adds support for list if unions.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #303](https://github.com/qtgql/qtgql/pull/303/)
+
+
 0.126.0 - 2023-07-06
 --------------------
 
