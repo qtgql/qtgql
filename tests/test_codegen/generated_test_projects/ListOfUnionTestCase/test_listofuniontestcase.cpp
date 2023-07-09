@@ -1,4 +1,5 @@
 #include "debugableclient.hpp"
+#include "graphql/__generated__/InsertToList.hpp"
 #include "graphql/__generated__/MainQuery.hpp"
 #include "graphql/__generated__/ModifyName.hpp"
 #include "graphql/__generated__/RemoveAt.hpp"
@@ -35,7 +36,14 @@ TEST_CASE("ListOfUnionTestCase", "[generated-testcase]") {
     auto remove_mut = removeat::RemoveAt::shared();
     auto person = mq->data()->get_randPerson();
     auto model = person->get_pets();
-    auto name_for_third_item = model->get(3)->property("name").toString();
+    auto obj_at_3 = model->get(3);
+    QString name_for_third_item("");
+    if (auto dog = qobject_cast<mainquery::Dog__randPersonpets *>(obj_at_3)) {
+      name_for_third_item = dog->get_name();
+    } else {
+      auto cat = qobject_cast<mainquery::Cat__randPersonpets *>(obj_at_3);
+      name_for_third_item = cat->get_name();
+    }
     REQUIRE(!name_for_third_item.isEmpty());
     remove_mut->set_variables({person->get_id(), 3});
     remove_mut->fetch();
@@ -53,6 +61,23 @@ TEST_CASE("ListOfUnionTestCase", "[generated-testcase]") {
     test_utils::wait_for_completion(modify_mut);
     REQUIRE(model->get(3)->property("name").toString().toStdString() ==
             new_name.toStdString());
+  }
+  SECTION("test update add") {
+    auto insert_mut = inserttolist::InsertToList::shared();
+    auto person = mq->data()->get_randPerson();
+    auto model = person->get_pets();
+    QString name_to_set("Abu Nasr al-Farabi");
+    auto prev_length = model->rowCount();
+    insert_mut->set_variables({person->get_id(), prev_length + 1, name_to_set,
+                               ListOfUnionTestCase::Enums::UnionTypes::DOG});
+    insert_mut->fetch();
+    test_utils::wait_for_completion(insert_mut);
+    REQUIRE(prev_length < model->rowCount());
+    qDebug() << model->last();
+    auto dog =
+        qobject_cast<const mainquery::Dog__randPersonpets *>(model->last());
+    REQUIRE(dog->__typename().toStdString() == "Dog");
+    REQUIRE(dog->get_name().toStdString() == name_to_set.toStdString());
   }
 }
 
