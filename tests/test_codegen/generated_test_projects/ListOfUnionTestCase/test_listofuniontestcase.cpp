@@ -1,5 +1,6 @@
 #include "debugableclient.hpp"
 #include "graphql/__generated__/MainQuery.hpp"
+#include "graphql/__generated__/RemoveAt.hpp"
 #include <QSignalSpy>
 #include <catch2/catch_test_macros.hpp>
 
@@ -7,7 +8,7 @@ namespace ListOfUnionTestCase {
 using namespace qtgql;
 
 auto ENV_NAME = QString("ListOfUnionTestCase");
-auto SCHEMA_ADDR = get_server_address("70862812");
+auto SCHEMA_ADDR = get_server_address("87764004");
 
 TEST_CASE("ListOfUnionTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
@@ -17,19 +18,30 @@ TEST_CASE("ListOfUnionTestCase", "[generated-testcase]") {
   test_utils::wait_for_completion(mq);
   SECTION("test deserialize") {
     auto root = mq->data();
-    auto model = root->get_usersAndFrogs();
+    auto model = root->get_randPerson()->get_pets();
     auto union_data = model->first();
     auto type_name = union_data->__typename();
-    if (type_name == "Frog") {
-      REQUIRE(!qobject_cast<mainquery::Frog__usersAndFrogs *>(union_data)
+    if (type_name == "Cat") {
+      REQUIRE(!qobject_cast<mainquery::Cat__randPersonpets *>(union_data)
                    ->get_color()
                    .isEmpty());
     } else {
-      REQUIRE(qobject_cast<mainquery::Person__usersAndFrogs *>(union_data)
+      REQUIRE(qobject_cast<mainquery::Dog__randPersonpets *>(union_data)
                   ->get_age() > 0);
     }
   };
-  SECTION("test update") { REQUIRE(false); };
+  SECTION("test update remove") {
+    auto remove_mut = removeat::RemoveAt::shared();
+    auto person = mq->data()->get_randPerson();
+    auto model = person->get_pets();
+    auto name_for_third_item = model->get(3)->property("name").toString();
+    REQUIRE(!name_for_third_item.isEmpty());
+    remove_mut->set_variables({person->get_id(), 3});
+    remove_mut->fetch();
+    test_utils::wait_for_completion(remove_mut);
+    REQUIRE(model->get(3)->property("name").toString().toStdString() !=
+            name_for_third_item.toStdString());
+  };
 }
 
 }; // namespace ListOfUnionTestCase

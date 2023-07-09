@@ -38,7 +38,7 @@ auto operation = m_operation;
         else{
             auto proxy_to_update = 👉field.private_name👈->get(i);
             if (proxy_to_update && proxy_to_update->__typename() == "👉choice.concrete.name👈"){
-                qobject_cast<👉choice.property_type👈>(👉field.private_name👈)->qtgql_replace_concrete(std::static_pointer_cast<👉choice.concrete.name👈>(concrete));
+                qobject_cast<👉choice.property_type👈>(proxy_to_update)->qtgql_replace_concrete(std::static_pointer_cast<👉choice.concrete.name👈>(concrete));
             }
             else{
                 delete proxy_to_update; {# // might have been optional or the type_name changed #}

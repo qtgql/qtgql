@@ -1,14 +1,20 @@
-type Frog implements Node {
-  id: ID!
+type Cat {
   name: String!
   color: String!
 }
 
-union FrogPerson = Frog | Person
+union CatDog = Cat | Dog
+
+type Dog implements Node {
+  id: ID!
+  name: String!
+  age: Int!
+}
 
 type Mutation {
-  insertToList(at: Int!, name: String!, type: UnionTypes!): Void
-  modifyName(at: Int!, name: String!): Void
+  insertToList(nodeId: ID!, at: Int!, name: String!, type: UnionTypes!): Person!
+  modifyName(nodeId: ID!, at: Int!, name: String!): Person!
+  removeAt(nodeId: ID!, at: Int!): Person!
 }
 
 interface Node {
@@ -17,18 +23,15 @@ interface Node {
 
 type Person implements Node {
   id: ID!
+  pets: [CatDog!]!
   name: String!
-  age: Int!
 }
 
 type Query {
-  usersAndFrogs: [FrogPerson!]!
+  randPerson: Person!
 }
 
 enum UnionTypes {
   PERSON
-  FROG
+  DOG
 }
-
-"""Represents NULL values"""
-scalar Void
