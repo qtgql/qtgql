@@ -67,8 +67,10 @@ mirrored in all the other operations.
 ## Pure fields
 All the fields in the server are considered [Pure Functions](https://en.wikipedia.org/wiki/Pure_function).
 Meaning that they should return the same value
-if they were to be called with the same arguments
-at the same time with same context.
+if they were to be called with the same arguments.
+!!! Warning
+    This means i.e that if a field would be changed based on
+    some arbitrary context (i.e headers) you might get unwanted behaviours.
 
 Not only that this assumption is a GraphQL best-practice, it also has a great benefit
 in global updates.

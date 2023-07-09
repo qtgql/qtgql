@@ -37,8 +37,11 @@ class NodeDb:
     def insert(self, node: T_Node) -> T_Node:
         self._data[node.id] = node
 
-    def get(self, id: str) -> Node | None:
-        return self._data.get(id, None)
+    def get(self, id: str, strict: bool = True) -> Node | None:
+        ret = self._data.get(id, None)
+        if not ret and strict:
+            raise KeyError(f"{id} not exists in the nodes store")
+        return ret
 
 
 NODE_DB = NodeDb()

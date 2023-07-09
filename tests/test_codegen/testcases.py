@@ -671,18 +671,45 @@ ListOfNonNodeType = QtGqlTestCase(
 ListOfUnionTestCase = QtGqlTestCase(
     schema=schemas.list_of_union.schema,
     operations="""
-       query MainQuery {
-          usersAndFrogs {
-            ... on User {
-              name
-              age
-            }
-            ... on Frog {
-              name
-              color
-            }
+    query MainQuery {
+      randPerson {
+        ...PersonFragment
+      }
+    }
+
+    mutation RemoveAt($nodeId: ID!, $at: Int!) {
+      removeAt(nodeId: $nodeId, at: $at) {
+        ...PersonFragment
+      }
+    }
+
+    mutation ModifyName($nodeId: ID!, $at: Int!, $name: String!) {
+      modifyName(nodeId: $nodeId, at: $at, name: $name) {
+        ...PersonFragment
+      }
+    }
+
+    mutation InsertToList($nodeId: ID!, $at: Int!, $name: String!, $type: UnionTypes!) {
+      insertToList(nodeId: $nodeId, at: $at, name: $name, type: $type) {
+        ...PersonFragment
+        }
+      }
+        """.replace(
+        "...PersonFragment",
+        """
+        name
+        pets {
+          ... on Dog {
+            name
+            age
           }
-        }""",
+          ... on Cat {
+            name
+            color
+          }
+        }
+        """,
+    ),
     test_name="ListOfUnionTestCase",
 )
 
@@ -817,6 +844,7 @@ implemented_testcases = [
     NodeInterfaceFieldTestCase,
     NonNodeUnionTestCase,
     ListOfNonNodeType,
+    ListOfUnionTestCase,
 ]
 
 
@@ -829,4 +857,6 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 
 if __name__ == "__main__":
-    generate_testcases(NonNodeUnionTestCase)
+    generate_testcases(
+        ListOfUnionTestCase,
+    )
