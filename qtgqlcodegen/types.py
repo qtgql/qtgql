@@ -170,6 +170,7 @@ class QtGqlList(QtGqlTypeABC):
             return f"qtgql::bases::ListModelABC<{self.of_type.type_name()}> *"
         if self.of_type.is_queried_union:
             return f"qtgql::bases::ListModelABC<{self.of_type.is_queried_union.type_name()}> *"
+        raise NotImplementedError
 
 
 @define
