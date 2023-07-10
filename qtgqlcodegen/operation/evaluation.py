@@ -271,7 +271,6 @@ def _unwrap_interface_fragments(
         elif frag_spread := is_fragment_spread_node(node):
             resolved_frag = _evaluate_fragment(type_info, frag_spread)
             concrete_selections.used_fragments.append(resolved_frag)
-            type_info.used_fragments[resolved_frag.name] = resolved_frag
         else:
             field_node = is_field_node(node)
             assert field_node
@@ -381,7 +380,6 @@ def _evaluate_object_type(
         elif frag_spread := is_fragment_spread_node(selection):
             resolved_frag = _evaluate_fragment(type_info, frag_spread)
             fields.update(resolved_frag.of.fields_dict)
-            type_info.used_fragments[resolved_frag.name] = resolved_frag
 
     name = f"{concrete.name}__{path}"
     if ret := type_info.narrowed_types_map.get(name, None):
@@ -425,11 +423,13 @@ def _evaluate_fragment(
             selection_set=raw_frag.selection_set,
             path=frag_name,
         )
-    return QtGqlFragmentDefinition(
+    ret = QtGqlFragmentDefinition(
         name=frag_name,
         ast=raw_frag,
         of=fragment_of,
     )
+    type_info.used_fragments[ret.name] = ret
+    return ret
 
 
 def _evaluate_operation(

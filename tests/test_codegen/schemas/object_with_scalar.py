@@ -43,6 +43,7 @@ class Query:
     def const_user_with_modified_fields(self) -> User:
         new_user = User()
         new_user.id = CONST_USER.id
+        new_user.male = not CONST_USER.male
         return new_user
 
 
