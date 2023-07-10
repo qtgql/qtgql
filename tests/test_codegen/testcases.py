@@ -881,6 +881,8 @@ all_test_cases = [
     ListOfNonNodeType,
     ListOfUnionTestCase,
     ListOfInterfaceTestcase,
+    FragmentTestCase,
+    FragmentsOnInterfaceTestCase,
     ListOfObjectWithUnionTestCase,
     CustomUserScalarTestCase,
     ObjectsThatReferenceEachOtherTestCase,
@@ -909,6 +911,8 @@ implemented_testcases = [
     ListOfNonNodeType,
     ListOfUnionTestCase,
     ListOfInterfaceTestcase,
+    FragmentTestCase,
+    FragmentsOnInterfaceTestCase,
 ]
 
 
