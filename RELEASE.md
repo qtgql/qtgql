@@ -1,6 +1,6 @@
 Release type: minor
 
 This release adds initial support for fragments.
-
-TODO:
-    - Support variables usages in fragments.
+- [x] Fragments on object types.
+- [x] Fragments on interfaces.
+- [ ] Fragments with variables usages.

@@ -22,7 +22,8 @@ This library is an attempt to provide a high-level graphql client to the QT worl
         - [ ] Interface
         - [x] Union
         - [ ] Enum
-- [x] *Garbage collection.* (partially, [see](https://github.com/qtgql/qtgql/issues/277))
+- [x] Fragments
 - [x] Operation handlers (queries the server and deserialize data) for Query / Mutation / Subscription.
 - [x] *Fully typed operation variables.* (partially, [see](https://github.com/qtgql/qtgql/issues/272))
+- [x] *Garbage collection.* (partially, [see](https://github.com/qtgql/qtgql/issues/277))
 - [x] Native-Qt client implementation of "[graphql-transport-ws](https://github.com/enisdenjo/graphql-ws/blob/master/PROTOCOL.md)" protocol (supports subscriptions) - You can provide your own network layer though.

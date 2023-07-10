@@ -179,6 +179,7 @@ RootScalarTestCase = QtGqlTestCase(
     """,
     test_name="RootScalarTestCase",
 )
+
 ScalarsTestCase = QtGqlTestCase(
     schema=schemas.object_with_scalar.schema,
     operations="""
@@ -262,14 +263,14 @@ DateTimeTestCase = QtGqlTestCase(
             birth
           }
         }
-mutation ChangeUserBirth($new_birth: DateTime!, $nodeId: ID!) {
-  changeBirth(newBirth: $new_birth, nodeId: $nodeId) {
-    age
-    id
-    birth
-    name
-  }
-}
+        mutation ChangeUserBirth($new_birth: DateTime!, $nodeId: ID!) {
+          changeBirth(newBirth: $new_birth, nodeId: $nodeId) {
+            age
+            id
+            birth
+            name
+          }
+        }
         """,
     test_name="DateTimeTestCase",
 )
@@ -747,6 +748,38 @@ FragmentTestCase = QtGqlTestCase(
     test_name="FragmentTestCase",
 )
 
+FragmentsOnInterfaceTestCase = QtGqlTestCase(
+    schema=schemas.node_interface_field.schema,
+    operations="""
+    query MainQuery($ret: TypesEnum!) {
+      node(ret: $ret) {
+        ... on HasNameAgeInterface {
+            ...HasNameFragment
+        }
+        ... on User {
+          password
+        }
+        ... on Dog {
+          barks
+        }
+      }
+    }
+
+    mutation ChangeName($node_id: ID!, $new_name: String!) {
+      modifyName(nodeId: $node_id, newName: $new_name) {
+        ... on HasNameAgeInterface {
+          ...HasNameFragment
+        }
+      }
+    }
+
+    fragment HasNameFragment on HasNameAgeInterface{
+      name
+      age
+    }
+    """,
+    test_name="FragmentsOnInterfaceTestCase",
+)
 InputTypeOperationVariableTestCase = QtGqlTestCase(
     schema=schemas.input_type.schema,
     operations="""
@@ -889,5 +922,5 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 if __name__ == "__main__":
     generate_testcases(
-        FragmentTestCase,
+        FragmentsOnInterfaceTestCase,
     )

@@ -1,0 +1,27 @@
+
+    query MainQuery($ret: TypesEnum!) {
+      node(ret: $ret) {
+        ... on HasNameAgeInterface {
+            ...HasNameFragment
+        }
+        ... on User {
+          password
+        }
+        ... on Dog {
+          barks
+        }
+      }
+    }
+
+    mutation ChangeName($node_id: ID!, $new_name: String!) {
+      modifyName(nodeId: $node_id, newName: $new_name) {
+        ... on HasNameAgeInterface {
+          ...HasNameFragment
+        }
+      }
+    }
+
+    fragment HasNameFragment on HasNameAgeInterface{
+      name
+      age
+    }
