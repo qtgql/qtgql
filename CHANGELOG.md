@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+0.128.0 - 2023-07-10
+--------------------
+
+This release adds support for list of interfaces.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #305](https://github.com/qtgql/qtgql/pull/305/)
+
+
 0.127.0 - 2023-07-09
 --------------------
 
