@@ -269,8 +269,7 @@ def _unwrap_interface_fragments(
                 id_was_selected,
             )
         elif frag_spread := is_fragment_spread_node(node):
-            resolved_frag = _evaluate_fragment(type_info, frag_spread)
-            concrete_selections.used_fragments.append(resolved_frag)
+            concrete_selections.used_fragments.append(_evaluate_fragment(type_info, frag_spread))
         else:
             field_node = is_field_node(node)
             assert field_node
@@ -423,6 +422,7 @@ def _evaluate_fragment(
             selection_set=raw_frag.selection_set,
             path=frag_name,
         )
+
     ret = QtGqlFragmentDefinition(
         name=frag_name,
         ast=raw_frag,
