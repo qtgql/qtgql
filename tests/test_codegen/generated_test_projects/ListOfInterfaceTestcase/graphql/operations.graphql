@@ -3,7 +3,7 @@
       randPerson {
 
         name
-        pets {
+        pets { name
           ... on Dog {
             name
             age
@@ -21,7 +21,7 @@
       removeAt(nodeId: $nodeId, at: $at) {
 
         name
-        pets {
+        pets { name
           ... on Dog {
             name
             age
@@ -39,7 +39,7 @@
       modifyName(nodeId: $nodeId, at: $at, name: $name) {
 
         name
-        pets {
+        pets { name
           ... on Dog {
             name
             age
@@ -57,7 +57,7 @@
       insertToList(nodeId: $nodeId, at: $at, name: $name, type: $type) {
 
         name
-        pets {
+        pets { name
           ... on Dog {
             name
             age

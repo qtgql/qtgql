@@ -715,7 +715,7 @@ ListOfUnionTestCase = QtGqlTestCase(
 
 ListOfInterfaceTestcase = QtGqlTestCase(
     schema=schemas.list_of_interface.schema,
-    operations=ListOfUnionTestCase.operations,
+    operations=ListOfUnionTestCase.operations.replace("pets {", "pets { name"),
     test_name="ListOfInterfaceTestcase",
 )
 
