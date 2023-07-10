@@ -1,0 +1,72 @@
+
+    query MainQuery {
+      randPerson {
+
+        name
+        pets {
+          ... on Dog {
+            name
+            age
+          }
+          ... on Cat {
+            name
+            color
+          }
+        }
+
+      }
+    }
+
+    mutation RemoveAt($nodeId: ID!, $at: Int!) {
+      removeAt(nodeId: $nodeId, at: $at) {
+
+        name
+        pets {
+          ... on Dog {
+            name
+            age
+          }
+          ... on Cat {
+            name
+            color
+          }
+        }
+
+      }
+    }
+
+    mutation ModifyName($nodeId: ID!, $at: Int!, $name: String!) {
+      modifyName(nodeId: $nodeId, at: $at, name: $name) {
+
+        name
+        pets {
+          ... on Dog {
+            name
+            age
+          }
+          ... on Cat {
+            name
+            color
+          }
+        }
+
+      }
+    }
+
+    mutation InsertToList($nodeId: ID!, $at: Int!, $name: String!, $type: UnionTypes!) {
+      insertToList(nodeId: $nodeId, at: $at, name: $name, type: $type) {
+
+        name
+        pets {
+          ... on Dog {
+            name
+            age
+          }
+          ... on Cat {
+            name
+            color
+          }
+        }
+
+        }
+      }

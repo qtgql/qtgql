@@ -166,7 +166,7 @@ class QtGqlList(QtGqlTypeABC):
 
     @property
     def property_type(self) -> str:
-        if self.of_type.is_queried_object_type:
+        if self.of_type.is_queried_object_type or self.of_type.is_queried_interface:
             return f"qtgql::bases::ListModelABC<{self.of_type.type_name()}> *"
         if self.of_type.is_queried_union:
             return f"qtgql::bases::ListModelABC<{self.of_type.is_queried_union.type_name()}> *"
