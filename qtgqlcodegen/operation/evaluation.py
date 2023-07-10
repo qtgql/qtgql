@@ -237,7 +237,11 @@ def _unwrap_interface_fragments(
     :returns: all of the inline fragments as a flat list.
     """
     fields_for_concrete: list[gql_lang.FieldNode] = []
-    if not has_id_selection(selection_set) and not id_was_selected:
+    if (
+        parent_concrete.implements_node
+        and not has_id_selection(selection_set)
+        and not id_was_selected
+    ):
         id_was_selected = True
         inject_id_selection(selection_set)
     for field_or_frag in selection_set.selections:

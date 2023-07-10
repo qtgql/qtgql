@@ -713,6 +713,12 @@ ListOfUnionTestCase = QtGqlTestCase(
     test_name="ListOfUnionTestCase",
 )
 
+ListOfInterfaceTestcase = QtGqlTestCase(
+    schema=schemas.list_of_interface.schema,
+    operations=ListOfUnionTestCase.operations.replace("pets {", "pets { name"),
+    test_name="ListOfInterfaceTestcase",
+)
+
 InputTypeOperationVariableTestCase = QtGqlTestCase(
     schema=schemas.input_type.schema,
     operations="""
@@ -791,11 +797,6 @@ SubscriptionTestCase = QtGqlTestCase(
     test_name="SubscriptionTestCase",
 )
 
-ListOfInterfaceTestcase = QtGqlTestCase(
-    schema=schemas.list_of_interface.schema,
-    operations=NodeInterfaceFieldTestCase.operations,
-    test_name="ListOfInterfaceTestcase",
-)
 
 all_test_cases = [
     ScalarsTestCase,
@@ -817,11 +818,12 @@ all_test_cases = [
     NodeInterfaceFieldTestCase,
     NonNodeUnionTestCase,
     ListOfNonNodeType,
+    ListOfUnionTestCase,
+    ListOfInterfaceTestcase,
     ListOfObjectWithUnionTestCase,
     CustomUserScalarTestCase,
     ObjectsThatReferenceEachOtherTestCase,
     RootListOfTestCase,
-    ListOfUnionTestCase,
 ]
 
 implemented_testcases = [
@@ -845,6 +847,7 @@ implemented_testcases = [
     NonNodeUnionTestCase,
     ListOfNonNodeType,
     ListOfUnionTestCase,
+    ListOfInterfaceTestcase,
 ]
 
 
@@ -858,5 +861,5 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 if __name__ == "__main__":
     generate_testcases(
-        ListOfUnionTestCase,
+        ObjectWithListOfObjectTestCase,
     )

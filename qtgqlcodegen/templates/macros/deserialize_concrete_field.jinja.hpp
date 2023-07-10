@@ -22,42 +22,25 @@ auto 👉proxy_field.name👈_typename  = 👉proxy_field.name👈_data.value("_
 👉iterate_type_condition(choice,type_cond, do_on_meets, loop)👈
 {% endfor %}
 {% elif proxy_field.type.is_model -%}
-    {% if proxy_field.type.is_model.of_type.is_queried_object_type or proxy_field.type.is_model.of_type.is_queried_union -%}
-    👉proxy_field.concrete.type.member_type👈 obj_list;
+    👉proxy_field.concrete.type.member_type👈 👉proxy_field.name👈_init_list;
     for (const auto& node: data.value("👉proxy_field.name👈").toArray()){
     {% if proxy_field.type.is_model.of_type.is_queried_object_type %}
-        obj_list.append(👉 proxy_field.type.is_model.of_type.is_queried_object_type.deserializer_name 👈(node.toObject(), 👉operation_pointer👈));
-    {% elif proxy_field.type.is_model.of_type.is_queried_union %}
+        👉proxy_field.name👈_init_list.append(👉 proxy_field.type.is_model.of_type.is_queried_object_type.deserializer_name 👈(node.toObject(), 👉operation_pointer👈));
+    {% elif proxy_field.type.is_model.of_type.is_queried_union or proxy_field.type.is_model.of_type.is_queried_interface %}
         auto node_data = node.toObject();
         auto 👉proxy_field.name👈_typename = node_data.value("__typename").toString();
         {%set type_cond -%}👉proxy_field.name👈_typename{% endset -%}
         {% for choice in proxy_field.type.of_type.choices -%}
         {% set do_on_meets -%}
-        obj_list.append(👉choice.deserializer_name👈(node_data, 👉operation_pointer👈) 👉 setter_end 👈);
+        👉proxy_field.name👈_init_list.append(👉choice.deserializer_name👈(node_data, 👉operation_pointer👈) 👉 setter_end 👈);
         {% endset -%}
         👉iterate_type_condition(choice,type_cond, do_on_meets, loop)👈
         {% endfor %}
+    {% else %}
+    throw qtgql::exceptions::NotImplementedError({"can't deserialize model of 👉proxy_field.type.of_type.__class__👈"});
     {% endif %}
     };
-    👉 setter_name 👈(obj_list👉 setter_end 👈);
-    {% elif proxy_field.type.is_model.is_interface -%}
-    👉 setter_name 👈(qtgql::ListModel(
-            parent=parent,
-            data=[👉proxy_field.type.is_model.is_interface.name👈.from_dict(parent, data=node, config=inner_config, metadata=👉operation_pointer👈) for
-    node in field_data],)👉 setter_end 👈);
-    {% elif proxy_field.type.is_model.is_union -%}
-    model_data = []
-    for node in field_data:
-    type_name = node['__typename']
-    choice = inner_👉config_name👈.choices[type_name]
-    model_data.append(
-            __TYPE_MAP__[type_name].from_dict(self, node,
-            choice, 👉operation_pointer👈)
-    )
-    👉 setter_name 👈(qtgql::ListModel(parent, data=model_data)👉 setter_end 👈);
-    {% else %}
-    throw qtgql::exceptions::NotImplementedError({"can't update model of 👉proxy_field.type.of_type.__class__👈"});
-    {% endif %}
+    👉 setter_name 👈(👉proxy_field.name👈_init_list👉 setter_end 👈);
 {% elif proxy_field.type.is_builtin_scalar -%}
     {% if proxy_field.type.is_void -%}
     /* deliberately empty */

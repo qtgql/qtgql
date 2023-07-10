@@ -1,48 +1,80 @@
+from __future__ import annotations
+
+import random
 from enum import Enum
 
 import strawberry
-from tests.conftest import fake
-from tests.test_codegen.schemas.node_interface import Node
+from tests.conftest import factory, fake
+from tests.test_codegen.schemas.node_interface import NODE_DB, Node
 
 
 @strawberry.interface
-class HasNameAgeInterface(Node):
+class Pet:
     name: str = strawberry.field(default_factory=fake.name)
+
+
+@strawberry.type
+class Dog(Pet):
     age: int = strawberry.field(default_factory=fake.pyint)
 
 
-@strawberry.type
-class User(HasNameAgeInterface):
-    password: str = strawberry.field(default_factory=fake.password)
+@strawberry.type()
+class Cat(Pet):
+    color: str = strawberry.field(default_factory=factory.text.color)
 
 
-@strawberry.type
-class Dog(HasNameAgeInterface):
-    barks: bool = strawberry.field(default_factory=fake.pybool)
+@strawberry.type()
+class Person(Node):
+    pets: list[Pet]
+    name: str = strawberry.field(default_factory=fake.name)
 
-
-@strawberry.enum()
-class TypesEnum(Enum):
-    Dog = Dog.__name__
-    User = User.__name__
+    @classmethod
+    def create(cls):
+        return Person(
+            pets=[random.choice((Dog(), Cat())) for _ in range(7)],  # noqa: S311
+        )
 
 
 @strawberry.type
 class Query:
     @strawberry.field
-    def node(self, ret: TypesEnum = TypesEnum.Dog) -> list[Node]:
-        if ret is TypesEnum.Dog:
-            return [Dog() for _ in range(5)]
+    def randPerson(self) -> Person:
+        return Person.create()
+
+
+@strawberry.enum()
+class UnionTypes(Enum):
+    PERSON, DOG = range(2)
+
+
+@strawberry.type()
+class Mutation:
+    @strawberry.field()
+    def insert_to_list(
+        self,
+        node_id: strawberry.ID,
+        at: int,
+        name: str,
+        type: UnionTypes,
+    ) -> Person:
+        p: Person = NODE_DB.get(node_id)
+        if type is UnionTypes.PERSON:
+            p.pets.insert(at, Cat(name=name))
         else:
-            return [User() for _ in range(5)]
+            p.pets.insert(at, Dog(name=name))
+        return p
 
     @strawberry.field()
-    def dog(self) -> Dog:
-        return Dog()
+    def modify_name(self, node_id: strawberry.ID, at: int, name: str) -> Person:
+        p: Person = NODE_DB.get(node_id)
+        p.pets[at].name = name
+        return p
 
     @strawberry.field()
-    def user(self) -> User:
-        return User()
+    def remove_at(self, node_id: strawberry.ID, at: int) -> Person:
+        p: Person = NODE_DB.get(node_id)
+        p.pets.pop(at)
+        return p
 
 
-schema = strawberry.Schema(query=Query)
+schema = strawberry.Schema(query=Query, mutation=Mutation, types=[Dog, Cat])

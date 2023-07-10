@@ -27,7 +27,7 @@ auto operation = m_operation;
             }
         }
 
-    {% elif field.type.of_type.is_queried_union %}
+    {% elif field.type.of_type.is_queried_union or field.type.of_type.is_queried_interface %}
         auto 👉field.name👈_typename = concrete->__typename();
         {%set type_cond -%}👉field.name👈_typename{% endset -%}
         {% for choice in field.type.of_type.choices %}
@@ -51,7 +51,8 @@ auto operation = m_operation;
         👉iterate_type_condition(choice,type_cond, do_on_meets, loop)👈
         {% endfor %}
     {% else %}
-    throw qtgql::exceptions::NotImplementedError({"can't update model of 👉field.type.of_type.__class__👈"});
+    throw qtgql::exceptions::NotImplementedError({""
+                                                  "can't update model of 👉field.type.of_type.__class__👈"});
     {% endif %}
     }
 {% elif field.type.is_queried_object_type -%}
