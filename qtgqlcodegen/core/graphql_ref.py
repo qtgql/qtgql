@@ -20,6 +20,8 @@ def ast_identifier_factory(
 
 is_selection_set = ast_identifier_factory(gql_lang.ast.SelectionSetNode)
 is_inline_fragment = ast_identifier_factory(gql_lang.InlineFragmentNode)
+is_fragment_spread_node = ast_identifier_factory(gql_lang.FragmentSpreadNode)
+is_fragment_definition_node = ast_identifier_factory(gql_def.FragmentDefinitionNode)
 is_operation_def_node = ast_identifier_factory(gql_def.OperationDefinitionNode)
 is_field_node = ast_identifier_factory(gql_def.FieldNode)
 is_nonnull_node = ast_identifier_factory(gql_lang.NonNullTypeNode)

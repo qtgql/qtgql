@@ -719,6 +719,34 @@ ListOfInterfaceTestcase = QtGqlTestCase(
     test_name="ListOfInterfaceTestcase",
 )
 
+FragmentTestCase = QtGqlTestCase(
+    schema=schemas.object_with_scalar.schema,
+    operations="""
+    fragment UserSelections on User {
+        name
+        age
+        agePoint
+        male
+        id
+        uuid
+        voidField
+    }
+
+    query MainQuery {
+      constUser {
+        ...UserSelections
+      }
+    }
+
+    query UserWithSameIDAndDifferentFieldsQuery {
+      constUserWithModifiedFields {
+        ...UserSelections
+      }
+    }
+    """,
+    test_name="FragmentTestCase",
+)
+
 InputTypeOperationVariableTestCase = QtGqlTestCase(
     schema=schemas.input_type.schema,
     operations="""
@@ -861,5 +889,5 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 if __name__ == "__main__":
     generate_testcases(
-        ObjectWithListOfObjectTestCase,
+        FragmentTestCase,
     )

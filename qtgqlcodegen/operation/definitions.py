@@ -8,6 +8,7 @@ import graphql
 from attr import define
 
 if TYPE_CHECKING:
+    from graphql.language import ast as gql_lang
     from graphql.type import definition as gql_def
 
     from qtgqlcodegen.schema.definitions import (
@@ -30,6 +31,8 @@ class OperationTypeInfo:
     narrowed_types_map: dict[str, QtGqlQueriedObjectType] = attrs.Factory(dict)
     narrowed_interfaces_map: dict[str, QtGqlQueriedInterface] = attrs.Factory(dict)
     variables: list[QtGqlVariableDefinition] = attrs.Factory(list)
+    used_fragments: dict[str, QtGqlFragmentDefinition] = attrs.Factory(dict)
+    available_fragments: dict[str, QtGqlFragmentDefinition] = attrs.Factory(dict)
 
 
 @attrs.define(frozen=True, slots=False, repr=False)
@@ -86,10 +89,10 @@ class QtGqlOperationDefinition:
     operation_def: gql_def.OperationDefinitionNode
     root_type: QtGqlQueriedObjectType
     root_field: QtGqlQueriedField
-    fragments: list[str] = attrs.Factory(list)
     variables: list[QtGqlVariableDefinition] = attrs.Factory(list)
     narrowed_types: tuple[QtGqlQueriedObjectType, ...] = attrs.Factory(tuple)
     interfaces: tuple[QtGqlQueriedInterface, ...] = attrs.Factory(tuple)
+    used_fragments: tuple[QtGqlFragmentDefinition, ...] = attrs.Factory(tuple)
 
     @property
     def generated_variables_type(self) -> str:
@@ -102,10 +105,26 @@ class QtGqlOperationDefinition:
 
     @property
     def query(self) -> str:
-        return graphql.print_ast(self.operation_def)
+        return "\n".join(
+            [
+                graphql.print_ast(self.operation_def),
+                *[frag.as_string for frag in self.used_fragments],
+            ],
+        )
 
 
 @define(slots=False, repr=False)
 class QtGqlVariableUse:
     argument: tuple[int, QtGqlArgumentDefinition]
     variable: QtGqlVariableDefinition
+
+
+@define(slots=False, repr=False)
+class QtGqlFragmentDefinition:
+    name: str
+    ast: gql_lang.FragmentDefinitionNode
+    of: QtGqlQueriedObjectType | QtGqlQueriedInterface
+
+    @cached_property
+    def as_string(self) -> str:
+        return graphql.print_ast(self.ast)

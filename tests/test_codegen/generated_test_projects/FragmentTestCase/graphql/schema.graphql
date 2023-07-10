@@ -1,0 +1,24 @@
+interface Node {
+  id: ID!
+}
+
+type Query {
+  user: User!
+  constUser: User!
+  constUserWithModifiedFields: User!
+}
+
+scalar UUID
+
+type User implements Node {
+  id: ID!
+  name: String!
+  age: Int!
+  agePoint: Float!
+  male: Boolean!
+  uuid: UUID!
+  voidField: Void
+}
+
+"""Represents NULL values"""
+scalar Void

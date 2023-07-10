@@ -6,6 +6,8 @@ from typing import TYPE_CHECKING, Literal
 from attr import Factory, define
 from graphql import OperationType
 
+from qtgqlcodegen.utils import require
+
 if TYPE_CHECKING:
     from graphql.type import definition as gql_def
     from typing_extensions import TypeAlias
@@ -123,6 +125,9 @@ class SchemaTypeInfo:
 
     def get_object_type(self, name: str) -> QtGqlObjectType | None:
         return self.object_types.get(name, None)
+
+    def get_object_or_interface(self, name: str) -> QtGqlInterface | QtGqlObjectType:
+        return require(self.get_object_type(name) or self.get_interface(name))
 
     def add_objecttype(self, objecttype: QtGqlObjectType) -> None:
         self.object_types[objecttype.name] = objecttype
