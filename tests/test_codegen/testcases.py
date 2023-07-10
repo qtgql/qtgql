@@ -780,6 +780,42 @@ FragmentsOnInterfaceTestCase = QtGqlTestCase(
     """,
     test_name="FragmentsOnInterfaceTestCase",
 )
+
+FragmentWithOperationVariable = QtGqlTestCase(
+    schema=schemas.object_with_optional_scalar.schema,
+    operations="""
+    fragment UserFragment on User {
+      uuid
+      name
+      id
+      birth
+      agePoint
+      age
+    }
+
+    fragment ModifyNameMutation on Mutation {
+      modifyName(userId: $userId, newName: $newName) {
+        ...UserFragment
+      }
+    }
+
+    mutation ChangeName($userId: ID!, $newName: String!) {
+      ...ModifyNameMutation
+    }
+
+    fragment GetUserQuery on Query {
+      user(retNone: $returnNone) {
+        ...UserFragment
+      }
+    }
+
+    query MainQuery($returnNone: Boolean! = false) {
+      ...GetUserQuery
+    }
+    """,
+    test_name="FragmentWithOperationVariable",
+)
+
 InputTypeOperationVariableTestCase = QtGqlTestCase(
     schema=schemas.input_type.schema,
     operations="""
@@ -883,6 +919,7 @@ all_test_cases = [
     ListOfInterfaceTestcase,
     FragmentTestCase,
     FragmentsOnInterfaceTestCase,
+    FragmentWithOperationVariable,
     ListOfObjectWithUnionTestCase,
     CustomUserScalarTestCase,
     ObjectsThatReferenceEachOtherTestCase,
@@ -913,6 +950,7 @@ implemented_testcases = [
     ListOfInterfaceTestcase,
     FragmentTestCase,
     FragmentsOnInterfaceTestCase,
+    FragmentWithOperationVariable,
 ]
 
 
@@ -925,6 +963,4 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 
 if __name__ == "__main__":
-    generate_testcases(
-        FragmentsOnInterfaceTestCase,
-    )
+    generate_testcases(FragmentWithOperationVariable)

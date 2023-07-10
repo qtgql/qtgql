@@ -32,7 +32,7 @@ class OperationTypeInfo:
     narrowed_interfaces_map: dict[str, QtGqlQueriedInterface] = attrs.Factory(dict)
     variables: list[QtGqlVariableDefinition] = attrs.Factory(list)
     used_fragments: dict[str, QtGqlFragmentDefinition] = attrs.Factory(dict)
-    available_fragments: dict[str, QtGqlFragmentDefinition] = attrs.Factory(dict)
+    raw_fragments: dict[str, gql_lang.FragmentDefinitionNode] = attrs.Factory(dict)
 
 
 @attrs.define(frozen=True, slots=False, repr=False)

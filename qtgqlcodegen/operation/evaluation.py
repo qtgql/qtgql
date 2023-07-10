@@ -269,7 +269,7 @@ def _unwrap_interface_fragments(
                 id_was_selected,
             )
         elif frag_spread := is_fragment_spread_node(node):
-            resolved_frag = type_info.available_fragments[frag_spread.name.value]
+            resolved_frag = _evaluate_fragment(type_info, frag_spread)
             concrete_selections.used_fragments.append(resolved_frag)
             type_info.used_fragments[resolved_frag.name] = resolved_frag
         else:
@@ -379,7 +379,7 @@ def _evaluate_object_type(
                 origin=concrete,
             )
         elif frag_spread := is_fragment_spread_node(selection):
-            resolved_frag = type_info.available_fragments[frag_spread.name.value]
+            resolved_frag = _evaluate_fragment(type_info, frag_spread)
             fields.update(resolved_frag.of.fields_dict)
             type_info.used_fragments[resolved_frag.name] = resolved_frag
 
@@ -397,31 +397,37 @@ def _evaluate_object_type(
 
 
 def _evaluate_fragment(
-    schema_type_info: SchemaTypeInfo,
-    node: gql_lang.FragmentDefinitionNode,
+    type_info: OperationTypeInfo,
+    frag_spread: gql_lang.FragmentSpreadNode,
 ) -> QtGqlFragmentDefinition:
-    type_info = OperationTypeInfo(schema_type_info)
-    type_cond_name = node.type_condition.name.value
-    frag_name = node.name.value
+    # Generally fragments could have been evaluated globally
+    # though we are evaluating them per operation
+    # since in the future fragments might be scoped to an operation because of
+    # https://github.com/graphql/graphql-spec/issues/204
+    if evaluated := type_info.used_fragments.get(frag_spread.name.value, None):
+        return evaluated
+    raw_frag = type_info.raw_fragments[frag_spread.name.value]
+    type_cond_name = raw_frag.type_condition.name.value
+    frag_name = raw_frag.name.value
     fragment_of: QtGqlQueriedInterface | QtGqlQueriedObjectType
-    if interface := schema_type_info.get_interface(type_cond_name):
+    if interface := type_info.schema_type_info.get_interface(type_cond_name):
         fragment_of = _evaluate_interface(
             type_info=type_info,
             concrete=interface,
-            selection_set=node.selection_set,
+            selection_set=raw_frag.selection_set,
             path=frag_name,
         )
     else:
-        object_type = require(schema_type_info.get_object_type(type_cond_name))
+        object_type = require(type_info.schema_type_info.get_object_type(type_cond_name))
         fragment_of = _evaluate_object_type(
             type_info=type_info,
             concrete=object_type,
-            selection_set=node.selection_set,
+            selection_set=raw_frag.selection_set,
             path=frag_name,
         )
     return QtGqlFragmentDefinition(
         name=frag_name,
-        ast=node,
+        ast=raw_frag,
         of=fragment_of,
     )
 
@@ -429,7 +435,7 @@ def _evaluate_fragment(
 def _evaluate_operation(
     operation: OperationDefinitionNode,
     schema_type_info: SchemaTypeInfo,
-    fragments: dict[str, QtGqlFragmentDefinition],
+    raw_fragments: dict[str, gql_lang.FragmentDefinitionNode],
 ) -> QtGqlOperationDefinition:
     """Each operation generates a whole new "proxy" schema. That schema will
     contain only the fields that are currently queried. The way we do that is
@@ -440,7 +446,7 @@ def _evaluate_operation(
 
     And because of that, one object type (at the concrete schema) might have many proxy objects.
     """
-    type_info = OperationTypeInfo(schema_type_info, available_fragments=fragments)
+    type_info = OperationTypeInfo(schema_type_info, raw_fragments=raw_fragments)
 
     # input variables
     if variables_def := operation.variable_definitions:
@@ -470,10 +476,14 @@ def _evaluate_operation(
 
 
 class _OperationsVisitor(visitor.Visitor):
-    def __init__(self, type_info: SchemaTypeInfo, fragments: dict[str, QtGqlFragmentDefinition]):
+    def __init__(
+        self,
+        type_info: SchemaTypeInfo,
+        fragments: dict[str, gql_lang.FragmentDefinitionNode],
+    ):
         super().__init__()
         self.schema_type_info = type_info
-        self.fragments = fragments
+        self.raw_fragments = fragments
         self.operations: dict[str, QtGqlOperationDefinition] = {}
 
     def enter_operation_definition(self, node: graphql.Node, *args, **kwargs) -> None:
@@ -487,20 +497,21 @@ class _OperationsVisitor(visitor.Visitor):
                 self.operations[operation.name.value] = _evaluate_operation(
                     operation,
                     self.schema_type_info,
-                    self.fragments,
+                    self.raw_fragments,
                 )
 
 
 class _FragmentsVisitor(visitor.Visitor):
+    """Gets all fragments from the operations file."""
+
     def __init__(self, type_info: SchemaTypeInfo):
         super().__init__()
         self.schema_type_info = type_info
-        self.fragments: dict[str, QtGqlFragmentDefinition] = {}
+        self.fragments: dict[str, gql_lang.FragmentDefinitionNode] = {}
 
     def enter_fragment_definition(self, node: graphql.Node, *args, **kwargs) -> None:
         fragment = require(is_fragment_definition_node(node))
-        evaluated = _evaluate_fragment(self.schema_type_info, fragment)
-        self.fragments[evaluated.name] = evaluated
+        self.fragments[fragment.name.value] = fragment
 
 
 def evaluate_operations(
