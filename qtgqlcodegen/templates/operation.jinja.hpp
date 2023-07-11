@@ -10,7 +10,7 @@ namespace 👉 context.config.env_name 👈::👉context.ns👈{
 class 👉 context.operation.name 👈;
 
 namespace deserializers{
-{% for t in context.operation.narrowed_types if not t.concrete.is_root -%}
+{% for t in context.operation.narrowed_types if not t.concrete.is_root and not t.is_fragment -%}
 std::shared_ptr<👉 t.concrete.name 👈> des_👉 t.name 👈(const QJsonObject& data, const 👉 context.operation.name 👈 * operation);
 {% endfor -%}
 {% for t in context.operation.interfaces -%}

@@ -393,6 +393,7 @@ def _evaluate_object_type(
         concrete=concrete,
         fields_dict=fields,
         used_fragments=tuple(bases_from_fragments),
+        is_fragment=is_fragment,
     )
     type_info.narrowed_types_map[name] = ret
     return ret

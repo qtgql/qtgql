@@ -49,10 +49,10 @@ throw qtgql::exceptions::InterfaceDeserializationError(type_name.toStdString());
     {%- for field in t.fields -%}
     👉 initialize_proxy_field(field) 👈
     {% endfor -%}
-    _qtgql_connect_signals();
     {% for frag in t.used_fragments -%}
     👉 frag.private_name 👈 = new 👉 frag.type_name() 👈(operation, inst);
     {% endfor %}
+    _qtgql_connect_signals();
 }
 
 void 👉 t.name 👈::_qtgql_connect_signals(){
@@ -81,7 +81,7 @@ emit 👉 field.concrete.signal_name 👈();
 };
 
 // Deserialzier
-{% if not t.concrete.is_root %}
+{% if not t.concrete.is_root and not t.is_fragment %}
 std::shared_ptr<👉 t.concrete.name 👈> 👉 t.deserializer_name 👈(const QJsonObject& data, const 👉 context.operation.name 👈 * operation){
 if (data.isEmpty()){
     return {};
@@ -95,7 +95,7 @@ if(cached_maybe.has_value()){
 }
 {% endif -%}
 auto inst = 👉 t.concrete.name 👈::shared();
-{% for f in t.fields -%}
+{% for f in t.fields + t.fields_from_fragments -%}
 👉deserialize_concrete_field(f)👈
 {% endfor %}
 {% if t.concrete. implements_node %}
@@ -108,7 +108,7 @@ return inst;
 // Updater
 void 👉 t.updater_name 👈(👉 t.concrete.member_type_arg 👈 inst, const QJsonObject &data, const 👉 context.operation.name 👈 * operation)
 {
-{%for f in t.fields -%}
+{%for f in t.fields + t.fields_from_fragments -%} // TODO: can updaters use the fragment updaters?
 👉update_concrete_field(f,f.concrete, private_name=f.private_name, operation_pointer="operation")👈
 {% endfor %}
 };
