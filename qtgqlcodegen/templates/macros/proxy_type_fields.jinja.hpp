@@ -17,7 +17,7 @@ protected:
 {% endif -%}
 {% if t.concrete.is_root -%} {# // root types are singletons, no need for shared ptr -#}
 👉context.schema_ns👈::👉 t.concrete.name 👈 * m_inst;
-{% else -%}
+{% elif not t.is_fragment -%} {# // fragments must not be instantiated alone#}
 std::shared_ptr<👉context.schema_ns👈::👉 t.concrete.name 👈> m_inst;
 {% endif -%}
 {% for ref_field in t.references -%}
