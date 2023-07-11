@@ -470,23 +470,6 @@ class QtGqlQueriedObjectType(QtGqlQueriedTypeABC, QtGqlTypeABC):
             return (self.base_interface, *self.base_fragments)
         return self.base_fragments
 
-    @cached_property
-    def initializers_list(self) -> list[str]:
-        initializers: list[str] = []
-        for frag in self.base_fragments:
-            initializers.append(CppAttribute(frag.name).ns_add(frag.name).name)
-        if self.base_interface:
-            initializers.append(
-                CppAttribute(self.base_interface.name).ns_add(self.base_interface.name).name,
-            )
-        if not initializers:
-            initializers.append(
-                CppAttribute(QtGqlTypes.ObjectTypeABC.last)
-                .ns_add(QtGqlTypes.ObjectTypeABC.last)
-                .name,
-            )
-        return initializers
-
     @property
     def implements_node(self) -> bool:
         return self.concrete.implements_node

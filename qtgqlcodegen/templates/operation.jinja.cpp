@@ -33,24 +33,16 @@ throw qtgql::exceptions::InterfaceDeserializationError(type_name.toStdString());
 
 {% for t in context.operation.narrowed_types -%}
 // Constructor
+{% set base_name -%}
+👉 context.qtgql_types.ObjectTypeABC.last if not t.base_interface else t.base_interface.name 👈
+{% endset -%}
 {% if t.concrete.is_root -%}
-👉 t.name 👈::👉 t.name 👈(👉 context.operation.name 👈 * operation):
-{% for initializer in t.initializers_list -%}
-👉 initializer 👈(operation) {% if not loop.first and not loop.last -%}, {% endif -%}
-{% endfor -%}{
+👉 t.name 👈::👉 t.name 👈(👉 context.operation.name 👈 * operation): 👉 base_name 👈::👉 base_name 👈(operation){
     m_inst = 👉 t.concrete.name 👈::instance();
     auto m_inst_ptr = m_inst;
-    _qtgql_connect_signals();
-}
 {% else -%}
     👉 t.name 👈::👉 t.name 👈(👉 context.operation.name 👈 * operation, const std::shared_ptr<👉 t.concrete.name 👈> &inst)
-:
-{% for initializer in t.initializers_list -%}
-👉 initializer 👈(operation) {% if not loop.first and not loop.last -%}, {% endif -%}
-{% endfor -%}
-
-{% if not t.is_fragment -%}
-m_inst{inst}, 👉initializer_list👈
+: m_inst{inst}, 👉 base_name 👈::👉 base_name 👈(operation)
 {
     {% endif -%}
     m_operation = operation;
@@ -59,9 +51,6 @@ m_inst{inst}, 👉initializer_list👈
     {% endfor -%}
     _qtgql_connect_signals();
 }
-{% else -%}
-{}
-{% endif -%}
 
 void 👉 t.name 👈::_qtgql_connect_signals(){
 {# connecting signals here, when the concrete changed it will be mirrored here. -#}

@@ -75,38 +75,6 @@ Now you project structure should look like this (with the generated files)
 └── test_scalarstestcase.cpp
 ```
 
-## Note about optionals
-This library will try to set default values for fields if they were not fetched by the query
-or to be used by `QGraphQListModel.currentObject`,
-This reduces unexpected bugs significantly.
-
-!!! Note
-    Object types are currently optional because two types
-    can refer each-other and cause recursion error, see [#84](https://github.com/nrbnlulu/qtgql/issues/84)
-
-```qml
-Item{
-    property int size: object?.size
-}
-```
-If `object` would be null property assignment would fail since
-you can't assign `undefined` to `int`.
-
-Therefore, **every generated type** has a default value,
-including scalars and custom-scalars.
-### Defaults mapping
-| GraphQL type                                                | Default                                             |
-|-------------------------------------------------------------|-----------------------------------------------------|
-| `Int`                                                       | `qtgql::DEFAULTS::INT` *(compiler lowest int)*      |
-| `String`                                                    | `""` Empty QString.                                 |
-| `Float`                                                     | `qtgql::DEFAULTS::FLOAT` *(compiler lowest double)* |
-| `ID`                                                        | `'9b2a0828-880d-4023-9909-de067984523c'`            |
-| `Boolean`                                                   | `false`                                             |
-| `UUID`                                                      | `QUuid("9b2a0828-880d-4023-9909-de067984523c")`     |
-| `List` or in our context a `QAbstractListModel`             | `<modelname>` Blank corresponding generated model   |
-| `ObjectType` or in our context an `QObject` with properties | Empty pointer                                       |
-| `SCALAR`                                                    | Provided by scalar implementation.                  |
-
 
 ## Usage
 
