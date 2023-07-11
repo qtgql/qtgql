@@ -234,6 +234,7 @@ def _unwrap_interface_fragments(
     parent_concrete: QtGqlObjectType | QtGqlInterface,
     selection_set: gql_lang.SelectionSetNode,
     initial: dict[str, _FieldsAndFragments],
+    path: str,
     id_was_selected: bool = False,
 ) -> dict[str, _FieldsAndFragments]:
     """Fragments can be nested, i.e node{ id.
@@ -266,10 +267,13 @@ def _unwrap_interface_fragments(
                 concrete_choice,
                 inline_frag.selection_set,
                 initial,
+                path,
                 id_was_selected,
             )
         elif frag_spread := is_fragment_spread_node(node):
-            concrete_selections.used_fragments.append(_evaluate_fragment(type_info, frag_spread))
+            concrete_selections.used_fragments.append(
+                _evaluate_fragment(type_info, frag_spread, path),
+            )
         else:
             field_node = is_field_node(node)
             assert field_node
@@ -289,10 +293,11 @@ def _evaluate_interface(
     choices: list[QtGqlQueriedObjectType] = []
 
     raw_fields_map = _unwrap_interface_fragments(
-        type_info,
-        concrete,
-        selection_set,
-        {},
+        type_info=type_info,
+        parent_concrete=concrete,
+        selection_set=selection_set,
+        path=path,
+        initial={},
     )
     # dispatch fragmented fields where they are needed.
     for resolve_able in concrete.implementations.values():
@@ -377,7 +382,7 @@ def _evaluate_object_type(
                 origin=concrete,
             )
         elif frag_spread := is_fragment_spread_node(selection):
-            resolved_frag = _evaluate_fragment(type_info, frag_spread)
+            resolved_frag = _evaluate_fragment(type_info, frag_spread, path)
             fields.update(resolved_frag.of.fields_dict)
 
     name = f"{concrete.name}__{path}"
@@ -396,13 +401,9 @@ def _evaluate_object_type(
 def _evaluate_fragment(
     type_info: OperationTypeInfo,
     frag_spread: gql_lang.FragmentSpreadNode,
+    path: str,
 ) -> QtGqlFragmentDefinition:
-    # Generally fragments could have been evaluated globally
-    # though we are evaluating them per operation
-    # since in the future fragments might be scoped to an operation because of
-    # https://github.com/graphql/graphql-spec/issues/204
-    if evaluated := type_info.used_fragments.get(frag_spread.name.value, None):
-        return evaluated
+    #  for mote details of this design choices see https://github.com/qtgql/qtgql/pull/306
     raw_frag = type_info.raw_fragments[frag_spread.name.value]
     type_cond_name = raw_frag.type_condition.name.value
     frag_name = raw_frag.name.value
@@ -412,17 +413,18 @@ def _evaluate_fragment(
             type_info=type_info,
             concrete=interface,
             selection_set=raw_frag.selection_set,
-            path=frag_name,
+            path=path,
         )
+        type_info.narrowed_interfaces_map.pop(fragment_of.name)
     else:
         object_type = require(type_info.schema_type_info.get_object_type(type_cond_name))
         fragment_of = _evaluate_object_type(
             type_info=type_info,
             concrete=object_type,
             selection_set=raw_frag.selection_set,
-            path=frag_name,
+            path=path,
         )
-
+        type_info.narrowed_types_map.pop(fragment_of.name)
     ret = QtGqlFragmentDefinition(
         name=frag_name,
         ast=raw_frag,
