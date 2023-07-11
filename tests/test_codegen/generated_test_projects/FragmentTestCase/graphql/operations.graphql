@@ -1,5 +1,5 @@
 
-    fragment UserSelections on User {
+    fragment UserSelectionsFrag on User {
         name
         age
         agePoint
@@ -11,12 +11,12 @@
 
     query MainQuery {
       constUser {
-        ...UserSelections
+        ...UserSelectionsFrag
       }
     }
 
     query UserWithSameIDAndDifferentFieldsQuery {
       constUserWithModifiedFields {
-        ...UserSelections
+        ...UserSelectionsFrag
       }
     }

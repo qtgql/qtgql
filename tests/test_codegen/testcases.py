@@ -723,7 +723,7 @@ ListOfInterfaceTestcase = QtGqlTestCase(
 FragmentTestCase = QtGqlTestCase(
     schema=schemas.object_with_scalar.schema,
     operations="""
-    fragment UserSelections on User {
+    fragment UserSelectionsFrag on User {
         name
         age
         agePoint
@@ -735,13 +735,13 @@ FragmentTestCase = QtGqlTestCase(
 
     query MainQuery {
       constUser {
-        ...UserSelections
+        ...UserSelectionsFrag
       }
     }
 
     query UserWithSameIDAndDifferentFieldsQuery {
       constUserWithModifiedFields {
-        ...UserSelections
+        ...UserSelectionsFrag
       }
     }
     """,
@@ -963,4 +963,4 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 
 if __name__ == "__main__":
-    generate_testcases(FragmentsOnInterfaceTestCase)
+    generate_testcases(FragmentTestCase)

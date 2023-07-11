@@ -43,8 +43,12 @@ public:
 {% endfor %}
 // ------------ Narrowed Object types ------------
 {% for t in context.operation.narrowed_types %}
-class 👉 t.name 👈: public 👉 context.qtgql_types.ObjectTypeABC.name if not t.base_interface else t.base_interface.name 👈{
-
+class 👉 t.name 👈:
+        {% if t.bases -%}
+        {% for base in t.bases -%} public 👉base.name👈 {% if not loop.first and not loop.last %}, {% endif -%}{% endfor -%}
+        {% else -%}
+        public 👉 context.qtgql_types.ObjectTypeABC.name 👈
+        {% endif -%}{
 👉context.operation.name👈* m_operation;
 
 👉 proxy_type_fields(t, context) 👈

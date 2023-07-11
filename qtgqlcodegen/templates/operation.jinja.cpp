@@ -33,16 +33,21 @@ throw qtgql::exceptions::InterfaceDeserializationError(type_name.toStdString());
 
 {% for t in context.operation.narrowed_types -%}
 // Constructor
-{% set base_name -%}
-👉 context.qtgql_types.ObjectTypeABC.last if not t.base_interface else t.base_interface.name 👈
-{% endset -%}
 {% if t.concrete.is_root -%}
-👉 t.name 👈::👉 t.name 👈(👉 context.operation.name 👈 * operation): 👉 base_name 👈::👉 base_name 👈(operation){
+👉 t.name 👈::👉 t.name 👈(👉 context.operation.name 👈 * operation):
+{% for initializer in t.initializers_list -%}
+👉 initializer 👈(operation) {% if not loop.first and not loop.last -%}, {% endif -%}
+{% endfor -%}{
     m_inst = 👉 t.concrete.name 👈::instance();
     auto m_inst_ptr = m_inst;
 {% else -%}
     👉 t.name 👈::👉 t.name 👈(👉 context.operation.name 👈 * operation, const std::shared_ptr<👉 t.concrete.name 👈> &inst)
-: m_inst{inst}, 👉 base_name 👈::👉 base_name 👈(operation)
+:
+{% for initializer in t.initializers_list -%}
+👉 initializer 👈(operation) {% if not loop.first and not loop.last -%}, {% endif -%}
+{% endfor -%}
+
+m_inst{inst}, 👉initializer_list👈
 {
     {% endif -%}
     m_operation = operation;

@@ -363,6 +363,7 @@ def _evaluate_object_type(
     if concrete.implements_node and not has_id_selection(selection_set):
         inject_id_selection(selection_set)
 
+    bases_from_fragments: list[QtGqlQueriedObjectType] = []
     fields: dict[str, QtGqlQueriedField] = {}
     for selection in selection_set.selections:
         if f_node := is_field_node(selection):
@@ -378,7 +379,7 @@ def _evaluate_object_type(
             )
         elif frag_spread := is_fragment_spread_node(selection):
             resolved_frag = _evaluate_fragment(type_info, frag_spread)
-            fields.update(resolved_frag.of.fields_dict)
+            bases_from_fragments.append(require(resolved_frag.of.is_queried_object_type))
 
     name = f"{concrete.name}__{path}"
     if ret := type_info.narrowed_types_map.get(name, None):
@@ -388,6 +389,7 @@ def _evaluate_object_type(
         name=name,
         concrete=concrete,
         fields_dict=fields,
+        base_fragments=tuple(bases_from_fragments),
     )
     type_info.narrowed_types_map[name] = ret
     return ret
