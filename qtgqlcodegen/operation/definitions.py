@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     from graphql.language import ast as gql_lang
     from graphql.type import definition as gql_def
 
+    from qtgqlcodegen.operation.types import QtGqlFragmentDefinition
     from qtgqlcodegen.schema.definitions import (
         QtGqlArgumentDefinition,
         QtGqlFieldDefinition,
@@ -117,14 +118,3 @@ class QtGqlOperationDefinition:
 class QtGqlVariableUse:
     argument: tuple[int, QtGqlArgumentDefinition]
     variable: QtGqlVariableDefinition
-
-
-@define(slots=False, repr=False)
-class QtGqlFragmentDefinition:
-    name: str
-    ast: gql_lang.FragmentDefinitionNode
-    of: QtGqlQueriedObjectType | QtGqlQueriedInterface
-
-    @cached_property
-    def as_string(self) -> str:
-        return graphql.print_ast(self.ast)

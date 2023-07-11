@@ -8,9 +8,11 @@ import attrs
 from attr import define
 
 from qtgqlcodegen.core.cppref import CppAttribute, QtGqlBasesNs, QtGqlTypes
+from qtgqlcodegen.core.exceptions import FragmentsFieldClashError
 
 if TYPE_CHECKING:
     from qtgqlcodegen.operation.definitions import QtGqlQueriedField
+    from qtgqlcodegen.operation.types import QtGqlFragmentDefinition
     from qtgqlcodegen.schema.definitions import (
         CustomScalarMap,
         QtGqlArgumentDefinition,
@@ -66,6 +68,10 @@ class QtGqlTypeABC(ABC):
 
     @property
     def is_queried_union(self) -> QtGqlQueriedUnion | None:
+        return None
+
+    @property
+    def is_fragment_definition(self) -> QtGqlFragmentDefinition | None:
         return None
 
     def json_repr(self, attr_name: str | None = None) -> str:
@@ -460,15 +466,9 @@ class QtGqlQueriedObjectType(QtGqlQueriedTypeABC, QtGqlTypeABC):
     fields_dict: dict[str, QtGqlQueriedField] = attrs.Factory(dict)
     base_interface: QtGqlQueriedInterface | None = None  # I think that there could be only one
     is_fragment: bool = False
-    base_fragments: tuple[QtGqlQueriedObjectType | QtGqlQueriedInterface, ...] = attrs.Factory(
+    used_fragments: tuple[QtGqlFragmentDefinition, ...] = attrs.Factory(
         tuple,
     )
-
-    @property
-    def bases(self) -> tuple[QtGqlQueriedObjectType | QtGqlQueriedInterface, ...]:
-        if self.base_interface:
-            return (self.base_interface, *self.base_fragments)
-        return self.base_fragments
 
     @property
     def implements_node(self) -> bool:
@@ -512,6 +512,22 @@ class QtGqlQueriedObjectType(QtGqlQueriedTypeABC, QtGqlTypeABC):
                 or f.type.is_queried_union
             )
         ]
+
+    @cached_property
+    def fields_from_fragments(self) -> tuple[QtGqlQueriedField]:
+        ret: list[QtGqlQueriedField] = []
+        collected_fields: list[str] = list(self.fields_dict.keys())
+        for frag in self.used_fragments:
+            for name, field in frag.of.fields_dict.items():
+                if name in collected_fields:
+                    raise FragmentsFieldClashError(
+                        f"Field `{name}` was found in multiple"
+                        f" fragments spreads on type `{self.name}`",
+                    )
+                collected_fields.append(name)
+                ret.append(field)
+
+        return tuple(ret)
 
     @cached_property
     def models(self) -> list[QtGqlQueriedField]:

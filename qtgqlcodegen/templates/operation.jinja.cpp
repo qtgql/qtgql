@@ -50,6 +50,9 @@ throw qtgql::exceptions::InterfaceDeserializationError(type_name.toStdString());
     👉 initialize_proxy_field(field) 👈
     {% endfor -%}
     _qtgql_connect_signals();
+    {% for frag in t.used_fragments -%}
+    👉 frag.private_name 👈 = new 👉 frag.type_name() 👈(operation, inst);
+    {% endfor %}
 }
 
 void 👉 t.name 👈::_qtgql_connect_signals(){
@@ -66,6 +69,15 @@ connect(m_inst_ptr, &👉context.schema_ns👈::👉t.concrete.name👈::👉 fi
 👉update_proxy_field(field, context.operation)👈
 });
 {% endfor -%}
+{% for frag in t.used_fragments -%}
+👉 frag.private_name 👈->_qtgql_connect_signals();
+{% for field in frag.of.fields -%}
+connect(👉 frag.private_name 👈, &👉 frag.type_name() 👈::👉 field.concrete.signal_name 👈, this,
+[&](){
+emit 👉 field.concrete.signal_name 👈();
+});
+{% endfor %}
+{% endfor %}
 };
 
 // Deserialzier
@@ -113,7 +125,13 @@ return m_inst->👉 f.concrete.getter_name 👈(👉f.build_variables_tuple_for_
 {%- endif -%}
 };
 {% endfor %}
-
+{% for  frag in t.used_fragments -%}
+{% for f in frag.of.fields %}
+[[nodiscard]] const 👉 f.type.property_type 👈  👉 t.name 👈::👉 f.concrete.getter_name 👈() const {
+    return 👉 frag.private_name 👈->👉 f.concrete.getter_name 👈();
+}
+{% endfor %}
+{% endfor %}
 
 {% if  not t.concrete.is_root -%}
 void 👉 t.name 👈::qtgql_replace_concrete(const std::shared_ptr<👉 t.concrete.name 👈> & new_inst){

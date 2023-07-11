@@ -57,10 +57,10 @@ public:
 {% if  not t.concrete.is_root -%}
 void qtgql_replace_concrete(const std::shared_ptr<👉 t.concrete.name 👈> & new_inst);
 {% endif %}
-protected:
+public:
     void _qtgql_connect_signals();
 public:
-{% for f in t.fields -%}
+{% for f in t.fields + t.fields_from_fragments  -%}
 [[nodiscard]] const 👉 f.type.property_type 👈  👉 f.concrete.getter_name 👈() const;
 {% endfor -%}
 public:

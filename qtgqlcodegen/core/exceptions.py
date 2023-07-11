@@ -1,2 +1,6 @@
 class QtGqlException(Exception):
     ...
+
+
+class FragmentsFieldClashError(QtGqlException):
+    ...
