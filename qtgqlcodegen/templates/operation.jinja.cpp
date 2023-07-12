@@ -9,7 +9,7 @@
 namespace 👉 context.config.env_name 👈::👉context.ns👈{
 
 // Interfaces
-{% for interface in context.operation.interfaces -%}
+{% for interface in context.operation.interfaces if not interface.is_fragment -%}
 std::shared_ptr<👉 interface.concrete.name 👈> 👉 interface.deserializer_name 👈(const QJsonObject& data, const 👉 context.operation.name 👈 * operation){
 auto type_name = data.value("__typename").toString();
 {% for choice in interface.choices -%}
@@ -49,7 +49,7 @@ throw qtgql::exceptions::InterfaceDeserializationError(type_name.toStdString());
     {%- for field in t.fields -%}
     👉 initialize_proxy_field(field) 👈
     {% endfor -%}
-    {% for frag in t.used_fragments -%}
+    {% for frag in t.used_fragments if frag.on.is_queried_object_type -%}
     👉 frag.private_name 👈 = new 👉 frag.type_name() 👈(operation, inst);
     {% endfor %}
     _qtgql_connect_signals();
@@ -68,15 +68,16 @@ connect(m_inst_ptr, &👉context.schema_ns👈::👉t.concrete.name👈::👉 fi
 [&](){
 👉update_proxy_field(field, context.operation)👈
 });
-{% endfor -%}
-{% for frag in t.used_fragments -%}
-👉 frag.private_name 👈->_qtgql_connect_signals();
-{% for field in frag.of.fields -%}
-connect(👉 frag.private_name 👈, &👉 frag.type_name() 👈::👉 field.concrete.signal_name 👈, this,
-[&](){
-emit 👉 field.concrete.signal_name 👈();
-});
-{% endfor %}
+    {% for frag in t.used_fragments if frag.on.is_queried_object_type -%}
+    👉 frag.private_name 👈->_qtgql_connect_signals();
+        {% for field in frag.on.fields -%}
+        connect(👉 frag.private_name 👈, &👉 frag.type_name() 👈::👉 field.concrete.signal_name 👈, this,
+        [&](){
+        emit 👉 field.concrete.signal_name 👈();
+        });
+        {% endfor %}
+    {% endfor -%}
+
 {% endfor %}
 };
 
@@ -111,8 +112,8 @@ void 👉 t.updater_name 👈(👉 t.concrete.member_type_arg 👈 inst, const Q
 {%for f in t.fields -%}
 👉update_concrete_field(f,f.concrete, private_name=f.private_name, operation_pointer="operation")👈
 {% endfor -%}
-{% for frag in t.used_fragments -%}
-👉 frag.of.updater_name 👈(inst, data, operation);
+{% for frag in t.used_fragments if frag.on.is_queried_object_type -%}
+👉 frag.on.updater_name 👈(inst, data, operation);
 {% endfor -%}
 };
 
@@ -129,7 +130,7 @@ return m_inst->👉 f.concrete.getter_name 👈(👉f.build_variables_tuple_for_
 };
 {% endfor %}
 {% for  frag in t.used_fragments -%}
-{% for f in frag.of.fields %}
+{% for f in frag.on.fields %}
 [[nodiscard]] const 👉 f.type.property_type 👈  👉 t.name 👈::👉 f.concrete.getter_name 👈() const {
     return 👉 frag.private_name 👈->👉 f.concrete.getter_name 👈();
 }

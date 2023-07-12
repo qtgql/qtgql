@@ -11,8 +11,7 @@ from qtgqlcodegen.core.cppref import CppAttribute, QtGqlBasesNs, QtGqlTypes
 from qtgqlcodegen.core.exceptions import FragmentsFieldClashError
 
 if TYPE_CHECKING:
-    from qtgqlcodegen.operation.definitions import QtGqlQueriedField
-    from qtgqlcodegen.operation.types import QtGqlFragmentDefinition
+    from qtgqlcodegen.operation.definitions import ComposeAbleFragmentProxy, QtGqlQueriedField
     from qtgqlcodegen.schema.definitions import (
         CustomScalarMap,
         QtGqlArgumentDefinition,
@@ -68,10 +67,6 @@ class QtGqlTypeABC(ABC):
 
     @property
     def is_queried_union(self) -> QtGqlQueriedUnion | None:
-        return None
-
-    @property
-    def is_fragment_definition(self) -> QtGqlFragmentDefinition | None:
         return None
 
     def json_repr(self, attr_name: str | None = None) -> str:
@@ -466,7 +461,7 @@ class QtGqlQueriedObjectType(QtGqlQueriedTypeABC, QtGqlTypeABC):
     fields_dict: dict[str, QtGqlQueriedField] = attrs.Factory(dict)
     base_interface: QtGqlQueriedInterface | None = None  # I think that there could be only one
     is_fragment: bool = False
-    used_fragments: tuple[QtGqlFragmentDefinition, ...] = attrs.Factory(
+    used_fragments: tuple[ComposeAbleFragmentProxy, ...] = attrs.Factory(
         tuple,
     )
 
@@ -514,19 +509,24 @@ class QtGqlQueriedObjectType(QtGqlQueriedTypeABC, QtGqlTypeABC):
         ]
 
     @cached_property
-    def fields_from_fragments(self) -> tuple[QtGqlQueriedField]:
+    def fields_from_fragments(self) -> tuple[QtGqlQueriedField, ...]:
+        if "Dog" in self.name:  # TODO: remove this
+            ...
         ret: list[QtGqlQueriedField] = []
-        collected_fields: list[str] = list(self.fields_dict.keys())
-        for frag in self.used_fragments:
-            for name, field in frag.of.fields_dict.items():
-                if name in collected_fields:
+        collected_fields: set[str] = set(self.fields_dict.keys())
+
+        def append_fields(fields: tuple[QtGqlQueriedField, ...]) -> None:
+            for f in fields:
+                if f.name in collected_fields:
                     raise FragmentsFieldClashError(
-                        f"Field `{name}` was found in multiple"
+                        f"Field `{f.name}` was found in multiple"
                         f" fragments spreads on type `{self.name}`",
                     )
-                collected_fields.append(name)
-                ret.append(field)
+                collected_fields.add(f.name)
+                ret.append(f)
 
+        for frag in self.used_fragments:
+            append_fields(frag.on.fields)
         return tuple(ret)
 
     @cached_property

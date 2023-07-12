@@ -748,34 +748,33 @@ FragmentTestCase = QtGqlTestCase(
     test_name="FragmentTestCase",
 )
 
+
 FragmentsOnInterfaceTestCase = QtGqlTestCase(
-    schema=schemas.node_interface_field.schema,
+    schema=schemas.non_node_interface_field.schema,
     operations="""
-    query MainQuery($ret: TypesEnum!) {
-      node(ret: $ret) {
-        ... on HasNameAgeInterface {
-            ...HasNameFragment
-        }
-        ... on User {
-          password
-        }
-        ... on Dog {
-          barks
-        }
+    query AnimalQuery($kind: AnimalKind!) {
+      animal(kind: $kind) {
+        ...AnimalFragment
       }
     }
 
-    mutation ChangeName($node_id: ID!, $new_name: String!) {
-      modifyName(nodeId: $node_id, newName: $new_name) {
-        ... on HasNameAgeInterface {
-          ...HasNameFragment
-        }
+    mutation ChangeAgeMutation($id: ID!, $newAge: Int!) {
+      changeAge(animalId: $id, newAge: $newAge) {
+        ...AnimalFragment
       }
     }
 
-    fragment HasNameFragment on HasNameAgeInterface{
-      name
+    fragment AnimalFragment on AnimalInterface {
+      kind
+      gender
       age
+      id
+      ... on Person {
+        language
+      }
+      ... on Dog {
+        furColor
+      }
     }
     """,
     test_name="FragmentsOnInterfaceTestCase",
@@ -963,4 +962,4 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 
 if __name__ == "__main__":
-    generate_testcases(FragmentTestCase)
+    generate_testcases(FragmentsOnInterfaceTestCase)

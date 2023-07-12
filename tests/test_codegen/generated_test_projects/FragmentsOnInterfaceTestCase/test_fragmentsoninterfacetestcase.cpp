@@ -1,6 +1,6 @@
 #include "debugableclient.hpp"
-#include "graphql/__generated__/ChangeName.hpp"
-#include "graphql/__generated__/MainQuery.hpp"
+#include "graphql/__generated__/AnimalQuery.hpp"
+#include "graphql/__generated__/ChangeAgeMutation.hpp"
 #include <QSignalSpy>
 #include <catch2/catch_test_macros.hpp>
 
@@ -8,50 +8,53 @@ namespace FragmentsOnInterfaceTestCase {
 using namespace qtgql;
 
 auto ENV_NAME = QString("FragmentsOnInterfaceTestCase");
-auto SCHEMA_ADDR = get_server_address("146984");
+auto SCHEMA_ADDR = get_server_address("32048780");
 
 TEST_CASE("FragmentsOnInterfaceTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
-  auto mq = mainquery::MainQuery::shared();
 
-  mq->set_variables({FragmentsOnInterfaceTestCase::Enums::TypesEnum::User});
-  mq->fetch();
-  test_utils::wait_for_completion(mq);
+  auto animal_query = animalquery::AnimalQuery::shared();
+  animal_query->set_variables({Enums::AnimalKind::DOG});
+  animal_query->fetch();
+  test_utils::wait_for_completion(animal_query);
   SECTION("test deserialize") {
-    REQUIRE(mq->data()->get_node()->property("__typeName") == "User");
-    auto user =
-        qobject_cast<const mainquery::User__node *>(mq->data()->get_node());
-    REQUIRE(!user->get_password().isEmpty());
+    auto animal = animal_query->data()->get_animal();
+    REQUIRE(animal->get_kind() == Enums::AnimalKind::DOG);
+    auto dog = qobject_cast<const animalquery::Dog__animal *>(animal);
+    REQUIRE(!dog->get_furColor().isEmpty());
   };
-  SECTION("test updates same id other operation") {
-    auto user =
-        qobject_cast<const mainquery::User__node *>(mq->data()->get_node());
-    auto change_name_mut = changename::ChangeName::shared();
-    QString new_name("Alfonso");
-    change_name_mut->set_variables({user->get_id(), new_name});
-    test_utils::SignalCatcher catcher({.source_obj = user, .only = "name"});
-    change_name_mut->fetch();
+  SECTION("test updates new type") {
+    auto root = animal_query->data();
+    animal_query->set_variables({Enums::AnimalKind::PERSON});
+    test_utils::SignalCatcher catcher({.source_obj = root, .only = "animal"});
+    animal_query->refetch();
     REQUIRE(catcher.wait());
-    test_utils::wait_for_completion(change_name_mut);
+    test_utils::wait_for_completion(animal_query);
+    REQUIRE(animal_query->data()->get_animal()->get_kind() == Enums::PERSON);
+    auto person = qobject_cast<const animalquery::Person__animal *>(
+        animal_query->data()->get_animal());
+    REQUIRE(!person->get_language().isEmpty());
+  }
 
-    REQUIRE(user->get_name().toStdString() == new_name.toStdString());
-  };
-
-  SECTION("test updates different id same type") {
-    auto mq2 = mainquery::MainQuery::shared();
+  SECTION("test updates same type") {
+    auto change_age_mut = changeagemutation::ChangeAgeMutation::shared();
+    // since this is not implementing node, first get the data filled on that
+    // field
+    auto animal_id = animal_query->data()->get_animal()->get_id();
+    change_age_mut->set_variables({animal_id, 156});
+    change_age_mut->fetch();
+    test_utils::wait_for_completion(change_age_mut);
+    // now we can test the update.
+    int new_age = 2223432;
     test_utils::SignalCatcher catcher(
-        {.source_obj = mq->data(), .only = "node"});
-    mq2->set_variables({FragmentsOnInterfaceTestCase::Enums::TypesEnum::User});
-    mq2->fetch();
+        {.source_obj = change_age_mut->data(), .only = "changeAge"});
+    change_age_mut->set_variables({animal_id, new_age});
+    change_age_mut->refetch();
     REQUIRE(catcher.wait());
-    test_utils::wait_for_completion(mq2);
-    auto user1 =
-        qobject_cast<const mainquery::User__node *>(mq->data()->get_node());
-    auto user2 =
-        qobject_cast<const mainquery::User__node *>(mq2->data()->get_node());
-    REQUIRE(user1->get_password() == user2->get_password());
-  };
+    test_utils::wait_for_completion(change_age_mut);
+    REQUIRE(change_age_mut->data()->get_changeAge()->get_age() == new_age);
+  }
 }
 
 }; // namespace FragmentsOnInterfaceTestCase

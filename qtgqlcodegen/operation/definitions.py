@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from abc import ABC
 from functools import cached_property
 from typing import TYPE_CHECKING
 
@@ -7,11 +8,13 @@ import attrs
 import graphql
 from attr import define
 
+from qtgqlcodegen.utils import require
+
 if TYPE_CHECKING:
     from graphql.language import ast as gql_lang
     from graphql.type import definition as gql_def
+    from typing_extensions import TypeGuard
 
-    from qtgqlcodegen.operation.types import QtGqlFragmentDefinition
     from qtgqlcodegen.schema.definitions import (
         QtGqlArgumentDefinition,
         QtGqlFieldDefinition,
@@ -26,7 +29,7 @@ if TYPE_CHECKING:
     )
 
 
-@attrs.define(slots=False)
+@attrs.define(slots=False, repr=False)
 class OperationTypeInfo:
     schema_type_info: SchemaTypeInfo
     narrowed_types_map: dict[str, QtGqlQueriedObjectType] = attrs.Factory(dict)
@@ -118,3 +121,60 @@ class QtGqlOperationDefinition:
 class QtGqlVariableUse:
     argument: tuple[int, QtGqlArgumentDefinition]
     variable: QtGqlVariableDefinition
+
+
+@define
+class _QtGqlFragmentABC(ABC):
+    name: str
+    ast: gql_lang.FragmentDefinitionNode
+
+    @cached_property
+    def as_string(self) -> str:
+        return graphql.print_ast(self.ast)
+
+
+@define(slots=False, repr=False)
+class QtGqlFragmentDefinition(_QtGqlFragmentABC):
+    on: QtGqlQueriedObjectType | QtGqlQueriedInterface
+
+    def create_proxy_for_type(self, name: str) -> ComposeAbleFragmentProxy:
+        # if it is an object type, or it is the same type as this, there is nothing to search for
+        if self.on.is_queried_object_type or name == self.on.concrete.name:
+            return ComposeAbleFragmentProxy(
+                self.on.name,
+                self.on,
+            )
+        else:
+
+            def key(
+                choice: QtGqlQueriedObjectType | QtGqlQueriedInterface,
+            ) -> TypeGuard[QtGqlQueriedObjectType | QtGqlQueriedInterface]:
+                if choice.concrete.name == name:
+                    return True
+                return False
+
+            ret = tuple(filter(key, require(self.on.is_queried_interface).choices))
+            assert len(ret) == 1
+            return ComposeAbleFragmentProxy(
+                name=ret[0].name,
+                on=ret[0],
+            )
+
+
+@define
+class ComposeAbleFragmentProxy:
+    """This class exists merely because fragments on interfaces.
+
+    1.  They might have type conditions and the type conditions can include more fields.
+    2. interfaces currently does not generate code for deserialization / updating themselves.
+    """
+
+    name: str
+    on: QtGqlQueriedObjectType | QtGqlQueriedInterface
+
+    def type_name(self) -> str:
+        return self.name  # TODO: can that use the "on" member?
+
+    @property
+    def private_name(self) -> str:
+        return f"_qtgql_{self.name.lower()}"

@@ -1,38 +1,40 @@
-type Dog implements HasNameAgeInterface & Node {
+interface AnimalInterface {
   id: ID!
-  name: String!
+  kind: AnimalKind!
+  gender: Gender!
   age: Int!
-  barks: Boolean!
 }
 
-interface HasNameAgeInterface implements Node {
+enum AnimalKind {
+  PERSON
+  DOG
+}
+
+type Dog implements AnimalInterface {
   id: ID!
-  name: String!
+  kind: AnimalKind!
+  gender: Gender!
   age: Int!
+  furColor: String!
+}
+
+enum Gender {
+  MALE
+  FEMALE
 }
 
 type Mutation {
-  modifyName(nodeId: ID!, newName: String!): Node!
+  changeAge(animalId: ID!, newAge: Int!): AnimalInterface!
 }
 
-interface Node {
+type Person implements AnimalInterface {
   id: ID!
+  kind: AnimalKind!
+  gender: Gender!
+  age: Int!
+  language: String!
 }
 
 type Query {
-  node(ret: TypesEnum! = Dog): Node!
-  dog: Dog!
-  user: User!
-}
-
-enum TypesEnum {
-  Dog
-  User
-}
-
-type User implements HasNameAgeInterface & Node {
-  id: ID!
-  name: String!
-  age: Int!
-  password: String!
+  animal(kind: AnimalKind!): AnimalInterface!
 }

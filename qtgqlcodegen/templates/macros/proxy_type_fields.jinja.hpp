@@ -19,14 +19,14 @@ protected:
 👉context.schema_ns👈::👉 t.concrete.name 👈 * m_inst;
 {% else -%}
 std::shared_ptr<👉context.schema_ns👈::👉 t.concrete.name 👈> m_inst;
-{% endif -%}
+{% endif -%} // TODO: I think all of these fields are irrelevant for interfaces.
 {% for ref_field in t.references -%}
 👉ref_field.type.property_type👈 👉ref_field.private_name👈 = {};
 {% endfor %}
 {%- for model_field in t.models -%}
 👉 model_field.type.property_type 👈 👉model_field.private_name👈;
 {% endfor %}
-{% for frag in t.used_fragments %}
+{% for frag in t.used_fragments if frag.on.is_queried_object_type -%}
 👉 frag.type_name() 👈 * 👉 frag.private_name 👈;
 {% endfor %}
 {% endmacro %}
