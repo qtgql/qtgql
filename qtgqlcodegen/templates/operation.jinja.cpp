@@ -108,9 +108,12 @@ return inst;
 // Updater
 void 👉 t.updater_name 👈(👉 t.concrete.member_type_arg 👈 inst, const QJsonObject &data, const 👉 context.operation.name 👈 * operation)
 {
-{%for f in t.fields + t.fields_from_fragments -%} // TODO: can updaters use the fragment updaters?
+{%for f in t.fields -%}
 👉update_concrete_field(f,f.concrete, private_name=f.private_name, operation_pointer="operation")👈
-{% endfor %}
+{% endfor -%}
+{% for frag in t.used_fragments -%}
+👉 frag.of.updater_name 👈(inst, data, operation);
+{% endfor -%}
 };
 
 
