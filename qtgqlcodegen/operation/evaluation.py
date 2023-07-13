@@ -2,11 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import attrs
 import graphql
-from attr import define
-from graphql import OperationDefinitionNode, OperationType, language as gql_lang
-from graphql.language import visitor
+from graphql import OperationDefinitionNode, language as gql_lang
 
 from qtgqlcodegen.core.graphql_ref import (
     has_id_selection,
@@ -14,12 +11,9 @@ from qtgqlcodegen.core.graphql_ref import (
     inject_id_selection,
     inject_typename_selection,
     is_field_node,
-    is_fragment_definition_node,
-    is_fragment_spread_node,
     is_inline_fragment,
     is_named_type_node,
     is_nonnull_node,
-    is_operation_def_node,
 )
 from qtgqlcodegen.operation.definitions import (
     OperationTypeInfo,
@@ -223,23 +217,16 @@ def _evaluate_union(
     )
 
 
-@define
-class _FieldsAndFragments:
-    fields: list[gql_lang.FieldNode] = attrs.Factory(list)
-    used_fragments: list[QtGqlFragmentDefinition] = attrs.Factory(list)
-
-
 def _unwrap_interface_fragments(
-    type_info: OperationTypeInfo,
+    type_info: SchemaTypeInfo,
     parent_concrete: QtGqlObjectType | QtGqlInterface,
     selection_set: gql_lang.SelectionSetNode,
-    initial: dict[str, _FieldsAndFragments],
-    path: str,
+    initial: dict[str, list[gql_lang.FieldNode]],
     id_was_selected: bool = False,
-) -> dict[str, _FieldsAndFragments]:
+) -> dict[str, list[gql_lang.FieldNode]]:
     """Fragments can be nested, i.e node{ id.
 
-    ...on SomeFrag{
+        ...on SomeFrag{
             field1
             ...on Obj{
                 name
@@ -248,8 +235,7 @@ def _unwrap_interface_fragments(
     }
     :return: unwrap everything and return the selections mapped to object types.
     """
-
-    concrete_selections = _FieldsAndFragments()
+    fields_for_concrete: list[gql_lang.FieldNode] = []
     if (
         parent_concrete.implements_node
         and not has_id_selection(selection_set)
@@ -257,30 +243,28 @@ def _unwrap_interface_fragments(
     ):
         id_was_selected = True
         inject_id_selection(selection_set)
-    for node in selection_set.selections:
-        if inline_frag := is_inline_fragment(node):
+    for field_or_frag in selection_set.selections:
+        if inline_frag := is_inline_fragment(field_or_frag):
             type_name = inline_frag.type_condition.name.value
             # no need to validate inner types are implementation, graphql-core does this.
-            concrete_choice = type_info.schema_type_info.get_object_or_interface(type_name)
+            concrete_choice = type_info.get_object_type(
+                type_name,
+            ) or type_info.get_interface(type_name)
+            assert concrete_choice
             _unwrap_interface_fragments(
                 type_info,
                 concrete_choice,
                 inline_frag.selection_set,
                 initial,
-                path,
                 id_was_selected,
             )
-        elif frag_spread := is_fragment_spread_node(node):
-            concrete_selections.used_fragments.append(
-                _evaluate_fragment(type_info, frag_spread, path),
-            )
         else:
-            field_node = is_field_node(node)
+            field_node = is_field_node(field_or_frag)
             assert field_node
             if field_node.name.value != "__typename":
-                concrete_selections.fields.append(field_node)
+                fields_for_concrete.append(field_node)
 
-    initial[parent_concrete.name] = concrete_selections
+    initial[parent_concrete.name] = fields_for_concrete
     return initial
 
 
@@ -293,64 +277,54 @@ def _evaluate_interface(
     choices: list[QtGqlQueriedObjectType] = []
 
     raw_fields_map = _unwrap_interface_fragments(
-        type_info=type_info,
-        parent_concrete=concrete,
-        selection_set=selection_set,
-        path=path,
-        initial={},
+        type_info.schema_type_info,
+        concrete,
+        selection_set,
+        {},
     )
     # dispatch fragmented fields where they are needed.
     for resolve_able in concrete.implementations.values():
         if concrete_choice := resolve_able.is_object_type:
-            selections_for_obj = _FieldsAndFragments()
+            fields_for_obj = []
             # collect fields from bases.
             for base in concrete_choice.interfaces_raw:
-                if selections_for_base := raw_fields_map.get(base.name, None):
-                    selections_for_obj.fields.extend(selections_for_base.fields)
-                    selections_for_obj.used_fragments.extend(selections_for_base.used_fragments)
+                if fields_for_base := raw_fields_map.get(base.name, None):
+                    fields_for_obj.extend(fields_for_base)
 
             # append fields of the choice itself
             if choice_fields := raw_fields_map.get(concrete_choice.name, None):
-                selections_for_obj.fields.extend(choice_fields.fields)
-                selections_for_obj.used_fragments.extend(choice_fields.used_fragments)
-
-            ss = gql_lang.SelectionSetNode(selections=tuple(selections_for_obj.fields))
-            # This could probably be more optimized though, currently
-            # this would suffice to reduce complexity.
-            obj = _evaluate_object_type(
-                type_info=type_info,
-                concrete=concrete_choice,
-                selection_set=ss,
-                path=path,
+                fields_for_obj.extend(choice_fields)
+            ss = gql_lang.SelectionSetNode(selections=tuple(fields_for_obj))
+            choices.append(
+                # This could probably be more optimized though, currently
+                # this would suffice to reduce complexity.
+                _evaluate_object_type(
+                    type_info=type_info,
+                    concrete=concrete_choice,
+                    selection_set=ss,
+                    path=path,
+                ),
             )
-            for frag in selections_for_obj.used_fragments:
-                obj.fields_dict.update(frag.of.fields_dict)
-            choices.append(obj)
 
     # inject __type_name selection, we'll use this to deserialize correctly.
     if not has_typename_selection(selection_set):
         inject_typename_selection(selection_set)
 
     name = f"{concrete.name}__{path}"
-    fields_for_interface = {
-        field.name.value: _evaluate_field(
-            type_info=type_info,
-            concrete_field=concrete.fields_dict[field.name.value],
-            path=path,
-            field_node=field,
-            origin=concrete,
-        )
-        for field in raw_fields_map[concrete.name].fields
-    }
-    for used_frag in raw_fields_map[concrete.name].used_fragments:
-        fields_for_interface.update(
-            used_frag.of.fields_dict,
-        )
     ret = QtGqlQueriedInterface(
         name=name,
         concrete=concrete,
         choices=choices,
-        fields_dict=fields_for_interface,
+        fields_dict={
+            field.name.value: _evaluate_field(
+                type_info=type_info,
+                concrete_field=concrete.fields_dict[field.name.value],
+                path=path,
+                field_node=field,
+                origin=concrete,
+            )
+            for field in raw_fields_map[concrete.name]
+        },
     )
     for choice in choices:
         choice.base_interface = ret
@@ -381,9 +355,6 @@ def _evaluate_object_type(
                 path=path,
                 origin=concrete,
             )
-        elif frag_spread := is_fragment_spread_node(selection):
-            resolved_frag = _evaluate_fragment(type_info, frag_spread, path)
-            fields.update(resolved_frag.of.fields_dict)
 
     name = f"{concrete.name}__{path}"
     if ret := type_info.narrowed_types_map.get(name, None):
@@ -398,46 +369,11 @@ def _evaluate_object_type(
     return ret
 
 
-def _evaluate_fragment(
-    type_info: OperationTypeInfo,
-    frag_spread: gql_lang.FragmentSpreadNode,
-    path: str,
-) -> QtGqlFragmentDefinition:
-    #  for mote details of this design choices see https://github.com/qtgql/qtgql/pull/306
-    raw_frag = type_info.raw_fragments[frag_spread.name.value]
-    type_cond_name = raw_frag.type_condition.name.value
-    frag_name = raw_frag.name.value
-    fragment_of: QtGqlQueriedInterface | QtGqlQueriedObjectType
-    if interface := type_info.schema_type_info.get_interface(type_cond_name):
-        fragment_of = _evaluate_interface(
-            type_info=type_info,
-            concrete=interface,
-            selection_set=raw_frag.selection_set,
-            path=path,
-        )
-        type_info.narrowed_interfaces_map.pop(fragment_of.name)
-    else:
-        object_type = require(type_info.schema_type_info.get_object_type(type_cond_name))
-        fragment_of = _evaluate_object_type(
-            type_info=type_info,
-            concrete=object_type,
-            selection_set=raw_frag.selection_set,
-            path=path,
-        )
-        type_info.narrowed_types_map.pop(fragment_of.name)
-    ret = QtGqlFragmentDefinition(
-        name=frag_name,
-        ast=raw_frag,
-        of=fragment_of,
-    )
-    type_info.used_fragments[ret.name] = ret
-    return ret
-
-
-def _evaluate_operation(
-    operation: OperationDefinitionNode,
+def evaluate_operation(
+    real_operation: OperationDefinitionNode,
+    unzipped_operation: OperationDefinitionNode,
+    used_fragments: tuple[QtGqlFragmentDefinition, ...],
     schema_type_info: SchemaTypeInfo,
-    raw_fragments: dict[str, gql_lang.FragmentDefinitionNode],
 ) -> QtGqlOperationDefinition:
     """Each operation generates a whole new "proxy" schema. That schema will
     contain only the fields that are currently queried. The way we do that is
@@ -448,16 +384,18 @@ def _evaluate_operation(
 
     And because of that, one object type (at the concrete schema) might have many proxy objects.
     """
-    type_info = OperationTypeInfo(schema_type_info, raw_fragments=raw_fragments)
+    type_info = OperationTypeInfo(schema_type_info)
 
     # input variables
-    if variables_def := operation.variable_definitions:
+    if variables_def := unzipped_operation.variable_definitions:
         for var in variables_def:
             type_info.variables.append(_evaluate_variable(type_info.schema_type_info, var))
 
-    selections = operation.selection_set
-    root_type = type_info.schema_type_info.operation_types[operation.operation.value]
-    assert root_type, f"Make sure you have {operation.operation.name} type defined in your schema"
+    selections = unzipped_operation.selection_set
+    root_type = type_info.schema_type_info.operation_types[unzipped_operation.operation.value]
+    assert (
+        root_type
+    ), f"Make sure you have {unzipped_operation.operation.name} type defined in your schema"
     root_proxy_type = _evaluate_object_type(
         type_info=type_info,
         concrete=root_type,
@@ -469,60 +407,9 @@ def _evaluate_operation(
     return QtGqlOperationDefinition(
         root_field=root_field,
         root_type=root_proxy_type,
-        operation_def=operation,
+        operation_def=real_operation,
         variables=type_info.variables,
         narrowed_types=tuple(type_info.narrowed_types_map.values()),
         interfaces=tuple(type_info.narrowed_interfaces_map.values()),
-        used_fragments=tuple(type_info.used_fragments.values()),
+        used_fragments=used_fragments,
     )
-
-
-class _OperationsVisitor(visitor.Visitor):
-    def __init__(
-        self,
-        type_info: SchemaTypeInfo,
-        fragments: dict[str, gql_lang.FragmentDefinitionNode],
-    ):
-        super().__init__()
-        self.schema_type_info = type_info
-        self.raw_fragments = fragments
-        self.operations: dict[str, QtGqlOperationDefinition] = {}
-
-    def enter_operation_definition(self, node: graphql.Node, *args, **kwargs) -> None:
-        if operation := is_operation_def_node(node):
-            if operation.operation in (
-                OperationType.QUERY,
-                OperationType.MUTATION,
-                OperationType.SUBSCRIPTION,
-            ):
-                assert operation.name, "QtGql enforces operations to have names."
-                self.operations[operation.name.value] = _evaluate_operation(
-                    operation,
-                    self.schema_type_info,
-                    self.raw_fragments,
-                )
-
-
-class _FragmentsVisitor(visitor.Visitor):
-    """Gets all fragments from the operations file."""
-
-    def __init__(self, type_info: SchemaTypeInfo):
-        super().__init__()
-        self.schema_type_info = type_info
-        self.fragments: dict[str, gql_lang.FragmentDefinitionNode] = {}
-
-    def enter_fragment_definition(self, node: graphql.Node, *args, **kwargs) -> None:
-        fragment = require(is_fragment_definition_node(node))
-        self.fragments[fragment.name.value] = fragment
-
-
-def evaluate_operations(
-    operations_document: graphql.DocumentNode,
-    type_info: SchemaTypeInfo,
-) -> dict[str, QtGqlOperationDefinition]:
-    fragment_visitor = _FragmentsVisitor(type_info)
-    graphql.visit(operations_document, fragment_visitor)
-    operation_visitor = _OperationsVisitor(type_info, fragment_visitor.fragments)
-    graphql.visit(operations_document, operation_visitor)
-    assert operation_visitor.operations
-    return operation_visitor.operations

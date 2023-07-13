@@ -31,8 +31,6 @@ class OperationTypeInfo:
     narrowed_types_map: dict[str, QtGqlQueriedObjectType] = attrs.Factory(dict)
     narrowed_interfaces_map: dict[str, QtGqlQueriedInterface] = attrs.Factory(dict)
     variables: list[QtGqlVariableDefinition] = attrs.Factory(list)
-    used_fragments: dict[str, QtGqlFragmentDefinition] = attrs.Factory(dict)
-    raw_fragments: dict[str, gql_lang.FragmentDefinitionNode] = attrs.Factory(dict)
 
 
 @attrs.define(frozen=True, slots=False, repr=False)
@@ -122,9 +120,8 @@ class QtGqlVariableUse:
 @define(slots=False, repr=False)
 class QtGqlFragmentDefinition:
     name: str
-    ast: gql_lang.FragmentDefinitionNode
-    of: QtGqlQueriedObjectType | QtGqlQueriedInterface
+    node: gql_lang.FragmentDefinitionNode
 
     @cached_property
     def as_string(self) -> str:
-        return graphql.print_ast(self.ast)
+        return graphql.print_ast(self.node)

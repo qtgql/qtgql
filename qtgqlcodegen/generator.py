@@ -6,7 +6,7 @@ import graphql
 
 from qtgqlcodegen.core.exceptions import QtGqlException
 from qtgqlcodegen.core.template import CmakeTemplateContext, cmake_template
-from qtgqlcodegen.operation.evaluation import evaluate_operations
+from qtgqlcodegen.operation.enterypoint import evaluate_operations
 from qtgqlcodegen.operation.template import OperationTemplateContext
 from qtgqlcodegen.schema.evaluation import evaluate_schema
 from qtgqlcodegen.schema.template import (
