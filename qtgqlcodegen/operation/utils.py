@@ -20,29 +20,40 @@ class _UnwrappedSelectionSet:
     selection_set: SelectionsSet
     used_fragments: dict[str, gql_lang.FragmentDefinitionNode] = attrs.Factory(dict)
 
-    def __hash__(self) -> int:
-        # there is no need to hash this.
-        return 0
+
+@functools.lru_cache(None)
+def _unwrap_fragment_spread(
+    available_fragments: HashAbleDict[str, gql_lang.FragmentDefinitionNode],
+    frag: gql_lang.FragmentDefinitionNode,
+) -> tuple[dict[str, gql_lang.FragmentDefinitionNode], SelectionsSet]:
+    ret: list[gql_lang.SelectionNode] = []
+    used_frags: dict[str, gql_lang.FragmentDefinitionNode] = {}
+    for node in frag.selection_set.selections:
+        # there might be inner fragments.
+        if frag_spread := is_fragment_spread_node(node):
+            frag = available_fragments[frag_spread.name.value]
+            used_frags[frag.name.value] = frag
+            res = _unwrap_fragment_spread(available_fragments, frag)
+            used_frags.update(res[0])
+            ret.extend(res[1])
+        else:
+            ret.append(node)
+
+    return used_frags, tuple(ret)
 
 
-@functools.cache
-def _unwrap_frag_spreads(
+def unwrap_frag_spreads(
     available_fragments: HashAbleDict[str, gql_lang.FragmentDefinitionNode],
     selections: SelectionsSet,
     ret: _UnwrappedSelectionSet | None = None,
 ) -> _UnwrappedSelectionSet:
     if not ret:
         ret = _UnwrappedSelectionSet(selection_set=selections)
-    to_replace: list[tuple[int, SelectionsSet]] = []
     for i, selection in enumerate(ret.selection_set):
         if frag_spread := is_fragment_spread_node(selection):
             resolved = available_fragments[frag_spread.name.value]
             ret.used_fragments[resolved.name.value] = resolved
-            to_replace.append((i, resolved.selection_set.selections))
-
-    for replacement in to_replace:
-        # there might be nested frag spreads.
-        unwrapped = _unwrap_frag_spreads(available_fragments, replacement[1])
-        ret.selection_set = _replace_tuple_item(selections, replacement[0], unwrapped.selection_set)
-
+            used_by_frag, frag_selections = _unwrap_fragment_spread(available_fragments, resolved)
+            ret.selection_set = _replace_tuple_item(ret.selection_set, i, frag_selections)
+            ret.used_fragments.update(used_by_frag)
     return ret

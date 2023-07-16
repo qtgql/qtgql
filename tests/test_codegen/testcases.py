@@ -784,12 +784,19 @@ FragmentWithOperationVariable = QtGqlTestCase(
     schema=schemas.object_with_optional_scalar.schema,
     operations="""
     fragment UserFragment on User {
-      uuid
-      name
-      id
+        ...UserFragA
+        ...UserFragB
+
+    }
+    fragment UserFragA on User{
       birth
       agePoint
       age
+    }
+    fragment UserFragB on User{
+      uuid
+      name
+      id
     }
 
     fragment ModifyNameMutation on Mutation {

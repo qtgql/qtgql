@@ -22,7 +22,7 @@ from qtgqlcodegen.operation.definitions import (
     QtGqlVariableUse,
 )
 from qtgqlcodegen.operation.selections_injection import inject_required_selections
-from qtgqlcodegen.operation.utils import _unwrap_frag_spreads
+from qtgqlcodegen.operation.utils import unwrap_frag_spreads
 from qtgqlcodegen.schema.definitions import (
     QtGqlFieldDefinition,
     QtGqlVariableDefinition,
@@ -300,7 +300,7 @@ def _evaluate_interface(
     selection_set: SelectionsSet,
     path: str,  # current path in the query tree.
 ) -> QtGqlQueriedInterface:
-    unwrapped_selections = _unwrap_frag_spreads(type_info.available_fragments, selection_set)
+    unwrapped_selections = unwrap_frag_spreads(type_info.available_fragments, selection_set)
     type_info.used_fragments.update(unwrapped_selections.used_fragments)
     selection_set = unwrapped_selections.selection_set
 
@@ -344,7 +344,7 @@ def _evaluate_object_type(
     path: str,  # current path in the query tree.
 ) -> QtGqlQueriedObjectType:
     assert not type_info.narrowed_types_map.get(concrete.name, None), "object already evaluated"
-    unwrapped_selections = _unwrap_frag_spreads(type_info.available_fragments, selection_set)
+    unwrapped_selections = unwrap_frag_spreads(type_info.available_fragments, selection_set)
     type_info.used_fragments.update(unwrapped_selections.used_fragments)
     selection_set = unwrapped_selections.selection_set
 
