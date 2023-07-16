@@ -19,7 +19,7 @@ protected:
 👉context.schema_ns👈::👉 t.concrete.name 👈 * m_inst;
 {% else -%}
 std::shared_ptr<👉context.schema_ns👈::👉 t.concrete.name 👈> m_inst;
-{% endif -%} // TODO: I think all of these fields are irrelevant for interfaces.
+{% endif -%}
 {% for ref_field in t.references -%}
 👉ref_field.type.property_type👈 👉ref_field.private_name👈 = {};
 {% endfor %}
