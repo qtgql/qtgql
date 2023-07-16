@@ -218,9 +218,6 @@ def _evaluate_union(
     )
 
 
-#  TODO: cache this.
-
-
 def _unwrap_interface_inline_fragments(
     type_info: OperationTypeInfo,
     parent_concrete: QtGqlObjectType | QtGqlInterface,
