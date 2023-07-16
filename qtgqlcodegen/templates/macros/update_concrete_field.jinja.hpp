@@ -73,8 +73,9 @@ auto 👉f_concrete.name👈_typename  = 👉f_concrete.name👈_data.value("__t
 {% for choice in proxy_field.type.choices %}
 {% set do_on_meets -%}
 {% if choice.implements_node %}
-if (👉current👈 && 👉current👈->get_id() == 👉f_concrete.name👈_data.value("id").toString()){
-👉choice.updater_name👈(std::static_pointer_cast<👉choice.concrete.name👈>(👉current👈), 👉f_concrete.name👈_data,  👉operation_pointer👈);
+auto 👉f_concrete.name👈_casted = std::static_pointer_cast<👉choice.concrete.name👈>(👉current👈);
+if (👉current👈 && 👉f_concrete.name👈_casted->get_id() == 👉f_concrete.name👈_data.value("id").toString()){
+👉choice.updater_name👈(👉f_concrete.name👈_casted, 👉f_concrete.name👈_data,  👉operation_pointer👈);
 }
 else{
 👉 setter_name 👈(👉choice.deserializer_name👈(👉proxy_field.name👈_data, 👉operation_pointer👈) 👉 setter_end 👈);
