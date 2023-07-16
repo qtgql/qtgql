@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+0.129.1 - 2023-07-16
+--------------------
+
+This release fixes a bug where object that implements
+node but is on a union or on an interface that doesn't implement node.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #312](https://github.com/qtgql/qtgql/pull/312/)
+
+
 0.129.0 - 2023-07-16
 --------------------
 
