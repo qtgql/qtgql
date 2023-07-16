@@ -524,6 +524,10 @@ class QtGqlQueriedInterface(QtGqlQueriedObjectType):
     def is_queried_interface(self) -> QtGqlQueriedInterface | None:
         return self
 
+    @property
+    def references(self) -> list[QtGqlQueriedField]:
+        return []  # there is no need for references in interfaces.
+
 
 @define(slots=False, repr=False)
 class QtGqlQueriedUnion(QtGqlQueriedTypeABC, QtGqlTypeABC):
