@@ -568,7 +568,7 @@ ListOfObjectWithUnionTestCase = QtGqlTestCase(
         }
 
     """,
-    test_name="ListOfUnionTestCase",
+    test_name="ListOfObjectWithUnionTestCase",
 )
 EnumTestCase = QtGqlTestCase(
     schema=schemas.object_with_enum.schema,
@@ -957,6 +957,7 @@ implemented_testcases = [
     FragmentTestCase,
     FragmentsOnInterfaceTestCase,
     FragmentWithOperationVariable,
+    ListOfObjectWithUnionTestCase,
 ]
 
 
@@ -969,4 +970,4 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 
 if __name__ == "__main__":
-    generate_testcases(FragmentWithOperationVariable)
+    generate_testcases(ListOfObjectWithUnionTestCase)
