@@ -29,6 +29,7 @@ from qtgqlcodegen.operation.definitions import (
     QtGqlQueriedField,
     QtGqlVariableUse,
 )
+from qtgqlcodegen.operation.utils import unwrap_frag_spreads
 from qtgqlcodegen.schema.definitions import (
     QtGqlFieldDefinition,
     QtGqlVariableDefinition,
@@ -393,8 +394,9 @@ def _evaluate_object_type(
     is_fragment: bool = False,
 ) -> QtGqlQueriedObjectType:
     assert not type_info.narrowed_types_map.get(concrete.name, None), "object already evaluated"
-    if "Dog" in concrete.name:  # TODO: remove this
-        ...
+    selection_set = unwrap_frag_spreads(type_info, selection_set)
+
+    # TODO: remove the fragments thing from here.
     # inject id selection for node implementors, it is required for caching purposes.
     if concrete.implements_node and not has_id_selection(selection_set, type_info.raw_fragments):
         inject_id_selection(selection_set)
@@ -414,8 +416,7 @@ def _evaluate_object_type(
                 origin=concrete,
             )
         elif frag_spread := is_fragment_spread_node(selection):
-            resolved_frag = _evaluate_fragment(type_info, frag_spread)
-            composed_fragments.append(resolved_frag.create_proxy_for_type(concrete.name))
+            raise Exception
 
     name = _create_name_for_path(concrete, path, is_fragment)
     if ret := type_info.narrowed_types_map.get(name, None):

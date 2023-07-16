@@ -4,10 +4,11 @@
         ...AnimalFragment
       }
     }
+
     mutation ChangeAgeMutation($id: ID!, $newAge: Int!) {
-        changeAge(animalId: $id, newAge: $newAge) {
-            ...AnimalFragment
-        }
+      changeAge(animalId: $id, newAge: $newAge) {
+        ...AnimalFragment
+      }
     }
 
     fragment AnimalFragment on AnimalInterface {

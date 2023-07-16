@@ -163,14 +163,16 @@ class QtGqlFragmentDefinition(_QtGqlFragmentABC):
 
 @define
 class ComposeAbleFragmentProxy:
+    # TODO: is that needed anymore?
     """This class exists merely because fragments on interfaces.
 
     1.  They might have type conditions and the type conditions can include more fields.
     2. interfaces currently does not generate code for deserialization / updating themselves.
+    3. You can't do qobject_cast<T> if they are not related with inheritance.
     """
 
     name: str
-    on: QtGqlQueriedObjectType | QtGqlQueriedInterface
+    on: QtGqlQueriedObjectType
 
     def type_name(self) -> str:
         return self.name  # TODO: can that use the "on" member?
