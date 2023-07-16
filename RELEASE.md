@@ -1,3 +1,4 @@
-Release type: minor
+Release type: patch
 
-This release adds support for list of object with union.
+This release fixes a bug where object that implements
+node but is on a union or on an interface that doesn't implement node.
