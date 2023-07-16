@@ -1,0 +1,32 @@
+type Frog implements Node {
+  id: ID!
+  name: String!
+  color: String!
+}
+
+union FrogPerson = Frog | Person
+
+interface Node {
+  id: ID!
+}
+
+type Person implements Node {
+  id: ID!
+  name: String!
+  age: Int!
+}
+
+type Query {
+  userManager: UserManager!
+}
+
+type User implements Node {
+  id: ID!
+  whoAmI: FrogPerson!
+}
+
+type UserManager implements Node {
+  id: ID!
+  name: String!
+  users: [User!]!
+}
