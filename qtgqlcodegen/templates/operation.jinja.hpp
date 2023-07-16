@@ -58,7 +58,7 @@ public:
 void qtgql_replace_concrete(const std::shared_ptr<👉 t.concrete.name 👈> & new_inst);
 {% endif %}
 protected:
-    void qtgql_connect_signals();
+    void _qtgql_connect_signals();
 public:
 {% for f in t.fields -%}
 [[nodiscard]] const 👉 f.type.property_type 👈  👉 f.concrete.getter_name 👈() const;

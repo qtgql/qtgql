@@ -179,6 +179,7 @@ RootScalarTestCase = QtGqlTestCase(
     """,
     test_name="RootScalarTestCase",
 )
+
 ScalarsTestCase = QtGqlTestCase(
     schema=schemas.object_with_scalar.schema,
     operations="""
@@ -262,14 +263,14 @@ DateTimeTestCase = QtGqlTestCase(
             birth
           }
         }
-mutation ChangeUserBirth($new_birth: DateTime!, $nodeId: ID!) {
-  changeBirth(newBirth: $new_birth, nodeId: $nodeId) {
-    age
-    id
-    birth
-    name
-  }
-}
+        mutation ChangeUserBirth($new_birth: DateTime!, $nodeId: ID!) {
+          changeBirth(newBirth: $new_birth, nodeId: $nodeId) {
+            age
+            id
+            birth
+            name
+          }
+        }
         """,
     test_name="DateTimeTestCase",
 )
@@ -719,6 +720,108 @@ ListOfInterfaceTestcase = QtGqlTestCase(
     test_name="ListOfInterfaceTestcase",
 )
 
+FragmentTestCase = QtGqlTestCase(
+    schema=schemas.object_with_scalar.schema,
+    operations="""
+    fragment UserSelectionsFrag on User {
+        name
+        age
+        agePoint
+        male
+        id
+        uuid
+        voidField
+    }
+
+    query MainQuery {
+      constUser {
+        ...UserSelectionsFrag
+      }
+    }
+
+    query UserWithSameIDAndDifferentFieldsQuery {
+      constUserWithModifiedFields {
+        ...UserSelectionsFrag
+      }
+    }
+    """,
+    test_name="FragmentTestCase",
+)
+
+
+FragmentsOnInterfaceTestCase = QtGqlTestCase(
+    schema=schemas.non_node_interface_field.schema,
+    operations="""
+    query AnimalQuery($kind: AnimalKind!) {
+      animal(kind: $kind) {
+        ...AnimalFragment
+      }
+    }
+
+    mutation ChangeAgeMutation($id: ID!, $newAge: Int!) {
+      changeAge(animalId: $id, newAge: $newAge) {
+        ...AnimalFragment
+      }
+    }
+
+    fragment AnimalFragment on AnimalInterface {
+      kind
+      gender
+      age
+      id
+      ... on Person {
+        language
+      }
+      ... on Dog {
+        furColor
+      }
+    }
+    """,
+    test_name="FragmentsOnInterfaceTestCase",
+)
+
+FragmentWithOperationVariable = QtGqlTestCase(
+    schema=schemas.object_with_optional_scalar.schema,
+    operations="""
+    fragment UserFragment on User {
+        ...UserFragA
+        ...UserFragB
+
+    }
+    fragment UserFragA on User{
+      birth
+      agePoint
+      age
+    }
+    fragment UserFragB on User{
+      uuid
+      name
+      id
+    }
+
+    fragment ModifyNameMutation on Mutation {
+      modifyName(userId: $userId, newName: $newName) {
+        ...UserFragment
+      }
+    }
+
+    mutation ChangeName($userId: ID!, $newName: String!) {
+      ...ModifyNameMutation
+    }
+
+    fragment GetUserQuery on Query {
+      user(retNone: $returnNone) {
+        ...UserFragment
+      }
+    }
+
+    query MainQuery($returnNone: Boolean! = false) {
+      ...GetUserQuery
+    }
+    """,
+    test_name="FragmentWithOperationVariable",
+)
+
 InputTypeOperationVariableTestCase = QtGqlTestCase(
     schema=schemas.input_type.schema,
     operations="""
@@ -820,6 +923,9 @@ all_test_cases = [
     ListOfNonNodeType,
     ListOfUnionTestCase,
     ListOfInterfaceTestcase,
+    FragmentTestCase,
+    FragmentsOnInterfaceTestCase,
+    FragmentWithOperationVariable,
     ListOfObjectWithUnionTestCase,
     CustomUserScalarTestCase,
     ObjectsThatReferenceEachOtherTestCase,
@@ -848,6 +954,9 @@ implemented_testcases = [
     ListOfNonNodeType,
     ListOfUnionTestCase,
     ListOfInterfaceTestcase,
+    FragmentTestCase,
+    FragmentsOnInterfaceTestCase,
+    FragmentWithOperationVariable,
 ]
 
 
@@ -860,6 +969,4 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 
 if __name__ == "__main__":
-    generate_testcases(
-        ObjectWithListOfObjectTestCase,
-    )
+    generate_testcases(FragmentWithOperationVariable)

@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 from functools import cached_property
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING
 
 from attr import Factory, define
 from graphql import OperationType
+
+from qtgqlcodegen.utils import require
 
 if TYPE_CHECKING:
     from graphql.type import definition as gql_def
@@ -110,7 +112,7 @@ class SchemaTypeInfo:
     schema_definition: gql_def.GraphQLSchema
     custom_scalars: CustomScalarMap
     operation_types: dict[
-        Literal["query", "mutation", "subscription"],
+        str,
         QtGqlObjectType,
     ] = Factory(dict)
     object_types: ObjectTypeMap = Factory(dict)
@@ -123,6 +125,9 @@ class SchemaTypeInfo:
 
     def get_object_type(self, name: str) -> QtGqlObjectType | None:
         return self.object_types.get(name, None)
+
+    def get_object_or_interface(self, name: str) -> QtGqlInterface | QtGqlObjectType:
+        return require(self.get_object_type(name) or self.get_interface(name))
 
     def add_objecttype(self, objecttype: QtGqlObjectType) -> None:
         self.object_types[objecttype.name] = objecttype
@@ -138,3 +143,8 @@ class SchemaTypeInfo:
     @cached_property
     def root_types_names(self) -> str:
         return " ".join([tp.name for tp in self.root_types if tp])
+
+    def get_root_type(self, name: str) -> QtGqlObjectType:
+        ret = self.operation_types.get(name, None)
+        assert ret, f"Make sure you have {name} type defined in your schema"
+        return ret

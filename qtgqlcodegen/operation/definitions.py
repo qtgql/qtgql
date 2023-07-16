@@ -7,7 +7,10 @@ import attrs
 import graphql
 from attr import define
 
+from qtgqlcodegen.utils import HashAbleDict
+
 if TYPE_CHECKING:
+    from graphql.language import ast as gql_lang
     from graphql.type import definition as gql_def
 
     from qtgqlcodegen.schema.definitions import (
@@ -24,12 +27,16 @@ if TYPE_CHECKING:
     )
 
 
-@attrs.define(slots=False)
+@attrs.define(slots=False, repr=False)
 class OperationTypeInfo:
     schema_type_info: SchemaTypeInfo
     narrowed_types_map: dict[str, QtGqlQueriedObjectType] = attrs.Factory(dict)
     narrowed_interfaces_map: dict[str, QtGqlQueriedInterface] = attrs.Factory(dict)
     variables: list[QtGqlVariableDefinition] = attrs.Factory(list)
+    used_fragments: HashAbleDict[str, gql_lang.FragmentDefinitionNode] = attrs.Factory(HashAbleDict)
+    available_fragments: HashAbleDict[str, gql_lang.FragmentDefinitionNode] = attrs.Factory(
+        HashAbleDict,
+    )
 
 
 @attrs.define(frozen=True, slots=False, repr=False)
@@ -86,10 +93,10 @@ class QtGqlOperationDefinition:
     operation_def: gql_def.OperationDefinitionNode
     root_type: QtGqlQueriedObjectType
     root_field: QtGqlQueriedField
-    fragments: list[str] = attrs.Factory(list)
     variables: list[QtGqlVariableDefinition] = attrs.Factory(list)
     narrowed_types: tuple[QtGqlQueriedObjectType, ...] = attrs.Factory(tuple)
     interfaces: tuple[QtGqlQueriedInterface, ...] = attrs.Factory(tuple)
+    used_fragments: tuple[gql_lang.FragmentDefinitionNode, ...] = attrs.Factory(tuple)
 
     @property
     def generated_variables_type(self) -> str:
@@ -102,7 +109,12 @@ class QtGqlOperationDefinition:
 
     @property
     def query(self) -> str:
-        return graphql.print_ast(self.operation_def)
+        return "\n".join(
+            [
+                graphql.print_ast(self.operation_def),
+                *[graphql.print_ast(frag) for frag in self.used_fragments],
+            ],
+        )
 
 
 @define(slots=False, repr=False)

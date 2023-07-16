@@ -1,0 +1,22 @@
+
+    fragment UserSelectionsFrag on User {
+        name
+        age
+        agePoint
+        male
+        id
+        uuid
+        voidField
+    }
+
+    query MainQuery {
+      constUser {
+        ...UserSelectionsFrag
+      }
+    }
+
+    query UserWithSameIDAndDifferentFieldsQuery {
+      constUserWithModifiedFields {
+        ...UserSelectionsFrag
+      }
+    }

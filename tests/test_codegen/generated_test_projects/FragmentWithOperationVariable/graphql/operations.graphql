@@ -1,0 +1,36 @@
+
+    fragment UserFragment on User {
+        ...UserFragA
+        ...UserFragB
+
+    }
+    fragment UserFragA on User{
+      birth
+      agePoint
+      age
+    }
+    fragment UserFragB on User{
+      uuid
+      name
+      id
+    }
+
+    fragment ModifyNameMutation on Mutation {
+      modifyName(userId: $userId, newName: $newName) {
+        ...UserFragment
+      }
+    }
+
+    mutation ChangeName($userId: ID!, $newName: String!) {
+      ...ModifyNameMutation
+    }
+
+    fragment GetUserQuery on Query {
+      user(retNone: $returnNone) {
+        ...UserFragment
+      }
+    }
+
+    query MainQuery($returnNone: Boolean! = false) {
+      ...GetUserQuery
+    }

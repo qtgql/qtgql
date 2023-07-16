@@ -6,6 +6,7 @@ from graphql import language as gql_lang
 from graphql.type import definition as gql_def
 
 T_AST_Node = TypeVar("T_AST_Node", bound=gql_lang.Node)
+SelectionsSet = tuple[gql_lang.SelectionNode, ...]
 
 
 def ast_identifier_factory(
@@ -20,6 +21,8 @@ def ast_identifier_factory(
 
 is_selection_set = ast_identifier_factory(gql_lang.ast.SelectionSetNode)
 is_inline_fragment = ast_identifier_factory(gql_lang.InlineFragmentNode)
+is_fragment_spread_node = ast_identifier_factory(gql_lang.FragmentSpreadNode)
+is_fragment_definition_node = ast_identifier_factory(gql_def.FragmentDefinitionNode)
 is_operation_def_node = ast_identifier_factory(gql_def.OperationDefinitionNode)
 is_field_node = ast_identifier_factory(gql_def.FieldNode)
 is_nonnull_node = ast_identifier_factory(gql_lang.NonNullTypeNode)
@@ -74,9 +77,11 @@ inject_typename_selection = inject_selection_factory(TYPENAME_SELECTION_NODE)
 def selection_set_search_factory(
     selection_name: str,
 ) -> Callable[[gql_lang.SelectionSetNode], bool]:
-    def factory(selection_set: gql_lang.SelectionSetNode):
-        for field_or_frag in selection_set.selections:
-            if field := is_field_node(field_or_frag):
+    def factory(
+        selection_set: gql_lang.SelectionSetNode,
+    ):
+        for node in selection_set.selections:
+            if field := is_field_node(node):
                 if field.name.value == selection_name:
                     return True
         return False

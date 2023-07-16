@@ -49,10 +49,10 @@ throw qtgql::exceptions::InterfaceDeserializationError(type_name.toStdString());
     {%- for field in t.fields -%}
     👉 initialize_proxy_field(field) 👈
     {% endfor -%}
-    qtgql_connect_signals();
+    _qtgql_connect_signals();
 }
 
-void 👉 t.name 👈::qtgql_connect_signals(){
+void 👉 t.name 👈::_qtgql_connect_signals(){
 {# connecting signals here, when the concrete changed it will be mirrored here. -#}
 {% if t.concrete.is_root -%}
 auto m_inst_ptr = m_inst;
@@ -127,7 +127,7 @@ void 👉 t.name 👈::qtgql_replace_concrete(const std::shared_ptr<👉 t.concr
     };
     {% endfor -%}
     m_inst = new_inst;
-    qtgql_connect_signals();
+    _qtgql_connect_signals();
 };
 {% endif -%}
 {% endfor %}

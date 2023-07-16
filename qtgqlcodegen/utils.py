@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Literal, TypeVar
+from typing import TYPE_CHECKING, Any, Hashable, Literal, TypeVar
 
 from attr import define
 
@@ -51,3 +51,25 @@ def require(v: T | None) -> T:  # pragma: no cover
 
 def freeze(self, key, value):  # pragma: no cover
     raise PermissionError("setattr called on frozen type")
+
+
+def _replace_tuple_item(
+    original: tuple,
+    at: int,
+    replace: tuple,
+):
+    return original[0:at] + replace + original[at + 1 : len(original)]
+
+
+T_Key = TypeVar("T_Key", bound=Hashable)
+T_Value = TypeVar("T_Value")
+
+
+class HashAbleDict(dict[T_Key, T_Value]):
+    """Dict that hashes the keys.
+
+    supports only flat dicts.
+    """
+
+    def __hash__(self):
+        return hash(frozenset(self.keys()))
