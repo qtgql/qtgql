@@ -341,6 +341,7 @@ def _evaluate_interface(
     path: str,  # current path in the query tree.
     is_fragment=False,
 ) -> QtGqlQueriedInterface:
+    selection_set = unwrap_frag_spreads(type_info, selection_set)
     raw_selections_map = _unwrap_interface_inline_fragments(
         type_info,
         concrete,
@@ -350,7 +351,7 @@ def _evaluate_interface(
     choices = _create_objects_for_interface(type_info, raw_selections_map, concrete, path)
 
     # inject __type_name selection, we'll use this to deserialize correctly.
-    if not has_typename_selection(selection_set, type_info.raw_fragments):
+    if not has_typename_selection(selection_set):
         inject_typename_selection(selection_set)
 
     name = _create_name_for_path(concrete, path, is_fragment)
@@ -415,8 +416,6 @@ def _evaluate_object_type(
                 path=path,
                 origin=concrete,
             )
-        elif frag_spread := is_fragment_spread_node(selection):
-            raise Exception
 
     name = _create_name_for_path(concrete, path, is_fragment)
     if ret := type_info.narrowed_types_map.get(name, None):

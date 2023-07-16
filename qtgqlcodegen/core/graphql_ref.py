@@ -75,20 +75,13 @@ inject_typename_selection = inject_selection_factory(TYPENAME_SELECTION_NODE)
 
 def selection_set_search_factory(
     selection_name: str,
-) -> Callable[[gql_lang.SelectionSetNode, dict[str, gql_lang.FragmentDefinitionNode]], bool]:
+) -> Callable[[gql_lang.SelectionSetNode], bool]:
     def factory(
         selection_set: gql_lang.SelectionSetNode,
-        available_fragments: dict[str, gql_lang.FragmentDefinitionNode],
     ):
         for node in selection_set.selections:
             if field := is_field_node(node):
                 if field.name.value == selection_name:
-                    return True
-            if frag_spread := is_fragment_spread_node(node):
-                if factory(
-                    available_fragments[frag_spread.name.value].selection_set,
-                    available_fragments,
-                ):
                     return True
         return False
 
