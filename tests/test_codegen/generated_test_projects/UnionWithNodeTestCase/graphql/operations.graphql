@@ -1,0 +1,19 @@
+
+        query MainQuery {
+          userManager {
+            users {
+              whoAmI {
+                ... on Frog {
+                  __typename
+                  name
+                  color
+                }
+                ... on Person {
+                  __typename
+                  name
+                  age
+                }
+              }
+            }
+          }
+        }

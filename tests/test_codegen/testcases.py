@@ -528,7 +528,7 @@ NodeInterfaceFieldTestCase = QtGqlTestCase(
 
 
 NonNodeUnionTestCase = QtGqlTestCase(
-    schema=schemas.object_with_union.schema,
+    schema=schemas.non_node_union.schema,
     operations="""
     query MainQuery($choice: UnionChoice!) {
         whoAmI(choice: $choice) {
@@ -545,34 +545,14 @@ NonNodeUnionTestCase = QtGqlTestCase(
     """,
     test_name="NonNodeUnionTestCase",
 )
-ListOfObjectWithUnionTestCase = QtGqlTestCase(
-    schema=schemas.object_with_list_of_type_with_union.schema,
-    operations="""
-        query MainQuery {
-          userManager {
-            users {
-              whoAmI {
-                ... on Frog {
-                  __typename
-                  name
-                  color
-                }
-                ... on Person {
-                  __typename
-                  name
-                  age
-                }
-              }
-            }
-          }
-        }
-
-    """,
-    test_name="ListOfObjectWithUnionTestCase",
+NodeUnionTestCase = QtGqlTestCase(
+    schema=schemas.node_union.schema,
+    operations=NonNodeUnionTestCase.operations,
+    test_name="NodeUnionTestCase",
 )
 EnumTestCase = QtGqlTestCase(
     schema=schemas.object_with_enum.schema,
-    # __typename selection here has no value but to check durability.
+    # __typename selection here has no value but to test durability.
     operations="""
         query MainQuery {
           user {
@@ -926,7 +906,7 @@ all_test_cases = [
     FragmentTestCase,
     FragmentsOnInterfaceTestCase,
     FragmentWithOperationVariable,
-    ListOfObjectWithUnionTestCase,
+    NodeUnionTestCase,
     CustomUserScalarTestCase,
     ObjectsThatReferenceEachOtherTestCase,
     RootListOfTestCase,
@@ -957,7 +937,7 @@ implemented_testcases = [
     FragmentTestCase,
     FragmentsOnInterfaceTestCase,
     FragmentWithOperationVariable,
-    ListOfObjectWithUnionTestCase,
+    NodeUnionTestCase,
 ]
 
 
@@ -970,4 +950,4 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 
 if __name__ == "__main__":
-    generate_testcases(ListOfObjectWithUnionTestCase)
+    generate_testcases(NodeUnionTestCase)
