@@ -6,6 +6,7 @@ from graphql import language as gql_lang
 from graphql.type import definition as gql_def
 
 T_AST_Node = TypeVar("T_AST_Node", bound=gql_lang.Node)
+SelectionsSet = tuple[gql_lang.SelectionNode, ...]
 
 
 def ast_identifier_factory(
@@ -62,9 +63,9 @@ TYPENAME_SELECTION_NODE = (
 
 def inject_selection_factory(
     node: tuple[gql_lang.FieldNode],
-) -> Callable[[gql_lang.SelectionSetNode], None]:
-    def injector(selection_set: gql_lang.SelectionSetNode) -> None:
-        selection_set.selections += node
+) -> Callable[[SelectionsSet], None]:
+    def injector(selection_set: SelectionsSet) -> None:
+        selection_set += node
 
     return injector
 
@@ -75,11 +76,11 @@ inject_typename_selection = inject_selection_factory(TYPENAME_SELECTION_NODE)
 
 def selection_set_search_factory(
     selection_name: str,
-) -> Callable[[gql_lang.SelectionSetNode], bool]:
+) -> Callable[[tuple[gql_lang.SelectionNode, ...]], bool]:
     def factory(
-        selection_set: gql_lang.SelectionSetNode,
+        selection_set: tuple[gql_lang.SelectionNode, ...],
     ):
-        for node in selection_set.selections:
+        for node in selection_set:
             if field := is_field_node(node):
                 if field.name.value == selection_name:
                     return True

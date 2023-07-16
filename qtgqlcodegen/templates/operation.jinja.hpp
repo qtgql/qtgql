@@ -10,10 +10,10 @@ namespace 👉 context.config.env_name 👈::👉context.ns👈{
 class 👉 context.operation.name 👈;
 
 namespace deserializers{
-{% for t in context.operation.narrowed_types if not t.concrete.is_root and not t.is_fragment -%}
+{% for t in context.operation.narrowed_types if not t.concrete.is_root -%}
 std::shared_ptr<👉 t.concrete.name 👈> des_👉 t.name 👈(const QJsonObject& data, const 👉 context.operation.name 👈 * operation);
 {% endfor -%}
-{% for t in context.operation.interfaces if not t.is_fragment -%}
+{% for t in context.operation.interfaces -%}
 std::shared_ptr<👉 t.concrete.name 👈> des_👉 t.name 👈(const QJsonObject& data, const 👉 context.operation.name 👈 * operation);
 {% endfor -%}
 };
@@ -30,7 +30,7 @@ class 👉 t.name 👈: public 👉 context.qtgql_types.ObjectTypeABC.name 👈{
 👉 proxy_type_fields(t, context) 👈
 public:
     using 👉 context.qtgql_types.ObjectTypeABC.name 👈::👉 context.qtgql_types.ObjectTypeABC.last 👈;
-{% for f in t.fields + t.fields_from_fragments -%}
+{% for f in t.fields -%}
 [[nodiscard]] inline virtual const 👉 f.type.property_type 👈  👉 f.concrete.getter_name 👈() const {
 throw qtgql::exceptions::InterfaceDirectAccessError("👉t.concrete.name👈");
 }
@@ -57,10 +57,10 @@ public:
 {% if  not t.concrete.is_root -%}
 void qtgql_replace_concrete(const std::shared_ptr<👉 t.concrete.name 👈> & new_inst);
 {% endif %}
-public:
+protected:
     void _qtgql_connect_signals();
 public:
-{% for f in t.fields + t.fields_from_fragments  -%}
+{% for f in t.fields -%}
 [[nodiscard]] const 👉 f.type.property_type 👈  👉 f.concrete.getter_name 👈() const;
 {% endfor -%}
 public:

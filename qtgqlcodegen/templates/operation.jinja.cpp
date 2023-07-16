@@ -9,7 +9,7 @@
 namespace 👉 context.config.env_name 👈::👉context.ns👈{
 
 // Interfaces
-{% for interface in context.operation.interfaces if not interface.is_fragment -%}
+{% for interface in context.operation.interfaces -%}
 std::shared_ptr<👉 interface.concrete.name 👈> 👉 interface.deserializer_name 👈(const QJsonObject& data, const 👉 context.operation.name 👈 * operation){
 auto type_name = data.value("__typename").toString();
 {% for choice in interface.choices -%}
@@ -49,9 +49,6 @@ throw qtgql::exceptions::InterfaceDeserializationError(type_name.toStdString());
     {%- for field in t.fields -%}
     👉 initialize_proxy_field(field) 👈
     {% endfor -%}
-    {% for frag in t.used_fragments if frag.on.is_queried_object_type -%}
-    👉 frag.private_name 👈 = new 👉 frag.type_name() 👈(operation, inst);
-    {% endfor %}
     _qtgql_connect_signals();
 }
 
@@ -68,21 +65,11 @@ connect(m_inst_ptr, &👉context.schema_ns👈::👉t.concrete.name👈::👉 fi
 [&](){
 👉update_proxy_field(field, context.operation)👈
 });
-    {% for frag in t.used_fragments if frag.on.is_queried_object_type -%}
-    👉 frag.private_name 👈->_qtgql_connect_signals();
-        {% for field in frag.on.fields -%}
-        connect(👉 frag.private_name 👈, &👉 frag.type_name() 👈::👉 field.concrete.signal_name 👈, this,
-        [&](){
-        emit 👉 field.concrete.signal_name 👈();
-        });
-        {% endfor %}
-    {% endfor -%}
-
-{% endfor %}
+{% endfor -%}
 };
 
 // Deserialzier
-{% if not t.concrete.is_root and not t.is_fragment %}
+{% if not t.concrete.is_root %}
 std::shared_ptr<👉 t.concrete.name 👈> 👉 t.deserializer_name 👈(const QJsonObject& data, const 👉 context.operation.name 👈 * operation){
 if (data.isEmpty()){
     return {};
@@ -96,7 +83,7 @@ if(cached_maybe.has_value()){
 }
 {% endif -%}
 auto inst = 👉 t.concrete.name 👈::shared();
-{% for f in t.fields + t.fields_from_fragments -%}
+{% for f in t.fields -%}
 👉deserialize_concrete_field(f)👈
 {% endfor %}
 {% if t.concrete. implements_node %}
@@ -111,10 +98,7 @@ void 👉 t.updater_name 👈(👉 t.concrete.member_type_arg 👈 inst, const Q
 {
 {%for f in t.fields -%}
 👉update_concrete_field(f,f.concrete, private_name=f.private_name, operation_pointer="operation")👈
-{% endfor -%}
-{% for frag in t.used_fragments if frag.on.is_queried_object_type -%}
-👉 frag.on.updater_name 👈(inst, data, operation);
-{% endfor -%}
+{% endfor %}
 };
 
 
@@ -129,13 +113,7 @@ return m_inst->👉 f.concrete.getter_name 👈(👉f.build_variables_tuple_for_
 {%- endif -%}
 };
 {% endfor %}
-{% for  frag in t.used_fragments -%}
-{% for f in frag.on.fields %}
-[[nodiscard]] const 👉 f.type.property_type 👈  👉 t.name 👈::👉 f.concrete.getter_name 👈() const {
-    return 👉 frag.private_name 👈->👉 f.concrete.getter_name 👈();
-}
-{% endfor %}
-{% endfor %}
+
 
 {% if  not t.concrete.is_root -%}
 void 👉 t.name 👈::qtgql_replace_concrete(const std::shared_ptr<👉 t.concrete.name 👈> & new_inst){

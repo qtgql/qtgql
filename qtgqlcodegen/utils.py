@@ -51,3 +51,11 @@ def require(v: T | None) -> T:  # pragma: no cover
 
 def freeze(self, key, value):  # pragma: no cover
     raise PermissionError("setattr called on frozen type")
+
+
+def _replace_tuple_item(
+    original: tuple,
+    at: int,
+    replace: tuple,
+):
+    return original[0:at] + replace + original[at + 1 : len(original)]
