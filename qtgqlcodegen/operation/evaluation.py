@@ -8,13 +8,8 @@ from graphql.language import visitor
 
 from qtgqlcodegen.core.graphql_ref import (
     SelectionsSet,
-    has_id_selection,
-    has_typename_selection,
-    inject_id_selection,
-    inject_typename_selection,
     is_field_node,
     is_fragment_definition_node,
-    is_fragment_spread_node,
     is_inline_fragment,
     is_named_type_node,
     is_nonnull_node,
@@ -26,6 +21,8 @@ from qtgqlcodegen.operation.definitions import (
     QtGqlQueriedField,
     QtGqlVariableUse,
 )
+from qtgqlcodegen.operation.selections_injection import inject_required_selections
+from qtgqlcodegen.operation.utils import _unwrap_frag_spreads
 from qtgqlcodegen.schema.definitions import (
     QtGqlFieldDefinition,
     QtGqlVariableDefinition,
@@ -41,7 +38,7 @@ from qtgqlcodegen.types import (
     QtGqlQueriedUnion,
     QtGqlUnion,
 )
-from qtgqlcodegen.utils import _replace_tuple_item, require
+from qtgqlcodegen.utils import HashAbleDict, require
 
 if TYPE_CHECKING:
     from qtgqlcodegen.types import QtGqlObjectType, QtGqlTypeABC
@@ -199,8 +196,7 @@ def _evaluate_union(
     path: str,
 ) -> QtGqlQueriedUnion:
     choices: dict[str, QtGqlQueriedObjectType] = {}
-    if not has_typename_selection(selection_set):
-        inject_typename_selection(selection_set)
+
     for selection in selection_set:
         if is_field_node(selection):
             continue  # __typename selection
@@ -225,31 +221,11 @@ def _evaluate_union(
 #  TODO: cache this.
 
 
-def _unwrap_frag_spreads(
-    type_info: OperationTypeInfo,
-    selections: SelectionsSet,
-) -> SelectionsSet:
-    to_replace: list[tuple[int, SelectionsSet]] = []
-    for i, selection in enumerate(selections):
-        if frag_spread := is_fragment_spread_node(selection):
-            resolved = type_info.available_fragments[frag_spread.name.value]
-            type_info.used_fragments[resolved.name.value] = resolved
-            to_replace.append((i, resolved.selection_set.selections))
-
-    for replacement in to_replace:
-        # there might be nested frag spreads.
-        unwrapped = _unwrap_frag_spreads(type_info, replacement[1])
-        selections = _replace_tuple_item(selections, replacement[0], unwrapped)
-
-    return selections
-
-
 def _unwrap_interface_inline_fragments(
     type_info: OperationTypeInfo,
     parent_concrete: QtGqlObjectType | QtGqlInterface,
     selection_set: SelectionsSet,
     initial: dict[str, list[gql_lang.FieldNode]],
-    id_was_selected: bool = False,
 ) -> dict[str, list[gql_lang.FieldNode]]:
     """Fragments can be nested, i.e node{ id.
 
@@ -263,13 +239,6 @@ def _unwrap_interface_inline_fragments(
     :return: unwrap everything and return the selections mapped to object names.
     """
     concrete_selections: list[gql_lang.FieldNode] = []
-    if (
-        parent_concrete.implements_node
-        and not id_was_selected
-        and not has_id_selection(selection_set)
-    ):
-        inject_id_selection(selection_set)
-        id_was_selected = True
     for node in selection_set:
         if inline_frag := is_inline_fragment(node):
             type_name = inline_frag.type_condition.name.value
@@ -279,7 +248,6 @@ def _unwrap_interface_inline_fragments(
                 concrete_choice,
                 inline_frag.selection_set.selections,
                 initial,
-                id_was_selected,
             )
         else:
             field_node = require(is_field_node(node))
@@ -334,9 +302,10 @@ def _evaluate_interface(
     concrete: QtGqlInterface,
     selection_set: SelectionsSet,
     path: str,  # current path in the query tree.
-    is_fragment=False,
 ) -> QtGqlQueriedInterface:
-    selection_set = _unwrap_frag_spreads(type_info, selection_set)
+    unwrapped_selections = _unwrap_frag_spreads(type_info.available_fragments, selection_set)
+    type_info.used_fragments.update(unwrapped_selections.used_fragments)
+    selection_set = unwrapped_selections.selection_set
 
     raw_selections_map = _unwrap_interface_inline_fragments(
         type_info,
@@ -345,11 +314,6 @@ def _evaluate_interface(
         {},
     )
     choices = _create_objects_for_interface(type_info, raw_selections_map, concrete, path)
-
-    # inject __type_name selection, we'll use this to deserialize correctly.
-    if not has_typename_selection(selection_set):
-        inject_typename_selection(selection_set)
-
     name = _create_name_for_path(concrete, path)
 
     fields_for_interface = {
@@ -383,11 +347,9 @@ def _evaluate_object_type(
     path: str,  # current path in the query tree.
 ) -> QtGqlQueriedObjectType:
     assert not type_info.narrowed_types_map.get(concrete.name, None), "object already evaluated"
-    selection_set = _unwrap_frag_spreads(type_info, selection_set)
-
-    # inject id selection for node implementors, it is required for caching purposes.
-    if concrete.implements_node and not has_id_selection(selection_set):
-        inject_id_selection(selection_set)
+    unwrapped_selections = _unwrap_frag_spreads(type_info.available_fragments, selection_set)
+    type_info.used_fragments.update(unwrapped_selections.used_fragments)
+    selection_set = unwrapped_selections.selection_set
 
     fields: dict[str, QtGqlQueriedField] = {}
     for selection in selection_set:
@@ -419,7 +381,7 @@ def _evaluate_object_type(
 def _evaluate_operation(
     operation: OperationDefinitionNode,
     schema_type_info: SchemaTypeInfo,
-    raw_fragments: dict[str, gql_lang.FragmentDefinitionNode],
+    raw_fragments: HashAbleDict[str, gql_lang.FragmentDefinitionNode],
 ) -> QtGqlOperationDefinition:
     """Each operation generates a whole new "proxy" schema. That schema will
     contain only the fields that are currently queried. The way we do that is
@@ -437,8 +399,8 @@ def _evaluate_operation(
             type_info.variables.append(_evaluate_variable(type_info.schema_type_info, var))
 
     selections = operation.selection_set
-    root_type = type_info.schema_type_info.operation_types[operation.operation.value]
-    assert root_type, f"Make sure you have {operation.operation.name} type defined in your schema"
+    root_type = type_info.schema_type_info.get_root_type(operation.operation.value)
+    inject_required_selections(type_info.schema_type_info, selections, root_type)
     root_proxy_type = _evaluate_object_type(
         type_info=type_info,
         concrete=root_type,
@@ -462,7 +424,7 @@ class _OperationsVisitor(visitor.Visitor):
     def __init__(
         self,
         type_info: SchemaTypeInfo,
-        fragments: dict[str, gql_lang.FragmentDefinitionNode],
+        fragments: HashAbleDict[str, gql_lang.FragmentDefinitionNode],
     ):
         super().__init__()
         self.schema_type_info = type_info
@@ -490,10 +452,12 @@ class _FragmentsVisitor(visitor.Visitor):
     def __init__(self, type_info: SchemaTypeInfo):
         super().__init__()
         self.schema_type_info = type_info
-        self.fragments: dict[str, gql_lang.FragmentDefinitionNode] = {}
+        self.fragments: HashAbleDict[str, gql_lang.FragmentDefinitionNode] = HashAbleDict()
 
     def enter_fragment_definition(self, node: graphql.Node, *args, **kwargs) -> None:
         fragment = require(is_fragment_definition_node(node))
+        on = self.schema_type_info.get_object_or_interface(fragment.type_condition.name.value)
+        inject_required_selections(self.schema_type_info, fragment.selection_set, on)
         self.fragments[fragment.name.value] = fragment
 
 

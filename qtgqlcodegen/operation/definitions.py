@@ -7,6 +7,8 @@ import attrs
 import graphql
 from attr import define
 
+from qtgqlcodegen.utils import HashAbleDict
+
 if TYPE_CHECKING:
     from graphql.language import ast as gql_lang
     from graphql.type import definition as gql_def
@@ -31,8 +33,10 @@ class OperationTypeInfo:
     narrowed_types_map: dict[str, QtGqlQueriedObjectType] = attrs.Factory(dict)
     narrowed_interfaces_map: dict[str, QtGqlQueriedInterface] = attrs.Factory(dict)
     variables: list[QtGqlVariableDefinition] = attrs.Factory(list)
-    used_fragments: dict[str, gql_lang.FragmentDefinitionNode] = attrs.Factory(dict)
-    available_fragments: dict[str, gql_lang.FragmentDefinitionNode] = attrs.Factory(dict)
+    used_fragments: HashAbleDict[str, gql_lang.FragmentDefinitionNode] = attrs.Factory(HashAbleDict)
+    available_fragments: HashAbleDict[str, gql_lang.FragmentDefinitionNode] = attrs.Factory(
+        HashAbleDict,
+    )
 
 
 @attrs.define(frozen=True, slots=False, repr=False)

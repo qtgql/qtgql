@@ -63,9 +63,9 @@ TYPENAME_SELECTION_NODE = (
 
 def inject_selection_factory(
     node: tuple[gql_lang.FieldNode],
-) -> Callable[[SelectionsSet], None]:
-    def injector(selection_set: SelectionsSet) -> None:
-        selection_set += node
+) -> Callable[[gql_lang.SelectionSetNode], None]:
+    def injector(selection_set: gql_lang.SelectionSetNode) -> None:
+        selection_set.selections += node
 
     return injector
 
@@ -76,11 +76,11 @@ inject_typename_selection = inject_selection_factory(TYPENAME_SELECTION_NODE)
 
 def selection_set_search_factory(
     selection_name: str,
-) -> Callable[[tuple[gql_lang.SelectionNode, ...]], bool]:
+) -> Callable[[gql_lang.SelectionSetNode], bool]:
     def factory(
-        selection_set: tuple[gql_lang.SelectionNode, ...],
+        selection_set: gql_lang.SelectionSetNode,
     ):
-        for node in selection_set:
+        for node in selection_set.selections:
             if field := is_field_node(node):
                 if field.name.value == selection_name:
                     return True
