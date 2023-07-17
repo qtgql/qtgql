@@ -64,21 +64,12 @@ def _replace_tuple_item(
 T_Key = TypeVar("T_Key", bound=Hashable)
 T_Value = TypeVar("T_Value")
 
-if (
-    TYPE_CHECKING
-):  # TODO(https://github.com/qtgql/qtgql/issues/315): remove when python 3.8 reaches EOL.
 
-    class HashAbleDict(dict[T_Key, T_Value]):
-        """Dict that hashes the keys.
+class HashAbleDict(dict[T_Key, T_Value]):
+    """Dict that hashes the keys.
 
-        supports only flat dicts.
-        """
+    supports only flat dicts.
+    """
 
-        def __hash__(self):
-            raise NotImplementedError
-
-else:
-
-    class HashAbleDict(dict):
-        def __hash__(self):
-            return hash(frozenset(self.keys()))
+    def __hash__(self):
+        raise NotImplementedError
