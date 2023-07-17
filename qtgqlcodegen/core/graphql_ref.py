@@ -1,12 +1,15 @@
 from __future__ import annotations
 
-from typing import Callable, TypeVar
+from typing import TYPE_CHECKING, Callable, TypeVar
 
 from graphql import language as gql_lang
 from graphql.type import definition as gql_def
 
+if TYPE_CHECKING:
+    from typing_extensions import TypeAlias
+
 T_AST_Node = TypeVar("T_AST_Node", bound=gql_lang.Node)
-SelectionsSet = tuple[gql_lang.SelectionNode, ...]
+SelectionsSet: TypeAlias = "tuple[gql_lang.SelectionNode, ...]"
 
 
 def ast_identifier_factory(
