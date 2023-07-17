@@ -72,4 +72,4 @@ class HashAbleDict(dict[T_Key, T_Value]):
     """
 
     def __hash__(self):
-        raise NotImplementedError
+        return hash(frozenset(self.keys()))
