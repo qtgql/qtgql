@@ -1,6 +1,7 @@
+from __future__ import annotations
+
 import uuid
 from datetime import datetime, timezone
-from typing import Optional
 from uuid import UUID
 
 import strawberry
@@ -9,9 +10,9 @@ from tests.test_codegen.schemas.node_interface import NODE_DB, Node
 
 @strawberry.type
 class User(Node):
-    name: Optional[str] = None
-    age: Optional[int] = None
-    age_point: Optional[float] = None
+    name: str | None = None
+    age: int | None = None
+    age_point: float | None = None
     uuid: UUID | None = None
     birth: datetime | None = None
 
@@ -34,7 +35,7 @@ class Query:
 @strawberry.type()
 class Mutation:
     @strawberry.field()
-    def modify_name(self, user_id: strawberry.ID, new_name: str) -> Optional[User]:
+    def modify_name(self, user_id: strawberry.ID, new_name: str) -> User | None:
         user: User = NODE_DB.get(user_id)
         assert user
         user.name = new_name

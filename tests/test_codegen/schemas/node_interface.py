@@ -17,9 +17,6 @@ class Node:
     def __post_init__(self):
         NODE_DB.insert(self)
 
-    def resolve_type(self) -> str:
-        return self.__type_name
-
     def hash_impl(self) -> int:
         return hash(self.id)
 

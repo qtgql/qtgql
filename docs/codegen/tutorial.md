@@ -30,6 +30,7 @@ and another file named `operations.graphql` and declare the queries / subscripti
 Create a Python script named `qtgqlconfig.py`
 !!! Warning
     This (`qtgqlconfig.py`) name is obliged.
+    we are using a glob to find it.
 
 Point your config to that directory
 ```python
@@ -38,14 +39,6 @@ from pathlib import Path
 
 myconfig = QtGqlConfig(graphql_dir= Path(__file__).parent / '.graphql')
 ```
-Now in your `pyproject.toml` add the full import path
-for `myconfig`:
-
-```yaml
-[ tool.qtgql ]
-config = "myapp.config:myconfig"
-```
-Now we will generate code based on the graphql operations defined in `graphql/operations.graphql`
 
 <div class="termy">
 

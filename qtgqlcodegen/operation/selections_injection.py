@@ -17,9 +17,7 @@ from qtgqlcodegen.utils import require
 if TYPE_CHECKING:
     from graphql import language as gql_lang
 
-    from qtgqlcodegen.schema.definitions import (
-        SchemaTypeInfo,
-    )
+    from qtgqlcodegen.schema.definitions import SchemaTypeInfo
     from qtgqlcodegen.types import (
         QtGqlInterface,
         QtGqlObjectType,

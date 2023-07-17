@@ -1,4 +1,4 @@
-from typing import Optional
+from __future__ import annotations
 
 import strawberry
 
@@ -6,7 +6,7 @@ import strawberry
 @strawberry.type
 class Query:
     @strawberry.field
-    def echo_or_hello(self, echo: Optional[str] = None) -> str:
+    def echo_or_hello(self, echo: str | None = None) -> str:
         return echo if echo else "Hello World!"
 
 

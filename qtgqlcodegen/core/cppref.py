@@ -1,15 +1,14 @@
 from __future__ import annotations
 
 from functools import cached_property
-from typing import TYPE_CHECKING, Literal, NamedTuple
+from typing import TYPE_CHECKING, NamedTuple
 
 from attr import define
 
 if TYPE_CHECKING:
-    from typing_extensions import Self
+    from typing_extensions import Literal, Self, TypeAlias
 
-
-CppAccessor = Literal["::"] | Literal["."] | Literal["->"]
+CppAccessor: TypeAlias = 'Literal["::"] | Literal["."] | Literal["->"]'
 
 
 @define(slots=False)
