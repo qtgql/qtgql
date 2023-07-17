@@ -246,8 +246,6 @@ exclude_lines = [
   "if typing.TYPE_CHECKING:"
 ]
 
-[tool.qtgql]
-config = "tests.test_sample_ui.main:qtgqlconfig"
 
 
 [tool.autopub]
@@ -257,4 +255,4 @@ project-name = "qtgql"
 append-github-contributor = true
 
 [tool.poetry.scripts]
-qtgql = "qtgql.cli:entrypoint"
+qtgql = "qtgqlcodegen.cli:entrypoint"
