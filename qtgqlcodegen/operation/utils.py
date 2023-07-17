@@ -6,7 +6,10 @@ from typing import TYPE_CHECKING
 import attrs
 from attr import define
 
-from qtgqlcodegen.core.graphql_ref import SelectionsSet, is_fragment_spread_node
+from qtgqlcodegen.core.graphql_ref import (
+    SelectionsSet,
+    is_fragment_spread_node,
+)
 from qtgqlcodegen.utils import HashAbleDict, _replace_tuple_item
 
 if TYPE_CHECKING:

@@ -26,6 +26,11 @@ repos:
               tests/test_sample_ui/qml/icons.py
           )$
 
+  - repo: https://github.com/frostming/fix-future-annotations
+    rev: 0.5.0  # a released version tag
+    hooks:
+      - id: fix-future-annotations
+
   - repo: https://github.com/charliermarsh/ruff-pre-commit
     rev: v0.0.275
     hooks:
@@ -65,7 +70,6 @@ repos:
       - id: clang-format
         types:
           - c++
-
 
 exclude: >
           (?x)^(

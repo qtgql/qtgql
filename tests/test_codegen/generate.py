@@ -1,4 +1,7 @@
-from tests.test_codegen.testcases import generate_testcases, implemented_testcases
+from tests.test_codegen.testcases import (
+    generate_testcases,
+    implemented_testcases,
+)
 
 
 def generate_all_testscases() -> None:
