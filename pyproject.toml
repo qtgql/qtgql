@@ -36,7 +36,7 @@ githubrelease = ">=1.5.9"
 httpx = ">=0.18.2"
 autopub = "0.3.0"
 mimesis = ">=10.1.0"
-pytest = "7.3.1"
+pytest = "7.4.0"
 pytest-cov = ">=4.1.0"
 
 
