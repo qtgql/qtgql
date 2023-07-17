@@ -37,7 +37,8 @@ jobs:
           run: |
             git remote set-url origin https://${{ secrets.BOT_TOKEN }}@github.com/${{ github.repository }}
             autopub prepare
-            poetry build
+            cd .github && poetry run python -m workflows.scripts.update_cmake_version
+            cd ..
             autopub commit
             autopub githubrelease
             poetry publish --username __token__
