@@ -95,13 +95,14 @@ class QtGqlRecipe(ConanFile):
     @cached_property
     def qt6_install_dir(self) -> Path | None:
         relative_to = self.aqt_install_dir / self.qt_version
-        prev = Path.cwd()
-        os.chdir(relative_to)
-        res = glob.glob("**/Qt6Config.cmake", recursive=True)
-        os.chdir(prev)
-        with contextlib.suppress(IndexError):
-            p = (relative_to / res[0]).resolve(True)
-            return p.parent
+        if relative_to.exists():
+            prev = Path.cwd()
+            os.chdir(relative_to)
+            res = glob.glob("**/Qt6Config.cmake", recursive=True)
+            os.chdir(prev)
+            with contextlib.suppress(IndexError):
+                p = (relative_to / res[0]).resolve(True)
+                return p.parent
 
     @cached_property
     def should_test(self) -> bool:
