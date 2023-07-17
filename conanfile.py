@@ -3,6 +3,7 @@ from __future__ import annotations
 import contextlib
 import glob
 import logging
+import os
 import subprocess
 from functools import cached_property
 from pathlib import Path
@@ -91,10 +92,13 @@ class QtGqlRecipe(ConanFile):
             ret.mkdir(parents=True)
         return ret
 
-    @property
+    @cached_property
     def qt6_install_dir(self) -> Path | None:
         relative_to = self.aqt_install_dir / self.qt_version
-        res = glob.glob("**/Qt6Config.cmake", root_dir=relative_to, recursive=True)
+        prev = Path.cwd()
+        os.chdir(relative_to)
+        res = glob.glob("**/Qt6Config.cmake", recursive=True)
+        os.chdir(prev)
         with contextlib.suppress(IndexError):
             p = (relative_to / res[0]).resolve(True)
             return p.parent
