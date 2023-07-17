@@ -92,7 +92,7 @@ class QtGqlRecipe(ConanFile):
             ret.mkdir(parents=True)
         return ret
 
-    @cached_property
+    @property
     def qt6_install_dir(self) -> Path | None:
         relative_to = self.aqt_install_dir / self.qt_version
         if relative_to.exists():
