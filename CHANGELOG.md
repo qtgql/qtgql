@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+0.129.2 - 2023-07-17
+--------------------
+
+This release adds support for python 3.9 3.10
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #314](https://github.com/qtgql/qtgql/pull/314/)
+
+
 0.129.1 - 2023-07-16
 --------------------
 
