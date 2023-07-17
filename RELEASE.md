@@ -1,3 +1,3 @@
 Release type: patch
 
-This release adds support for python 3.8 3.9 3.10
+This release adds support for python 3.9 3.10
