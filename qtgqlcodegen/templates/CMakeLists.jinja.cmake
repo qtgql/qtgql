@@ -1,11 +1,16 @@
-set(SCHEMA_TARGET "👉 context.target_name 👈")
-add_library(${SCHEMA_TARGET} "")
-add_library(generated::${SCHEMA_TARGET} ALIAS ${SCHEMA_TARGET})
+set(EnvTarget "👉 context.target_name 👈")
+add_library(${EnvTarget} "")
+add_library(generated::${EnvTarget} ALIAS ${EnvTarget})
 # cmake-lint: disable=C0301
-target_sources(${SCHEMA_TARGET} PUBLIC 
-{% for file in context.sources -%}
-👉 file.path.as_posix() 👈
-{% endfor -%}
-)
-target_link_libraries(${SCHEMA_TARGET} PUBLIC Qt6::Core qtgql::qtgql)
-target_include_directories(${SCHEMA_TARGET} PUBLIC ${CMAKE_CURRENT_LIST_DIR})
+
+
+qt_add_qml_module(${EnvTarget}
+        URI ${EnvTarget}
+        SOURCES
+        {% for file in context.sources -%}
+        👉 file.path.as_posix() 👈
+        {% endfor -%}
+        RESOURCE_PREFIX :/qt/qml/
+        )
+target_link_libraries(${EnvTarget} PUBLIC Qt6::Core qtgql::qtgql)
+target_include_directories(${EnvTarget} PUBLIC ${CMAKE_CURRENT_LIST_DIR})

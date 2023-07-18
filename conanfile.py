@@ -117,7 +117,7 @@ class QtGqlRecipe(ConanFile):
             subprocess.run(
                 f"poetry run aqt install-qt {self.os_name} "
                 f"desktop {self.qt_version} {self.qt_arch} "
-                f"--outputdir {self.aqt_install_dir!s} "
+                f"--outputdir {self.aqt_install_dir} "
                 f"-m qtwebsockets".split(" "),
             ).check_returncode()
         assert self.qt6_install_dir

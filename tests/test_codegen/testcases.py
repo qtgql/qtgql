@@ -65,6 +65,7 @@ class BoolWithReason:
 
 class TestCaseMetadata(NamedTuple):
     should_test_updates: BoolWithReason = BoolWithReason.true("")
+    should_test_deserialization: BoolWithReason = BoolWithReason.true("")
 
 
 @define(slots=False, kw_only=True)
@@ -880,6 +881,15 @@ SubscriptionTestCase = QtGqlTestCase(
     test_name="SubscriptionTestCase",
 )
 
+QmlUsageTestCase = QtGqlTestCase(
+    schema=ObjectWithListOfObjectTestCase.schema,
+    operations=ObjectWithListOfObjectTestCase.operations,
+    test_name="QmlUsageTestCase",
+    metadata=TestCaseMetadata(
+        should_test_updates=BoolWithReason.false("qml testcase"),
+        should_test_deserialization=BoolWithReason.false("qml testcase"),
+    ),
+)
 
 all_test_cases = [
     ScalarsTestCase,
@@ -910,6 +920,7 @@ all_test_cases = [
     CustomUserScalarTestCase,
     ObjectsThatReferenceEachOtherTestCase,
     RootListOfTestCase,
+    QmlUsageTestCase,
 ]
 
 implemented_testcases = [
@@ -938,6 +949,7 @@ implemented_testcases = [
     FragmentsOnInterfaceTestCase,
     FragmentWithOperationVariable,
     NodeUnionTestCase,
+    QmlUsageTestCase,
 ]
 
 
@@ -950,4 +962,4 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 
 if __name__ == "__main__":
-    generate_testcases(NodeInterfaceFieldTestCase)
+    generate_testcases(QmlUsageTestCase)

@@ -5,6 +5,7 @@
 #include "./schema.hpp"
 #include <qtgql/gqlwstransport/gqlwstransport.hpp>
 #include <QObject>
+#include <QtQml/qqmlregistration.h>
 
 namespace 👉 context.config.env_name 👈::👉context.ns👈{
 class 👉 context.operation.name 👈;
@@ -87,7 +88,9 @@ std::optional<👉 var.type.member_type 👈> 👉 var.name 👈 = {};
 
 class 👉 context.operation.name 👈: public qtgql::gqlwstransport::OperationHandlerABC{
     Q_OBJECT
-Q_PROPERTY(const 👉 context.operation.root_type.name 👈 * data READ data NOTIFY dataChanged);
+    Q_PROPERTY(const 👉 context.operation.root_type.name 👈 * data READ data NOTIFY dataChanged);
+    QML_ELEMENT
+    QML_UNCREATABLE("Must be instantiated as with shared.")
 
 std::optional<👉 context.operation.root_type.name 👈 *> m_data = {};
 
