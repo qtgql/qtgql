@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import contextlib
-import os
 import re
 import shutil
 from functools import cached_property
@@ -16,9 +15,11 @@ from qtgqlcodegen.cli import app
 from qtgqlcodegen.config import QtGqlConfig
 from qtgqlcodegen.generator import SchemaGenerator
 from qtgqlcodegen.types import CustomScalarDefinition
+from typer.testing import CliRunner
+
 from tests.conftest import hash_schema
 from tests.test_codegen import schemas
-from typer.testing import CliRunner
+from tests.test_codegen.utils import temp_cwd
 
 if TYPE_CHECKING:
     from strawberry import Schema
@@ -165,10 +166,8 @@ class QtGqlTestCase:
             )
             self.testcase_file.write_text(updated)
 
-        cwd = Path.cwd()
-        os.chdir(self.config_file.parent)
-        CLI_RUNNER.invoke(app, "gen", catch_exceptions=False)
-        os.chdir(cwd)
+        with temp_cwd(self.config_file.parent):
+            CLI_RUNNER.invoke(app, "gen", catch_exceptions=False)
 
 
 RootScalarTestCase = QtGqlTestCase(
