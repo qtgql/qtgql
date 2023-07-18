@@ -1,3 +1,8 @@
-Release type: patch
+Release type: minor
 
-Add `Typer[all]` to dependencies.
+### Features
+- add `version` endpoint to the cli
+
+### Trivial changes
+- Add `Typer[all]` to dependencies.
+- add static version to the root cmake and in `qtgqlcodegen` `__init__.py`

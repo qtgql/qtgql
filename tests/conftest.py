@@ -25,6 +25,7 @@ class PATHS:
     PROJECT_ROOT = Path(__file__).parent.parent
     QTGQL_TEST_TARGET = PROJECT_ROOT / "tests" / "build"
     ROOT_CMAKE = PROJECT_ROOT / "CMakeLists.txt"
+    QTGQLCODEGEN_ROOT = PROJECT_ROOT / "qtgqlcodegen"
 
 
 class factory:

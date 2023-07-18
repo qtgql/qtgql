@@ -10,6 +10,8 @@ from typing import TYPE_CHECKING
 import rich
 import typer
 
+import qtgqlcodegen
+
 if TYPE_CHECKING:
     from qtgqlcodegen.config import QtGqlConfig
 
@@ -43,7 +45,7 @@ def _get_config() -> QtGqlConfig:
 
 
 @app.command()
-def gen():
+def gen() -> None:
     """Generates types based on your `QtGqlConfig` configuration object."""
     console.print("[bold blue]Generating...")
     with console.status("Still generating...") as s:
@@ -62,6 +64,11 @@ def gen():
 @app.command()
 def hotreload():  # pragma: no cover
     raise NotImplementedError
+
+
+@app.command()
+def version() -> None:
+    console.print(f"[bold blue]{qtgqlcodegen.__version__}")
 
 
 def entrypoint():  # pragma: no cover
