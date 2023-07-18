@@ -21,14 +21,14 @@ QTGQL_CONFIG_FNAME = "qtgqlconfig.py"
 
 
 def _create_path_link(path: Path) -> str:
-    return f"file://{path.resolve()}[/link]"
+    return f"[link={path.resolve()}]{path!s}[/link]"
 
 
 def _get_config() -> QtGqlConfig:
     console.print("[bold blue]Looking for a config file...")
     res = glob.glob(f"**/{QTGQL_CONFIG_FNAME}", recursive=True)
 
-    if len(res) != 1:
+    if len(res) > 1:
         cwd = Path.cwd()
         results = " \n".join([_create_path_link(cwd / rel) for rel in res])
 
@@ -36,6 +36,12 @@ def _get_config() -> QtGqlConfig:
             f"[bold red]Found more than one config file. {len(res)}" f" found:\n {results}",
         )
         raise typer.Abort()
+    elif len(res) < 1:
+        console.print(
+            f"[bold red]Could not find a config file under {_create_path_link(Path.cwd())}",
+        )
+        raise typer.Abort()
+
     mod_path = Path(res[0]).resolve(True)
     spec = importlib.util.spec_from_file_location(QTGQL_CONFIG_FNAME, mod_path)
     assert spec
