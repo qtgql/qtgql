@@ -1,9 +1,14 @@
 cmake_minimum_required(VERSION 3.20)
 set(EnvTarget "👉 context.target_name 👈")
-set(QTGQL_QML_PLUGIN_DIRECTORY qml/Generated/${EnvTarget})
-cmake_minimum_required(VERSION 3.20)
+set(QTGQL_QML_PLUGIN_DIRECTORY ${CMAKE_BINARY_DIR}/qml/Generated/${EnvTarget})
 
 project(${EnvTarget} LANGUAGES CXX)
+
+# add import path for Qt-Creator usage.
+if (NOT ${CMAKE_BINARY_DIR}/qml IN_LIST QML_DIRS)
+    list(APPEND QML_DIRS ${CMAKE_BINARY_DIR}/qml)
+    set(QML_IMPORT_PATH "${QML_DIRS}" CACHE PATH "Qt Creator 10.1 extra qml import paths")
+endif()
 
 # Configure general compilation
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
