@@ -1,14 +1,14 @@
 #include "main.hpp"
 
-#include <QCoreApplication>
+#include <QGuiApplication>
 #include <QTest>
 #include <QTimer>
 #include <catch2/catch_session.hpp>
 
 int main(int argc, char **argv) {
-  auto app = QCoreApplication::instance();
+  auto app = QGuiApplication::instance();
   if (!app) {
-    auto app = new QCoreApplication(argc, argv);
+    auto app = new QGuiApplication(argc, argv);
   }
   const Main &main = Main::getInstance();
 

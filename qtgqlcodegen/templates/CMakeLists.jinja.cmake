@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 set(EnvTarget "👉 context.target_name 👈")
-set(QTGQL_QML_PLUGIN_DIRECTORY ${CMAKE_BINARY_DIR}/qml/Generated/${EnvTarget})
+set(QTGQL_QML_PLUGIN_DIRECTORY 👉 context.config.qml_plugins_path 👈/Generated/${EnvTarget})
 
 project(${EnvTarget} LANGUAGES CXX)
 

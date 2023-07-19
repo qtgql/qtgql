@@ -154,22 +154,21 @@ m_variables = vars_inst.to_json();
 {# // This class exists as an alias class to an operation for qml, since operations
 // must be created with shared pointers. -#}
 class Use👉 context.operation.name 👈: public QObject{
-Q_OBJECT
-QML_ELEMENT
-Q_PROPERTY(const 👉 context.operation.root_type.name 👈 * data READ data NOTIFY dataChanged);
-Q_PROPERTY(bool completed READ completed NOTIFY completedChanged)
-Q_PROPERTY(bool operationOnFlight READ operation_on_flight NOTIFY
-operationOnFlightChanged)
+    Q_OBJECT
+    QML_ELEMENT
+    Q_PROPERTY(const 👉 context.operation.root_type.name 👈 * data READ data NOTIFY dataChanged);
+    Q_PROPERTY(bool completed READ completed NOTIFY completedChanged)
+    Q_PROPERTY(bool operationOnFlight READ operation_on_flight NOTIFY operationOnFlightChanged)
 
 public:
 std::shared_ptr<👉 context.operation.name 👈> m_operation;
 
-Use👉 context.operation.name 👈(){
-m_operation = 👉 context.operation.name 👈::shared();
-auto op_ptr = m_operation.get();
-connect(op_ptr, &👉 context.operation.name 👈::dataChanged, this, [&]{emit dataChanged();});
-connect(op_ptr, &👉 context.operation.name 👈::completedChanged, this, [&]{emit completedChanged();});
-connect(op_ptr, &👉 context.operation.name 👈::operationOnFlightChanged, this, [&]{emit operationOnFlightChanged();});
+Use👉 context.operation.name 👈(QObject *parent = nullptr): QObject(parent){
+    m_operation = 👉 context.operation.name 👈::shared();
+    auto op_ptr = m_operation.get();
+    connect(op_ptr, &👉 context.operation.name 👈::dataChanged, this, [&]{emit dataChanged();});
+    connect(op_ptr, &👉 context.operation.name 👈::completedChanged, this, [&]{emit completedChanged();});
+    connect(op_ptr, &👉 context.operation.name 👈::operationOnFlightChanged, this, [&]{emit operationOnFlightChanged();});
 };
 
 inline const 👉 context.operation.root_type.name 👈 * data() const{

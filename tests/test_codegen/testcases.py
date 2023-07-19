@@ -130,6 +130,7 @@ class QtGqlTestCase:
             env_name="default_env",
             custom_scalars=self.custom_scalars,
             debug=self.needs_debug,
+            qml_plugins_path="${CMAKE_BINARY_DIR}/qml/tests",
         )
 
     @cached_property
