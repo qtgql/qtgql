@@ -1,5 +1,5 @@
 import QtQuick
-import QmlUsageTestCase
+import Generated.QmlUsageTestCase.MainQuery
 
 Window {
     visible: true

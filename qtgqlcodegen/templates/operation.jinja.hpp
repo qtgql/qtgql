@@ -150,5 +150,49 @@ m_variables = vars_inst.to_json();
 {% endif %}
 
 };
+
+{# // This class exists as an alias class to an operation for qml, since operations
+// must be created with shared pointers. -#}
+class Use👉 context.operation.name 👈: public QObject{
+Q_OBJECT
+QML_ELEMENT
+Q_PROPERTY(const 👉 context.operation.root_type.name 👈 * data READ data NOTIFY dataChanged);
+Q_PROPERTY(bool completed READ completed NOTIFY completedChanged)
+Q_PROPERTY(bool operationOnFlight READ operation_on_flight NOTIFY
+operationOnFlightChanged)
+
+public:
+std::shared_ptr<👉 context.operation.name 👈> m_operation;
+
+Use👉 context.operation.name 👈(){
+m_operation = 👉 context.operation.name 👈::shared();
+auto op_ptr = m_operation.get();
+connect(op_ptr, &👉 context.operation.name 👈::dataChanged, this, [&]{emit dataChanged();});
+connect(op_ptr, &👉 context.operation.name 👈::completedChanged, this, [&]{emit completedChanged();});
+connect(op_ptr, &👉 context.operation.name 👈::operationOnFlightChanged, this, [&]{emit operationOnFlightChanged();});
 };
 
+inline const 👉 context.operation.root_type.name 👈 * data() const{
+    return m_operation->data();
+}
+inline bool completed() const{
+    return m_operation->completed();
+}
+inline bool operation_on_flight() const{
+    return m_operation->operation_on_flight();
+}
+
+public slots:
+void fetch(){
+    m_operation->fetch();
+};
+void refetch(){
+    m_operation->refetch();
+};
+
+signals:
+void dataChanged();
+void completedChanged();
+void operationOnFlightChanged();
+};
+};

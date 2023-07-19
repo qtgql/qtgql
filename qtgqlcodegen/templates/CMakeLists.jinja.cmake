@@ -12,9 +12,6 @@ endif()
 
 # Configure general compilation
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-if(APPLE)
-    set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "" FORCE)
-endif()
 
 find_package(Qt6 REQUIRED COMPONENTS Core Quick Qml)
 
@@ -25,6 +22,8 @@ else()
     set(CMAKE_AUTORCC ON)
     set(CMAKE_AUTOUIC ON)
 endif()
+
+# see https://doc.qt.io/qt-6/qt-cmake-policy-qtp0001.html
 qt_policy(SET QTP0001 NEW)
 
 add_library(${PROJECT_NAME}schema
