@@ -2,8 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Generated.QmlUsageTestCase.MainQuery
 
-Window {
-    visible: true
+Item {
 
     UseMainQuery {
         id: main_query

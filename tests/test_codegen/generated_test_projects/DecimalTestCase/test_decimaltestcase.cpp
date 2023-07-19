@@ -2,9 +2,9 @@
 #include <QTest>
 #include <catch2/catch_test_macros.hpp>
 
-#include "debugableclient.hpp"
 #include "graphql/__generated__/MainQuery.hpp"
 #include "graphql/__generated__/UpdateBalance.hpp"
+#include "testutils.hpp"
 
 namespace DecimalTestCase {
 using namespace qtgql;

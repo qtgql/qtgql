@@ -1,6 +1,6 @@
-#include "debugableclient.hpp"
 #include "graphql/__generated__/MainQuery.hpp"
 #include "graphql/__generated__/UserWithSameIDAndDifferentFieldsQuery.hpp"
+#include "testutils.hpp"
 #include <QSignalSpy>
 #include <catch2/catch_test_macros.hpp>
 

@@ -1,9 +1,9 @@
 #include <QSignalSpy>
 #include <catch2/catch_test_macros.hpp>
 
-#include "debugableclient.hpp"
 #include "graphql/__generated__/AddFriend.hpp"
 #include "graphql/__generated__/MainQuery.hpp"
+#include "testutils.hpp"
 
 namespace ObjectWithListOfObjectTestCase {
 using namespace qtgql;

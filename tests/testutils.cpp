@@ -1,4 +1,4 @@
-#include "debugableclient.hpp"
+#include "testutils.hpp"
 
 #include <memory>
 using namespace qtgql;

@@ -1,11 +1,20 @@
 #pragma once
+#include <catch2/catch_test_macros.hpp>
+
 #include <QSignalSpy>
 #include <QTest>
-#include <catch2/catch_test_macros.hpp>
+
+#include <QQmlEngine>
+#include <QQuickItem>
+#include <QQuickView>
+
+#include <filesystem>
 
 #include "qtgql/bases/bases.hpp"
 #include "qtgql/gqlwstransport/gqlwstransport.hpp"
+
 using namespace qtgql;
+namespace fs = std::filesystem;
 
 #define assert_m(cond, msg)                                                    \
   if (!cond) {                                                                 \
@@ -91,4 +100,37 @@ public:
   [[nodiscard]] bool wait(int timeout = 1000);
 };
 
+struct QmlBot {
+  QQuickView *qquick_view;
+  QmlBot() {
+    qquick_view = new QQuickView();
+    auto qmltester = fs::path(__FILE__).parent_path() / "qmltester.qml";
+    qquick_view->setSource(QUrl{qmltester.c_str()});
+    auto errors = qquick_view->errors();
+    if (!errors.empty()) {
+      qDebug() << errors;
+      throw "errors during qml load";
+    }
+    qquick_view->show();
+  }
+
+  template <typename T> T find(const QString &objectName) {
+    return qquick_view->findChild<T>(objectName);
+  };
+
+  QQuickItem *loader() { return find<QQuickItem *>("contentloader"); };
+
+  QQuickItem *load(const fs::path &path) {
+    loader()->setProperty("source", path.c_str());
+    auto ret = loader()->findChildren<QQuickItem *>()[0];
+    return ret;
+  }
+
+  QQmlEngine *engine() const { return qquick_view->engine(); }
+
+  ~QmlBot() {
+    qquick_view->close();
+    delete qquick_view;
+  }
+};
 }; // namespace test_utils
