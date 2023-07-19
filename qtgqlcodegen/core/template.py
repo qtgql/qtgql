@@ -9,9 +9,9 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 
 if TYPE_CHECKING:  # pragma: no cover
     from qtgqlcodegen.config import QtGqlConfig
-    from qtgqlcodegen.utils import FileSpec
+    from qtgqlcodegen.generator import GenerationOutput
 
-template_env = Environment(
+template_env: Environment = Environment(
     loader=PackageLoader("qtgqlcodegen"),
     autoescape=select_autoescape(),
     variable_start_string="👉",  # originally {{ variable }}, using 👉 variable 👈 because C++ uses curly brackets.
@@ -33,7 +33,7 @@ CMAKE_TEMPLATE = template_env.get_template("CMakeLists.jinja.cmake")
 @define(slots=False)
 class CmakeTemplateContext:
     config: QtGqlConfig
-    sources: list[FileSpec]
+    generation_output: GenerationOutput
 
     @property
     def target_name(self) -> str:

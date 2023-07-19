@@ -28,6 +28,8 @@ void update_👉 t.name 👈(👉 t.concrete.member_type_arg 👈 inst, const QJ
 // ------------ Narrowed Interfaces ------------
 {% for t in context.operation.interfaces -%}
 class 👉 t.name 👈: public 👉 context.qtgql_types.ObjectTypeABC.name 👈{
+    QML_ELEMENT
+    QML_UNCREATABLE("QTGql currently not supports instantiation via qml")
 👉 proxy_type_fields(t, context) 👈
 public:
     using 👉 context.qtgql_types.ObjectTypeABC.name 👈::👉 context.qtgql_types.ObjectTypeABC.last 👈;
@@ -45,7 +47,8 @@ public:
 // ------------ Narrowed Object types ------------
 {% for t in context.operation.narrowed_types %}
 class 👉 t.name 👈: public 👉 context.qtgql_types.ObjectTypeABC.name if not t.base_interface else t.base_interface.name 👈{
-
+    QML_ELEMENT
+    QML_UNCREATABLE("QTGql currently not supports instantiation via qml")
 👉context.operation.name👈* m_operation;
 
 👉 proxy_type_fields(t, context) 👈

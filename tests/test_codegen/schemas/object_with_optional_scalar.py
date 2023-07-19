@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from uuid import UUID
 
 import strawberry
+
 from tests.test_codegen.schemas.node_interface import NODE_DB, Node
 
 

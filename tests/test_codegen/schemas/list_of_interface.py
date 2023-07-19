@@ -4,6 +4,7 @@ import random
 from enum import Enum
 
 import strawberry
+
 from tests.conftest import factory, fake
 from tests.test_codegen.schemas.node_interface import NODE_DB, Node
 

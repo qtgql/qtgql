@@ -1,6 +1,7 @@
 from enum import Enum, auto
 
 import strawberry
+
 from tests.test_codegen.schemas.node_interface import NODE_DB, Node
 
 

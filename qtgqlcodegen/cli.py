@@ -63,9 +63,7 @@ def gen() -> None:
         config.generate()
 
     console.print(
-        "[bold green]Types were generated to"
-        f"[link={config.generated_dir.resolve()}]"
-        f"{_create_path_link(config.generated_dir)} successfully!",
+        "[bold green]Generated to" f"{_create_path_link(config.generated_dir)} successfully!",
     )
 
 

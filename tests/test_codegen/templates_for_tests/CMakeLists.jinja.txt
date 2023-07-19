@@ -1,6 +1,6 @@
 {% for tc in context.testcases -%}
 add_subdirectory(👉 tc.generated_dir 👈)
-target_link_libraries(${TESTS_TARGET} PRIVATE generated::👉 tc.test_name 👈)
+target_link_libraries(${TESTS_TARGET} PRIVATE 👉 tc.test_name 👈)
 {% endfor %}
 
 

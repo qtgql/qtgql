@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import graphql
+from attr import define
 
 from qtgqlcodegen.core.exceptions import QtGqlException
 from qtgqlcodegen.core.template import CmakeTemplateContext, cmake_template
@@ -22,14 +23,32 @@ if TYPE_CHECKING:
     from qtgqlcodegen.config import QtGqlConfig
 
 
+@define
+class OperationOutput:
+    name: str
+    sources: list[FileSpec]
+
+
+@define
+class GenerationOutput:
+    schema: FileSpec
+    operations: list[OperationOutput]
+
+    def dump(self) -> None:
+        self.schema.dump()
+        for op in self.operations:
+            for source in op.sources:
+                source.dump()
+
+
 class SchemaGenerator:
     def __init__(self, config: QtGqlConfig, schema: graphql.GraphQLSchema):
         self.gql_schema = schema
         self.config = config
         self.schema_type_info = evaluate_schema(schema, self.config.custom_scalars)
 
-    def generate(self) -> list[FileSpec]:
-        operations: list[FileSpec] = self._generate_operations()
+    def generate(self) -> GenerationOutput:
+        operations = self._generate_operations()
         context = SchemaTemplateContext(
             enums=list(self.schema_type_info.enums.values()),
             types=[
@@ -46,17 +65,19 @@ class SchemaGenerator:
             path=self.config.generated_dir / "schema.hpp",
         )
 
-        return [schema_hpp, *operations]
+        return GenerationOutput(
+            schema=schema_hpp,
+            operations=operations,
+        )
 
-    def _generate_operations(self) -> list[FileSpec]:
+    def _generate_operations(self) -> list[OperationOutput]:
         operations_document = graphql.parse(self.config.operations_dir.read_text())
-
         # validate the operation against the static schema
         if errors := graphql.validate(self.gql_schema, operations_document):
             raise QtGqlException([error.formatted for error in errors])
 
         operations = evaluate_operations(operations_document, self.schema_type_info)
-        ret: list[FileSpec] = []
+        ret: list[OperationOutput] = []
         for op_name, op in operations.items():
             context = OperationTemplateContext(
                 operation=op,
@@ -65,26 +86,31 @@ class SchemaGenerator:
             )
 
             ret.append(
-                FileSpec(
-                    content=operation_hpp_template(context=context),
-                    path=self.config.generated_dir / f"{op_name}.hpp",
+                OperationOutput(
+                    name=op_name,
+                    sources=[
+                        FileSpec(
+                            content=operation_hpp_template(context=context),
+                            path=self.config.generated_dir / f"{op_name}.hpp",
+                        ),
+                        FileSpec(
+                            content=operation_cpp_template(context=context),
+                            path=self.config.generated_dir / f"{op_name}.cpp",
+                        ),
+                    ],
                 ),
             )
-            ret.append(
-                FileSpec(
-                    content=operation_cpp_template(context=context),
-                    path=self.config.generated_dir / f"{op_name}.cpp",
-                ),
-            )
+
         return ret
 
     def dump(self):
-        sources = self.generate()
+        generation_output = self.generate()
 
         cmake = FileSpec(
-            content=cmake_template(CmakeTemplateContext(config=self.config, sources=sources)),
+            content=cmake_template(
+                CmakeTemplateContext(config=self.config, generation_output=generation_output),
+            ),
             path=self.config.generated_dir / "CMakeLists.txt",
         )
-        sources.append(cmake)
-        for f in sources:
-            f.dump()
+        generation_output.dump()
+        cmake.dump()

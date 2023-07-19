@@ -5,6 +5,7 @@ import random
 import uuid
 
 import strawberry
+
 from tests.conftest import factory
 
 DB: dict[str, AnimalInterface] = {}

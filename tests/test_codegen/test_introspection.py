@@ -1,5 +1,6 @@
 import pytest
 from qtgqlcodegen.core.exceptions import QtGqlException
+
 from tests.test_codegen import schemas
 from tests.test_codegen.testcases import QtGqlTestCase
 
