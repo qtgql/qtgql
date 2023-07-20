@@ -154,18 +154,21 @@ class QtGqlTestCase:
             url_suffix=self.url_suffix,
             test_name=self.test_name,
         )
-        self.schema_file.write_text(self.schema.as_str())
-        self.operations_file.write_text(self.operations)
-        self.config_file.write_text(TST_CONFIG_TEMPLATE.render(context=template_context))
+        self.schema_file.write_text(self.schema.as_str(), "UTF-8")
+        self.operations_file.write_text(self.operations, "UTF-8")
+        self.config_file.write_text(TST_CONFIG_TEMPLATE.render(context=template_context), "UTF-8")
         if not self.testcase_file.exists():
-            self.testcase_file.write_text(TST_CATCH2_TEMPLATE.render(context=template_context))
+            self.testcase_file.write_text(
+                TST_CATCH2_TEMPLATE.render(context=template_context),
+                "UTF-8",
+            )
         else:
             updated = re.sub(
                 'get_server_address\\("([0-9])*"\\)',
                 f'get_server_address("{self.url_suffix}")',
                 self.testcase_file.read_text("utf-8"),
             )
-            self.testcase_file.write_text(updated)
+            self.testcase_file.write_text(updated, "UTF-8")
 
         with temp_cwd(self.config_file.parent):
             CLI_RUNNER.invoke(app, "gen", catch_exceptions=False)
@@ -956,6 +959,7 @@ implemented_testcases = [
 def generate_testcases(*testcases: QtGqlTestCase) -> None:
     (GENERATED_TESTS_DIR / "CMakeLists.txt").write_text(
         TST_CMAKE_TEMPLATE.render(context={"testcases": testcases}),
+        "UTF-8",
     )
     for tc in testcases:
         tc.generate()

@@ -15,7 +15,7 @@ def update_cmake_version() -> None:
         return match.group(0).replace(match.group(1), CURRENT_VERSION)
 
     replaced = regex.sub(cmake_ver_pattern, ver_repl, PATHS.ROOT_CMAKE.read_text(), count=1)
-    PATHS.ROOT_CMAKE.write_text(replaced)
+    PATHS.ROOT_CMAKE.write_text(replaced, "UTF-8")
 
 
 def update_python_version() -> None:
@@ -27,7 +27,7 @@ def update_python_version() -> None:
         return match.group(0).replace(match.group(1), CURRENT_VERSION)
 
     replaced = re.sub(pattern, ver_repl, init_file.read_text())
-    init_file.write_text(replaced)
+    init_file.write_text(replaced, "UTF-8")
 
 
 if __name__ == "__main__":

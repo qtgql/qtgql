@@ -14,7 +14,7 @@ class FileSpec:
     content: str
 
     def dump(self) -> None:
-        self.path.write_text(self.content)
+        self.path.write_text(self.content, "UTF-8")
 
 
 class AntiForwardRef:
