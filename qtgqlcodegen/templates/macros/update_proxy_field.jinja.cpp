@@ -7,9 +7,7 @@ auto operation = m_operation;
 {% if field.type.is_model -%}
     auto new_data = 👉new_concrete👈;
     auto new_len = new_data.size();
-    qDebug() << "new size = " << new_len;
     auto prev_len = 👉field.private_name👈->rowCount();
-    qDebug() << "prev size = " << prev_len;
     if (new_len < prev_len){
         👉field.private_name👈->removeRows(prev_len - 1, prev_len - new_len);
     }
@@ -36,8 +34,6 @@ auto operation = m_operation;
         if (i > prev_len){
             👉field.private_name👈->insert(i, new 👉choice.name👈(operation, std::static_pointer_cast<👉choice.concrete.name👈>(concrete)));
         } else{
-            qDebug() << m_pets->rowCount();
-            qDebug() << i;
             auto proxy_to_update = 👉field.private_name👈->get(i);
             if (proxy_to_update && proxy_to_update->__typename() == "👉choice.concrete.name👈"){
                 qobject_cast<👉choice.property_type👈>(proxy_to_update)->qtgql_replace_concrete(std::static_pointer_cast<👉choice.concrete.name👈>(concrete));

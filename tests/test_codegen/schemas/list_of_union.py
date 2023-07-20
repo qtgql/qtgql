@@ -29,7 +29,7 @@ class Person(Node):
     @classmethod
     def create(cls):
         return Person(
-            pets=[random.choice((Dog(), Cat())) for _ in range(50)],  # noqa: S311
+            pets=[random.choice((Dog(), Cat())) for _ in range(10)],  # noqa: S311
         )
 
 
