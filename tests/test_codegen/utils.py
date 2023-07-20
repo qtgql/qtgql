@@ -7,5 +7,7 @@ from pathlib import Path
 def temp_cwd(to: Path) -> None:
     prev = Path.cwd()
     os.chdir(to)
-    yield
-    os.chdir(prev)
+    try:
+        yield
+    finally:
+        os.chdir(prev)
