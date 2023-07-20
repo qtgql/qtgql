@@ -130,7 +130,11 @@ public:
       index = 0;
     }
     insert_common(index, index);
-    m_data->insert(index, object);
+    if (index < m_count) {
+      m_data->replace(index, object);
+    } else {
+      m_data->insert(index, object);
+    }
     end_insert_common();
   }
 

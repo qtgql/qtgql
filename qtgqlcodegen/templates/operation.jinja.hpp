@@ -28,8 +28,7 @@ void update_👉 t.name 👈(👉 t.concrete.member_type_arg 👈 inst, const QJ
 // ------------ Narrowed Interfaces ------------
 {% for t in context.operation.interfaces -%}
 class 👉 t.name 👈: public 👉 context.qtgql_types.ObjectTypeABC.name 👈{
-    QML_ELEMENT
-    QML_UNCREATABLE("QtGql does not supports instantiation via qml")
+
 👉 proxy_type_fields(t, context) 👈
 public:
     using 👉 context.qtgql_types.ObjectTypeABC.name 👈::👉 context.qtgql_types.ObjectTypeABC.last 👈;
@@ -38,17 +37,12 @@ public:
 throw qtgql::exceptions::InterfaceDirectAccessError("👉t.concrete.name👈");
 }
 {% endfor %}
-public:
-[[nodiscard]] virtual const QString & __typename() const{
-    throw qtgql::exceptions::InterfaceDirectAccessError("👉t.concrete.name👈");
-}
 };
 {% endfor %}
 // ------------ Narrowed Object types ------------
 {% for t in context.operation.narrowed_types %}
 class 👉 t.name 👈: public 👉 context.qtgql_types.ObjectTypeABC.name if not t.base_interface else t.base_interface.name 👈{
-    QML_ELEMENT
-    QML_UNCREATABLE("QtGql does not supports instantiation via qml")
+
 👉context.operation.name👈* m_operation;
 
 👉 proxy_type_fields(t, context) 👈
@@ -68,7 +62,7 @@ public:
 [[nodiscard]] const 👉 f.type.property_type 👈  👉 f.concrete.getter_name 👈() const;
 {% endfor -%}
 public:
-[[nodiscard]] const QString & __typename() const {% if t.base_interface -%}final{% endif %}{
+[[nodiscard]] const QString & __typename() const final{
     return m_inst->__typename();
 }
 };

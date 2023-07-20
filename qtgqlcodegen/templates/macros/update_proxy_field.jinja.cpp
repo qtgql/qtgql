@@ -7,22 +7,23 @@ auto operation = m_operation;
 {% if field.type.is_model -%}
     auto new_data = 👉new_concrete👈;
     auto new_len = new_data.size();
+    qDebug() << "new size = " << new_len;
     auto prev_len = 👉field.private_name👈->rowCount();
+    qDebug() << "prev size = " << prev_len;
     if (new_len < prev_len){
         👉field.private_name👈->removeRows(prev_len - 1, prev_len - new_len);
     }
     for (int i = 0; i < new_len; i++){
         auto concrete = new_data.at(i);
     {% if field.type.of_type.is_queried_object_type -%}
-        if (i > prev_len - 1){
+        if (i > prev_len){
             👉field.private_name👈->insert(i, new 👉field.type.of_type.name👈(operation, concrete));
-        }
-        else {
+        } else {
             auto proxy_to_update = 👉field.private_name👈->get(i);
             if(proxy_to_update){
                 proxy_to_update->qtgql_replace_concrete(concrete);
             }
-            else{
+            else{ {#// handle optionals no need to delete -#}
                 👉field.private_name👈->insert(i, new 👉field.type.of_type.name👈(operation, concrete));
             }
         }
@@ -32,17 +33,18 @@ auto operation = m_operation;
         {%set type_cond -%}👉field.name👈_typename{% endset -%}
         {% for choice in field.type.of_type.choices %}
         {% set do_on_meets -%}
-        if (i > prev_len - 1){
+        if (i > prev_len){
             👉field.private_name👈->insert(i, new 👉choice.name👈(operation, std::static_pointer_cast<👉choice.concrete.name👈>(concrete)));
-        }
-        else{
+        } else{
+            qDebug() << m_pets->rowCount();
+            qDebug() << i;
             auto proxy_to_update = 👉field.private_name👈->get(i);
             if (proxy_to_update && proxy_to_update->__typename() == "👉choice.concrete.name👈"){
                 qobject_cast<👉choice.property_type👈>(proxy_to_update)->qtgql_replace_concrete(std::static_pointer_cast<👉choice.concrete.name👈>(concrete));
             }
             else{
-                delete proxy_to_update; {# // might have been optional or the type_name changed #}
                 👉field.private_name👈->insert(i, new 👉choice.name👈(operation, std::static_pointer_cast<👉choice.concrete.name👈>(concrete)));
+                delete proxy_to_update; {# // might have been optional or the type_name changed #}
             }
 
         }
