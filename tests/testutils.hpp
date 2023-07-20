@@ -122,6 +122,8 @@ struct QmlBot {
 
   QQuickItem *load(const fs::path &path) {
     loader()->setProperty("source", path.c_str());
+    assert_m((loader()->property("status").toInt() == 1),
+             "could not load component");
     auto ret = loader()->findChildren<QQuickItem *>()[0];
     return ret;
   }

@@ -3,7 +3,9 @@ import QtQuick.Layouts
 import Generated.QmlUsageTestCase.MainQuery
 
 Item {
-
+    id: root
+    objectName: "foobar"
+    property bool success: false
     UseMainQuery {
         id: main_query
 
@@ -23,6 +25,12 @@ Item {
                 delegate: Text {
                     property Person__userfriends friend: model.qtObject
                     text: `name: ${friend.name} age: ${friend.age}`
+                    Component.onCompleted: {
+                        if (friend.name != "") {
+                            root.success = true;
+                        }
+                        ;
+                    }
                 }
             }
         }

@@ -19,8 +19,9 @@ TEST_CASE("QmlUsageTestCase", "[generated-testcase]") {
   QQmlApplicationEngine engine;
   auto main_qml = fs::path(__FILE__).parent_path() / "main.qml";
   auto bot = test_utils::QmlBot();
-  bot.load(main_qml);
-  REQUIRE(QTest::qWaitFor([] { return false; }));
+  auto res = bot.load(main_qml);
+  REQUIRE(res->objectName().toStdString() == "foobar");
+  REQUIRE(QTest::qWaitFor([&] { return res->property("success").toBool(); }));
 }
 
 }; // namespace QmlUsageTestCase
