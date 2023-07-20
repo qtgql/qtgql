@@ -85,7 +85,7 @@ class QtGqlTestCase:
         return SchemaGenerator(
             config=self.config,
             schema=graphql.build_schema(
-                (self.graphql_dir / "schema.graphql").resolve(True).read_text(),
+                (self.graphql_dir / "schema.graphql").resolve(True).read_text("utf-8"),
             ),
         )
 
@@ -163,7 +163,7 @@ class QtGqlTestCase:
             updated = re.sub(
                 'get_server_address\\("([0-9])*"\\)',
                 f'get_server_address("{self.url_suffix}")',
-                self.testcase_file.read_text(),
+                self.testcase_file.read_text("utf-8"),
             )
             self.testcase_file.write_text(updated)
 

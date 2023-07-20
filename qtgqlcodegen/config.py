@@ -55,7 +55,7 @@ class QtGqlConfig:
         return SchemaGenerator(
             config=self,
             schema=graphql.build_schema(
-                (self.graphql_dir / "schema.graphql").resolve(True).read_text(),
+                (self.graphql_dir / "schema.graphql").resolve(True).read_text("utf-8"),
             ),
         )
 

@@ -71,7 +71,7 @@ class SchemaGenerator:
         )
 
     def _generate_operations(self) -> list[OperationOutput]:
-        operations_document = graphql.parse(self.config.operations_dir.read_text())
+        operations_document = graphql.parse(self.config.operations_dir.read_text("utf-8"))
         # validate the operation against the static schema
         if errors := graphql.validate(self.gql_schema, operations_document):
             raise QtGqlException([error.formatted for error in errors])

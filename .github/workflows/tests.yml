@@ -13,6 +13,7 @@ on:
       - ".github/workflows/test.yml"
 env:
   IS_GITHUB_ACTION: 1
+  QT_DEBUG_PLUGINS: 1
 
 jobs:
   tests:
