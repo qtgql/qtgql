@@ -61,6 +61,8 @@ qt_add_library(${PROJECT_NAME} "")
 target_link_libraries(
     ${PROJECT_NAME}
     PUBLIC
+    Qt6::Core
+    qtgql::qtgql
     ${PROJECT_NAME}schema
     {% for operation in context.generation_output.operations -%}
     ${PROJECT_NAME}👉 operation.name 👈

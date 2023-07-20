@@ -1,4 +1,3 @@
-#include "graphql/__generated__/MainQuery.hpp"
 #include "testutils.hpp"
 #include <QQmlApplicationEngine>
 #include <QSignalSpy>

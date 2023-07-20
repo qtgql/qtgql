@@ -52,7 +52,7 @@ class QtGqlRecipe(ConanFile):
         self.requires("openssl/1.1.1t")
 
     def build_requirements(self) -> None:
-        self.test_requires("catch2/3.1.0")
+        self.test_requires("catch2/3.4.0")
 
     def layout(self) -> None:
         cmake_layout(self)
