@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 set(EnvTarget "👉 context.target_name 👈")
-set(QTGQL_QML_PLUGIN_DIRECTORY 👉 context.config.qml_plugins_path 👈/Generated/${EnvTarget})
+set(QTGQL_QML_PLUGIN_DIRECTORY 👉 context.config.qml_plugins_path 👈/GraphQL/${EnvTarget})
 
 project(${EnvTarget} LANGUAGES CXX)
 
@@ -37,7 +37,7 @@ target_link_libraries(${PROJECT_NAME}schema
 {% for operation in context.generation_output.operations -%}
 
 qt_add_qml_module(${PROJECT_NAME}👉 operation.name 👈
-        URI Generated.${PROJECT_NAME}.👉 operation.name 👈
+        URI GraphQL.${PROJECT_NAME}.👉 operation.name 👈
         # Using PLUGIN_TARGET in static library compilation will cause link failure
         OUTPUT_DIRECTORY ${QTGQL_QML_PLUGIN_DIRECTORY}/👉 operation.name 👈
         # TYPEINFO "plugins.qmltypes"

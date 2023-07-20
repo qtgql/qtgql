@@ -17,7 +17,7 @@ TEST_CASE("QmlUsageTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   QQmlApplicationEngine engine;
-  auto main_qml = fs::path(__FILE__).parent_path() / "main.qml";
+  auto main_qml = fs::path(__FILE__).parent_path() / "qmlusagetestcase.qml";
   auto bot = test_utils::QmlBot();
   auto res = bot.load(main_qml);
   REQUIRE(res->objectName().toStdString() == "foobar");
