@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import os
 import subprocess
 from functools import cached_property
 from pathlib import Path
@@ -52,6 +53,8 @@ class QtGqlRecipe(ConanFile):
         self.test_requires("catch2/3.4.0")
 
     def configure(self) -> None:
+        # required because of conan-io/conan-center-index#13472
+        os.environ.setdefault("NOT_ON_C3I", "1")
         self.options["qt"].qtwebsockets = True
 
     def layout(self) -> None:
