@@ -52,12 +52,12 @@ jobs:
           sudo pip install poetry
           sudo poetry install
 
-      - name: Install Qt dependencies
-        shell: bash
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt update
-          sudo apt install libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-xinerama0 libxcb-keysyms1 libxcb1 libxcb-render-util0 libxcb-randr0 libgl1-mesa-dev
+#      - name: Install Qt dependencies
+#        shell: bash
+#        if: runner.os == 'Linux'
+#        run: |
+#          sudo apt update
+#          sudo apt install libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-xinerama0 libxcb-keysyms1 libxcb1 libxcb-render-util0 libxcb-randr0 libgl1-mesa-dev
 
       - name: Generate test files and coverage python
         run: sudo poetry run coverage run tests/test_codegen/generate.py -a
@@ -65,6 +65,7 @@ jobs:
       - name: Conan profile detect
         run: |
           sudo poetry run conan profile detect
+
       - name: Conan install
         run: |
           sudo poetry run conan install . -pr=profiles/${{ runner.os }} -s build_type=Debug --build=missing -c tools.system.package_manager:mode=install
