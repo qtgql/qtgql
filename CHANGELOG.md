@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+0.130.5 - 2023-07-23
+--------------------
+
+test release 2
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #329](https://github.com/qtgql/qtgql/pull/329/)
+
+
 0.130.4 - 2023-07-23
 --------------------
 
