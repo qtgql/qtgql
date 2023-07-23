@@ -4,7 +4,6 @@ include(Catch)
 find_package(Qt6 REQUIRED COMPONENTS Test Core Network)
 set(TESTS_TARGET "test_qtgql")
 
-set(CMAKE_PREFIX_PATH ${QT_ROOT_DIR})
 
 add_executable(${TESTS_TARGET} main.cpp ${TEST_SRCS} testutils.cpp testutils.hpp
         test_customscalar.cpp test_graphqlwstransport/test_gqlwstransport.cpp

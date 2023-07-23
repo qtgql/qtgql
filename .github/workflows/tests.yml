@@ -19,6 +19,7 @@ env:
 jobs:
   tests:
     runs-on: ${{ matrix.os }}
+    container: ghcr.io/kdab/hotspot-ubuntu22.04-dependencies
     strategy:
       fail-fast: false
       matrix:
@@ -61,12 +62,6 @@ jobs:
 
       - name: Generate test files and coverage python
         run: sudo poetry run coverage run tests/test_codegen/generate.py -a
-      - name: Install Qt
-        uses: jurplel/install-qt-action@v3
-        with:
-          cache: true
-          version: 6.5.0
-          modules: qtwebsockets
 
       - name: Conan profile detect
         run: |
