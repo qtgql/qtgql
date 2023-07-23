@@ -14,7 +14,7 @@ on:
 env:
   IS_GITHUB_ACTION: 1
   QT_DEBUG_PLUGINS: 1
-  QT_QPA_PLATFORM: "wayland"
+  QT_QPA_PLATFORM: "xcb"
 
 jobs:
   tests:
@@ -69,11 +69,11 @@ jobs:
 
       - name: Conan install
         run: |
-          poetry run conan install . -pr=profiles/${{ runner.os }} -s build_type=Debug --build=missing -c tools.system.package_manager:mode=install
+          poetry run xvfb-run -a conan install . -pr=profiles/${{ runner.os }} -s build_type=Debug --build=missing -c tools.system.package_manager:mode=install
 
       - name: Conan build
         run: |
-          poetry run conan build . -o test=True -s build_type=Debug -pr=profiles/${{ runner.os }}
+          poetry run xvfb-run -a conan build . -o test=True -s build_type=Debug -pr=profiles/${{ runner.os }}
 
       - name: Run tests
         shell: bash
