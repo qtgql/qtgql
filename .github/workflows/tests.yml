@@ -14,7 +14,7 @@ on:
 env:
   IS_GITHUB_ACTION: 1
   QT_DEBUG_PLUGINS: 1
-
+  QT_QPA_PLATFORM: "xcb"
 
 jobs:
   tests:
@@ -64,6 +64,7 @@ jobs:
       - name: Conan profile detect
         run: |
           poetry run conan profile detect
+
 
       - name: Conan install
         run: |
