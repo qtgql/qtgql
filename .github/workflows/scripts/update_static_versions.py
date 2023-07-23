@@ -1,6 +1,5 @@
 import re
 
-import regex
 from autopub.base import get_project_version
 from tests.conftest import PATHS
 
@@ -14,7 +13,7 @@ def update_cmake_version() -> None:
     def ver_repl(match: re.Match) -> str:
         return match.group(0).replace(match.group(1), CURRENT_VERSION)
 
-    replaced = regex.sub(cmake_ver_pattern, ver_repl, PATHS.ROOT_CMAKE.read_text(), count=1)
+    replaced = re.sub(cmake_ver_pattern, ver_repl, PATHS.ROOT_CMAKE.read_text(), count=1)
     PATHS.ROOT_CMAKE.write_text(replaced, "UTF-8")
 
 
