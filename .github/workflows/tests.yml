@@ -69,6 +69,9 @@ jobs:
         run: |
           export NOT_ON_C3I=1
           sudo poetry run conan install . -pr=profiles/${{ runner.os }} -s build_type=Debug --build=missing -c tools.system.package_manager:mode=install
+        env:
+          NOT_ON_C3I: 1
+
       - name: Conan build
         run: |
           sudo poetry run conan build . -o test=True -s build_type=Debug -pr=profiles/${{ runner.os }}
