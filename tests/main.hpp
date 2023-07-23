@@ -5,8 +5,6 @@
 #include <QSignalSpy>
 #include <QTcpServer>
 
-QString get_open_port();
-
 class Main : public QObject {
   Q_OBJECT
 

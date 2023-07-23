@@ -49,10 +49,10 @@ class QtGqlRecipe(ConanFile):
     exports_sources = "CMakeLists.txt", "include/*", "pyproject.toml"
 
     def requirements(self) -> None:
-        self.requires("openssl/1.1.1t")
+        ...
 
     def build_requirements(self) -> None:
-        self.test_requires("catch2/3.1.0")
+        self.test_requires("catch2/3.4.0")
 
     def layout(self) -> None:
         cmake_layout(self)
@@ -72,9 +72,9 @@ class QtGqlRecipe(ConanFile):
         qt_version = self.options.qt_version.value
         if self.is_windows() and "6.5" in qt_version:
             logger.warning(
-                "Can't compile with aqt installer on Windows just yet fall back to 6.4.3",
+                "Can't compile with aqt installer on Windows just yet fall back to 6.5.0",
             )
-            return "6.4.3"
+            return "6.5.0"
         return qt_version
 
     @property
@@ -117,9 +117,20 @@ class QtGqlRecipe(ConanFile):
             subprocess.run(
                 f"poetry run aqt install-qt {self.os_name} "
                 f"desktop {self.qt_version} {self.qt_arch} "
-                f"--outputdir {self.aqt_install_dir!s} "
+                f"--outputdir {self.aqt_install_dir} "
                 f"-m qtwebsockets".split(" "),
             ).check_returncode()
+        os.environ.setdefault(
+            "QT_PLUGIN_PATH",
+            (self.qt6_install_dir.parent.parent.parent / "plugins").resolve(True).as_uri(),
+        )
+        os.environ.setdefault(
+            "LD_LIBRARY_PATH",
+            (self.qt6_install_dir.parent.parent.parent / "lib").resolve(True).as_uri(),
+        )
+        paths = os.environ.get("PATH").split(":")
+        paths.append((self.qt6_install_dir.parent.parent.parent / "bin").resolve(True).as_uri())
+        os.environ.setdefault("PATH", ":".join(paths))
         assert self.qt6_install_dir
         assert self.qt6_install_dir.exists()
         deps = CMakeDeps(self)

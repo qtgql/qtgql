@@ -1,14 +1,15 @@
 from __future__ import annotations
 
 import glob
-import importlib
-import os
+import importlib.util
 import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 import rich
 import typer
+
+import qtgqlcodegen
 
 if TYPE_CHECKING:
     from qtgqlcodegen.config import QtGqlConfig
@@ -19,19 +20,28 @@ app = typer.Typer(pretty_exceptions_show_locals=False)
 QTGQL_CONFIG_FNAME = "qtgqlconfig.py"
 
 
-def _get_config() -> QtGqlConfig:
-    console.print("[bold blue]Looking for you config file...")
-    res = glob.glob(f"{QTGQL_CONFIG_FNAME}")
+def _create_path_link(path: Path) -> str:
+    return f"[link={path.resolve()}]{path!s}[/link]"
 
-    if not len(res) > 1:
+
+def _get_config() -> QtGqlConfig:
+    console.print("[bold blue]Looking for a config file...")
+    res = glob.glob(f"**/{QTGQL_CONFIG_FNAME}", recursive=True)
+
+    if len(res) > 1:
+        cwd = Path.cwd()
+        results = " \n".join([_create_path_link(cwd / rel) for rel in res])
+
         console.print(
-            f"[bold red]Found more than one config file. {len(res)}"
-            f" found: {os.linesep.join(res)}",
+            f"[bold red]Found more than one config file. {len(res)}" f" found:\n {results}",
         )
-        typer.Abort()
-    if len(res) == 0:
-        console.print("[bold red]Found more than one config file using the first one")
-        typer.Abort()
+        raise typer.Abort()
+    elif len(res) < 1:
+        console.print(
+            f"[bold red]Could not find a config file under {_create_path_link(Path.cwd())}",
+        )
+        raise typer.Abort()
+
     mod_path = Path(res[0]).resolve(True)
     spec = importlib.util.spec_from_file_location(QTGQL_CONFIG_FNAME, mod_path)
     assert spec
@@ -43,7 +53,7 @@ def _get_config() -> QtGqlConfig:
 
 
 @app.command()
-def gen():
+def gen() -> None:
     """Generates types based on your `QtGqlConfig` configuration object."""
     console.print("[bold blue]Generating...")
     with console.status("Still generating...") as s:
@@ -53,15 +63,19 @@ def gen():
         config.generate()
 
     console.print(
-        "[bold green]Types were generated to"
-        f"[link={config.generated_dir.resolve()}]"
-        f"file://{config.generated_dir.resolve()}[/link] successfully!",
+        "[bold green]Generated to" f"{_create_path_link(config.generated_dir)} successfully!",
     )
 
 
 @app.command()
 def hotreload():  # pragma: no cover
     raise NotImplementedError
+
+
+@app.command()
+def version() -> None:
+    """Show the version of qtgql."""
+    console.print(f"[bold blue]{qtgqlcodegen.__version__}")
 
 
 def entrypoint():  # pragma: no cover

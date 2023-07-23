@@ -1,4 +1,5 @@
 import strawberry
+
 from tests.test_codegen.schemas.node_interface import Node
 
 

@@ -19,7 +19,7 @@ This library is an attempt to provide a high-level graphql client to the QT worl
         - [x] Object Type
         - [ ] Scalar
         - [ ] custom scalar
-        - [ ] Interface
+        - [x] Interface
         - [x] Union
         - [ ] Enum
 - [x] Fragments

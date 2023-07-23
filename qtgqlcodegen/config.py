@@ -27,6 +27,11 @@ class QtGqlConfig:
     """
     custom_scalars: CustomScalarMap = Factory(dict)
     """Mapping of custom scalars, respected by the schema evaluator."""
+    qml_plugins_path: str = "${CMAKE_BINARY_DIR}/qml"
+    """Qml plugins would be installed under this directory.
+
+    This should suffice for most basic setups.
+    """
     debug: bool = False
     """Templates would render some additional helpers for testing."""
 
@@ -50,7 +55,7 @@ class QtGqlConfig:
         return SchemaGenerator(
             config=self,
             schema=graphql.build_schema(
-                (self.graphql_dir / "schema.graphql").resolve(True).read_text(),
+                (self.graphql_dir / "schema.graphql").resolve(True).read_text("utf-8"),
             ),
         )
 

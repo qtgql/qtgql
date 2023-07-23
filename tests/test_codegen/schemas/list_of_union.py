@@ -4,6 +4,7 @@ import random
 from enum import Enum
 
 import strawberry
+
 from tests.conftest import factory, fake
 from tests.test_codegen.schemas.node_interface import NODE_DB, Node
 
@@ -28,7 +29,7 @@ class Person(Node):
     @classmethod
     def create(cls):
         return Person(
-            pets=[random.choice((Dog(), Cat())) for _ in range(7)],  # noqa: S311
+            pets=[random.choice((Dog(), Cat())) for _ in range(10)],  # noqa: S311
         )
 
 

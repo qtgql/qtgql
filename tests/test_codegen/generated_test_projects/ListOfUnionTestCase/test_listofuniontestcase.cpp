@@ -1,8 +1,8 @@
-#include "debugableclient.hpp"
 #include "graphql/__generated__/InsertToList.hpp"
 #include "graphql/__generated__/MainQuery.hpp"
 #include "graphql/__generated__/ModifyName.hpp"
 #include "graphql/__generated__/RemoveAt.hpp"
+#include "testutils.hpp"
 #include <QSignalSpy>
 #include <catch2/catch_test_macros.hpp>
 
@@ -14,7 +14,8 @@ auto SCHEMA_ADDR = get_server_address("87764004");
 
 TEST_CASE("ListOfUnionTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
-      ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
+      ENV_NAME, DebugClientSettings{.print_debug = true,
+                                    .prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = mainquery::MainQuery::shared();
   mq->fetch();
   test_utils::wait_for_completion(mq);
@@ -32,25 +33,7 @@ TEST_CASE("ListOfUnionTestCase", "[generated-testcase]") {
                   ->get_age() > 0);
     }
   };
-  SECTION("test update remove") {
-    auto remove_mut = removeat::RemoveAt::shared();
-    auto person = mq->data()->get_randPerson();
-    auto model = person->get_pets();
-    auto obj_at_3 = model->get(3);
-    QString name_for_third_item("");
-    if (auto dog = qobject_cast<mainquery::Dog__randPersonpets *>(obj_at_3)) {
-      name_for_third_item = dog->get_name();
-    } else {
-      auto cat = qobject_cast<mainquery::Cat__randPersonpets *>(obj_at_3);
-      name_for_third_item = cat->get_name();
-    }
-    REQUIRE(!name_for_third_item.isEmpty());
-    remove_mut->set_variables({person->get_id(), 3});
-    remove_mut->fetch();
-    test_utils::wait_for_completion(remove_mut);
-    REQUIRE(model->get(3)->property("name").toString().toStdString() !=
-            name_for_third_item.toStdString());
-  };
+
   SECTION("test update modify") {
     auto modify_mut = modifyname::ModifyName::shared();
     auto person = mq->data()->get_randPerson();
@@ -79,6 +62,28 @@ TEST_CASE("ListOfUnionTestCase", "[generated-testcase]") {
     REQUIRE(dog->__typename().toStdString() == "Dog");
     REQUIRE(dog->get_name().toStdString() == name_to_set.toStdString());
   }
+  SECTION("test update remove") {
+    auto person = mq->data()->get_randPerson();
+    auto model = person->get_pets();
+    auto obj_at_3 = model->get(3);
+    QString name_for_third_item("");
+    if (auto dog = qobject_cast<mainquery::Dog__randPersonpets *>(obj_at_3)) {
+      name_for_third_item = dog->get_name();
+    } else {
+      auto cat = qobject_cast<mainquery::Cat__randPersonpets *>(obj_at_3);
+      name_for_third_item = cat->get_name();
+    }
+    REQUIRE(!name_for_third_item.isEmpty());
+
+    auto remove_mut = removeat::RemoveAt::shared();
+    remove_mut->set_variables({person->get_id(), 3});
+    remove_mut->fetch();
+
+    test_utils::wait_for_completion(remove_mut);
+
+    REQUIRE(model->get(3)->property("name").toString().toStdString() !=
+            name_for_third_item.toStdString());
+  };
 }
 
 }; // namespace ListOfUnionTestCase

@@ -13,6 +13,8 @@ on:
       - ".github/workflows/test.yml"
 env:
   IS_GITHUB_ACTION: 1
+  QT_DEBUG_PLUGINS: 1
+  QT_QPA_PLATFORM: "xcb"
 
 jobs:
   tests:
@@ -33,6 +35,7 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+
       #----------------------------------------------
       #        load pip cache if cache exists
       #----------------------------------------------
@@ -46,46 +49,40 @@ jobs:
       #  -----  install & configure poetry  -----
       #----------------------------------------------
       - name: Install Poetry
-        uses: abatilo/actions-poetry@v2
-      #----------------------------------------------
-      #       load cached venv if cache exists
-      #----------------------------------------------
-      - name: Load cached venv
-        id: cached-poetry-dependencies
-        uses: actions/cache@v3
-        with:
-          path: .venv
-          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
-      #----------------------------------------------
-      # install dependencies if cache does not exist
-      #----------------------------------------------
-      - name: Install Python dependencies
-        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-        run: poetry install
+        run: |
+          pip install poetry
+          poetry install
 
       - name: Install Qt dependencies
         shell: bash
         if: runner.os == 'Linux'
         run: |
           sudo apt update
-          sudo apt install libgl1-mesa-dev libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-render-util0 libxcb-xinerama0 libzstd-dev libcurl4-openssl-dev
+          sudo apt install libxcb-cursor-dev build-essential libgl1-mesa-dev libgstreamer-gl1.0-0 libpulse-dev libxcb-glx0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-render0 libxcb-shape0 libxcb-shm0 libxcb-sync1 libxcb-util1 libxcb-xfixes0 libxcb-xinerama0 libxcb1 libxkbcommon-dev libxkbcommon-x11-0 libxcb-xkb-dev
 
       - name: Generate test files and coverage python
         run: poetry run coverage run tests/test_codegen/generate.py -a
 
-      - name: Configure and Build
+      - name: Conan profile detect
         run: |
           poetry run conan profile detect
-          poetry run conan install . -pr=profiles/${{ runner.os }} -s build_type=Debug --build=missing
-          poetry run conan build . -o test=True -s build_type=Debug -pr=profiles/${{ runner.os }}
+
+      - name: Conan install
+        run: |
+          poetry run xvfb-run -a conan install . -pr=profiles/${{ runner.os }} -s build_type=Debug --build=missing -c tools.system.package_manager:mode=install
+
+      - name: Conan build
+        run: |
+          poetry run xvfb-run -a conan build . -o test=True -s build_type=Debug -pr=profiles/${{ runner.os }}
 
       - name: Run tests
         shell: bash
         run: |
+
           if [ "$RUNNER_OS" == "Windows" ]; then
             poetry run make test
           elif [ "$RUNNER_OS" == "Linux" ]; then
-            poetry run xvfb-run make test
+            poetry run make test
           fi
 
 

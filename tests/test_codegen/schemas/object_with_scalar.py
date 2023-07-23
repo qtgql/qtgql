@@ -4,6 +4,7 @@ import uuid
 from uuid import UUID
 
 import strawberry
+
 from tests.conftest import factory
 from tests.test_codegen.schemas.node_interface import Node
 

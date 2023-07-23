@@ -1,7 +1,7 @@
-#include "debugableclient.hpp"
 #include "graphql/__generated__/ChangeUserName.hpp"
 #include "graphql/__generated__/InsertUser.hpp"
 #include "graphql/__generated__/MainQuery.hpp"
+#include "testutils.hpp"
 #include <QSignalSpy>
 #include <catch2/catch_test_macros.hpp>
 

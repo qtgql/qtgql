@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import contextlib
-import os
 import re
 import shutil
 from functools import cached_property
@@ -16,9 +15,11 @@ from qtgqlcodegen.cli import app
 from qtgqlcodegen.config import QtGqlConfig
 from qtgqlcodegen.generator import SchemaGenerator
 from qtgqlcodegen.types import CustomScalarDefinition
+from typer.testing import CliRunner
+
 from tests.conftest import hash_schema
 from tests.test_codegen import schemas
-from typer.testing import CliRunner
+from tests.test_codegen.utils import temp_cwd
 
 if TYPE_CHECKING:
     from strawberry import Schema
@@ -65,6 +66,7 @@ class BoolWithReason:
 
 class TestCaseMetadata(NamedTuple):
     should_test_updates: BoolWithReason = BoolWithReason.true("")
+    should_test_deserialization: BoolWithReason = BoolWithReason.true("")
 
 
 @define(slots=False, kw_only=True)
@@ -83,7 +85,7 @@ class QtGqlTestCase:
         return SchemaGenerator(
             config=self.config,
             schema=graphql.build_schema(
-                (self.graphql_dir / "schema.graphql").resolve(True).read_text(),
+                (self.graphql_dir / "schema.graphql").resolve(True).read_text("utf-8"),
             ),
         )
 
@@ -128,6 +130,7 @@ class QtGqlTestCase:
             env_name="default_env",
             custom_scalars=self.custom_scalars,
             debug=self.needs_debug,
+            qml_plugins_path="${CMAKE_BINARY_DIR}/tests",
         )
 
     @cached_property
@@ -151,23 +154,24 @@ class QtGqlTestCase:
             url_suffix=self.url_suffix,
             test_name=self.test_name,
         )
-        self.schema_file.write_text(self.schema.as_str())
-        self.operations_file.write_text(self.operations)
-        self.config_file.write_text(TST_CONFIG_TEMPLATE.render(context=template_context))
+        self.schema_file.write_text(self.schema.as_str(), "UTF-8")
+        self.operations_file.write_text(self.operations, "UTF-8")
+        self.config_file.write_text(TST_CONFIG_TEMPLATE.render(context=template_context), "UTF-8")
         if not self.testcase_file.exists():
-            self.testcase_file.write_text(TST_CATCH2_TEMPLATE.render(context=template_context))
+            self.testcase_file.write_text(
+                TST_CATCH2_TEMPLATE.render(context=template_context),
+                "UTF-8",
+            )
         else:
             updated = re.sub(
                 'get_server_address\\("([0-9])*"\\)',
                 f'get_server_address("{self.url_suffix}")',
-                self.testcase_file.read_text(),
+                self.testcase_file.read_text("utf-8"),
             )
-            self.testcase_file.write_text(updated)
+            self.testcase_file.write_text(updated, "UTF-8")
 
-        cwd = Path.cwd()
-        os.chdir(self.config_file.parent)
-        CLI_RUNNER.invoke(app, "gen", catch_exceptions=False)
-        os.chdir(cwd)
+        with temp_cwd(self.config_file.parent):
+            CLI_RUNNER.invoke(app, "gen", catch_exceptions=False)
 
 
 RootScalarTestCase = QtGqlTestCase(
@@ -880,6 +884,15 @@ SubscriptionTestCase = QtGqlTestCase(
     test_name="SubscriptionTestCase",
 )
 
+QmlUsageTestCase = QtGqlTestCase(
+    schema=ObjectWithListOfObjectTestCase.schema,
+    operations=ObjectWithListOfObjectTestCase.operations,
+    test_name="QmlUsageTestCase",
+    metadata=TestCaseMetadata(
+        should_test_updates=BoolWithReason.false("qml testcase"),
+        should_test_deserialization=BoolWithReason.false("qml testcase"),
+    ),
+)
 
 all_test_cases = [
     ScalarsTestCase,
@@ -910,6 +923,7 @@ all_test_cases = [
     CustomUserScalarTestCase,
     ObjectsThatReferenceEachOtherTestCase,
     RootListOfTestCase,
+    QmlUsageTestCase,
 ]
 
 implemented_testcases = [
@@ -938,16 +952,18 @@ implemented_testcases = [
     FragmentsOnInterfaceTestCase,
     FragmentWithOperationVariable,
     NodeUnionTestCase,
+    QmlUsageTestCase,
 ]
 
 
 def generate_testcases(*testcases: QtGqlTestCase) -> None:
     (GENERATED_TESTS_DIR / "CMakeLists.txt").write_text(
         TST_CMAKE_TEMPLATE.render(context={"testcases": testcases}),
+        "UTF-8",
     )
     for tc in testcases:
         tc.generate()
 
 
 if __name__ == "__main__":
-    generate_testcases(NodeInterfaceFieldTestCase)
+    generate_testcases(ListOfUnionTestCase)

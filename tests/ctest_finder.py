@@ -43,7 +43,7 @@ class CtestTestCommand:
             log_file = match[0][1]
         except IndexError:
             return None
-        return Path(log_file + ".log").resolve(True).read_text()
+        return Path(log_file + ".log").resolve(True).read_text("utf-8")
 
     def run(self) -> None:
         self.ret_res = subprocess.run(

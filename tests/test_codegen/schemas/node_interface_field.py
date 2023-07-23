@@ -1,6 +1,7 @@
 from enum import Enum
 
 import strawberry
+
 from tests.conftest import fake
 from tests.test_codegen.schemas.node_interface import NODE_DB, Node
 

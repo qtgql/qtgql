@@ -2,9 +2,9 @@
 #include <QTest>
 #include <catch2/catch_test_macros.hpp>
 
-#include "debugableclient.hpp"
 #include "graphql/__generated__/ChangeName.hpp"
 #include "graphql/__generated__/MainQuery.hpp"
+#include "testutils.hpp"
 
 namespace OptionalScalarsTestCase {
 using namespace qtgql;

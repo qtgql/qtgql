@@ -1,5 +1,7 @@
 {% macro proxy_type_fields(t, context) -%}
 Q_OBJECT
+QML_ELEMENT
+QML_UNCREATABLE("QtGql does not supports instantiation via qml")
 Q_PROPERTY(QString  __typeName READ __typename CONSTANT)
 
 {% for f in t.fields -%}

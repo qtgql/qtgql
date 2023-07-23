@@ -3,6 +3,7 @@ from __future__ import annotations
 import enum
 
 import strawberry
+
 from tests.conftest import factory
 
 

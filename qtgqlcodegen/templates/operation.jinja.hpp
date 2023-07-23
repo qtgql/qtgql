@@ -5,6 +5,7 @@
 #include "./schema.hpp"
 #include <qtgql/gqlwstransport/gqlwstransport.hpp>
 #include <QObject>
+#include <QtQml/qqmlregistration.h>
 
 namespace 👉 context.config.env_name 👈::👉context.ns👈{
 class 👉 context.operation.name 👈;
@@ -27,6 +28,7 @@ void update_👉 t.name 👈(👉 t.concrete.member_type_arg 👈 inst, const QJ
 // ------------ Narrowed Interfaces ------------
 {% for t in context.operation.interfaces -%}
 class 👉 t.name 👈: public 👉 context.qtgql_types.ObjectTypeABC.name 👈{
+
 👉 proxy_type_fields(t, context) 👈
 public:
     using 👉 context.qtgql_types.ObjectTypeABC.name 👈::👉 context.qtgql_types.ObjectTypeABC.last 👈;
@@ -35,10 +37,6 @@ public:
 throw qtgql::exceptions::InterfaceDirectAccessError("👉t.concrete.name👈");
 }
 {% endfor %}
-public:
-[[nodiscard]] virtual const QString & __typename() const{
-    throw qtgql::exceptions::InterfaceDirectAccessError("👉t.concrete.name👈");
-}
 };
 {% endfor %}
 // ------------ Narrowed Object types ------------
@@ -64,7 +62,7 @@ public:
 [[nodiscard]] const 👉 f.type.property_type 👈  👉 f.concrete.getter_name 👈() const;
 {% endfor -%}
 public:
-[[nodiscard]] const QString & __typename() const {% if t.base_interface -%}final{% endif %}{
+[[nodiscard]] const QString & __typename() const final{
     return m_inst->__typename();
 }
 };
@@ -87,7 +85,9 @@ std::optional<👉 var.type.member_type 👈> 👉 var.name 👈 = {};
 
 class 👉 context.operation.name 👈: public qtgql::gqlwstransport::OperationHandlerABC{
     Q_OBJECT
-Q_PROPERTY(const 👉 context.operation.root_type.name 👈 * data READ data NOTIFY dataChanged);
+    Q_PROPERTY(const 👉 context.operation.root_type.name 👈 * data READ data NOTIFY dataChanged);
+    QML_ELEMENT
+    QML_UNCREATABLE("Must be instantiated as with shared.")
 
 std::optional<👉 context.operation.root_type.name 👈 *> m_data = {};
 
@@ -144,5 +144,48 @@ m_variables = vars_inst.to_json();
 {% endif %}
 
 };
+
+{# // This class exists as an alias class to an operation for qml, since operations
+// must be created with shared pointers. -#}
+class Use👉 context.operation.name 👈: public QObject{
+    Q_OBJECT
+    QML_ELEMENT
+    Q_PROPERTY(const 👉 context.operation.root_type.name 👈 * data READ data NOTIFY dataChanged);
+    Q_PROPERTY(bool completed READ completed NOTIFY completedChanged)
+    Q_PROPERTY(bool operationOnFlight READ operation_on_flight NOTIFY operationOnFlightChanged)
+
+public:
+std::shared_ptr<👉 context.operation.name 👈> m_operation;
+
+Use👉 context.operation.name 👈(QObject *parent = nullptr): QObject(parent){
+    m_operation = 👉 context.operation.name 👈::shared();
+    auto op_ptr = m_operation.get();
+    connect(op_ptr, &👉 context.operation.name 👈::dataChanged, this, [&]{emit dataChanged();});
+    connect(op_ptr, &👉 context.operation.name 👈::completedChanged, this, [&]{emit completedChanged();});
+    connect(op_ptr, &👉 context.operation.name 👈::operationOnFlightChanged, this, [&]{emit operationOnFlightChanged();});
 };
 
+inline const 👉 context.operation.root_type.name 👈 * data() const{
+    return m_operation->data();
+}
+inline bool completed() const{
+    return m_operation->completed();
+}
+inline bool operation_on_flight() const{
+    return m_operation->operation_on_flight();
+}
+
+public slots:
+void fetch(){
+    m_operation->fetch();
+};
+void refetch(){
+    m_operation->refetch();
+};
+
+signals:
+void dataChanged();
+void completedChanged();
+void operationOnFlightChanged();
+};
+};
