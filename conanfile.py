@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import contextlib
+import glob
 import logging
 import os
 import subprocess
@@ -47,14 +49,10 @@ class QtGqlRecipe(ConanFile):
     exports_sources = "CMakeLists.txt", "include/*", "pyproject.toml"
 
     def requirements(self) -> None:
-        self.requires("qt/6.5.0")
+        ...
 
     def build_requirements(self) -> None:
         self.test_requires("catch2/3.4.0")
-
-    def configure(self) -> None:
-        os.environ.setdefault("NOT_ON_C3I", "1")
-        self.options["qt"].qtwebsockets = True
 
     def layout(self) -> None:
         cmake_layout(self)
@@ -70,6 +68,43 @@ class QtGqlRecipe(ConanFile):
         return self.os_name == "linux"
 
     @cached_property
+    def qt_version(self) -> str:
+        qt_version = self.options.qt_version.value
+        if self.is_windows() and "6.5" in qt_version:
+            logger.warning(
+                "Can't compile with aqt installer on Windows just yet fall back to 6.4.3",
+            )
+            return "6.4.3"
+        return qt_version
+
+    @property
+    def qt_arch(self) -> str:
+        if self.is_linux():
+            return "gcc_64"
+        elif self.is_windows():
+            return "win64_mingw"
+
+    @cached_property
+    def aqt_install_dir(self) -> Path:
+        ret = Path.home() / "MyConnandeps" / "Qt"
+
+        if not ret.exists():
+            ret.mkdir(parents=True)
+        return ret
+
+    @property
+    def qt6_install_dir(self) -> Path | None:
+        relative_to = self.aqt_install_dir / self.qt_version
+        if relative_to.exists():
+            prev = Path.cwd()
+            os.chdir(relative_to)
+            res = glob.glob("**/Qt6Config.cmake", recursive=True)
+            os.chdir(prev)
+            with contextlib.suppress(IndexError):
+                p = (relative_to / res[0]).resolve(True)
+                return p.parent
+
+    @cached_property
     def should_test(self) -> bool:
         if self.options.test.value in ("True", "true", True):
             if not PATHS.QTGQL_TEST_TARGET.exists():
@@ -78,6 +113,15 @@ class QtGqlRecipe(ConanFile):
         return False
 
     def generate(self) -> None:
+        if not self.qt6_install_dir:
+            subprocess.run(
+                f"poetry run aqt install-qt {self.os_name} "
+                f"desktop {self.qt_version} {self.qt_arch} "
+                f"--outputdir {self.aqt_install_dir} "
+                f"-m qtwebsockets".split(" "),
+            ).check_returncode()
+        assert self.qt6_install_dir
+        assert self.qt6_install_dir.exists()
         deps = CMakeDeps(self)
         deps.generate()
         tc = CMakeToolchain(self)
@@ -85,6 +129,7 @@ class QtGqlRecipe(ConanFile):
             "binaryDir"
         ] = PATHS.QTGQL_TEST_TARGET.as_posix()  # cmake works with posix paths only
         tc.cache_variables["QTGQL_TESTING"] = self.should_test
+        tc.cache_variables["Qt6_DIR"] = str(self.qt6_install_dir)
         tc.generate()
 
     def build(self):

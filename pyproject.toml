@@ -28,6 +28,7 @@ aiohttp = {extras = ["speedups"], version = "^3.8.3"}
 faker = ">=15.3.4,<19.0.0"
 mypy = ">=1.0.1"
 strawberry-graphql = ">=0.158.2"
+aqtinstall = "v3.1.6"
 conan = ">=2.0.4"
 cmake = ">=3.25.0"
 pygithub = ">=1.58.2"
