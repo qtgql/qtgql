@@ -50,38 +50,38 @@ jobs:
       #----------------------------------------------
       - name: Install Poetry
         run: |
-          sudo pip install poetry
-          sudo poetry install
+          pip install poetry
+          poetry install
 
 #      - name: Install Qt dependencies
 #        shell: bash
 #        if: runner.os == 'Linux'
 #        run: |
-#          sudo apt update
-#          sudo apt install libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-xinerama0 libxcb-keysyms1 libxcb1 libxcb-render-util0 libxcb-randr0 libgl1-mesa-dev
+#          apt update
+#          apt install libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-xinerama0 libxcb-keysyms1 libxcb1 libxcb-render-util0 libxcb-randr0 libgl1-mesa-dev
 
       - name: Generate test files and coverage python
-        run: sudo poetry run coverage run tests/test_codegen/generate.py -a
+        run: poetry run coverage run tests/test_codegen/generate.py -a
 
       - name: Conan profile detect
         run: |
-          sudo poetry run conan profile detect
+          poetry run conan profile detect
 
       - name: Conan install
         run: |
-          sudo poetry run conan install . -pr=profiles/${{ runner.os }} -s build_type=Debug --build=missing -c tools.system.package_manager:mode=install
+          poetry run conan install . -pr=profiles/${{ runner.os }} -s build_type=Debug --build=missing -c tools.system.package_manager:mode=install
 
       - name: Conan build
         run: |
-          sudo poetry run conan build . -o test=True -s build_type=Debug -pr=profiles/${{ runner.os }}
+          poetry run conan build . -o test=True -s build_type=Debug -pr=profiles/${{ runner.os }}
 
       - name: Run tests
         shell: bash
         run: |
           if [ "$RUNNER_OS" == "Windows" ]; then
-            sudo poetry run make test
+            poetry run make test
           elif [ "$RUNNER_OS" == "Linux" ]; then
-            sudo poetry run make test
+            poetry run make test
           fi
 
 
