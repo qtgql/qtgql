@@ -38,6 +38,7 @@ jobs:
             poetry run autopub prepare
             cd .github && poetry run python -m workflows.scripts.update_static_versions
             cd ..
+            poetry run autopub build
             poetry run autopub commit
             poetry run autopub githubrelease
             poetry publish --username __token__
