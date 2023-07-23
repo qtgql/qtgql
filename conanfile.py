@@ -120,6 +120,10 @@ class QtGqlRecipe(ConanFile):
                 f"--outputdir {self.aqt_install_dir} "
                 f"-m qtwebsockets".split(" "),
             ).check_returncode()
+        os.environ.setdefault(
+            "QT_PLUGIN_PATH",
+            (self.qt6_install_dir.parent.parent.parent / "plugins").resolve(True).as_uri(),
+        )
         assert self.qt6_install_dir
         assert self.qt6_install_dir.exists()
         deps = CMakeDeps(self)
