@@ -61,6 +61,10 @@ jobs:
 
       - name: Generate test files and coverage python
         run: sudo poetry run coverage run tests/test_codegen/generate.py -a
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v3
+        with:
+          cache: true
 
       - name: Conan profile detect
         run: |

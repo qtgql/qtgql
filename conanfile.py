@@ -47,15 +47,13 @@ class QtGqlRecipe(ConanFile):
     exports_sources = "CMakeLists.txt", "include/*", "pyproject.toml"
 
     def requirements(self) -> None:
-        self.requires("qt/6.5.0")
+        ...
 
     def build_requirements(self) -> None:
         self.test_requires("catch2/3.4.0")
 
     def configure(self) -> None:
-        # required because of conan-io/conan-center-index#13472
         os.environ.setdefault("NOT_ON_C3I", "1")
-        self.options["qt"].qtwebsockets = True
 
     def layout(self) -> None:
         cmake_layout(self)
