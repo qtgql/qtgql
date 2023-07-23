@@ -13,3 +13,5 @@ code completion, and you can type your properties based on the operation types.
 ### Trivial changes
 - Add `Typer[all]` to dependencies.
 - add static version to the root cmake and in `qtgqlcodegen` `__init__.py`
+
+initial PR was #316
