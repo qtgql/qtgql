@@ -19,7 +19,6 @@ env:
 jobs:
   tests:
     runs-on: ${{ matrix.os }}
-    container: ghcr.io/kdab/hotspot-ubuntu22.04-dependencies
     strategy:
       fail-fast: false
       matrix:
