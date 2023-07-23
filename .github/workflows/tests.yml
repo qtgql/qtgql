@@ -66,8 +66,9 @@ jobs:
           sudo poetry run conan profile detect
           sudo poetry run conan install . -pr=profiles/${{ runner.os }} -s build_type=Debug --build=missing -c tools.system.package_manager:mode=install
           sudo poetry run conan build . -o test=True -s build_type=Debug -pr=profiles/${{ runner.os }}
-        with:
-          NOT_ON_C3I: 1 # required because of conan-io/conan-center-index#13472
+        env:
+          # required because of conan-io/conan-center-index#13472
+          NOT_ON_C3I: 1
 
       - name: Run tests
         shell: bash
