@@ -42,7 +42,7 @@ class QtGqlRecipe(ConanFile):
     options = {"qt_version": ["6.4.3"], "verbose": ConanBool, "test": ConanBool}  # noqa
     default_options = {  # noqa
         "verbose": False,
-        "qt_version": "6.5.0",
+        "qt_version": "6.4.3",
         "test": False,
     }
 
