@@ -56,6 +56,8 @@ class QtGqlRecipe(ConanFile):
         # required because of conan-io/conan-center-index#13472
         os.environ.setdefault("NOT_ON_C3I", "1")
         self.options["qt"].qtwebsockets = True
+        if self.is_linux():
+            self.options["qt"].qtwayland = False
 
     def layout(self) -> None:
         cmake_layout(self)
