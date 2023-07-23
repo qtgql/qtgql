@@ -1,4 +1,5 @@
 import re
+import subprocess
 
 from autopub.base import get_project_version
 from tests.conftest import PATHS
@@ -25,10 +26,11 @@ def update_python_version() -> None:
     def ver_repl(match: re.Match) -> str:
         return match.group(0).replace(match.group(1), CURRENT_VERSION)
 
-    replaced = re.sub(pattern, ver_repl, init_file.read_text())
+    replaced = re.sub(pattern, ver_repl, init_file.read_text(), count=1)
     init_file.write_text(replaced, "UTF-8")
 
 
 if __name__ == "__main__":
     update_cmake_version()
     update_python_version()
+    subprocess.run("git add .".split(" "))
