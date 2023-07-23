@@ -14,8 +14,7 @@ on:
 env:
   IS_GITHUB_ACTION: 1
   QT_DEBUG_PLUGINS: 1
-  NOT_ON_C3I: 1
-  # required because of conan-io/conan-center-index#13472
+
 
 jobs:
   tests:
@@ -63,11 +62,12 @@ jobs:
       - name: Generate test files and coverage python
         run: sudo poetry run coverage run tests/test_codegen/generate.py -a
 
-      - name: Conan profile detect and Build
+      - name: Conan profile detect
         run: |
           sudo poetry run conan profile detect
       - name: Conan install
         run: |
+          export NOT_ON_C3I=1
           sudo poetry run conan install . -pr=profiles/${{ runner.os }} -s build_type=Debug --build=missing -c tools.system.package_manager:mode=install
       - name: Conan build
         run: |
