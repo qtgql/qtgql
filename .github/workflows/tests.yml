@@ -47,7 +47,9 @@ jobs:
       #  -----  install & configure poetry  -----
       #----------------------------------------------
       - name: Install Poetry
-        run: pip install poetry
+        run: |
+          pip install poetry
+          poetry install
 
       - name: Install Qt dependencies
         shell: bash
