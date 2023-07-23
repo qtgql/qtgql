@@ -48,8 +48,8 @@ jobs:
       #----------------------------------------------
       - name: Install Poetry
         run: |
-          pip install poetry
-          poetry install
+          sudo pip install poetry
+          sudo poetry install
 
       - name: Install Qt dependencies
         shell: bash
@@ -63,17 +63,17 @@ jobs:
 
       - name: Configure and Build
         run: |
-          poetry run sudo conan profile detect
-          poetry run sudo conan install . -pr=profiles/${{ runner.os }} -s build_type=Debug --build=missing -c tools.system.package_manager:mode=install
-          poetry run sudo conan build . -o test=True -s build_type=Debug -pr=profiles/${{ runner.os }}
+          sudo poetry run conan profile detect
+          sudo poetry run conan install . -pr=profiles/${{ runner.os }} -s build_type=Debug --build=missing -c tools.system.package_manager:mode=install
+          sudo poetry run conan build . -o test=True -s build_type=Debug -pr=profiles/${{ runner.os }}
 
       - name: Run tests
         shell: bash
         run: |
           if [ "$RUNNER_OS" == "Windows" ]; then
-            poetry run make test
+            sudo poetry run make test
           elif [ "$RUNNER_OS" == "Linux" ]; then
-            poetry run make test
+            sudo poetry run make test
           fi
 
 
