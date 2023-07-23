@@ -47,22 +47,7 @@ jobs:
       #  -----  install & configure poetry  -----
       #----------------------------------------------
       - name: Install Poetry
-        uses: abatilo/actions-poetry@v2
-      #----------------------------------------------
-      #       load cached venv if cache exists
-      #----------------------------------------------
-      - name: Load cached venv
-        id: cached-poetry-dependencies
-        uses: actions/cache@v3
-        with:
-          path: .venv
-          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
-      #----------------------------------------------
-      # install dependencies if cache does not exist
-      #----------------------------------------------
-      - name: Install Python dependencies
-        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-        run: poetry install
+        run: pip install poetry
 
       - name: Install Qt dependencies
         shell: bash
@@ -70,14 +55,15 @@ jobs:
         run: |
           sudo apt update
           sudo apt install libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-xinerama0 libxcb-keysyms1 libxcb1 libxcb-render-util0 libxcb-randr0 libgl1-mesa-dev
+
       - name: Generate test files and coverage python
         run: poetry run coverage run tests/test_codegen/generate.py -a
 
       - name: Configure and Build
         run: |
-          sudo poetry run conan profile detect
-          sudo poetry run conan install . -pr=profiles/${{ runner.os }} -s build_type=Debug --build=missing -c tools.system.package_manager:mode=install
-          sudo poetry run conan build . -o test=True -s build_type=Debug -pr=profiles/${{ runner.os }}
+          poetry run sudo conan profile detect
+          poetry run sudo conan install . -pr=profiles/${{ runner.os }} -s build_type=Debug --build=missing -c tools.system.package_manager:mode=install
+          poetry run sudo conan build . -o test=True -s build_type=Debug -pr=profiles/${{ runner.os }}
 
       - name: Run tests
         shell: bash
