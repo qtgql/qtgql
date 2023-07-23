@@ -58,7 +58,7 @@ class helloTestConan(ConanFile):
     def qt_version(self) -> str:
         qt_version = self.options.qt_version.value
         if self.is_windows() and "6.5" in qt_version:
-            return "6.4.3"
+            return "6.5.0"
         return qt_version
 
     @property
