@@ -65,6 +65,8 @@ jobs:
         uses: jurplel/install-qt-action@v3
         with:
           cache: true
+          version: 6.5.0
+          modules: qtwebsockets
 
       - name: Conan profile detect
         run: |
