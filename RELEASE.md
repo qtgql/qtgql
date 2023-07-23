@@ -1,3 +1,3 @@
 Release type: patch
 
-test release 1
+test release 2
