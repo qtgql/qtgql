@@ -33,7 +33,6 @@ def update_python_version() -> None:
 
 
 if __name__ == "__main__":
-    a = str(INIT_FILE)
     os.chdir(PATHS.PROJECT_ROOT)
     args = None
     autopub.prepare(args)
