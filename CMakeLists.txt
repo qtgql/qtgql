@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.22.0)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(QTGQL_VERSION 0.130.7)
+set(QTGQL_VERSION 0.130.8)
 
 project(
   qtgql
