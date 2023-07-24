@@ -17,7 +17,7 @@ struct HashAbleABC {
   };
 };
 
-// To be extended by all consumers (Replaced `HandlerProto` in Python).
+// To be extended by all consumers.
 struct HandlerABC {
   [[nodiscard]] virtual const QUuid &operation_id() const = 0;
 
