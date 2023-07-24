@@ -33,13 +33,14 @@ def update_python_version() -> None:
 
 
 if __name__ == "__main__":
+    a = str(INIT_FILE)
     os.chdir(PATHS.PROJECT_ROOT)
     args = None
     autopub.prepare(args)
     update_cmake_version()
     update_python_version()
     subprocess.run(
-        f"git add {INIT_FILE.as_uri()} {PATHS.ROOT_CMAKE.as_uri()}".split(" "),
+        f"git add {INIT_FILE!s} {PATHS.ROOT_CMAKE!s}".split(" "),
     ).check_returncode()
     autopub.build(args)
     autopub.commit(args)
