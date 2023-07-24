@@ -22,11 +22,7 @@ ConanBool = [True, False]
 
 
 logger = logging.getLogger(__name__)
-
-
-def get_version_from_poetry():
-    res = subprocess.run("poetry version".split(" "), capture_output=True)
-    return res.stdout.decode().replace("qtgql ", "").rstrip()
+__version__: str = "0.130.7"
 
 
 class QtGqlRecipe(ConanFile):
@@ -37,7 +33,7 @@ class QtGqlRecipe(ConanFile):
     url = "https://github.com/qtgql/qtgql"
     description = "GraphQL codegen client library for Qt"
     topics = ("GraphQL", "Qt", "codegen")
-    version = get_version_from_poetry()
+    version = __version__
     build_policy = "missing"
     options = {"qt_version": ["6.5.0"], "verbose": ConanBool, "test": ConanBool}  # noqa
     default_options = {  # noqa
