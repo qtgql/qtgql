@@ -1,3 +1,3 @@
-Release type: path
+Release type: patch
 
 ...
