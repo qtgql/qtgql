@@ -1,9 +1,8 @@
 import os
 import re
-import subprocess
 
 from autopub import autopub
-from autopub.base import get_project_version
+from autopub.base import get_project_version, git
 from tests.conftest import PATHS
 
 
@@ -38,9 +37,8 @@ if __name__ == "__main__":
     autopub.prepare(args)
     update_cmake_version()
     update_python_version()
-    subprocess.run(
-        f"git add {INIT_FILE!s} {PATHS.ROOT_CMAKE!s}".split(" "),
-    ).check_returncode()
+    git(["add", str(INIT_FILE)])
+    git(["add", str(PATHS.ROOT_CMAKE)])
     autopub.build(args)
     autopub.commit(args)
     autopub.githubrelease(args)
