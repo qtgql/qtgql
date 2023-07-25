@@ -97,7 +97,7 @@ public:
     set_completed(false);
     fetch();
   };
-  void set_variables(const QJsonObject &vars) {
+  void set_vars(const QJsonObject &vars) {
     m_message_template.set_variables(vars);
   }
 

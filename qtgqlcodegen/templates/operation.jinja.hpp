@@ -87,7 +87,7 @@ class 👉 context.operation.name 👈: public qtgql::bases::OperationHandlerABC
     Q_OBJECT
     Q_PROPERTY(const 👉 context.operation.root_type.name 👈 * data READ data NOTIFY dataChanged);
     QML_ELEMENT
-    QML_UNCREATABLE("Must be instantiated as with shared.")
+    QML_UNCREATABLE("Must be instantiated as shared pointer.")
 
 std::optional<👉 context.operation.root_type.name 👈 *> m_data = {};
 
@@ -133,9 +133,9 @@ inline const 👉 context.operation.root_type.name 👈 * data() const{
 }
 
 {% if context.operation.variables %}
-void set_variables(👉 context.operation.generated_variables_type 👈 vars){
+void set_variables(const 👉 context.operation.generated_variables_type 👈 & vars){
 vars_inst = vars;
-m_variables = vars_inst.to_json();
+qtgql::bases::OperationHandlerABC::set_vars(vars_inst.to_json());
 }
 {% endif %}
 
