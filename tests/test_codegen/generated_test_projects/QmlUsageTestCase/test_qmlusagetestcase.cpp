@@ -22,5 +22,4 @@ TEST_CASE("QmlUsageTestCase", "[generated-testcase]") {
   REQUIRE(res->objectName().toStdString() == "foobar");
   REQUIRE(QTest::qWaitFor([&] { return res->property("success").toBool(); }));
 }
-
 }; // namespace QmlUsageTestCase
