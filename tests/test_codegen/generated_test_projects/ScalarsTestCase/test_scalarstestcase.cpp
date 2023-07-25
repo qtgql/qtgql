@@ -36,7 +36,8 @@ TEST_CASE("ScalarsTestCase", "[generated-testcase]") {
     auto previous_name = user->get_name();
     auto modified_user_op = userwithsameidanddifferentfieldsquery::
         UserWithSameIDAndDifferentFieldsQuery::shared();
-    auto catcher = test_utils::SignalCatcher({user});
+    auto catcher = test_utils::SignalCatcher(
+        {.source_obj = user, .excludes = {{"voidField"}}});
     modified_user_op->fetch();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(modified_user_op);
