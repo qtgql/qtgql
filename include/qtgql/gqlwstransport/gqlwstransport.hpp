@@ -1,2 +1,2 @@
 #pragma once
-#include "qtgql/bases/detail/operationhandler.hpp"
+#include "detail/gqlwstransport.hpp"

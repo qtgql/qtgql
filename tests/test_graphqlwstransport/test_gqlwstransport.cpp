@@ -7,7 +7,7 @@
 using namespace qtgql;
 
 QString get_subscription_str(bool raiseOn5 = false,
-                             QString op_name = "defaultOpName",
+                             const QString &op_name = "defaultOpName",
                              int target = 10) {
   QString ro5 = raiseOn5 ? "true" : "false";
   return QString("subscription %1 {count(target: %2, raiseOn5: %3) }")
@@ -15,15 +15,16 @@ QString get_subscription_str(bool raiseOn5 = false,
 }
 
 struct DefaultHandler : public bases::HandlerABC {
-  qtgql::gqlwstransport::GqlWsTrnsMsgWithID m_message;
-  DefaultHandler(const QString &query = get_subscription_str())
-      : m_message{qtgql::gqlwstransport::GqlWsTrnsMsgWithID(
-            qtgql::gqlwstransport::OperationPayload(query))} {};
+  bases::GraphQLMessage m_message;
+  explicit DefaultHandler(const QString &query = get_subscription_str())
+      : m_message{bases::GraphQLMessage(query)} {
+    id = QUuid::createUuid();
+  };
 
   QJsonArray m_errors;
   QJsonObject m_data;
   bool m_completed = false;
-  const QUuid &operation_id() const override { return m_message.op_id; }
+  [[nodiscard]] const QUuid &operation_id() const { return id; }
   void on_next(const QJsonObject &message) override {
     // here we copy the message though generally user wouldn't do this as it
     // would just use the reference to initialize some data
@@ -33,12 +34,12 @@ struct DefaultHandler : public bases::HandlerABC {
   void on_error(const QJsonArray &errors) override { m_errors = errors; }
   void on_completed() override { m_completed = true; }
 
-  const bases::HashAbleABC &message() override { return m_message; }
+  const bases::GraphQLMessage &message() override { return m_message; }
+
   bool wait_for_completed() const {
     return QTest::qWaitFor([&]() -> bool { return m_completed; }, 1500);
   }
-
-  bool count_eq_9() {
+  [[nodiscard]] bool count_eq_9() const {
     if (m_data.value("count").isDouble()) {
       auto ret = m_data.value("count").toInt();
       return ret == 9;
@@ -92,7 +93,6 @@ TEST_CASE("Send ping receive pong", "[gqlwstransport][ws-client]") {
 TEST_CASE("Subscribe to data (next message)", "[gqlwstransport][ws-client]") {
   auto client = get_valid_client();
   auto handler = std::make_shared<DefaultHandler>();
-  auto serialized = handler->message().serialize();
   client->execute(handler);
   REQUIRE(
       QTest::qWaitFor([&]() -> bool { return handler->count_eq_9(); }, 1500));

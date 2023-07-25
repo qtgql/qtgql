@@ -153,8 +153,9 @@ void GqlWsTransportClient::onConnected() {
 
 void GqlWsTransportClient::onDisconnected() {
   m_connection_ack = false;
-  qDebug() << "disconnected from " << m_url.toDisplayString()
-           << "close code: " << m_ws.closeCode() << " : " << m_ws.closeReason();
+  qWarning() << "disconnected from " << m_url.toDisplayString()
+             << "close code: " << m_ws.closeCode()
+             << " reason: " << m_ws.closeReason();
   m_ping_timer->stop();
   m_ping_tester_timer->stop();
   if (m_auto_reconnect) {
@@ -185,16 +186,15 @@ bool GqlWsTransportClient::gql_is_valid() const {
 
 void GqlWsTransportClient::execute(
     const std::shared_ptr<bases::HandlerABC> &handler) {
-  auto casted = std::static_pointer_cast<bases::OperationHandlerABC>(handler);
-  if (m_handlers.contains(handler->id)) {
-
+  if (!m_handlers.contains(handler->id)) {
+    m_handlers[handler->id] = handler;
     if (m_ws.isValid()) {
-      send_message(handler->message());
-      if (m_pending_handlers.contains(casted)) {
-        m_pending_handlers.erase(casted);
+      send_message(GqlWsTrnsMsgWithID(handler->message(), handler->id));
+      if (m_pending_handlers.contains(handler)) {
+        m_pending_handlers.erase(handler);
       }
-    } else if (!m_pending_handlers.contains(casted)) {
-      m_pending_handlers.insert(casted);
+    } else if (!m_pending_handlers.contains(handler)) {
+      m_pending_handlers.insert(handler);
     }
   }
 }

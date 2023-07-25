@@ -61,7 +61,7 @@ std::shared_ptr<DebugAbleClient> get_valid_client();
 namespace test_utils {
 using namespace std::chrono_literals;
 void wait_for_completion(
-    const std::shared_ptr<gqlwstransport::OperationHandlerABC> handler);
+    const std::shared_ptr<bases::OperationHandlerABC> handler);
 class QCleanerObject : public QObject {};
 
 struct ModelSignalSpy {

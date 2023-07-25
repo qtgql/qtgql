@@ -45,9 +45,11 @@ protected slots:
 public:
   using QObject::QObject;
 
-  [[nodiscard]] bool completed() const;
+  [[nodiscard]] inline bool completed() const { return m_completed; };
 
-  bool operation_on_flight() { return m_operation_on_the_fly; }
+  [[nodiscard]] inline bool operation_on_flight() const {
+    return m_operation_on_the_fly;
+  }
 };
 
 // Must be extended in the templates.

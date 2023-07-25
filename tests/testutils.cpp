@@ -20,7 +20,7 @@ std::shared_ptr<DebugAbleClient> get_valid_client() {
 
 bool DebugAbleClient::has_handler(
     const std::shared_ptr<bases::HandlerABC> &handler) {
-  return m_handlers.contains(handler->operation_id());
+  return m_handlers.contains(handler->id);
 }
 
 void DebugAbleClient::onTextMessageReceived(const QString &raw_message) {
@@ -60,8 +60,7 @@ void DebugAbleClient::onTextMessageReceived(const QString &raw_message) {
 namespace test_utils {
 
 void wait_for_completion(
-    const std::shared_ptr<qtgql::gqlwstransport::OperationHandlerABC>
-        operation) {
+    const std::shared_ptr<qtgql::bases::OperationHandlerABC> operation) {
   if (!QTest::qWaitFor([&]() -> bool { return operation->completed(); },
                        1500)) {
     auto error_message =

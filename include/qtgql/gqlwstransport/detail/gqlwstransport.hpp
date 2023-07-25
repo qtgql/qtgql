@@ -76,7 +76,7 @@ struct GqlWsTrnsMsgWithID : public BaseGqlWsTrnsMsg {
   }
 
   explicit GqlWsTrnsMsgWithID(const bases::GraphQLMessage &payload,
-                              QUuid id = QUuid::createUuid())
+                              const QUuid &id)
       : BaseGqlWsTrnsMsg(PROTOCOL::SUBSCRIBE, payload.serialize()),
         op_id{id} {};
 
@@ -109,8 +109,6 @@ class GqlWsTransportClient : public QObject, public bases::NetworkLayer {
   Q_OBJECT
 
 private:
-  GqlWsTransportClient() = delete;
-
   void send_message(const bases::HashAbleABC &message);
 
 private Q_SLOTS:
