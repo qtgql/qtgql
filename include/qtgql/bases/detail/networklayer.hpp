@@ -4,12 +4,21 @@
  * at ../gqlwstransport dir.
  */
 #pragma once
-#include "../../utils.hpp"
+
 #include "QJsonObject"
 #include "QUuid"
 #include "exceptions.hpp"
-namespace qtgql {
-namespace bases {
+#include "qtgql/utils.hpp"
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QString>
+#include <optional>
+#include <utility>
+
+namespace qtgql::bases {
 
 struct HashAbleABC {
   [[nodiscard]] virtual QJsonObject serialize() const {
@@ -17,9 +26,34 @@ struct HashAbleABC {
   };
 };
 
-// To be extended by all consumers.
+struct GraphQLMessage : public bases::HashAbleABC {
+  QString query;
+  QString operationName;
+  std::optional<QJsonObject> variables;
+
+  explicit GraphQLMessage(QString _query, std::optional<QJsonObject> vars = {})
+      : query{std::move(_query)}, variables{std::move(vars)} {
+    auto op_name = utils::get_operation_name(query);
+    Q_ASSERT_X(op_name.has_value(), "OperationPayload",
+               "qtgql enforces operations to have names your query has no "
+               "operation name");
+    operationName = op_name.value();
+  }
+
+  [[nodiscard]] QJsonObject serialize() const override {
+    QJsonObject ret{{"operationName", operationName}, {"query", query}};
+    if (variables.has_value()) {
+      ret.insert("variables", variables.value());
+    }
+    return ret;
+  };
+  void set_variables(const QJsonObject &vars) { variables = vars; }
+};
+
 struct HandlerABC {
-  [[nodiscard]] virtual const QUuid &operation_id() const = 0;
+
+  // this is mainly for graphql-ws-transport.
+  QUuid id;
 
   // https://github.com/enisdenjo/graphql-ws/blob/master/PROTOCOL.md#next
   virtual void on_next(const QJsonObject &message) = 0;
@@ -30,7 +64,7 @@ struct HandlerABC {
   // https://github.com/enisdenjo/graphql-ws/blob/master/PROTOCOL.md#complete
   virtual void on_completed() = 0;
 
-  virtual const HashAbleABC &message() = 0;
+  virtual const GraphQLMessage &message() = 0;
 };
 
 /*
@@ -38,11 +72,10 @@ class that should  support executing handlers
  and expected to call the handler's `on_data` /
 `on_error` / 'on_completed' when the operation is completed.
 */
-class NetworkLayer {
-public:
+struct NetworkLayer {
   virtual void execute(const std::shared_ptr<HandlerABC> &handler) {
     throw exceptions::NotImplementedError({});
   }
 };
-} // namespace bases
-} // namespace qtgql
+
+} // namespace qtgql::bases

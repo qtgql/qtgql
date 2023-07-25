@@ -1,7 +1,6 @@
-#include "operationhandler.hpp"
+#include "gqlwstransport.hpp"
 
-using namespace qtgql;
-using namespace gqlwstransport;
+namespace qtgql::gqlwstransport {
 
 GqlWsTransportClient::GqlWsTransportClient(
     const GqlWsTransportClientSettings &settings)
@@ -56,8 +55,7 @@ GqlWsTransportClient::GqlWsTransportClient(
 void GqlWsTransportClient::on_gql_next(const GqlWsTrnsMsgWithID &message) {
   if (message.has_payload()) {
     if (m_handlers.contains(message.op_id)) {
-      auto handler = m_handlers.value(message.op_id);
-      handler->on_next(message.payload);
+      m_handlers.at(message.op_id)->on_next(message.payload);
     }
   }
 }
@@ -67,16 +65,16 @@ void GqlWsTransportClient::on_gql_error(const GqlWsTrnsMsgWithID &message) {
   qWarning() << message.errors;
   if (message.has_errors()) {
     if (m_handlers.contains(message.op_id)) {
-      m_handlers.value(message.op_id)->on_error(message.errors);
+      m_handlers.at(message.op_id)->on_error(message.errors);
     }
   }
 }
 
 void GqlWsTransportClient::on_gql_complete(const GqlWsTrnsMsgWithID &message) {
   if (m_handlers.contains(message.op_id)) {
-    auto handler = m_handlers.value(message.op_id);
+    auto handler = m_handlers[message.op_id];
     handler->on_completed();
-    m_handlers.remove(message.op_id);
+    m_handlers.erase(message.op_id);
   }
 }
 
@@ -187,17 +185,21 @@ bool GqlWsTransportClient::gql_is_valid() const {
 
 void GqlWsTransportClient::execute(
     const std::shared_ptr<bases::HandlerABC> &handler) {
-  m_handlers.insert(handler->operation_id(), handler);
-  if (m_ws.isValid()) {
-    send_message(handler->message());
-    if (m_pending_handlers.contains(handler)) {
-      m_pending_handlers.remove(handler);
+  auto casted = std::static_pointer_cast<bases::OperationHandlerABC>(handler);
+  if (m_handlers.contains(handler->id)) {
+
+    if (m_ws.isValid()) {
+      send_message(handler->message());
+      if (m_pending_handlers.contains(casted)) {
+        m_pending_handlers.erase(casted);
+      }
+    } else if (!m_pending_handlers.contains(casted)) {
+      m_pending_handlers.insert(casted);
     }
-  } else if (!m_pending_handlers.contains(handler)) {
-    m_pending_handlers << handler; // refcount increased (copy constructor)
   }
 }
 
 void GqlWsTransportClient::reconnect() {
   this->m_ws.open(m_ws.request(), m_ws_options);
 }
+} // namespace qtgql::gqlwstransport

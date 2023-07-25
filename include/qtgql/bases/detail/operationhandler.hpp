@@ -1,11 +1,8 @@
 #pragma once
+#include "environment.hpp"
 #include <QObject>
 
-#include "gqlwstransport.hpp"
-#include "qtgql/bases/bases.hpp"
-
-namespace qtgql {
-namespace gqlwstransport {
+namespace qtgql::bases {
 
 class _OperationHandlerABCSignals : public QObject {
   Q_OBJECT
@@ -28,39 +25,57 @@ signals:
 
 protected slots:
 
-  void set_completed(bool v);
+  void set_completed(bool v) {
+    if (m_completed != v) {
+      m_completed = v;
+      emit completedChanged();
+    }
+    if (m_completed) {
+      set_operation_on_flight(false);
+    }
+  }
 
-  void set_operation_on_flight(bool v);
+  void set_operation_on_flight(bool v) {
+    if (m_operation_on_the_fly != v) {
+      m_operation_on_the_fly = v;
+      emit operationOnFlightChanged();
+    }
+  }
 
 public:
   using QObject::QObject;
 
   [[nodiscard]] bool completed() const;
 
-  bool operation_on_flight();
+  bool operation_on_flight() { return m_operation_on_the_fly; }
 };
 
-// NOTE: This class should not be defined in the .cpp since it is abstract.
+// Must be extended in the templates.
 class OperationHandlerABC
     : public _OperationHandlerABCSignals,
-
       public bases::HandlerABC,
       public std::enable_shared_from_this<OperationHandlerABC> {
 protected:
-  QUuid m_operation_id = QUuid::createUuid();
+  GraphQLMessage m_message_template;
 
-  const std::shared_ptr<bases::Environment> &environment() {
-    static auto m_env = bases::Environment::get_env(ENV_NAME());
+  const std::shared_ptr<Environment> &environment() {
+    static auto m_env = Environment::get_env(ENV_NAME());
     return m_env.value();
   };
-  QJsonObject m_variables;
-  GqlWsTrnsMsgWithID m_message_template = GqlWsTrnsMsgWithID{{}};
 
 public:
-  explicit OperationHandlerABC(GqlWsTrnsMsgWithID message)
-      : _OperationHandlerABCSignals(), m_message_template(std::move(message)) {}
+  explicit OperationHandlerABC(GraphQLMessage message)
+      : _OperationHandlerABCSignals(), m_message_template(std::move(message)) {
+    id = QUuid::createUuid();
+  }
 
-  QJsonObject variables() const { return m_variables; }
+  QJsonObject variables() const {
+    if (m_message_template.variables.has_value())
+      return m_message_template.variables.value();
+    else {
+      return {};
+    }
+  }
   // abstract functions.
   virtual const QString &ENV_NAME() = 0;
   // end abstract functions.
@@ -80,9 +95,11 @@ public:
     set_completed(false);
     fetch();
   };
+  void set_variables(const QJsonObject &vars) {
+    m_message_template.set_variables(vars);
+  }
 
-  const bases::HashAbleABC &message() override {
-    m_message_template.set_variables(m_variables);
+  const bases::GraphQLMessage &message() override {
     return m_message_template;
   };
 
@@ -93,5 +110,4 @@ public:
     emit error(errors);
   };
 };
-}; // namespace gqlwstransport
-} // namespace qtgql
+}; // namespace qtgql::bases

@@ -16,16 +16,6 @@ namespace qtgql::gqloverhttp {
 // graphql-transport-
 // https://github.com/enisdenjo/graphql-ws/blob/master/PROTOCOL.md
 
-struct PostQueryMessage : public bases::HashAbleABC {
-  QString query;
-  QString operationName;
-  std::optional<QJsonObject> variables;
-
-  explicit PostQueryMessage(QString _query, std::optional<QJsonObject> vars);
-
-  QJsonObject serialize() const override;
-};
-
 struct GraphQLResponse {
   std::optional<QJsonObject> data = {};
   std::optional<QJsonArray> errors = {};
@@ -53,8 +43,6 @@ public:
     setRawHeader("Content-Type", HTTP_ACCEPT);
   }
 };
-
-class GqlOverHttpHandler : public bases::HandlerABC {};
 
 class GqlOverHttpLayer : public QObject, public bases::NetworkLayer {
   Q_OBJECT

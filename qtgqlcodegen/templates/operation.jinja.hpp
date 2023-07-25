@@ -83,7 +83,7 @@ std::optional<👉 var.type.member_type 👈> 👉 var.name 👈 = {};
     }
 };
 
-class 👉 context.operation.name 👈: public qtgql::gqlwstransport::OperationHandlerABC{
+class 👉 context.operation.name 👈: public qtgql::bases::OperationHandlerABC{
     Q_OBJECT
     Q_PROPERTY(const 👉 context.operation.root_type.name 👈 * data READ data NOTIFY dataChanged);
     QML_ELEMENT
@@ -93,7 +93,7 @@ std::optional<👉 context.operation.root_type.name 👈 *> m_data = {};
 
 
 
-inline const QString &ENV_NAME() override{
+inline const QString &ENV_NAME() final{
     static const auto ret = QString("👉 context.config.env_name 👈");
     return ret;
     }
@@ -103,18 +103,14 @@ signals:
 public:
 👉 context.operation.generated_variables_type 👈 vars_inst;
 
-👉 context.operation.name 👈(): qtgql::gqlwstransport::OperationHandlerABC(qtgql::gqlwstransport::GqlWsTrnsMsgWithID(qtgql::gqlwstransport::OperationPayload(
+👉 context.operation.name 👈(): qtgql::bases::OperationHandlerABC(qtgql::bases::GraphQLMessage(
         {%- for line in context.operation.query.splitlines() %}"👉 line 👈"{% endfor -%}
-        ))){
-m_message_template.op_id = m_operation_id;
-};
+        )){};
 
 
 QTGQL_STATIC_MAKE_SHARED(👉 context.operation.name 👈)
 
-inline const QUuid & operation_id() const override{
-return m_operation_id;
-}
+
 
 
 void on_next(const QJsonObject &message) override{

@@ -8,8 +8,7 @@
 #include "QString"
 #include "objecttype.hpp"
 
-namespace qtgql {
-namespace bases {
+namespace qtgql::bases {
 using namespace std::chrono_literals;
 
 class NodeInstanceStore {
@@ -107,5 +106,4 @@ public:
   EnvCache *get_cache() { return m_cache.get(); }
 };
 
-} // namespace bases
-} // namespace qtgql
+} // namespace qtgql::bases

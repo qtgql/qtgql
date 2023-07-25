@@ -7,11 +7,13 @@
 #include <deque>
 #include <memory>
 #include <optional>
+#include <unordered_set>
 
 #include "qtgql/bases/bases.hpp"
 
-namespace qtgql {
-namespace gqlwstransport {
+#include "tools.hpp"
+
+namespace qtgql::gqlwstransport {
 
 // The WebSocket sub-protocol for this specification is: graphql-transport-
 // ws.
@@ -63,23 +65,6 @@ struct BaseGqlWsTrnsMsg : public bases::HashAbleABC {
   }
 };
 
-struct OperationPayload : public bases::HashAbleABC {
-  QString query;
-  QString operationName;
-
-  explicit OperationPayload(const QString &_query) : query{_query} {
-    auto op_name = utils::get_operation_name(query);
-    Q_ASSERT_X(op_name.has_value(), "OperationPayload",
-               "qtgql enforces operations to have names your query has no "
-               "operation name");
-    operationName = op_name.value();
-  };
-
-  QJsonObject serialize() const override {
-    return {{"operationName", operationName}, {"query", query}};
-  }
-};
-
 struct GqlWsTrnsMsgWithID : public BaseGqlWsTrnsMsg {
   QJsonArray errors;
   QUuid op_id;
@@ -92,14 +77,10 @@ struct GqlWsTrnsMsgWithID : public BaseGqlWsTrnsMsg {
     }
   }
 
-  explicit GqlWsTrnsMsgWithID(const OperationPayload &payload,
+  explicit GqlWsTrnsMsgWithID(const bases::GraphQLMessage &payload,
                               QUuid id = QUuid::createUuid())
       : BaseGqlWsTrnsMsg(PROTOCOL::SUBSCRIBE, payload.serialize()),
         op_id{id} {};
-
-  void set_variables(const QJsonObject &vars) { payload["variables"] = vars; }
-
-  const auto get_variables() { return payload.value("variables").toObject(); }
 
   bool has_errors() const { return !this->errors.isEmpty(); }
 
@@ -152,9 +133,9 @@ protected:
   QWebSocket m_ws;
   QWebSocketHandshakeOptions m_ws_options;
 
-  QMap<QUuid, std::shared_ptr<bases::HandlerABC>> m_handlers;
+  std::map<QUuid, std::shared_ptr<bases::HandlerABC>> m_handlers;
   // handlers that theirs execution was deferred due to connection issues.
-  QSet<std::shared_ptr<bases::HandlerABC>> m_pending_handlers;
+  std::unordered_set<std::shared_ptr<bases::HandlerABC>> m_pending_handlers;
 
   // general protocol handlers:
   void on_gql_ack();
@@ -202,5 +183,4 @@ public:
   void reconnect();
 };
 
-} // namespace gqlwstransport
-} // namespace qtgql
+} // namespace qtgql::gqlwstransport
