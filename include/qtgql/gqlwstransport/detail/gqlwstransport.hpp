@@ -11,8 +11,6 @@
 
 #include "qtgql/bases/bases.hpp"
 
-#include "tools.hpp"
-
 namespace qtgql::gqlwstransport {
 
 // The WebSocket sub-protocol for this specification is: graphql-transport-
