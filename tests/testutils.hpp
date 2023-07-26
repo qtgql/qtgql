@@ -9,6 +9,7 @@
 #include <QQuickView>
 
 #include <filesystem>
+#include <memory>
 
 #include "qtgql/bases/bases.hpp"
 #include "qtgql/gqlwstransport/gqlwstransport.hpp"
@@ -22,7 +23,8 @@ namespace fs = std::filesystem;
   }                                                                            \
   assert(cond);
 
-QString get_server_address(const QString &suffix = "graphql");
+QString get_server_address(const QString &suffix = "graphql", const QString& prefix = "ws");
+
 
 struct DebugClientSettings {
   bool handle_ack = true;
@@ -60,8 +62,11 @@ std::shared_ptr<DebugAbleWsNetworkLayer> get_valid_ws_client();
 
 namespace test_utils {
 using namespace std::chrono_literals;
+inline QString get_http_server_addr(const QString& suffix){
+    return get_server_address(suffix, "http");
+}
 void wait_for_completion(
-    const std::shared_ptr<bases::OperationHandlerABC> handler);
+    const std::shared_ptr<bases::OperationHandlerABC>& handler);
 class QCleanerObject : public QObject {};
 
 struct ModelSignalSpy {
@@ -135,4 +140,6 @@ struct QmlBot {
     delete qquick_view;
   }
 };
+
+
 }; // namespace test_utils

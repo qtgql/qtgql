@@ -43,7 +43,7 @@ public:
       setRawHeader(header.first, header.second);
     }
     setRawHeader("Accept", HTTP_ACCEPT);
-    setRawHeader("Content-Type", HTTP_ACCEPT);
+    setRawHeader("Content-Type", HTTP_CONTENT_TYPE);
   }
 };
 
@@ -52,19 +52,21 @@ class NetworkLayer : public QObject, public bases::NetworkLayerABC {
 protected:
   QUrl m_url;
   std::unique_ptr<QNetworkAccessManager> m_manager;
-  QMap<QString, QString> m_headers = {};
+    std::list<std::pair<QByteArray, QByteArray>> m_headers = {};
 
 public:
-  NetworkLayer(QUrl url, QMap<QString, QString> headers = {})
-      : QObject::QObject(nullptr), m_url(std::move(url)),
-        m_headers(std::move(headers)) {
+  NetworkLayer(QUrl url, std::map<std::string, std::string> headers = {})
+      : QObject::QObject(nullptr), m_url(std::move(url)){
+      for(const auto & kv: headers){
+          m_headers.emplace_front(QByteArray::fromStdString(kv.first), QByteArray::fromStdString(kv.second));
+      }
     m_manager = std::make_unique<QNetworkAccessManager>();
   }
   // execute a handler for execution.
   void execute(const std::shared_ptr<bases::HandlerABC> &handler) override {
     QJsonDocument data(handler->message().serialize());
     auto reply =
-        m_manager->post(_GraphQLRequest(m_url, {}), QByteArray(data.toJson()));
+        m_manager->post(_GraphQLRequest(m_url, m_headers), QByteArray(data.toJson()));
 
     QObject::connect(reply, &QNetworkReply::finished, [=]() {
       if (reply->error() == QNetworkReply::NoError) {

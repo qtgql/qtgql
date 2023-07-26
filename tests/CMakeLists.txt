@@ -6,8 +6,11 @@ set(TESTS_TARGET "test_qtgql")
 
 
 add_executable(${TESTS_TARGET} main.cpp ${TEST_SRCS} testutils.cpp testutils.hpp
-        test_customscalar.cpp test_networklayers/test_gqlwstransport.cpp
-        )
+        test_customscalar.cpp
+        test_networklayers/test_gqlwstransport.cpp
+        test_networklayers/test_graphql_over_http.cpp
+        test_networklayers/debughandler.hpp
+)
 include_directories(../tests)
 add_subdirectory(test_codegen/generated_test_projects)
 
