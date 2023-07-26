@@ -105,7 +105,7 @@ struct GqlWsTransportClientSettings {
   const QList<std::pair<QString, QString>> headers = {};
 };
 
-class GqlWsTransportClient : public QObject, public bases::NetworkLayer {
+class NetworkLayer : public QObject, public bases::NetworkLayerABC {
   Q_OBJECT
 
 private:
@@ -161,7 +161,7 @@ protected Q_SLOTS:
 public:
   inline static const QString SUB_PROTOCOL = "graphql-transport-ws";
 
-  explicit GqlWsTransportClient(const GqlWsTransportClientSettings &settings);
+  explicit NetworkLayer(const GqlWsTransportClientSettings &settings);
 
   void close(QWebSocketProtocol::CloseCode closeCode =
                  QWebSocketProtocol::CloseCodeNormal,

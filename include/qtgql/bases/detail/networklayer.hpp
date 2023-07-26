@@ -72,7 +72,7 @@ class that should  support executing handlers
  and expected to call the handler's `on_data` /
 `on_error` / 'on_completed' when the operation is completed.
 */
-struct NetworkLayer {
+struct NetworkLayerABC {
   virtual void execute(const std::shared_ptr<HandlerABC> &handler) {
     throw exceptions::NotImplementedError({});
   }

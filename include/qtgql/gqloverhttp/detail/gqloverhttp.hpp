@@ -10,6 +10,9 @@
 #include <QString>
 #include <optional>
 
+// Implementation of the GrapQL over HTTP protocol
+// https://graphql.github.io/graphql-over-http/draft/
+
 namespace qtgql::gqloverhttp {
 
 // The GraphQL over http sub-protocol for this specification is:
@@ -44,7 +47,7 @@ public:
   }
 };
 
-class GqlOverHttpLayer : public QObject, public bases::NetworkLayer {
+class NetworkLayer : public QObject, public bases::NetworkLayerABC {
   Q_OBJECT
 protected:
   QUrl m_url;
@@ -52,7 +55,7 @@ protected:
   QMap<QString, QString> m_headers = {};
 
 public:
-  GqlOverHttpLayer(QUrl url, QMap<QString, QString> headers = {})
+  NetworkLayer(QUrl url, QMap<QString, QString> headers = {})
       : QObject::QObject(nullptr), m_url(std::move(url)),
         m_headers(std::move(headers)) {
     m_manager = std::make_unique<QNetworkAccessManager>();

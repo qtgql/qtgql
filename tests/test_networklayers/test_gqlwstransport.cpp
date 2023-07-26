@@ -29,7 +29,7 @@ TEST_CASE("If ws not valid gql_valid=false", "[gqlwstransport][ws-client]") {
 
 TEST_CASE("If ack not received - gql is not valid",
           "[gqlwstransport][ws-client]") {
-  auto client = DebugAbleWsClient(DebugClientSettings{.handle_ack = false});
+  auto client = DebugAbleWsNetworkLayer(DebugClientSettings{.handle_ack = false});
   REQUIRE(QTest::qWaitFor([&]() { return client.is_valid(); }, 1000));
   std::ignore =
       QTest::qWaitFor([&]() -> bool { return client.gql_is_valid(); }, 200);
@@ -38,13 +38,13 @@ TEST_CASE("If ack not received - gql is not valid",
 
 TEST_CASE("Connection init is sent and receives ack",
           "[gqlwstransport][ws-client]") {
-  auto client = DebugAbleWsClient();
+  auto client = DebugAbleWsNetworkLayer();
   auto success = QTest::qWaitFor([&]() { return client.gql_is_valid(); }, 1000);
   REQUIRE(success);
 }
 
 TEST_CASE("Send ping receive pong", "[gqlwstransport][ws-client]") {
-  auto client = DebugAbleWsClient();
+  auto client = DebugAbleWsNetworkLayer();
   REQUIRE(QTest::qWaitFor([&]() { return client.gql_is_valid(); }, 1000));
   auto success =
       QTest::qWaitFor([&]() { return client.m_pong_received; }, 1000);
@@ -61,7 +61,7 @@ TEST_CASE("Subscribe to data (next message)", "[gqlwstransport][ws-client]") {
 
 TEST_CASE("execute via environment", "[gqlwstransport]") {
   auto env =
-      new bases::Environment("Sample env", std::make_unique<DebugAbleWsClient>());
+      new bases::Environment("Sample env", std::make_unique<DebugAbleWsNetworkLayer>());
   auto handler = std::make_shared<DebugHandler>(get_subscription_str());
   env->execute(handler);
   handler->wait_for_completed();
@@ -77,7 +77,7 @@ TEST_CASE("Subscribe get complete message on complete",
 }
 
 TEST_CASE("Ping timeout close connection", "[gqlwstransport][ws-client]") {
-  auto client = DebugAbleWsClient(
+  auto client = DebugAbleWsNetworkLayer(
       {.handle_pong = false,
        .prod_settings = {.url = get_server_address(), .ping_timeout = 500}});
   client.wait_for_valid();
@@ -86,7 +86,7 @@ TEST_CASE("Ping timeout close connection", "[gqlwstransport][ws-client]") {
 
 TEST_CASE("wont reconnect if reconnect is false",
           "[gqlwstransport][ws-client]") {
-  auto client = DebugAbleWsClient({.prod_settings = {.url = get_server_address(),
+  auto client = DebugAbleWsNetworkLayer({.prod_settings = {.url = get_server_address(),
                                                    .auto_reconnect = false}});
   client.wait_for_valid();
   client.close();
@@ -94,7 +94,7 @@ TEST_CASE("wont reconnect if reconnect is false",
 }
 
 TEST_CASE("Reconnection tests", "[gqlwstransport][ws-client]") {
-  auto client = DebugAbleWsClient(
+  auto client = DebugAbleWsNetworkLayer(
       {.prod_settings = {.url = get_server_address(), .auto_reconnect = true}});
   client.wait_for_valid();
   client.close();
@@ -114,7 +114,7 @@ TEST_CASE("Reconnection tests", "[gqlwstransport][ws-client]") {
 TEST_CASE("client can have headers and and authorize",
           "[gqlwstransport][ws-client]") {
   QString expected_ret = "The resolver will return this";
-  auto authorized_client = DebugAbleWsClient(
+  auto authorized_client = DebugAbleWsNetworkLayer(
       {.prod_settings = {.url = get_server_address(),
                          .headers = {{"Authorization", expected_ret}}}});
   authorized_client.wait_for_valid();

@@ -2,7 +2,7 @@
 
 namespace qtgql::gqlwstransport {
 
-GqlWsTransportClient::GqlWsTransportClient(
+NetworkLayer::NetworkLayer(
     const GqlWsTransportClientSettings &settings)
     : m_url{settings.url}, QObject::QObject(settings.parent) {
   m_ws = new QWebSocket();
@@ -12,28 +12,28 @@ GqlWsTransportClient::GqlWsTransportClient(
   if (settings.auto_reconnect) {
     m_reconnect_timer->setInterval(settings.reconnect_timeout);
     connect(m_reconnect_timer, &QTimer::timeout, this,
-            &GqlWsTransportClient::onReconnectTimeout);
+            &NetworkLayer::onReconnectTimeout);
   }
   m_ping_timer = new QTimer(this);
   m_ping_timer->setInterval(settings.ping_interval);
   connect(m_ping_timer, &QTimer::timeout, this,
-          &GqlWsTransportClient::onPingTimeout);
+          &NetworkLayer::onPingTimeout);
 
   m_ping_tester_timer = new QTimer(this);
   m_ping_tester_timer->setInterval(settings.ping_timeout);
   connect(m_ping_tester_timer, &QTimer::timeout, this,
-          &GqlWsTransportClient::onPingTesterTimeout);
+          &NetworkLayer::onPingTesterTimeout);
 
   m_ws_options = QWebSocketHandshakeOptions();
   m_ws_options.setSubprotocols(QList<QString>{
       this->SUB_PROTOCOL,
   });
   connect(m_ws, &QWebSocket::textMessageReceived, this,
-          &GqlWsTransportClient::onTextMessageReceived);
+          &NetworkLayer::onTextMessageReceived);
   connect(m_ws, &QWebSocket::connected, this,
-          &GqlWsTransportClient::onConnected);
+          &NetworkLayer::onConnected);
   connect(m_ws, &QWebSocket::disconnected, this,
-          &GqlWsTransportClient::onDisconnected);
+          &NetworkLayer::onDisconnected);
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 5, 0)
   connect(m_ws, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error),
@@ -41,7 +41,7 @@ GqlWsTransportClient::GqlWsTransportClient(
 #else
 
   connect(m_ws, &QWebSocket::errorOccurred, this,
-          &GqlWsTransportClient::onError);
+          &NetworkLayer::onError);
 #endif
 
   auto req = QNetworkRequest(m_url);
@@ -53,7 +53,7 @@ GqlWsTransportClient::GqlWsTransportClient(
   init_connection(req);
 }
 
-void GqlWsTransportClient::on_gql_next(const GqlWsTrnsMsgWithID &message) {
+void NetworkLayer::on_gql_next(const GqlWsTrnsMsgWithID &message) {
   if (message.has_payload()) {
     if (m_connected_handlers.contains(message.op_id)) {
       m_connected_handlers.at(message.op_id)->on_next(message.payload);
@@ -61,7 +61,7 @@ void GqlWsTransportClient::on_gql_next(const GqlWsTrnsMsgWithID &message) {
   }
 }
 
-void GqlWsTransportClient::on_gql_error(const GqlWsTrnsMsgWithID &message) {
+void NetworkLayer::on_gql_error(const GqlWsTrnsMsgWithID &message) {
   qWarning() << "GraphQL Error occurred on ID: " << message.op_id.toString();
   qWarning() << message.errors;
   if (message.has_errors()) {
@@ -71,7 +71,7 @@ void GqlWsTransportClient::on_gql_error(const GqlWsTrnsMsgWithID &message) {
   }
 }
 
-void GqlWsTransportClient::on_gql_complete(const GqlWsTrnsMsgWithID &message) {
+void NetworkLayer::on_gql_complete(const GqlWsTrnsMsgWithID &message) {
   if (m_connected_handlers.contains(message.op_id)) {
     auto handler = m_connected_handlers[message.op_id];
     handler->on_completed();
@@ -79,7 +79,7 @@ void GqlWsTransportClient::on_gql_complete(const GqlWsTrnsMsgWithID &message) {
   }
 }
 
-void GqlWsTransportClient::on_gql_ack() {
+void NetworkLayer::on_gql_ack() {
   send_message(DEF_MESSAGES::PING);
   m_ping_timer->start();
   m_ping_tester_timer->start();
@@ -99,33 +99,33 @@ void GqlWsTransportClient::on_gql_ack() {
   }
 }
 
-void GqlWsTransportClient::on_gql_pong() { m_ping_tester_timer->stop(); }
+void NetworkLayer::on_gql_pong() { m_ping_tester_timer->stop(); }
 
-void GqlWsTransportClient::on_gql_ping() { send_message(DEF_MESSAGES::PONG); }
+void NetworkLayer::on_gql_ping() { send_message(DEF_MESSAGES::PONG); }
 
-void GqlWsTransportClient::onReconnectTimeout() {
+void NetworkLayer::onReconnectTimeout() {
   if (!m_ws->isValid() || !m_connection_ack) {
     reconnect();
   }
 }
 
-void GqlWsTransportClient::onPingTimeout() {
+void NetworkLayer::onPingTimeout() {
   send_message(DEF_MESSAGES::PING);
   m_ping_tester_timer->start();
 }
 
-void GqlWsTransportClient::onPingTesterTimeout() {
+void NetworkLayer::onPingTesterTimeout() {
   qDebug() << "pong timeout reached, endpoint (" << m_url.toDisplayString()
            << ") did not send a pong the configured maximum delay";
   m_ws->close(QWebSocketProtocol::CloseCodeReserved1004);
   m_ping_tester_timer->stop();
 }
 
-void GqlWsTransportClient::send_message(const bases::HashAbleABC &message) {
+void NetworkLayer::send_message(const bases::HashAbleABC &message) {
   m_ws->sendTextMessage(QJsonDocument(message.serialize()).toJson());
 }
 
-void GqlWsTransportClient::onTextMessageReceived(const QString &message) {
+void NetworkLayer::onTextMessageReceived(const QString &message) {
   auto raw_data = QJsonDocument::fromJson(message.toUtf8());
   if (raw_data.isObject()) {
     auto data = raw_data.object();
@@ -154,7 +154,7 @@ void GqlWsTransportClient::onTextMessageReceived(const QString &message) {
   }
 }
 
-void GqlWsTransportClient::onConnected() {
+void NetworkLayer::onConnected() {
   qDebug() << "Connection established on url " << m_url.toDisplayString();
   send_message(DEF_MESSAGES::CONNECTION_INIT);
   if (m_reconnect_timer->isActive()) {
@@ -162,7 +162,7 @@ void GqlWsTransportClient::onConnected() {
   }
 }
 
-void GqlWsTransportClient::onDisconnected() {
+void NetworkLayer::onDisconnected() {
   m_connection_ack = false;
   qWarning() << "disconnected from " << m_url.toDisplayString()
              << "close code: " << m_ws->closeCode()
@@ -179,27 +179,27 @@ void GqlWsTransportClient::onDisconnected() {
   }
 }
 
-void GqlWsTransportClient::onError(const QAbstractSocket::SocketError &error) {
+void NetworkLayer::onError(const QAbstractSocket::SocketError &error) {
   qDebug() << "connection error occurred in " << typeid(this).name() << ": "
            << error;
 }
 
-void GqlWsTransportClient::init_connection(const QNetworkRequest &request) {
+void NetworkLayer::init_connection(const QNetworkRequest &request) {
   this->m_ws->open(request, this->m_ws_options);
 }
 
-void GqlWsTransportClient::close(QWebSocketProtocol::CloseCode closeCode,
-                                 const QString &reason) {
+void NetworkLayer::close(QWebSocketProtocol::CloseCode closeCode,
+                         const QString &reason) {
   m_ws->close(closeCode, reason);
 }
 // whether the web socket us connected.
-bool GqlWsTransportClient::is_valid() const { return m_ws->isValid(); }
+bool NetworkLayer::is_valid() const { return m_ws->isValid(); }
 
-bool GqlWsTransportClient::gql_is_valid() const {
+bool NetworkLayer::gql_is_valid() const {
   return is_valid() && m_connection_ack;
 }
 
-void GqlWsTransportClient::execute(
+void NetworkLayer::execute(
     const std::shared_ptr<bases::HandlerABC> &handler) {
   if (!m_connected_handlers.contains(handler->id)) {
     // if GQL_ACK and connected
@@ -213,7 +213,7 @@ void GqlWsTransportClient::execute(
   }
 }
 
-void GqlWsTransportClient::reconnect() {
+void NetworkLayer::reconnect() {
   this->m_ws->open(m_ws->request(), m_ws_options);
 }
 } // namespace qtgql::gqlwstransport

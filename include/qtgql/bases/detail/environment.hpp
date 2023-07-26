@@ -66,7 +66,7 @@ by the generated handlers based on the configurations.
 class Environment {
   typedef std::shared_ptr<Environment> SharedQtGqlEnv;
   //  using a ptr here since client is to be extended by implementors.
-  typedef std::unique_ptr<NetworkLayer> UniqueNetworkLayer;
+  typedef std::unique_ptr<NetworkLayerABC> UniqueNetworkLayer;
   typedef std::unique_ptr<EnvCache> UniqueCache;
 
   UniqueNetworkLayer m_network_layer;
@@ -99,7 +99,7 @@ public:
    * You would generally not be needed for this method.
    * Though it might be of use for testing purposes.
    */
-  [[nodiscard]] NetworkLayer *get_network_layer() const {
+  [[nodiscard]] NetworkLayerABC *get_network_layer() const {
     return m_network_layer.get();
   };
 
