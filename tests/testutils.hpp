@@ -32,7 +32,7 @@ struct DebugClientSettings {
       .url = get_server_address()};
 };
 
-class DebugAbleClient : public gqlwstransport::GqlWsTransportClient {
+class DebugAbleWsClient : public gqlwstransport::GqlWsTransportClient {
   void onTextMessageReceived(const QString &raw_message);
 
 public:
@@ -40,7 +40,7 @@ public:
   DebugClientSettings m_settings;
   QJsonObject m_current_message;
 
-  DebugAbleClient(DebugClientSettings settings = DebugClientSettings())
+  DebugAbleWsClient(DebugClientSettings settings = DebugClientSettings())
       : GqlWsTransportClient(settings.prod_settings), m_settings{settings} {};
   const void wait_for_valid() {
     if (!QTest::qWaitFor([&]() { return gql_is_valid(); }, 1000)) {
@@ -50,13 +50,13 @@ public:
   bool is_reconnect_timer_active() { return m_reconnect_timer->isActive(); }
   bool has_handler(const std::shared_ptr<bases::HandlerABC> &handler);
 
-  static DebugAbleClient *
+  static DebugAbleWsClient *
   from_environment(std::shared_ptr<bases::Environment> env) {
-    return dynamic_cast<DebugAbleClient *>(env->get_network_layer());
+    return dynamic_cast<DebugAbleWsClient *>(env->get_network_layer());
   };
 };
 
-std::shared_ptr<DebugAbleClient> get_valid_client();
+std::shared_ptr<DebugAbleWsClient> get_valid_ws_client();
 
 namespace test_utils {
 using namespace std::chrono_literals;

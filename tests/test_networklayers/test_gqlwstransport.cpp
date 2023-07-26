@@ -1,9 +1,4 @@
-#include <QTest>
-#include <catch2/catch_test_macros.hpp>
-
-#include "qtgql/bases/bases.hpp"
-#include "qtgql/gqlwstransport/gqlwstransport.hpp"
-#include "testutils.hpp"
+#include "debughandler.hpp"
 using namespace qtgql;
 
 QString get_subscription_str(bool raiseOn5 = false,
@@ -14,40 +9,6 @@ QString get_subscription_str(bool raiseOn5 = false,
       .arg(op_name, QString::number(target), ro5);
 }
 
-struct DefaultHandler : public bases::HandlerABC {
-  bases::GraphQLMessage m_message;
-  explicit DefaultHandler(const QString &query = get_subscription_str())
-      : m_message{bases::GraphQLMessage(query)} {
-    id = QUuid::createUuid();
-  };
-
-  QJsonArray m_errors;
-  QJsonObject m_data;
-  bool m_completed = false;
-  [[nodiscard]] const QUuid &operation_id() const { return id; }
-  void on_next(const QJsonObject &message) override {
-    // here we copy the message though generally user wouldn't do this as it
-    // would just use the reference to initialize some data
-    m_data = message["data"].toObject();
-  }
-
-  void on_error(const QJsonArray &errors) override { m_errors = errors; }
-  void on_completed() override { m_completed = true; }
-
-  const bases::GraphQLMessage &message() override { return m_message; }
-
-  bool wait_for_completed() const {
-    return QTest::qWaitFor([&]() -> bool { return m_completed; }, 1500);
-  }
-  [[nodiscard]] bool count_eq_9() const {
-    if (m_data.value("count").isDouble()) {
-      auto ret = m_data.value("count").toInt();
-      return ret == 9;
-    }
-    return false;
-  }
-};
-
 TEST_CASE("get operation name", "[gqlwstransport][ws-client]") {
   const QString operation_name = "SampleOperation";
   auto res_op_name =
@@ -57,7 +18,7 @@ TEST_CASE("get operation name", "[gqlwstransport][ws-client]") {
 };
 
 TEST_CASE("If ws not valid gql_valid=false", "[gqlwstransport][ws-client]") {
-  auto client = get_valid_client();
+  auto client = get_valid_ws_client();
   REQUIRE(QTest::qWaitFor([&]() { return client->gql_is_valid(); }, 1000));
   client->close();
 
@@ -68,7 +29,7 @@ TEST_CASE("If ws not valid gql_valid=false", "[gqlwstransport][ws-client]") {
 
 TEST_CASE("If ack not received - gql is not valid",
           "[gqlwstransport][ws-client]") {
-  auto client = DebugAbleClient(DebugClientSettings{.handle_ack = false});
+  auto client = DebugAbleWsClient(DebugClientSettings{.handle_ack = false});
   REQUIRE(QTest::qWaitFor([&]() { return client.is_valid(); }, 1000));
   std::ignore =
       QTest::qWaitFor([&]() -> bool { return client.gql_is_valid(); }, 200);
@@ -77,13 +38,13 @@ TEST_CASE("If ack not received - gql is not valid",
 
 TEST_CASE("Connection init is sent and receives ack",
           "[gqlwstransport][ws-client]") {
-  auto client = DebugAbleClient();
+  auto client = DebugAbleWsClient();
   auto success = QTest::qWaitFor([&]() { return client.gql_is_valid(); }, 1000);
   REQUIRE(success);
 }
 
 TEST_CASE("Send ping receive pong", "[gqlwstransport][ws-client]") {
-  auto client = DebugAbleClient();
+  auto client = DebugAbleWsClient();
   REQUIRE(QTest::qWaitFor([&]() { return client.gql_is_valid(); }, 1000));
   auto success =
       QTest::qWaitFor([&]() { return client.m_pong_received; }, 1000);
@@ -91,8 +52,8 @@ TEST_CASE("Send ping receive pong", "[gqlwstransport][ws-client]") {
 }
 
 TEST_CASE("Subscribe to data (next message)", "[gqlwstransport][ws-client]") {
-  auto client = get_valid_client();
-  auto handler = std::make_shared<DefaultHandler>();
+  auto client = get_valid_ws_client();
+  auto handler = std::make_shared<DebugHandler>(get_subscription_str());
   client->execute(handler);
   REQUIRE(
       QTest::qWaitFor([&]() -> bool { return handler->count_eq_9(); }, 1500));
@@ -100,23 +61,23 @@ TEST_CASE("Subscribe to data (next message)", "[gqlwstransport][ws-client]") {
 
 TEST_CASE("execute via environment", "[gqlwstransport]") {
   auto env =
-      new bases::Environment("Sample env", std::make_unique<DebugAbleClient>());
-  auto handler = std::make_shared<DefaultHandler>();
+      new bases::Environment("Sample env", std::make_unique<DebugAbleWsClient>());
+  auto handler = std::make_shared<DebugHandler>(get_subscription_str());
   env->execute(handler);
   handler->wait_for_completed();
 }
 
 TEST_CASE("Subscribe get complete message on complete",
           "[gqlwstransport][ws-client]") {
-  auto client = get_valid_client();
-  auto handler = std::make_shared<DefaultHandler>(get_subscription_str());
+  auto client = get_valid_ws_client();
+  auto handler = std::make_shared<DebugHandler>(get_subscription_str());
   REQUIRE(!handler->m_completed);
   client->execute(handler);
   REQUIRE(handler->wait_for_completed());
 }
 
 TEST_CASE("Ping timeout close connection", "[gqlwstransport][ws-client]") {
-  auto client = DebugAbleClient(
+  auto client = DebugAbleWsClient(
       {.handle_pong = false,
        .prod_settings = {.url = get_server_address(), .ping_timeout = 500}});
   client.wait_for_valid();
@@ -125,7 +86,7 @@ TEST_CASE("Ping timeout close connection", "[gqlwstransport][ws-client]") {
 
 TEST_CASE("wont reconnect if reconnect is false",
           "[gqlwstransport][ws-client]") {
-  auto client = DebugAbleClient({.prod_settings = {.url = get_server_address(),
+  auto client = DebugAbleWsClient({.prod_settings = {.url = get_server_address(),
                                                    .auto_reconnect = false}});
   client.wait_for_valid();
   client.close();
@@ -133,7 +94,7 @@ TEST_CASE("wont reconnect if reconnect is false",
 }
 
 TEST_CASE("Reconnection tests", "[gqlwstransport][ws-client]") {
-  auto client = DebugAbleClient(
+  auto client = DebugAbleWsClient(
       {.prod_settings = {.url = get_server_address(), .auto_reconnect = true}});
   client.wait_for_valid();
   client.close();
@@ -153,21 +114,21 @@ TEST_CASE("Reconnection tests", "[gqlwstransport][ws-client]") {
 TEST_CASE("client can have headers and and authorize",
           "[gqlwstransport][ws-client]") {
   QString expected_ret = "The resolver will return this";
-  auto authorized_client = DebugAbleClient(
+  auto authorized_client = DebugAbleWsClient(
       {.prod_settings = {.url = get_server_address(),
                          .headers = {{"Authorization", expected_ret}}}});
   authorized_client.wait_for_valid();
   auto handler =
-      std::make_shared<DefaultHandler>("query MyQuery {isAuthenticated}");
+      std::make_shared<DebugHandler>("query MyQuery {isAuthenticated}");
   authorized_client.execute(handler);
   REQUIRE(handler->wait_for_completed());
   REQUIRE(handler->m_data["isAuthenticated"] == expected_ret);
 }
 
 TEST_CASE("Handlers tests", "[gqlwstransport][handlers]") {
-  auto client = get_valid_client();
-  auto sub1 = std::make_shared<DefaultHandler>();
-  auto sub2 = std::make_shared<DefaultHandler>();
+  auto client = get_valid_ws_client();
+  auto sub1 = std::make_shared<DebugHandler>(get_subscription_str());
+  auto sub2 = std::make_shared<DebugHandler>(get_subscription_str());
   REQUIRE(sub1->operation_id() != sub2->operation_id());
 
   SECTION("executing handlers adds them to handlers map") {
@@ -206,7 +167,7 @@ TEST_CASE("Handlers tests", "[gqlwstransport][handlers]") {
 
   SECTION("gql operation error passes error to operation handler") {
     auto sub_with_error =
-        std::make_shared<DefaultHandler>(get_subscription_str(true));
+        std::make_shared<DebugHandler>(get_subscription_str(true));
     client->execute(sub_with_error);
     REQUIRE(QTest::qWaitFor(
         [&]() -> bool { return !sub_with_error->m_errors.isEmpty(); }));
@@ -217,9 +178,9 @@ TEST_CASE("Handlers tests", "[gqlwstransport][handlers]") {
 }
 TEST_CASE("Mutation and Query operations compatibility",
           "[gqlwstransport][handlers]") {
-  auto client = get_valid_client();
+  auto client = get_valid_ws_client();
   SECTION("mutation") {
-    auto mutation_handler = std::make_shared<DefaultHandler>(
+    auto mutation_handler = std::make_shared<DebugHandler>(
         "mutation TestMutation{pseudoMutation}");
     client->execute(mutation_handler);
     mutation_handler->wait_for_completed();
@@ -230,7 +191,7 @@ TEST_CASE("Mutation and Query operations compatibility",
 
   SECTION("query") {
     auto query_handler =
-        std::make_shared<DefaultHandler>("query TestQuery{hello}");
+        std::make_shared<DebugHandler>("query TestQuery{hello}");
     client->execute(query_handler);
     query_handler->wait_for_completed();
     REQUIRE(query_handler->m_data["hello"].toString() == "world");
@@ -238,8 +199,8 @@ TEST_CASE("Mutation and Query operations compatibility",
 }
 
 TEST_CASE("Test variables", "[gqlwstransport][handlers]") {
-  auto client = get_valid_client();
-  auto sub1 = std::make_shared<DefaultHandler>(
+  auto client = get_valid_ws_client();
+  auto sub1 = std::make_shared<DebugHandler>(
       QString("subscription Sub1($target: Int!, $raiseOn5: Boolean = false) {\n"
               "  count(target: $target, raiseOn5: $raiseOn5)\n"
               "}"));

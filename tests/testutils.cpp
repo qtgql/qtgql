@@ -12,18 +12,18 @@ QString get_server_address(const QString &suffix) {
   return addr + suffix;
 }
 
-std::shared_ptr<DebugAbleClient> get_valid_client() {
-  auto client = std::make_shared<DebugAbleClient>();
+std::shared_ptr<DebugAbleWsClient> get_valid_ws_client() {
+  auto client = std::make_shared<DebugAbleWsClient>();
   client->wait_for_valid();
   return client;
 }
 
-bool DebugAbleClient::has_handler(
+bool DebugAbleWsClient::has_handler(
     const std::shared_ptr<bases::HandlerABC> &handler) {
   return m_connected_handlers.contains(handler->id);
 }
 
-void DebugAbleClient::onTextMessageReceived(const QString &raw_message) {
+void DebugAbleWsClient::onTextMessageReceived(const QString &raw_message) {
   auto raw_data = QJsonDocument::fromJson(raw_message.toUtf8());
   if (raw_data.isObject()) {
     auto data = raw_data.object();
@@ -76,11 +76,11 @@ get_or_create_env(const QString &env_name, const DebugClientSettings &settings,
     auto env_ = std::make_shared<bases::Environment>(
         env_name,
         std::unique_ptr<qtgql::gqlwstransport::GqlWsTransportClient>(
-            new DebugAbleClient(settings)),
+            new DebugAbleWsClient(settings)),
         std::unique_ptr<qtgql::bases::EnvCache>(
             new qtgql::bases::EnvCache{{cache_dur}}));
     bases::Environment::set_gql_env(env_);
-    DebugAbleClient::from_environment(env_)->wait_for_valid();
+    DebugAbleWsClient::from_environment(env_)->wait_for_valid();
     env = bases::Environment::get_env(env_name);
   }
   return env.value();
