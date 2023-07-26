@@ -20,7 +20,7 @@ std::shared_ptr<DebugAbleClient> get_valid_client() {
 
 bool DebugAbleClient::has_handler(
     const std::shared_ptr<bases::HandlerABC> &handler) {
-  return m_handlers.contains(handler->id);
+  return m_connected_handlers.contains(handler->id);
 }
 
 void DebugAbleClient::onTextMessageReceived(const QString &raw_message) {

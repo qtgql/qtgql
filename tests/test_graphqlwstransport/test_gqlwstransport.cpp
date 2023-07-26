@@ -200,6 +200,7 @@ TEST_CASE("Handlers tests", "[gqlwstransport][handlers]") {
     REQUIRE(!sub1->m_completed);
     client->execute(sub1);
     client->reconnect();
+    REQUIRE(QTest::qWaitFor([&]() { return client->gql_is_valid(); }));
     REQUIRE(sub1->wait_for_completed());
   }
 

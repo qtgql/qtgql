@@ -126,10 +126,10 @@ protected:
   QTimer *m_reconnect_timer;
   QTimer *m_ping_timer;
   QTimer *m_ping_tester_timer;
-  QWebSocket m_ws;
+  QWebSocket *m_ws;
   QWebSocketHandshakeOptions m_ws_options;
 
-  std::map<QUuid, std::shared_ptr<bases::HandlerABC>> m_handlers;
+  std::map<QUuid, std::shared_ptr<bases::HandlerABC>> m_connected_handlers;
   // handlers that theirs execution was deferred due to connection issues.
   std::unordered_set<std::shared_ptr<bases::HandlerABC>> m_pending_handlers;
 
