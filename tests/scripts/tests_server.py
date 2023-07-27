@@ -84,6 +84,8 @@ class DebugHttpHandler(AioHTTPRequestAdapter):
         print(ret) # noqa
         return ret
 
+
+
 class DebugGqlView(GraphQLView):
     graphql_transport_ws_handler_class = DebugGraphQLTransportWSHandler
     request_adapter_class = DebugHttpHandler

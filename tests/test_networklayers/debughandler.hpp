@@ -19,10 +19,10 @@ struct DebugHandler : public bases::HandlerABC {
     QJsonObject m_data;
     bool m_completed = false;
     [[nodiscard]] const QUuid &operation_id() const { return id; }
-    void on_next(const QJsonObject &message) override {
+    void on_next(const QJsonObject &data) override {
         // here we copy the message though generally user wouldn't do this as it
         // would just use the reference to initialize some data
-        m_data = message["data"].toObject();
+        m_data = data;
     }
 
     void on_error(const QJsonArray &errors) override { m_errors = errors; }

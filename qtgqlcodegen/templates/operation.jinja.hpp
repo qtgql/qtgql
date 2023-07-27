@@ -113,15 +113,14 @@ QTGQL_STATIC_MAKE_SHARED(👉 context.operation.name 👈)
 
 
 
-void on_next(const QJsonObject &message) override{
-    auto data = message.value("data").toObject();
+void on_next(const QJsonObject &data_) override{
     if (!m_data){
-        👉 context.operation.root_type.updater_name👈(👉 context.operation.root_type.concrete.name👈::instance(), data, this);
+        👉 context.operation.root_type.updater_name👈(👉 context.operation.root_type.concrete.name👈::instance(), data_, this);
         m_data = new 👉 context.operation.root_type.name👈(this);
         emit dataChanged();
     }
     else{
-        👉 context.operation.root_type.updater_name👈(👉 context.operation.root_type.concrete.name👈::instance(), data, this);
+        👉 context.operation.root_type.updater_name👈(👉 context.operation.root_type.concrete.name👈::instance(), data_, this);
     }
 }
 

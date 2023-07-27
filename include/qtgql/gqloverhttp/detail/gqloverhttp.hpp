@@ -80,7 +80,7 @@ public:
   };
   static void process_reply(const QByteArray &raw_data,
                             const std::shared_ptr<bases::HandlerABC> &handler) {
-    auto response = GraphQLResponse(QJsonDocument::fromJson(raw_data).object());
+      auto response = GraphQLResponse(QJsonDocument::fromJson(raw_data).object());
     if (response.errors.has_value()) {
       handler->on_error(response.errors.value());
     };

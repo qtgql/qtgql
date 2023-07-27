@@ -56,7 +56,7 @@ NetworkLayer::NetworkLayer(
 void NetworkLayer::on_gql_next(const GqlWsTrnsMsgWithID &message) {
   if (message.has_payload()) {
     if (m_connected_handlers.contains(message.op_id)) {
-      m_connected_handlers.at(message.op_id)->on_next(message.payload);
+      m_connected_handlers.at(message.op_id)->on_next(message.payload.value("data").toObject());
     }
   }
 }

@@ -14,9 +14,7 @@ TEST_CASE("test_fetch", "[graphql-over-http]"){
         auto handler = std::make_shared<DebugHandler>("query HelloWorld{hello}");
         client->execute(handler);
         handler->wait_for_completed();
-        qDebug() << handler->m_data;
-        REQUIRE(handler->m_data.contains("data"));
-
+        REQUIRE(handler->m_data.value("hello").toString().toStdString() == "world");
     }
 
 }
