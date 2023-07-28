@@ -122,7 +122,7 @@ TEST_CASE("client can have headers and and authorize",
       std::make_shared<DebugHandler>("query MyQuery {isAuthenticated}");
   authorized_client.execute(handler);
   REQUIRE(handler->wait_for_completed());
-  REQUIRE(handler->m_data["isAuthenticated"] == expected_ret);
+  REQUIRE(handler->m_data["isAuthenticated"].toString().toStdString() == expected_ret.toStdString());
 }
 
 TEST_CASE("Handlers tests", "[gqlwstransport][handlers]") {
