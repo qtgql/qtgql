@@ -28,7 +28,7 @@ struct DebugHandler : public bases::HandlerABC {
 
   const bases::GraphQLMessage &message() override { return m_message; }
 
-  bool wait_for_completed() const {
+  [[nodiscard]] bool wait_for_completed() const {
     return QTest::qWaitFor([&]() -> bool { return m_completed; }, 1500);
   }
   // TODO: move this out of here.
@@ -40,3 +40,11 @@ struct DebugHandler : public bases::HandlerABC {
     return false;
   }
 };
+
+inline QString get_subscription_str(bool raiseOn5 = false,
+                                    const QString &op_name = "defaultOpName",
+                                    int target = 10) {
+  QString ro5 = raiseOn5 ? "true" : "false";
+  return QString("subscription %1 {count(target: %2, raiseOn5: %3) }")
+      .arg(op_name, QString::number(target), ro5);
+}

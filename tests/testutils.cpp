@@ -5,7 +5,7 @@ using namespace qtgql;
 
 QString get_server_address(const QString &suffix, const QString &prefix) {
   auto env_addr = getenv("SCHEMAS_SERVER_ADDR");
-  QString addr = prefix + "://localhost:9000/";
+  QString addr = "://localhost:9000/";
   if (env_addr) {
     addr = QString::fromUtf8(env_addr);
   }
