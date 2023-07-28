@@ -13,4 +13,17 @@ TEST_CASE("test_fetch", "[graphql-over-http]") {
     handler->wait_for_completed();
     REQUIRE(handler->m_data.value("hello").toString().toStdString() == "world");
   }
+
+  SECTION("test error") {
+    auto handler =
+        std::make_shared<DebugHandler>("query HelloWorld{raiseError}");
+    client->execute(handler);
+    handler->wait_for_completed();
+    qDebug() << handler->m_errors;
+    REQUIRE(handler->m_errors.first()
+                .toObject()
+                .value("message")
+                .toString()
+                .toStdString() == "foobar");
+  }
 }

@@ -52,6 +52,10 @@ class Query:
     def apples(self) -> list[Apple]:
         return [Apple(worms=[Worm() for _ in range(5)] if fake.pybool() else []) for _ in range(30)]
 
+    @strawberry.field()
+    def raiseError(self) -> None:
+        raise Exception("foobar")
+
 
 @strawberry.type
 class Mutation:

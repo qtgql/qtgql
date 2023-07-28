@@ -55,7 +55,8 @@ protected:
   std::list<std::pair<QByteArray, QByteArray>> m_headers = {};
 
 public:
-  NetworkLayer(QUrl url, std::map<std::string, std::string> headers = {})
+  explicit NetworkLayer(QUrl url,
+                        const std::map<std::string, std::string> &headers = {})
       : QObject::QObject(nullptr), m_url(std::move(url)) {
     for (const auto &kv : headers) {
       m_headers.emplace_front(QByteArray::fromStdString(kv.first),
@@ -87,9 +88,9 @@ public:
     };
     if (response.data.has_value()) {
       handler->on_next(response.data.value());
-      // Http over GraphQL has only one response per request.
-      handler->on_completed();
     }
+    // Http over GraphQL has only one response per request.
+    handler->on_completed();
   };
 };
 
