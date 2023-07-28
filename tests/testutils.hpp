@@ -34,7 +34,7 @@ struct DebugClientSettings {
       .url = get_server_address()};
 };
 
-class DebugAbleWsNetworkLayer : public gqlwstransport::NetworkLayer {
+class DebugAbleWsNetworkLayer : public gqlwstransport::GqlWsTransport {
   void onTextMessageReceived(const QString &raw_message);
 
 public:
@@ -43,7 +43,7 @@ public:
   QJsonObject m_current_message;
 
   DebugAbleWsNetworkLayer(DebugClientSettings settings = DebugClientSettings())
-      : NetworkLayer(settings.prod_settings), m_settings{settings} {};
+      : GqlWsTransport(settings.prod_settings), m_settings{settings} {};
   const void wait_for_valid() {
     if (!QTest::qWaitFor([&]() { return gql_is_valid(); }, 1000)) {
       throw "Client could not connect to the GraphQL server";

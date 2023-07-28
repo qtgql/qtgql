@@ -55,7 +55,7 @@ void DebugAbleWsNetworkLayer::onTextMessageReceived(
       }
     }
   }
-  NetworkLayer::onTextMessageReceived(raw_message);
+  GqlWsTransport::onTextMessageReceived(raw_message);
 }
 
 namespace test_utils {
@@ -76,7 +76,7 @@ get_or_create_env(const QString &env_name, const DebugClientSettings &settings,
   if (!env.has_value()) {
     auto env_ = std::make_shared<bases::Environment>(
         env_name,
-        std::unique_ptr<qtgql::gqlwstransport::NetworkLayer>(
+        std::unique_ptr<qtgql::gqlwstransport::GqlWsTransport>(
             new DebugAbleWsNetworkLayer(settings)),
         std::unique_ptr<qtgql::bases::EnvCache>(
             new qtgql::bases::EnvCache{{cache_dur}}));

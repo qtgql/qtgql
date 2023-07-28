@@ -47,7 +47,7 @@ public:
   }
 };
 
-class NetworkLayer : public QObject, public bases::NetworkLayerABC {
+class GraphQLOverHttp : public QObject, public bases::NetworkLayerABC {
   Q_OBJECT
 protected:
   QUrl m_url;
@@ -55,8 +55,8 @@ protected:
   std::list<std::pair<QByteArray, QByteArray>> m_headers = {};
 
 public:
-  explicit NetworkLayer(QUrl url,
-                        const std::map<std::string, std::string> &headers = {})
+  explicit GraphQLOverHttp(
+      QUrl url, const std::map<std::string, std::string> &headers = {})
       : QObject::QObject(nullptr), m_url(std::move(url)) {
     for (const auto &kv : headers) {
       m_headers.emplace_front(QByteArray::fromStdString(kv.first),

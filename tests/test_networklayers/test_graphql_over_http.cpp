@@ -4,8 +4,8 @@
 using namespace qtgql;
 
 TEST_CASE("test_fetch", "[graphql-over-http]") {
-  auto client =
-      std::unique_ptr<gqloverhttp::NetworkLayer>{new gqloverhttp::NetworkLayer(
+  auto client = std::unique_ptr<gqloverhttp::GraphQLOverHttp>{
+      new gqloverhttp::GraphQLOverHttp(
           test_utils::get_http_server_addr("graphql"), {})};
   SECTION("test simple query") {
     auto handler = std::make_shared<DebugHandler>("query HelloWorld{hello}");
