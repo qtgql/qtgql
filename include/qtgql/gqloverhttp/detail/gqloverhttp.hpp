@@ -58,12 +58,17 @@ public:
   explicit GraphQLOverHttp(
       QUrl url, const std::map<std::string, std::string> &headers = {})
       : QObject::QObject(nullptr), m_url(std::move(url)) {
+    set_headers(headers);
+    m_manager = std::make_unique<QNetworkAccessManager>();
+  }
+  inline void set_headers(const std::map<std::string, std::string> &headers) {
+    m_headers.clear();
     for (const auto &kv : headers) {
       m_headers.emplace_front(QByteArray::fromStdString(kv.first),
                               QByteArray::fromStdString(kv.second));
     }
-    m_manager = std::make_unique<QNetworkAccessManager>();
   }
+
   // execute a handler for execution.
   void execute(const std::shared_ptr<bases::HandlerABC> &handler) override {
     QJsonDocument data(handler->message().serialize());

@@ -26,4 +26,15 @@ TEST_CASE("test_fetch", "[graphql-over-http]") {
                 .toString()
                 .toStdString() == "foobar");
   }
+
+  SECTION("test headers") {
+    std::string expected_ret = "The resolver will return this";
+    client->set_headers({{"Authorization", expected_ret}});
+    auto handler =
+        std::make_shared<DebugHandler>("query MyQuery {isAuthenticated}");
+    client->execute(handler);
+    REQUIRE(handler->wait_for_completed());
+    REQUIRE(handler->m_data["isAuthenticated"].toString().toStdString() ==
+            expected_ret);
+  }
 }
