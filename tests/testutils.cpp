@@ -9,7 +9,7 @@ QString get_server_address(const QString &suffix, const QString &prefix) {
   if (env_addr) {
     addr = QString::fromUtf8(env_addr);
   }
-  return addr + suffix;
+  return prefix + addr + suffix;
 }
 
 std::shared_ptr<DebugAbleWsNetworkLayer> get_valid_ws_client() {

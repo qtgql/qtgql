@@ -73,7 +73,7 @@ def schemas_server() -> MiniServer:
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
     )
-    address = f"ws://localhost:{port}/graphql"
+    address = f"://localhost:{port}/graphql"
     time.sleep(5)
     assert not p.poll(), p.stdout.read().decode("utf-8")
     ms = MiniServer(process=p, address=address, port=port)
