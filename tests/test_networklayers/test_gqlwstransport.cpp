@@ -29,7 +29,8 @@ TEST_CASE("If ws not valid gql_valid=false", "[gqlwstransport][ws-client]") {
 
 TEST_CASE("If ack not received - gql is not valid",
           "[gqlwstransport][ws-client]") {
-  auto client = DebugAbleWsNetworkLayer(DebugClientSettings{.handle_ack = false});
+  auto client =
+      DebugAbleWsNetworkLayer(DebugClientSettings{.handle_ack = false});
   REQUIRE(QTest::qWaitFor([&]() { return client.is_valid(); }, 1000));
   std::ignore =
       QTest::qWaitFor([&]() -> bool { return client.gql_is_valid(); }, 200);
@@ -60,8 +61,8 @@ TEST_CASE("Subscribe to data (next message)", "[gqlwstransport][ws-client]") {
 }
 
 TEST_CASE("execute via environment", "[gqlwstransport]") {
-  auto env =
-      new bases::Environment("Sample env", std::make_unique<DebugAbleWsNetworkLayer>());
+  auto env = new bases::Environment(
+      "Sample env", std::make_unique<DebugAbleWsNetworkLayer>());
   auto handler = std::make_shared<DebugHandler>(get_subscription_str());
   env->execute(handler);
   handler->wait_for_completed();
@@ -86,8 +87,9 @@ TEST_CASE("Ping timeout close connection", "[gqlwstransport][ws-client]") {
 
 TEST_CASE("wont reconnect if reconnect is false",
           "[gqlwstransport][ws-client]") {
-  auto client = DebugAbleWsNetworkLayer({.prod_settings = {.url = get_server_address(),
-                                                   .auto_reconnect = false}});
+  auto client =
+      DebugAbleWsNetworkLayer({.prod_settings = {.url = get_server_address(),
+                                                 .auto_reconnect = false}});
   client.wait_for_valid();
   client.close();
   REQUIRE(QTest::qWaitFor([&]() -> bool { return !client.is_valid(); }, 700));
@@ -122,7 +124,8 @@ TEST_CASE("client can have headers and and authorize",
       std::make_shared<DebugHandler>("query MyQuery {isAuthenticated}");
   authorized_client.execute(handler);
   REQUIRE(handler->wait_for_completed());
-  REQUIRE(handler->m_data["isAuthenticated"].toString().toStdString() == expected_ret.toStdString());
+  REQUIRE(handler->m_data["isAuthenticated"].toString().toStdString() ==
+          expected_ret.toStdString());
 }
 
 TEST_CASE("Handlers tests", "[gqlwstransport][handlers]") {
@@ -180,8 +183,8 @@ TEST_CASE("Mutation and Query operations compatibility",
           "[gqlwstransport][handlers]") {
   auto client = get_valid_ws_client();
   SECTION("mutation") {
-    auto mutation_handler = std::make_shared<DebugHandler>(
-        "mutation TestMutation{pseudoMutation}");
+    auto mutation_handler =
+        std::make_shared<DebugHandler>("mutation TestMutation{pseudoMutation}");
     client->execute(mutation_handler);
     mutation_handler->wait_for_completed();
     bool is_bool = mutation_handler->m_data["pseudoMutation"].isBool();

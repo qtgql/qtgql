@@ -8,4 +8,3 @@
     mutation InsertUser($at: Int!, $name: String!) {
       insertUser(at: $at, name: $name)
     }
-    

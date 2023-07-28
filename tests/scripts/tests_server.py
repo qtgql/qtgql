@@ -7,7 +7,7 @@ import strawberry
 from aiohttp import web
 from faker import Faker
 from strawberry.aiohttp.handlers import GraphQLTransportWSHandler
-from strawberry.aiohttp.views import GraphQLView, AioHTTPRequestAdapter
+from strawberry.aiohttp.views import AioHTTPRequestAdapter, GraphQLView
 
 from tests.conftest import hash_schema
 from tests.test_codegen.schemas import __all__ as all_schemas
@@ -78,17 +78,18 @@ class DebugGraphQLTransportWSHandler(GraphQLTransportWSHandler):
         print(f"message -> {message}")  # noqa
         await super().handle_message(message)
 
+
 class DebugHttpHandler(AioHTTPRequestAdapter):
     async def get_body(self) -> str:
         ret = await super().get_body()
-        print(ret) # noqa
+        print(ret)  # noqa
         return ret
-
 
 
 class DebugGqlView(GraphQLView):
     graphql_transport_ws_handler_class = DebugGraphQLTransportWSHandler
     request_adapter_class = DebugHttpHandler
+
 
 app = web.Application()
 app.router.add_route("*", "/graphql", DebugGqlView(schema=schema))

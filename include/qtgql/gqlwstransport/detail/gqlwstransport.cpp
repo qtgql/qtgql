@@ -2,8 +2,7 @@
 
 namespace qtgql::gqlwstransport {
 
-NetworkLayer::NetworkLayer(
-    const GqlWsTransportClientSettings &settings)
+NetworkLayer::NetworkLayer(const GqlWsTransportClientSettings &settings)
     : m_url{settings.url}, QObject::QObject(settings.parent) {
   m_ws = new QWebSocket();
   m_ws->setParent(this);
@@ -16,8 +15,7 @@ NetworkLayer::NetworkLayer(
   }
   m_ping_timer = new QTimer(this);
   m_ping_timer->setInterval(settings.ping_interval);
-  connect(m_ping_timer, &QTimer::timeout, this,
-          &NetworkLayer::onPingTimeout);
+  connect(m_ping_timer, &QTimer::timeout, this, &NetworkLayer::onPingTimeout);
 
   m_ping_tester_timer = new QTimer(this);
   m_ping_tester_timer->setInterval(settings.ping_timeout);
@@ -30,18 +28,15 @@ NetworkLayer::NetworkLayer(
   });
   connect(m_ws, &QWebSocket::textMessageReceived, this,
           &NetworkLayer::onTextMessageReceived);
-  connect(m_ws, &QWebSocket::connected, this,
-          &NetworkLayer::onConnected);
-  connect(m_ws, &QWebSocket::disconnected, this,
-          &NetworkLayer::onDisconnected);
+  connect(m_ws, &QWebSocket::connected, this, &NetworkLayer::onConnected);
+  connect(m_ws, &QWebSocket::disconnected, this, &NetworkLayer::onDisconnected);
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 5, 0)
   connect(m_ws, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error),
           this, &GqlWsTransportClient::onError);
 #else
 
-  connect(m_ws, &QWebSocket::errorOccurred, this,
-          &NetworkLayer::onError);
+  connect(m_ws, &QWebSocket::errorOccurred, this, &NetworkLayer::onError);
 #endif
 
   auto req = QNetworkRequest(m_url);
@@ -56,7 +51,8 @@ NetworkLayer::NetworkLayer(
 void NetworkLayer::on_gql_next(const GqlWsTrnsMsgWithID &message) {
   if (message.has_payload()) {
     if (m_connected_handlers.contains(message.op_id)) {
-      m_connected_handlers.at(message.op_id)->on_next(message.payload.value("data").toObject());
+      m_connected_handlers.at(message.op_id)
+          ->on_next(message.payload.value("data").toObject());
     }
   }
 }
@@ -199,8 +195,7 @@ bool NetworkLayer::gql_is_valid() const {
   return is_valid() && m_connection_ack;
 }
 
-void NetworkLayer::execute(
-    const std::shared_ptr<bases::HandlerABC> &handler) {
+void NetworkLayer::execute(const std::shared_ptr<bases::HandlerABC> &handler) {
   if (!m_connected_handlers.contains(handler->id)) {
     // if GQL_ACK and connected
     // send message and delete the pending handler it is now "connected".

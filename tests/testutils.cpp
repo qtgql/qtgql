@@ -3,13 +3,13 @@
 #include <memory>
 using namespace qtgql;
 
-QString get_server_address(const QString &suffix, const QString& prefix) {
-    auto env_addr = getenv("SCHEMAS_SERVER_ADDR");
-    QString addr = prefix + "://localhost:9000/";
-    if (env_addr) {
-        addr = QString::fromUtf8(env_addr);
-    }
-    return addr + suffix;
+QString get_server_address(const QString &suffix, const QString &prefix) {
+  auto env_addr = getenv("SCHEMAS_SERVER_ADDR");
+  QString addr = prefix + "://localhost:9000/";
+  if (env_addr) {
+    addr = QString::fromUtf8(env_addr);
+  }
+  return addr + suffix;
 }
 
 std::shared_ptr<DebugAbleWsNetworkLayer> get_valid_ws_client() {
@@ -23,7 +23,8 @@ bool DebugAbleWsNetworkLayer::has_handler(
   return m_connected_handlers.contains(handler->id);
 }
 
-void DebugAbleWsNetworkLayer::onTextMessageReceived(const QString &raw_message) {
+void DebugAbleWsNetworkLayer::onTextMessageReceived(
+    const QString &raw_message) {
   auto raw_data = QJsonDocument::fromJson(raw_message.toUtf8());
   if (raw_data.isObject()) {
     auto data = raw_data.object();

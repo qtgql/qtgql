@@ -52,7 +52,8 @@ TEST_CASE(
   typedef qtgql::bases::ListModelABC<ObjectType> ModelType;
 
   auto model_with_data = mq->data()->get_user()->m_friends;
-  auto raw_message = DebugAbleWsNetworkLayer::from_environment(env)->m_current_message;
+  auto raw_message =
+      DebugAbleWsNetworkLayer::from_environment(env)->m_current_message;
   auto raw_friends_list = raw_message.value("data")
                               .toObject()
                               .value("user")
