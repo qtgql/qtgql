@@ -9,9 +9,8 @@ from faker import Faker
 from strawberry.aiohttp.handlers import GraphQLTransportWSHandler
 from strawberry.aiohttp.views import AioHTTPRequestAdapter, GraphQLView
 
-from tests.conftest import hash_schema
-from tests.test_codegen.schemas import __all__ as all_schemas
 from tests.test_codegen.schemas.node_interface import Node
+from tests.test_codegen.testcases import implemented_testcases
 
 if TYPE_CHECKING:
     from strawberry.types import Info
@@ -79,14 +78,14 @@ schema = strawberry.Schema(query=Query, subscription=Subscription, mutation=Muta
 
 class DebugGraphQLTransportWSHandler(GraphQLTransportWSHandler):
     async def handle_message(self, message: dict):
-        print(f"message -> {message}")  # noqa
+        print(f"[{self._ws!r}-{self.testcase_name}] message -> {message}")  # noqa
         await super().handle_message(message)
 
 
 class DebugHttpHandler(AioHTTPRequestAdapter):
     async def get_body(self) -> str:
         ret = await super().get_body()
-        print(ret)  # noqa
+        print(f"[{self.request.rel_url}-{self.testcase_name}] message -> {ret}")  # noqa
         return ret
 
 
@@ -94,11 +93,22 @@ class DebugGqlView(GraphQLView):
     graphql_transport_ws_handler_class = DebugGraphQLTransportWSHandler
     request_adapter_class = DebugHttpHandler
 
+    def __init__(self, testcase_name: str, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.graphql_transport_ws_handler_class.testcase_name = testcase_name
+        self.request_adapter_class.testcase_name = testcase_name
+
 
 app = web.Application()
-app.router.add_route("*", "/graphql", DebugGqlView(schema=schema))
-for mod in all_schemas:
-    app.router.add_route("*", f"/{hash_schema(mod.schema)}", DebugGqlView(schema=mod.schema))
+app.router.add_route("*", "/graphql", DebugGqlView("main test schema", schema=schema))
+
+
+for tst_case in implemented_testcases:
+    app.router.add_route(
+        "*",
+        f"/{tst_case.test_name}",
+        DebugGqlView(tst_case.test_name, schema=tst_case.schema),
+    )
 
 
 def init_func(argv):

@@ -8,7 +8,7 @@ namespace NonNodeInterfaceTestCase {
 using namespace qtgql;
 
 auto ENV_NAME = QString("NonNodeInterfaceTestCase");
-auto SCHEMA_ADDR = get_server_address("32048780");
+auto SCHEMA_ADDR = get_server_address("NonNodeInterfaceTestCase");
 
 TEST_CASE("NonNodeInterfaceTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(

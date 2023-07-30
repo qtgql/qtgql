@@ -11,7 +11,7 @@ using namespace qtgql;
 
 auto ENV_NAME = QString("QmlUsageTestCase");
 
-auto SCHEMA_ADDR = get_server_address("46038122");
+auto SCHEMA_ADDR = get_server_address("QmlUsageTestCase");
 
 TEST_CASE("QmlUsageTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(

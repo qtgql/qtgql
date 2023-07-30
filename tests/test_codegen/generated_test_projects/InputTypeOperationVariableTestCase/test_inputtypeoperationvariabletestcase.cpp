@@ -8,7 +8,7 @@ namespace InputTypeOperationVariableTestCase {
 using namespace qtgql;
 
 auto ENV_NAME = QString("InputTypeOperationVariableTestCase");
-auto SCHEMA_ADDR = get_server_address("87625710");
+auto SCHEMA_ADDR = get_server_address("InputTypeOperationVariableTestCase");
 
 TEST_CASE("InputTypeOperationVariableTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(

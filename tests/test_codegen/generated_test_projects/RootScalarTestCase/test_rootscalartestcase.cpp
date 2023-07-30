@@ -7,7 +7,7 @@ namespace RootScalarTestCase {
 using namespace qtgql;
 
 auto ENV_NAME = QString("RootScalarTestCase");
-auto SCHEMA_ADDR = get_server_address("80354852");
+auto SCHEMA_ADDR = get_server_address("RootScalarTestCase");
 
 TEST_CASE("RootScalarTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(

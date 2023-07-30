@@ -21,8 +21,8 @@ TEST_CASE("If ws not valid gql_valid=false", "[gqlwstransport][ws-client]") {
 
 TEST_CASE("If ack not received - gql is not valid",
           "[gqlwstransport][ws-client]") {
-  auto client =
-      DebugAbleWsNetworkLayer(DebugClientSettings{.handle_ack = false});
+  auto client = DebugAbleWsNetworkLayer(
+      DebugClientSettings{.url = get_server_address(), .handle_ack = false});
   REQUIRE(QTest::qWaitFor([&]() { return client.is_valid(); }, 1000));
   std::ignore =
       QTest::qWaitFor([&]() -> bool { return client.gql_is_valid(); }, 200);
@@ -31,13 +31,13 @@ TEST_CASE("If ack not received - gql is not valid",
 
 TEST_CASE("Connection init is sent and receives ack",
           "[gqlwstransport][ws-client]") {
-  auto client = DebugAbleWsNetworkLayer();
+  auto client = DebugAbleWsNetworkLayer({.url = get_server_address()});
   auto success = QTest::qWaitFor([&]() { return client.gql_is_valid(); }, 1000);
   REQUIRE(success);
 }
 
 TEST_CASE("Send ping receive pong", "[gqlwstransport][ws-client]") {
-  auto client = DebugAbleWsNetworkLayer();
+  auto client = DebugAbleWsNetworkLayer({.url = get_server_address()});
   REQUIRE(QTest::qWaitFor([&]() { return client.gql_is_valid(); }, 1000));
   auto success =
       QTest::qWaitFor([&]() { return client.m_pong_received; }, 1000);

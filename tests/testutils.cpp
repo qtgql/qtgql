@@ -13,7 +13,8 @@ QString get_server_address(const QString &suffix, const QString &prefix) {
 }
 
 std::shared_ptr<DebugAbleWsNetworkLayer> get_valid_ws_client() {
-  auto client = std::make_shared<DebugAbleWsNetworkLayer>();
+  auto client = std::shared_ptr<DebugAbleWsNetworkLayer>(
+      new DebugAbleWsNetworkLayer({.url = get_server_address()}));
   client->wait_for_valid();
   return client;
 }
@@ -76,6 +77,8 @@ void wait_for_completion(
 std::shared_ptr<qtgql::bases::Environment>
 get_or_create_env(const QString &env_name, const DebugClientSettings &settings,
                   std::chrono::milliseconds cache_dur) {
+  auto a = env_name.toStdString();
+  qDebug() << a << "address: " << settings.prod_settings.url.toString();
   auto env = bases::Environment::get_env(env_name);
   if (!env.has_value()) {
     auto env_ = std::make_shared<bases::Environment>(

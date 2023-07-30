@@ -24,7 +24,7 @@ GqlTransportWs::GqlTransportWs(const GqlTransportWsClientSettings &settings)
 
   m_ws_options = QWebSocketHandshakeOptions();
   m_ws_options.setSubprotocols(QList<QString>{
-      this->SUB_PROTOCOL,
+      SUB_PROTOCOL,
   });
   connect(m_ws, &QWebSocket::textMessageReceived, this,
           &GqlTransportWs::onTextMessageReceived);
@@ -59,11 +59,14 @@ void GqlTransportWs::on_gql_next(const GqlTrnsWsMsgWithID &message) {
 }
 
 void GqlTransportWs::on_gql_error(const GqlTrnsWsMsgWithID &message) {
-  qWarning() << "GraphQL Error occurred on ID: " << message.op_id.toString();
-  qWarning() << message.errors;
   if (message.has_errors()) {
     if (m_connected_handlers.contains(message.op_id)) {
-      m_connected_handlers.at(message.op_id)->on_error(message.errors);
+      auto handler = m_connected_handlers.at(message.op_id);
+      qWarning() << "GraphQL Error occurred on operation"
+                 << handler->message().operationName
+                 << " ID: " << message.op_id.toString();
+      qWarning() << message.errors;
+      handler->on_error(message.errors);
     }
   }
 }
@@ -119,6 +122,7 @@ void GqlTransportWs::onPingTesterTimeout() {
 }
 
 void GqlTransportWs::send_message(const bases::HashAbleABC &message) {
+
   m_ws->sendTextMessage(QJsonDocument(message.serialize()).toJson());
 }
 
@@ -177,8 +181,8 @@ void GqlTransportWs::onDisconnected() {
 }
 
 void GqlTransportWs::onError(const QAbstractSocket::SocketError &error) {
-  qDebug() << "connection error occurred in " << typeid(this).name() << ": "
-           << error;
+  qWarning() << "connection error occurred in " << typeid(this).name() << ": "
+             << error;
 }
 
 void GqlTransportWs::init_connection(const QNetworkRequest &request) {

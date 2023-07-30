@@ -17,7 +17,6 @@ from qtgqlcodegen.generator import SchemaGenerator
 from qtgqlcodegen.types import CustomScalarDefinition
 from typer.testing import CliRunner
 
-from tests.conftest import hash_schema
 from tests.test_codegen import schemas
 from tests.test_codegen.utils import temp_cwd
 
@@ -135,7 +134,7 @@ class QtGqlTestCase:
 
     @cached_property
     def url_suffix(self):
-        return str(hash_schema(self.schema))
+        return self.test_name
 
     @contextlib.contextmanager
     def virtual_generate(self) -> None:
@@ -164,7 +163,7 @@ class QtGqlTestCase:
             )
         else:
             updated = re.sub(
-                'get_server_address\\("([0-9])*"\\)',
+                'get_server_address\\("([A-Za-z])*"\\)',
                 f'get_server_address("{self.url_suffix}")',
                 self.testcase_file.read_text("utf-8"),
             )
@@ -967,9 +966,9 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 if __name__ == "__main__":
     generate_testcases(
-        FragmentTestCase,
-        FragmentsOnInterfaceTestCase,
-        FragmentWithOperationVariable,
-        NodeUnionTestCase,
-        QmlUsageTestCase,
+        ScalarsTestCase,
+        NoIdOnQueryTestCase,
+        DateTimeTestCase,
+        DecimalTestCase,
+        DateTestCase,
     )

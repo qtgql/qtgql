@@ -1,22 +1,17 @@
 from __future__ import annotations
 
-import hashlib
 import os
 import platform
 import socket
 import subprocess
 import time
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 import mimesis
 import pytest
 from attrs import define
 from faker import Faker
 from mimesis.locales import Locale
-
-if TYPE_CHECKING:
-    from strawberry import Schema
 
 fake = Faker()
 
@@ -37,10 +32,6 @@ class factory:
 
 IS_WINDOWS = platform.system() == "Windows"
 IS_GITHUB_ACTION = os.environ.get("CI", False)
-
-
-def hash_schema(schema: Schema) -> int:
-    return int(hashlib.sha256(str(schema).encode("utf-8")).hexdigest(), 16) % 10**8
 
 
 @define

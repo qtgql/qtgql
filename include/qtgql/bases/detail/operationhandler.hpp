@@ -60,11 +60,6 @@ class OperationHandlerABC
 protected:
   GraphQLMessage m_message_template;
 
-  const std::shared_ptr<Environment> &environment() {
-    static auto m_env = Environment::get_env(ENV_NAME());
-    return m_env.value();
-  };
-
 public:
   explicit OperationHandlerABC(GraphQLMessage message)
       : _OperationHandlerABCSignals(), m_message_template(std::move(message)) {}
@@ -79,6 +74,9 @@ public:
   // abstract functions.
   virtual const QString &ENV_NAME() = 0;
   // end abstract functions.
+  std::shared_ptr<Environment> environment() {
+    return Environment::get_env(ENV_NAME()).value();
+  };
 
   void fetch() {
     if (!m_operation_on_the_fly && !m_completed) {
@@ -87,6 +85,7 @@ public:
       Q_ASSERT_X(a, "QtGqlOperationHandlerABC",
                  "Could not get a shared_ptr from `this` make sure to only "
                  "instantiate this with `std::make_shared`");
+
       environment()->execute(a);
     }
   }

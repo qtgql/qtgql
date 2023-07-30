@@ -8,7 +8,7 @@
 namespace OptionalNestedObjectTestCase {
 using namespace qtgql;
 auto ENV_NAME = QString("OptionalNestedObjectTestCase");
-auto SCHEMA_ADDR = get_server_address("45810550");
+auto SCHEMA_ADDR = get_server_address("OptionalNestedObjectTestCase");
 
 TEST_CASE("OptionalNestedObjectTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(

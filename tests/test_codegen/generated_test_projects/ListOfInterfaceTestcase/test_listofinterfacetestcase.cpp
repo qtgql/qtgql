@@ -10,7 +10,7 @@ namespace ListOfInterfaceTestcase {
 using namespace qtgql;
 
 auto ENV_NAME = QString("ListOfInterfaceTestcase");
-auto SCHEMA_ADDR = get_server_address("25272377");
+auto SCHEMA_ADDR = get_server_address("ListOfInterfaceTestcase");
 
 TEST_CASE("ListOfInterfaceTestcase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(

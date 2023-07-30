@@ -76,7 +76,7 @@ class Environment {
 
 public:
   // static members
-  static void set_gql_env(SharedQtGqlEnv env);
+  static void set_gql_env(const SharedQtGqlEnv &env);
   static std::optional<Environment::SharedQtGqlEnv>
   get_env(const QString &name);
   static Environment::SharedQtGqlEnv get_env_strict(const QString &name);

@@ -9,7 +9,7 @@
 namespace TimeScalarTestCase {
 using namespace qtgql;
 auto ENV_NAME = QString("TimeScalarTestCase");
-auto SCHEMA_ADDR = get_server_address("57016807");
+auto SCHEMA_ADDR = get_server_address("TimeScalarTestCase");
 
 TEST_CASE("TimeScalarTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(

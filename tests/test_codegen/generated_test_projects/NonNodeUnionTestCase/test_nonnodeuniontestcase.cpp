@@ -7,7 +7,7 @@ namespace NonNodeUnionTestCase {
 using namespace qtgql;
 
 auto ENV_NAME = QString("NonNodeUnionTestCase");
-auto SCHEMA_ADDR = get_server_address("48912056");
+auto SCHEMA_ADDR = get_server_address("NonNodeUnionTestCase");
 
 TEST_CASE("NonNodeUnionTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(

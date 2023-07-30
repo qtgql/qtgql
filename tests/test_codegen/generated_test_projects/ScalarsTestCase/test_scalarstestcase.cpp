@@ -11,7 +11,7 @@
 namespace ScalarsTestCase {
 using namespace qtgql;
 auto ENV_NAME = QString("ScalarsTestCase");
-auto SCHEMA_ADDR = get_server_address("76177312");
+auto SCHEMA_ADDR = get_server_address("ScalarsTestCase");
 
 TEST_CASE("ScalarsTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
@@ -52,15 +52,6 @@ TEST_CASE("ScalarsTestCase", "[generated-testcase]") {
   };
 };
 
-std::shared_ptr<ScalarsTestCase::User> get_shared_user() {
-  auto mq = std::make_shared<mainquery::MainQuery>();
-  mq->fetch();
-  test_utils::wait_for_completion(mq);
-  auto node_id = mq->data()->get_constUser()->get_id();
-  REQUIRE(mq.use_count() == 1);
-  return ScalarsTestCase::User::get_node(node_id).value();
-}
-
 TEST_CASE("Test GraphQLOverHttp as env") {
   auto env = bases::Environment::get_env(ENV_NAME);
   REQUIRE(!env.has_value());
@@ -86,6 +77,14 @@ TEST_CASE("Test GraphQLOverHttp as env") {
 }
 
 using namespace std::chrono_literals;
+std::shared_ptr<ScalarsTestCase::User> get_shared_user() {
+  auto mq = std::make_shared<mainquery::MainQuery>();
+  mq->fetch();
+  test_utils::wait_for_completion(mq);
+  auto node_id = mq->data()->get_constUser()->get_id();
+  REQUIRE(mq.use_count() == 1);
+  return ScalarsTestCase::User::get_node(node_id).value();
+}
 
 TEST_CASE("Test Garbage collection") {
 

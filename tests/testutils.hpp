@@ -27,13 +27,13 @@ QString get_server_address(const QString &suffix = "graphql",
                            const QString &prefix = "ws");
 
 struct DebugClientSettings {
+  QString url;
   bool handle_ack = true;
   bool handle_pong = true;
   bool print_debug = false;
+
   gqltransportws::GqlTransportWsClientSettings prod_settings = {
-      .url = get_server_address(),
-      .auto_reconnect = true,
-      .reconnect_timeout = 500};
+      .url = url, .auto_reconnect = true, .reconnect_timeout = 500};
 };
 
 class DebugAbleWsNetworkLayer : public gqltransportws::GqlTransportWs {
