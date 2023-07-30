@@ -39,20 +39,28 @@ TEST_CASE("NestedObjectTestCase", "[generated-testcase]") {
     REQUIRE(old_user->get_person()->get_name() == new_name);
   }
   SECTION("test update returned entirely new node") {
-    auto old_user = mq->data()->get_user();
+    auto user_inst_from_mq = mq->data()->get_user();
+    auto old_user_id = user_inst_from_mq->get_id();
+    auto old_person_name = user_inst_from_mq->get_person()->get_name();
+    auto old_person_id = user_inst_from_mq->get_person()->get_id();
     auto replace_person_op = replaceperson::ReplacePerson::shared();
-    replace_person_op->set_variables({old_user->get_id()});
+    replace_person_op->set_variables({old_user_id});
     replace_person_op->fetch();
-    auto catcher =
-        test_utils::SignalCatcher({.source_obj = old_user, .only = "person"});
+    // The current mechanism is to replace the instance with the new concrete.
+    auto catcher = test_utils::SignalCatcher(
+        {.source_obj = user_inst_from_mq->get_person(), .only = "name"});
     REQUIRE(catcher.wait());
 
     test_utils::wait_for_completion(replace_person_op);
     auto new_person =
         replace_person_op->data()->get_replacePerson()->get_person();
 
-    REQUIRE(old_user->get_person()->get_id() == new_person->get_id());
-    REQUIRE(old_user->get_person()->get_name() == new_person->get_name());
+    REQUIRE(new_person->get_id() != old_person_id);
+    REQUIRE(new_person->get_id() == user_inst_from_mq->get_person()->get_id());
+    REQUIRE(new_person->get_name().toStdString() !=
+            old_person_name.toStdString());
+    REQUIRE(new_person->get_name() ==
+            user_inst_from_mq->get_person()->get_name());
   }
 }
 
