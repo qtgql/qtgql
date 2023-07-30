@@ -25,7 +25,7 @@ class PATHS:
 
 class PersonFactory(mimesis.Person):
     def age(self, minimum: int = 0, maximum: int = 999999) -> int:
-        super().age(minimum, maximum)
+        return super().age(minimum, maximum)
 
 
 class factory:

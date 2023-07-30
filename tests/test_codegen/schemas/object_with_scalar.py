@@ -12,7 +12,7 @@ from tests.test_codegen.schemas.node_interface import Node
 @strawberry.type
 class User(Node):
     name: str = strawberry.field(default_factory=factory.person.name)
-    age: int = strawberry.field(default_factory=factory.person.age(0, 999999))
+    age: int = strawberry.field(default_factory=factory.person.age)
     age_point: float = strawberry.field(default_factory=factory.numeric.float_number)
     male: bool = strawberry.field(default_factory=factory.develop.boolean)
     id: strawberry.ID = strawberry.field(default_factory=lambda: strawberry.ID(uuid.uuid4().hex))
