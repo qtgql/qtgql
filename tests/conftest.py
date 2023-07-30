@@ -23,8 +23,13 @@ class PATHS:
     QTGQLCODEGEN_ROOT = PROJECT_ROOT / "qtgqlcodegen"
 
 
+class PersonFactory(mimesis.Person):
+    def age(self, minimum: int = 0, maximum: int = 999999) -> int:
+        super().age(minimum, maximum)
+
+
 class factory:
-    person = mimesis.Person(locale=Locale.DEFAULT)
+    person = PersonFactory(locale=Locale.DEFAULT)
     develop = mimesis.Development()
     numeric = mimesis.Numeric()
     text = mimesis.Text()
