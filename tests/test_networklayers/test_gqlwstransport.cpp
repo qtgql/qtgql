@@ -54,7 +54,9 @@ TEST_CASE("Subscribe to data (next message)", "[gqlwstransport][ws-client]") {
 
 TEST_CASE("execute via environment", "[gqlwstransport]") {
   auto env = new bases::Environment(
-      "Sample env", std::make_unique<DebugAbleWsNetworkLayer>());
+      "Sample env",
+      std::unique_ptr<DebugAbleWsNetworkLayer>(
+          new DebugAbleWsNetworkLayer({.url = get_server_address()})));
   auto handler = std::make_shared<DebugHandler>(get_subscription_str());
   env->execute(handler);
   handler->wait_for_completed();

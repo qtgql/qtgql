@@ -92,11 +92,6 @@ get_or_create_env(const QString &env_name, const DebugClientSettings &settings,
   return env.value();
 }
 
-void remove_env(const QString &env_name) {
-  if (bases::Environment::get_env(env_name).has_value())
-    bases::Environment::remove_env(
-        bases::Environment::get_env(env_name).value());
-};
 SignalCatcher::SignalCatcher(const SignalCatcherParams &params) {
   m_excludes = params.excludes;
   if (params.exclude_id) {
