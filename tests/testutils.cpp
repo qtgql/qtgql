@@ -87,7 +87,7 @@ get_or_create_env(const QString &env_name, const DebugClientSettings &settings,
             new qtgql::bases::EnvCache{{cache_dur}}));
     bases::Environment::set_gql_env(env_);
     DebugAbleWsNetworkLayer::from_environment(env_)->wait_for_valid();
-    env = bases::Environment::get_env(env_name);
+    return env_;
   }
   return env.value();
 }

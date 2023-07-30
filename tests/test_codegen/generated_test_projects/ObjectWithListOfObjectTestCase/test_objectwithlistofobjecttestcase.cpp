@@ -38,13 +38,10 @@ TEST_CASE("ObjectWithListOfObjectTestCase", "[generated-testcase]") {
   }
 }
 
-TEST_CASE(
-    "default ListModelABC modifications and operations (not specific to this "
-    "testcase)",
-    "") {
+TEST_CASE("default ListModelABC modifications and operations",
+          "[listmodel testcase]") {
   auto env = test_utils::get_or_create_env(
-      ENV_NAME, DebugClientSettings{.print_debug = true,
-                                    .prod_settings = {.url = SCHEMA_ADDR}});
+      ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = std::make_shared<mainquery::MainQuery>();
   mq->fetch();
   test_utils::wait_for_completion(mq);
