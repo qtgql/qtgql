@@ -80,6 +80,7 @@ public:
   static std::optional<Environment::SharedQtGqlEnv>
   get_env(const QString &name);
   static Environment::SharedQtGqlEnv get_env_strict(const QString &name);
+  static void remove_env(const SharedQtGqlEnv &env);
   // end static members
 
   const QString m_name;

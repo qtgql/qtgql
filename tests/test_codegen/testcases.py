@@ -212,6 +212,26 @@ ScalarsTestCase = QtGqlTestCase(
     test_name="ScalarsTestCase",
 )
 
+SimpleGarbageCollectionTestCase = QtGqlTestCase(
+    schema=schemas.object_with_scalar.schema,
+    operations=ScalarsTestCase.operations,
+    test_name="SimpleGarbageCollectionTestCase",
+    metadata=TestCaseMetadata(
+        should_test_updates=BoolWithReason.false("tested in scalar testcase"),
+        should_test_deserialization=BoolWithReason.false("tested in scalar testcase"),
+    ),
+)
+
+GqlOverHttpAsEnvTestCase = QtGqlTestCase(
+    schema=schemas.object_with_scalar.schema,
+    operations=ScalarsTestCase.operations,
+    test_name="GqlOverHttpAsEnvTestCase",
+    metadata=TestCaseMetadata(
+        should_test_updates=BoolWithReason.false("tested in scalar testcase"),
+        should_test_deserialization=BoolWithReason.false("tested in scalar testcase"),
+    ),
+)
+
 OptionalScalarsTestCase = QtGqlTestCase(
     schema=schemas.object_with_optional_scalar.schema,
     operations="""
@@ -895,6 +915,8 @@ QmlUsageTestCase = QtGqlTestCase(
 
 all_test_cases = [
     ScalarsTestCase,
+    SimpleGarbageCollectionTestCase,
+    GqlOverHttpAsEnvTestCase,
     OptionalScalarsTestCase,
     NoIdOnQueryTestCase,
     DateTimeTestCase,
@@ -927,6 +949,8 @@ all_test_cases = [
 
 implemented_testcases = [
     ScalarsTestCase,
+    SimpleGarbageCollectionTestCase,
+    GqlOverHttpAsEnvTestCase,
     NoIdOnQueryTestCase,
     DateTimeTestCase,
     DecimalTestCase,
@@ -966,9 +990,5 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 if __name__ == "__main__":
     generate_testcases(
-        ScalarsTestCase,
-        NoIdOnQueryTestCase,
-        DateTimeTestCase,
-        DecimalTestCase,
-        DateTestCase,
+        GqlOverHttpAsEnvTestCase,
     )

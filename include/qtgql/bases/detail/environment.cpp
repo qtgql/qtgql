@@ -47,6 +47,10 @@ Environment::SharedQtGqlEnv Environment::get_env_strict(const QString &name) {
   throw exceptions::EnvironmentNotFoundError(name.toStdString());
 }
 
+void Environment::remove_env(const Environment::SharedQtGqlEnv &env) {
+  ENV_MAP.remove(env->m_name);
+}
+
 EnvCache::EnvCache(const qtgql::bases::EnvCacheOptions &options)
     : QObject(nullptr) {
   m_gc_timer = new QTimer(this);

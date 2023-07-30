@@ -77,8 +77,6 @@ void wait_for_completion(
 std::shared_ptr<qtgql::bases::Environment>
 get_or_create_env(const QString &env_name, const DebugClientSettings &settings,
                   std::chrono::milliseconds cache_dur) {
-  auto a = env_name.toStdString();
-  qDebug() << a << "address: " << settings.prod_settings.url.toString();
   auto env = bases::Environment::get_env(env_name);
   if (!env.has_value()) {
     auto env_ = std::make_shared<bases::Environment>(
@@ -92,8 +90,13 @@ get_or_create_env(const QString &env_name, const DebugClientSettings &settings,
     env = bases::Environment::get_env(env_name);
   }
   return env.value();
-};
+}
 
+void remove_env(const QString &env_name) {
+  if (bases::Environment::get_env(env_name).has_value())
+    bases::Environment::remove_env(
+        bases::Environment::get_env(env_name).value());
+};
 SignalCatcher::SignalCatcher(const SignalCatcherParams &params) {
   m_excludes = params.excludes;
   if (params.exclude_id) {

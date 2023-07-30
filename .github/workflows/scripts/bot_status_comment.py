@@ -77,7 +77,10 @@ def get_testcases_context() -> TstCaseImplementationStatusTemplateContext:
             TstCaseStatus(
                 test=tc,
                 implemented=implemented,
-                deserialization=ImplementationStatus("test deserialize" in tst_content),
+                deserialization=ImplementationStatus(
+                    "test deserialize" in tst_content,
+                    ignored=not tc.metadata.should_test_updates,
+                ),
                 update=ImplementationStatus(
                     "test update" in tst_content,
                     ignored=not tc.metadata.should_test_updates,

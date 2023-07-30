@@ -98,6 +98,7 @@ struct SignalCatcherParams {
 std::shared_ptr<qtgql::bases::Environment>
 get_or_create_env(const QString &env_name, const DebugClientSettings &settings,
                   std::chrono::milliseconds cache_dur = 5s);
+void remove_env(const QString &env_name);
 
 class SignalCatcher {
   std::list<std::pair<QSignalSpy *, QString>> m_spys = {};
