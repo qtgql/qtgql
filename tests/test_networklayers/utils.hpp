@@ -28,8 +28,9 @@ struct DebugHandler : public bases::HandlerABC {
 
   const bases::GraphQLMessage &message() override { return m_message; }
 
-  [[nodiscard]] bool wait_for_completed() const {
-    return QTest::qWaitFor([&]() -> bool { return m_completed; }, 1500);
+  inline void wait_for_completed() const {
+    assert_m(QTest::qWaitFor([&]() -> bool { return m_completed; }, 1500),
+             "handler couldn't complete successfully.")
   }
   // TODO: move this out of here.
   [[nodiscard]] bool count_eq_9() const {

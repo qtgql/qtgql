@@ -66,7 +66,7 @@ TEST_CASE("Subscribe get complete message on complete",
   auto handler = std::make_shared<DebugHandler>(get_subscription_str());
   REQUIRE(!handler->m_completed);
   client->execute(handler);
-  REQUIRE(handler->wait_for_completed());
+  handler->wait_for_completed();
 }
 
 TEST_CASE("Ping timeout close connection", "[gqlwstransport][ws-client]") {
@@ -115,7 +115,7 @@ TEST_CASE("client can have headers and and authorize",
   auto handler =
       std::make_shared<DebugHandler>("query MyQuery {isAuthenticated}");
   authorized_client.execute(handler);
-  REQUIRE(handler->wait_for_completed());
+  handler->wait_for_completed();
   REQUIRE(handler->m_data["isAuthenticated"].toString().toStdString() ==
           expected_ret.toStdString());
 }
@@ -146,7 +146,7 @@ TEST_CASE("Handlers tests", "[gqlwstransport][handlers]") {
   SECTION("handler completed pops out of handlers vector") {
     client->execute(sub1);
     REQUIRE(client->has_handler(sub1));
-    REQUIRE(sub1->wait_for_completed());
+    sub1->wait_for_completed();
     REQUIRE(!client->has_handler(sub1));
   }
 
@@ -157,7 +157,7 @@ TEST_CASE("Handlers tests", "[gqlwstransport][handlers]") {
     client->execute(sub1);
     client->reconnect();
     REQUIRE(QTest::qWaitFor([&]() { return client->gql_is_valid(); }));
-    REQUIRE(sub1->wait_for_completed());
+    sub1->wait_for_completed();
   }
 
   SECTION("gql operation error passes error to operation handler") {

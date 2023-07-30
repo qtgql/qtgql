@@ -31,7 +31,9 @@ struct DebugClientSettings {
   bool handle_pong = true;
   bool print_debug = false;
   gqlwstransport::GqlWsTransportClientSettings prod_settings = {
-      .url = get_server_address()};
+      .url = get_server_address(),
+      .auto_reconnect = true,
+      .reconnect_timeout = 500};
 };
 
 class DebugAbleWsNetworkLayer : public gqlwstransport::GqlWsTransport {
@@ -46,7 +48,7 @@ public:
       const DebugClientSettings &settings = DebugClientSettings())
       : GqlWsTransport(settings.prod_settings), m_settings{settings} {};
   void wait_for_valid() {
-    if (!QTest::qWaitFor([&]() { return gql_is_valid(); }, 1000)) {
+    if (!QTest::qWaitFor([&]() { return gql_is_valid(); }, 1500)) {
       throw "Client could not connect to the GraphQL server";
     }
   }

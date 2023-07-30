@@ -33,7 +33,7 @@ TEST_CASE("test_fetch", "[graphql-over-http]") {
     auto handler =
         std::make_shared<DebugHandler>("query MyQuery {isAuthenticated}");
     client->execute(handler);
-    REQUIRE(handler->wait_for_completed());
+    handler->wait_for_completed();
     REQUIRE(handler->m_data["isAuthenticated"].toString().toStdString() ==
             expected_ret);
   }
