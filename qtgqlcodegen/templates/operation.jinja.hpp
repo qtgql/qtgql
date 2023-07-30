@@ -3,7 +3,7 @@
 {%- from "macros/update_proxy_field.jinja.cpp" import  update_proxy_field -%}
 #pragma once
 #include "./schema.hpp"
-#include <qtgql/gqlwstransport/gqlwstransport.hpp>
+#include <qtgql/bases/bases.hpp>
 #include <QObject>
 #include <QtQml/qqmlregistration.h>
 

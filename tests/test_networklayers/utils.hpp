@@ -3,20 +3,17 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "qtgql/bases/bases.hpp"
-#include "qtgql/gqlwstransport/gqlwstransport.hpp"
+#include "qtgql/gqltransportws/gqltransportws.hpp"
 #include "testutils.hpp"
 
 struct DebugHandler : public bases::HandlerABC {
   bases::GraphQLMessage m_message;
   explicit DebugHandler(const QString &query)
-      : m_message{bases::GraphQLMessage(query)} {
-    id = QUuid::createUuid();
-  };
+      : m_message{bases::GraphQLMessage(query)} {};
 
   QJsonArray m_errors;
   QJsonObject m_data;
   bool m_completed = false;
-  [[nodiscard]] const QUuid &operation_id() const { return id; }
   void on_next(const QJsonObject &data) override {
     // here we copy the message though generally user wouldn't do this as it
     // would just use the reference to initialize some data

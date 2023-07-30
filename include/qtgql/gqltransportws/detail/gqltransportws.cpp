@@ -1,8 +1,8 @@
-#include "gqlwstransport.hpp"
+#include "gqltransportws.hpp"
 
-namespace qtgql::gqlwstransport {
+namespace qtgql::gqltransportws {
 
-GqlWsTransport::GqlWsTransport(const GqlWsTransportClientSettings &settings)
+GqlTransportWs::GqlTransportWs(const GqlTransportWsClientSettings &settings)
     : m_url{settings.url}, QObject::QObject(settings.parent) {
   m_ws = new QWebSocket();
   m_ws->setParent(this);
@@ -11,33 +11,33 @@ GqlWsTransport::GqlWsTransport(const GqlWsTransportClientSettings &settings)
   if (settings.auto_reconnect) {
     m_reconnect_timer->setInterval(settings.reconnect_timeout);
     connect(m_reconnect_timer, &QTimer::timeout, this,
-            &GqlWsTransport::onReconnectTimeout);
+            &GqlTransportWs::onReconnectTimeout);
   }
   m_ping_timer = new QTimer(this);
   m_ping_timer->setInterval(settings.ping_interval);
-  connect(m_ping_timer, &QTimer::timeout, this, &GqlWsTransport::onPingTimeout);
+  connect(m_ping_timer, &QTimer::timeout, this, &GqlTransportWs::onPingTimeout);
 
   m_ping_tester_timer = new QTimer(this);
   m_ping_tester_timer->setInterval(settings.ping_timeout);
   connect(m_ping_tester_timer, &QTimer::timeout, this,
-          &GqlWsTransport::onPingTesterTimeout);
+          &GqlTransportWs::onPingTesterTimeout);
 
   m_ws_options = QWebSocketHandshakeOptions();
   m_ws_options.setSubprotocols(QList<QString>{
       this->SUB_PROTOCOL,
   });
   connect(m_ws, &QWebSocket::textMessageReceived, this,
-          &GqlWsTransport::onTextMessageReceived);
-  connect(m_ws, &QWebSocket::connected, this, &GqlWsTransport::onConnected);
+          &GqlTransportWs::onTextMessageReceived);
+  connect(m_ws, &QWebSocket::connected, this, &GqlTransportWs::onConnected);
   connect(m_ws, &QWebSocket::disconnected, this,
-          &GqlWsTransport::onDisconnected);
+          &GqlTransportWs::onDisconnected);
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 5, 0)
   connect(m_ws, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error),
           this, &GqlWsTransportClient::onError);
 #else
 
-  connect(m_ws, &QWebSocket::errorOccurred, this, &GqlWsTransport::onError);
+  connect(m_ws, &QWebSocket::errorOccurred, this, &GqlTransportWs::onError);
 #endif
 
   auto req = QNetworkRequest(m_url);
@@ -49,7 +49,7 @@ GqlWsTransport::GqlWsTransport(const GqlWsTransportClientSettings &settings)
   init_connection(req);
 }
 
-void GqlWsTransport::on_gql_next(const GqlWsTrnsMsgWithID &message) {
+void GqlTransportWs::on_gql_next(const GqlTrnsWsMsgWithID &message) {
   if (message.has_payload()) {
     if (m_connected_handlers.contains(message.op_id)) {
       m_connected_handlers.at(message.op_id)
@@ -58,7 +58,7 @@ void GqlWsTransport::on_gql_next(const GqlWsTrnsMsgWithID &message) {
   }
 }
 
-void GqlWsTransport::on_gql_error(const GqlWsTrnsMsgWithID &message) {
+void GqlTransportWs::on_gql_error(const GqlTrnsWsMsgWithID &message) {
   qWarning() << "GraphQL Error occurred on ID: " << message.op_id.toString();
   qWarning() << message.errors;
   if (message.has_errors()) {
@@ -68,7 +68,7 @@ void GqlWsTransport::on_gql_error(const GqlWsTrnsMsgWithID &message) {
   }
 }
 
-void GqlWsTransport::on_gql_complete(const GqlWsTrnsMsgWithID &message) {
+void GqlTransportWs::on_gql_complete(const GqlTrnsWsMsgWithID &message) {
   if (m_connected_handlers.contains(message.op_id)) {
     auto handler = m_connected_handlers[message.op_id];
     handler->on_completed();
@@ -76,7 +76,7 @@ void GqlWsTransport::on_gql_complete(const GqlWsTrnsMsgWithID &message) {
   }
 }
 
-void GqlWsTransport::on_gql_ack() {
+void GqlTransportWs::on_gql_ack() {
   send_message(DEF_MESSAGES::PING);
   m_ping_timer->start();
   m_ping_tester_timer->start();
@@ -85,10 +85,10 @@ void GqlWsTransport::on_gql_ack() {
   // If a handler was executed successfully we should remove it from
   // the set.
   while (i != m_pending_handlers.end()) {
-    const auto &handler = (*i);
-    qDebug() << "re-executing handler with id: " << handler->id;
-    execute(handler);
-    if (m_connected_handlers.contains(handler->id)) {
+    const auto &uuid_handler = (*i);
+    qDebug() << "re-executing handler with id: " << uuid_handler.first;
+    execute_impl(uuid_handler.first, uuid_handler.second);
+    if (m_connected_handlers.contains(uuid_handler.first)) {
       m_pending_handlers.erase(i++);
     } else {
       ++i;
@@ -96,39 +96,39 @@ void GqlWsTransport::on_gql_ack() {
   }
 }
 
-void GqlWsTransport::on_gql_pong() { m_ping_tester_timer->stop(); }
+void GqlTransportWs::on_gql_pong() { m_ping_tester_timer->stop(); }
 
-void GqlWsTransport::on_gql_ping() { send_message(DEF_MESSAGES::PONG); }
+void GqlTransportWs::on_gql_ping() { send_message(DEF_MESSAGES::PONG); }
 
-void GqlWsTransport::onReconnectTimeout() {
+void GqlTransportWs::onReconnectTimeout() {
   if (!m_ws->isValid() || !m_connection_ack) {
     reconnect();
   }
 }
 
-void GqlWsTransport::onPingTimeout() {
+void GqlTransportWs::onPingTimeout() {
   send_message(DEF_MESSAGES::PING);
   m_ping_tester_timer->start();
 }
 
-void GqlWsTransport::onPingTesterTimeout() {
+void GqlTransportWs::onPingTesterTimeout() {
   qDebug() << "pong timeout reached, endpoint (" << m_url.toDisplayString()
            << ") did not send a pong the configured maximum delay";
   m_ws->close(QWebSocketProtocol::CloseCodeReserved1004);
   m_ping_tester_timer->stop();
 }
 
-void GqlWsTransport::send_message(const bases::HashAbleABC &message) {
+void GqlTransportWs::send_message(const bases::HashAbleABC &message) {
   m_ws->sendTextMessage(QJsonDocument(message.serialize()).toJson());
 }
 
-void GqlWsTransport::onTextMessageReceived(const QString &message) {
+void GqlTransportWs::onTextMessageReceived(const QString &message) {
   auto raw_data = QJsonDocument::fromJson(message.toUtf8());
   if (raw_data.isObject()) {
     auto data = raw_data.object();
     if (data.contains("id")) {
       // Any that contains ID is directed to a single handler.
-      auto message = GqlWsTrnsMsgWithID(data);
+      auto message = GqlTrnsWsMsgWithID(data);
       auto message_type = message.type;
       if (message_type == PROTOCOL::NEXT) {
         on_gql_next(message);
@@ -138,7 +138,7 @@ void GqlWsTransport::onTextMessageReceived(const QString &message) {
         on_gql_complete(message);
       }
     } else {
-      auto message = BaseGqlWsTrnsMsg(data);
+      auto message = BaseGqlTrnsWsMsg(data);
       auto message_type = message.type;
       if (message_type == PROTOCOL::CONNECTION_ACK) {
         on_gql_ack();
@@ -151,7 +151,7 @@ void GqlWsTransport::onTextMessageReceived(const QString &message) {
   }
 }
 
-void GqlWsTransport::onConnected() {
+void GqlTransportWs::onConnected() {
   qDebug() << "Connection established on url " << m_url.toDisplayString();
   send_message(DEF_MESSAGES::CONNECTION_INIT);
   if (m_reconnect_timer->isActive()) {
@@ -159,7 +159,7 @@ void GqlWsTransport::onConnected() {
   }
 }
 
-void GqlWsTransport::onDisconnected() {
+void GqlTransportWs::onDisconnected() {
   m_connection_ack = false;
   qWarning() << "disconnected from " << m_url.toDisplayString()
              << "close code: " << m_ws->closeCode()
@@ -167,7 +167,7 @@ void GqlWsTransport::onDisconnected() {
   m_ping_timer->stop();
   m_ping_tester_timer->stop();
   for (const auto &id_handler_pair : m_connected_handlers) {
-    m_pending_handlers.insert(id_handler_pair.second);
+    m_pending_handlers.insert(id_handler_pair);
   };
   m_connected_handlers.clear();
   if (m_auto_reconnect) {
@@ -176,41 +176,47 @@ void GqlWsTransport::onDisconnected() {
   }
 }
 
-void GqlWsTransport::onError(const QAbstractSocket::SocketError &error) {
+void GqlTransportWs::onError(const QAbstractSocket::SocketError &error) {
   qDebug() << "connection error occurred in " << typeid(this).name() << ": "
            << error;
 }
 
-void GqlWsTransport::init_connection(const QNetworkRequest &request) {
+void GqlTransportWs::init_connection(const QNetworkRequest &request) {
   this->m_ws->open(request, this->m_ws_options);
 }
 
-void GqlWsTransport::close(QWebSocketProtocol::CloseCode closeCode,
+void GqlTransportWs::close(QWebSocketProtocol::CloseCode closeCode,
                            const QString &reason) {
   m_ws->close(closeCode, reason);
 }
 // whether the web socket us connected.
-bool GqlWsTransport::is_valid() const { return m_ws->isValid(); }
+bool GqlTransportWs::is_valid() const { return m_ws->isValid(); }
 
-bool GqlWsTransport::gql_is_valid() const {
+bool GqlTransportWs::gql_is_valid() const {
   return is_valid() && m_connection_ack;
 }
 
-void GqlWsTransport::execute(
+void GqlTransportWs::execute(
     const std::shared_ptr<bases::HandlerABC> &handler) {
-  if (!m_connected_handlers.contains(handler->id)) {
-    // if GQL_ACK and connected
-    // send message and delete the pending handler it is now "connected".
+  auto new_op_id = QUuid::createUuid();
+  execute_impl(new_op_id, handler);
+}
+void GqlTransportWs::execute_impl(
+    const QUuid &op_id, const std::shared_ptr<bases::HandlerABC> &handler) {
+  // if GQL_ACK and connected
+  // send message and delete the pending handler it is now "connected".
+  if (!m_connected_handlers.contains(op_id)) {
+
     if (gql_is_valid()) {
-      m_connected_handlers[handler->id] = handler;
-      send_message(GqlWsTrnsMsgWithID(handler->message(), handler->id));
-    } else if (!m_pending_handlers.contains(handler)) {
-      m_pending_handlers.insert(handler);
+      m_connected_handlers[op_id] = handler;
+      send_message(GqlTrnsWsMsgWithID(handler->message(), op_id));
+    } else if (!m_pending_handlers.contains(op_id)) {
+      m_pending_handlers[op_id] = handler;
     }
   }
 }
-
-void GqlWsTransport::reconnect() {
+void GqlTransportWs::reconnect() {
   this->m_ws->open(m_ws->request(), m_ws_options);
 }
-} // namespace qtgql::gqlwstransport
+
+} // namespace qtgql::gqltransportws

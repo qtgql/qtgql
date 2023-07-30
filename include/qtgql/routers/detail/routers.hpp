@@ -1,7 +1,7 @@
 #pragma once
 #include "qtgql/bases/bases.hpp"
 #include "qtgql/gqloverhttp/gqloverhttp.hpp"
-#include "qtgql/gqlwstransport/gqlwstransport.hpp"
+#include "qtgql/gqltransportws/gqltransportws.hpp"
 
 namespace qtgql::routers {
 
@@ -9,12 +9,12 @@ namespace qtgql::routers {
  graphql-over-http.
  */
 class SubscriptionRouter : public bases::NetworkLayerABC {
-  std::shared_ptr<gqlwstransport::GqlWsTransport> ws_layer;
+  std::shared_ptr<gqltransportws::GqlTransportWs> ws_layer;
   std::shared_ptr<gqloverhttp::GraphQLOverHttp> http_layer;
 
 public:
   explicit SubscriptionRouter(
-      std::shared_ptr<gqlwstransport::GqlWsTransport> ws_layer,
+      std::shared_ptr<gqltransportws::GqlTransportWs> ws_layer,
       std::shared_ptr<gqloverhttp::GraphQLOverHttp> http_layer)
       : ws_layer(std::move(ws_layer)), http_layer(std::move(http_layer)) {}
   inline void execute(const std::shared_ptr<bases::HandlerABC> &handler) final {

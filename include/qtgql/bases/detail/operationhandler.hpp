@@ -67,9 +67,7 @@ protected:
 
 public:
   explicit OperationHandlerABC(GraphQLMessage message)
-      : _OperationHandlerABCSignals(), m_message_template(std::move(message)) {
-    id = QUuid::createUuid();
-  }
+      : _OperationHandlerABCSignals(), m_message_template(std::move(message)) {}
 
   QJsonObject variables() const {
     if (m_message_template.variables.has_value())
@@ -94,8 +92,14 @@ public:
   }
 
   void refetch() {
-    set_completed(false);
-    fetch();
+    if (m_completed) {
+      set_completed(false);
+      fetch();
+    } else {
+      qWarning() << "Tried to refetch operation "
+                 << m_message_template.operationName
+                 << " but the operation haven't completed yet.";
+    }
   };
   void set_vars(const QJsonObject &vars) {
     m_message_template.set_variables(vars);

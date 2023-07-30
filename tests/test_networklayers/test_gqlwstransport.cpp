@@ -124,7 +124,6 @@ TEST_CASE("Handlers tests", "[gqlwstransport][handlers]") {
   auto client = get_valid_ws_client();
   auto sub1 = std::make_shared<DebugHandler>(get_subscription_str());
   auto sub2 = std::make_shared<DebugHandler>(get_subscription_str());
-  REQUIRE(sub1->operation_id() != sub2->operation_id());
 
   SECTION("executing handlers adds them to handlers map") {
     client->execute(sub1);

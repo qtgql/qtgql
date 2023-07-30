@@ -52,9 +52,6 @@ struct GraphQLMessage : public bases::HashAbleABC {
 
 struct HandlerABC {
 
-  // this is mainly for graphql-ws-transport.
-  QUuid id;
-
   // https://github.com/enisdenjo/graphql-ws/blob/master/PROTOCOL.md#next
   virtual void on_next(const QJsonObject &message) = 0;
 

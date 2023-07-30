@@ -20,7 +20,11 @@ std::shared_ptr<DebugAbleWsNetworkLayer> get_valid_ws_client() {
 
 bool DebugAbleWsNetworkLayer::has_handler(
     const std::shared_ptr<bases::HandlerABC> &handler) {
-  return m_connected_handlers.contains(handler->id);
+  for (const auto &uuid_handler_pair : m_connected_handlers) {
+    if (uuid_handler_pair.second == handler)
+      return true;
+  }
+  return false;
 }
 
 void DebugAbleWsNetworkLayer::onTextMessageReceived(
@@ -33,29 +37,29 @@ void DebugAbleWsNetworkLayer::onTextMessageReceived(
     }
     if (data.contains("id")) {
       // Any that contains ID is directed to a single handler.
-      auto message = gqlwstransport::GqlWsTrnsMsgWithID(data);
-      if (message.type == qtgql::gqlwstransport::PROTOCOL::NEXT) {
+      auto message = gqltransportws::GqlTrnsWsMsgWithID(data);
+      if (message.type == qtgql::gqltransportws::PROTOCOL::NEXT) {
         m_current_message = message.payload;
-      } else if (message.type == qtgql::gqlwstransport::PROTOCOL::COMPLETE) {
+      } else if (message.type == qtgql::gqltransportws::PROTOCOL::COMPLETE) {
         if (m_settings.print_debug) {
           qDebug() << "Completed";
         }
       }
     } else {
-      auto message = gqlwstransport::BaseGqlWsTrnsMsg(data);
+      auto message = gqltransportws::BaseGqlTrnsWsMsg(data);
       auto message_type = message.type;
-      if (message_type == gqlwstransport::PROTOCOL::PONG) {
+      if (message_type == gqltransportws::PROTOCOL::PONG) {
         m_pong_received = true;
         if (!m_settings.handle_pong) {
           return;
         }
-      } else if (message_type == gqlwstransport::PROTOCOL::CONNECTION_ACK &&
+      } else if (message_type == gqltransportws::PROTOCOL::CONNECTION_ACK &&
                  !m_settings.handle_ack) {
         return;
       }
     }
   }
-  GqlWsTransport::onTextMessageReceived(raw_message);
+  GqlTransportWs::onTextMessageReceived(raw_message);
 }
 
 namespace test_utils {
@@ -76,7 +80,7 @@ get_or_create_env(const QString &env_name, const DebugClientSettings &settings,
   if (!env.has_value()) {
     auto env_ = std::make_shared<bases::Environment>(
         env_name,
-        std::unique_ptr<qtgql::gqlwstransport::GqlWsTransport>(
+        std::unique_ptr<qtgql::gqltransportws::GqlTransportWs>(
             new DebugAbleWsNetworkLayer(settings)),
         std::unique_ptr<qtgql::bases::EnvCache>(
             new qtgql::bases::EnvCache{{cache_dur}}));

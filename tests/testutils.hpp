@@ -12,7 +12,7 @@
 #include <memory>
 
 #include "qtgql/bases/bases.hpp"
-#include "qtgql/gqlwstransport/gqlwstransport.hpp"
+#include "qtgql/gqltransportws/gqltransportws.hpp"
 
 using namespace qtgql;
 namespace fs = std::filesystem;
@@ -30,13 +30,13 @@ struct DebugClientSettings {
   bool handle_ack = true;
   bool handle_pong = true;
   bool print_debug = false;
-  gqlwstransport::GqlWsTransportClientSettings prod_settings = {
+  gqltransportws::GqlTransportWsClientSettings prod_settings = {
       .url = get_server_address(),
       .auto_reconnect = true,
       .reconnect_timeout = 500};
 };
 
-class DebugAbleWsNetworkLayer : public gqlwstransport::GqlWsTransport {
+class DebugAbleWsNetworkLayer : public gqltransportws::GqlTransportWs {
   void onTextMessageReceived(const QString &raw_message);
 
 public:
@@ -46,9 +46,10 @@ public:
 
   DebugAbleWsNetworkLayer(
       const DebugClientSettings &settings = DebugClientSettings())
-      : GqlWsTransport(settings.prod_settings), m_settings{settings} {};
+      : gqltransportws::GqlTransportWs(settings.prod_settings),
+        m_settings{settings} {};
   void wait_for_valid() {
-    if (!QTest::qWaitFor([&]() { return gql_is_valid(); }, 1500)) {
+    if (!QTest::qWaitFor([&]() { return gql_is_valid(); }, 1000)) {
       throw "Client could not connect to the GraphQL server";
     }
   }

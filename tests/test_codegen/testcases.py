@@ -966,4 +966,10 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 
 if __name__ == "__main__":
-    generate_testcases(FragmentWithOperationVariable, NodeUnionTestCase, QmlUsageTestCase)
+    generate_testcases(
+        FragmentTestCase,
+        FragmentsOnInterfaceTestCase,
+        FragmentWithOperationVariable,
+        NodeUnionTestCase,
+        QmlUsageTestCase,
+    )
