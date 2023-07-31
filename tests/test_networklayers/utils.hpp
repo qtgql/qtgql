@@ -29,14 +29,6 @@ struct DebugHandler : public bases::HandlerABC {
     assert_m(QTest::qWaitFor([&]() -> bool { return m_completed; }, 1500),
              "handler couldn't complete successfully.")
   }
-  // TODO: move this out of here.
-  [[nodiscard]] bool count_eq_9() const {
-    if (m_data.value("count").isDouble()) {
-      auto ret = m_data.value("count").toInt();
-      return ret == 9;
-    }
-    return false;
-  }
 };
 
 inline QString get_subscription_str(bool raiseOn5 = false,
@@ -45,4 +37,12 @@ inline QString get_subscription_str(bool raiseOn5 = false,
   QString ro5 = raiseOn5 ? "true" : "false";
   return QString("subscription %1 {count(target: %2, raiseOn5: %3) }")
       .arg(op_name, QString::number(target), ro5);
+}
+
+bool count_eq_9(const QJsonObject &data) {
+  if (data.value("count").isDouble()) {
+    auto ret = data.value("count").toInt();
+    return ret == 9;
+  }
+  return false;
 }

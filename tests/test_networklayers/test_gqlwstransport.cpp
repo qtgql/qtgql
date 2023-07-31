@@ -48,8 +48,8 @@ TEST_CASE("Subscribe to data (next message)", "[gqlwstransport][ws-client]") {
   auto client = get_valid_ws_client();
   auto handler = std::make_shared<DebugHandler>(get_subscription_str());
   client->execute(handler);
-  REQUIRE(
-      QTest::qWaitFor([&]() -> bool { return handler->count_eq_9(); }, 1500));
+  REQUIRE(QTest::qWaitFor([&]() -> bool { return count_eq_9(handler->m_data); },
+                          1500));
 }
 
 TEST_CASE("execute via environment", "[gqlwstransport]") {
@@ -136,12 +136,14 @@ TEST_CASE("Handlers tests", "[gqlwstransport][handlers]") {
   SECTION("handler called on gql_next") {
     REQUIRE(sub1->m_data.empty());
     client->execute(sub1);
-    REQUIRE(QTest::qWaitFor([&]() -> bool { return sub1->count_eq_9(); }));
+    REQUIRE(
+        QTest::qWaitFor([&]() -> bool { return count_eq_9(sub1->m_data); }));
   }
   SECTION("handler called on completed") {
     REQUIRE(!sub1->m_completed);
     client->execute(sub1);
-    std::ignore = QTest::qWaitFor([&]() -> bool { return sub1->count_eq_9(); });
+    std::ignore =
+        QTest::qWaitFor([&]() -> bool { return count_eq_9(sub1->m_data); });
     REQUIRE(sub1->m_completed);
   }
   SECTION("handler completed pops out of handlers vector") {
