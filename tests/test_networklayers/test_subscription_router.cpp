@@ -34,7 +34,7 @@ TEST_CASE("test subscription router", "[subscription router]") {
   SECTION("test subscription") {
     auto handler = std::make_shared<DebugHandler>(get_subscription_str());
     client->execute(handler);
-    REQUIRE(
-        QTest::qWaitFor([&]() -> bool { return handler->count_eq_9(); }, 1500));
+    REQUIRE(QTest::qWaitFor(
+        [&]() -> bool { return count_eq_9(handler->m_data); }, 1500));
   }
 }
