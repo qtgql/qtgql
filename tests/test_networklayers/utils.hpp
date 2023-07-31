@@ -39,7 +39,7 @@ inline QString get_subscription_str(bool raiseOn5 = false,
       .arg(op_name, QString::number(target), ro5);
 }
 
-[[nodiscard]] bool count_eq_9(const QJsonObject &data) {
+bool count_eq_9(const QJsonObject &data) {
   if (data.value("count").isDouble()) {
     auto ret = data.value("count").toInt();
     return ret == 9;
