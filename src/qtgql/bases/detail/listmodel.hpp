@@ -42,7 +42,7 @@ public:
     return (!parent.isValid() ? m_count : 0);
   }
 
-  static const int QOBJECT_ROLE = Qt::UserRole + 1;
+  static const int DATA_ROLE = Qt::UserRole + 1;
 
   QHash<int, QByteArray> roleNames() const override { return c_role_names; }
 
@@ -58,8 +58,8 @@ signals:
   void currentIndexChanged();
 };
 
-template <typename T_QObject> class ListModelABC : public ListModelMixin {
-  typedef std::unique_ptr<QList<T_QObject *>> T_QObjectList;
+template <typename T> class ListModelABC : public ListModelMixin {
+  typedef std::unique_ptr<std::list<T>> T_List;
 
 private:
   void update_count() {
@@ -71,7 +71,7 @@ private:
   };
 
 protected:
-  T_QObjectList m_data;
+  T_List m_data;
 
   void insert_common(const int from, const int to) {
     beginInsertRows(invalid_index(), from, to);
@@ -92,7 +92,7 @@ protected:
   }
 
 public:
-  explicit ListModelABC(QObject *parent, T_QObjectList data = {})
+  explicit ListModelABC(QObject *parent, T_List data = {})
       : ListModelMixin(parent), m_data{std::move(data)} {
     m_count = m_data->length();
   };
@@ -101,24 +101,24 @@ public:
                               int role) const override {
     auto row = index.row();
     if (row < m_count && index.isValid()) {
-      if (role == QOBJECT_ROLE) {
+      if (role == DATA_ROLE) {
         return QVariant::fromValue(static_cast<QObject *>(m_data->value(row)));
       }
     }
     return {};
   }
 
-  T_QObject *get(int index) const { return m_data->value(index); }
+  [[nodiscard]] const T &get(int index) const { return m_data->value(index); }
 
-  T_QObject *first() const { return m_data->first(); }
+  [[nodiscard]] const T &first() const { return m_data->first(); }
 
-  T_QObject *last() const { return m_data->last(); }
+  [[nodiscard]] const T &last() const { return m_data->last(); }
 
   int rowCount(const QModelIndex &parent = {}) const override {
     return m_count;
   }
 
-  void insert(int index, T_QObject *object) {
+  void insert(int index, T *object) {
     if (index > m_count) {
       qWarning() << "index " << index << " is greater than count " << m_count
                  << ". "
@@ -138,7 +138,7 @@ public:
     end_insert_common();
   }
 
-  void append(T_QObject *object) {
+  void append(T *object) {
     insert_common(m_count, m_count);
     m_data->append(object);
     end_insert_common();

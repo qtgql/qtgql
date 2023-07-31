@@ -157,7 +157,12 @@ class QtGqlList(QtGqlTypeABC):
 
     @property
     def member_type(self) -> str:
-        return f"QList<{self.of_type.member_type}>"
+        if bs := self.of_type.is_builtin_scalar:
+            # scalars has no underlying fields hence they don't need to be
+            # proxied. So each proxy would get an instance to the model.
+            return f"std::shared_ptr<{QtGqlTypes.ListModelABC.name}<{bs.member_type}>>"
+
+        return f"std::list<{self.of_type.member_type}>"
 
     def type_name(self) -> str:
         raise NotImplementedError(
@@ -167,9 +172,11 @@ class QtGqlList(QtGqlTypeABC):
     @property
     def property_type(self) -> str:
         if self.of_type.is_queried_object_type or self.of_type.is_queried_interface:
-            return f"qtgql::bases::ListModelABC<{self.of_type.type_name()}> *"
+            return f"{QtGqlTypes.ListModelABC.name}<{self.of_type.property_type}> *"  # TODO: check what would this return now.
         if self.of_type.is_queried_union:
-            return f"qtgql::bases::ListModelABC<{self.of_type.is_queried_union.type_name()}> *"
+            return f"{QtGqlTypes.ListModelABC.name}<{self.of_type.property_type}> *"
+        if bs := self.of_type.is_builtin_scalar:
+            return f"{QtGqlTypes.ListModelABC.name}<{bs.member_type}> *"
         raise NotImplementedError
 
 
@@ -219,6 +226,10 @@ class BuiltinScalar(QtGqlTypeABC):
     @property
     def is_void(self) -> bool:
         return self is BuiltinScalars.VOID
+
+    @property
+    def property_type(self) -> str:
+        return self.type_name()
 
     def json_repr(self, attr_name: str | None = None) -> str:
         return f"{attr_name}"

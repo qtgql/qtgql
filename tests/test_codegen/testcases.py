@@ -913,6 +913,20 @@ QmlUsageTestCase = QtGqlTestCase(
     ),
 )
 
+ListOfScalarTestCase = QtGqlTestCase(
+    schema=schemas.list_of_scalar.schema,
+    operations="""
+    query getRndPost{
+      post{
+        content
+        tags
+      }
+    }
+
+    """,
+    test_name="ListOfScalarTestCase",
+)
+
 all_test_cases = [
     ScalarsTestCase,
     SimpleGarbageCollectionTestCase,
@@ -941,10 +955,11 @@ all_test_cases = [
     FragmentsOnInterfaceTestCase,
     FragmentWithOperationVariable,
     NodeUnionTestCase,
+    QmlUsageTestCase,
+    ListOfScalarTestCase,
     CustomUserScalarTestCase,
     ObjectsThatReferenceEachOtherTestCase,
     RootListOfTestCase,
-    QmlUsageTestCase,
 ]
 
 implemented_testcases = [
@@ -976,6 +991,7 @@ implemented_testcases = [
     FragmentWithOperationVariable,
     NodeUnionTestCase,
     QmlUsageTestCase,
+    ListOfScalarTestCase,
 ]
 
 
@@ -990,6 +1006,5 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 if __name__ == "__main__":
     generate_testcases(
-        FragmentTestCase,
-        NoIdOnQueryTestCase,
+        ListOfScalarTestCase,
     )

@@ -30,6 +30,7 @@ is_operation_def_node = ast_identifier_factory(gql_def.OperationDefinitionNode)
 is_field_node = ast_identifier_factory(gql_def.FieldNode)
 is_nonnull_node = ast_identifier_factory(gql_lang.NonNullTypeNode)
 is_named_type_node = ast_identifier_factory(gql_lang.NamedTypeNode)
+is_list_node = ast_identifier_factory(gql_lang.ListTypeNode)
 
 
 T_Definition = TypeVar("T_Definition", bound=gql_def.GraphQLType)

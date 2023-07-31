@@ -10,15 +10,15 @@ if (👉 instance_of_concrete 👈){
 }
 {% elif field.type.is_queried_object_type %}
 👉field.private_name👈 = new 👉field.type_name👈(👉operation_pointer👈, 👉 instance_of_concrete 👈);
-{% elif field.type.is_model  %}
+{% elif field.type.is_model and not field.type.of_type.is_builtin_scalar %}
     {% if  field.type.is_model.of_type.is_queried_object_type %}
-    auto init_list_👉 field.name 👈 =  std::make_unique<QList<👉field.type.of_type.name👈*>>();
+    auto init_list_👉 field.name 👈 =  std::make_unique<std::list<👉field.type.of_type.name👈*>>();
     for (const auto & node: 👉 instance_of_concrete 👈){
     init_list_👉 field.name 👈->append(new 👉field.type.of_type.name👈(👉operation_pointer👈, node));
     }
     👉field.private_name👈 = new qtgql::bases::ListModelABC<👉 field.type.of_type.name 👈>(this, std::move(init_list_👉 field.name 👈));
-    {% elif field.type.is_model.of_type.is_queried_union or field.type.is_model.of_type.is_queried_interface %}
-    auto init_list_👉 field.name 👈 =  std::make_unique<QList<👉field.type.of_type.property_type👈>>();
+    {% elif field.type.is_model.of_type.is_queried_union or field.type.is_model.of_type.is_queried_interface%}
+    auto init_list_👉 field.name 👈 =  std::make_unique<std::list<👉field.type.of_type.type_name()👈>>();
     for (const auto & node: 👉 instance_of_concrete 👈){
         auto 👉field.name👈_typename = node->__typename();
         {%set type_cond -%}👉field.name👈_typename{% endset -%}

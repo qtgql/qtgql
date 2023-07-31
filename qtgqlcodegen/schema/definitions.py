@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 from attr import Factory, define
 from graphql import OperationType
 
+from qtgqlcodegen.types import BuiltinScalars
 from qtgqlcodegen.utils import require
 
 if TYPE_CHECKING:
@@ -128,6 +129,25 @@ class SchemaTypeInfo:
 
     def get_object_or_interface(self, name: str) -> QtGqlInterface | QtGqlObjectType:
         return require(self.get_object_type(name) or self.get_interface(name))
+
+    def get_enum(self, name: str) -> QtGqlEnumDefinition | None:
+        return self.enums.get(name, None)
+
+    def get_input(self, name: str) -> QtGqlInputObjectTypeDefinition | None:
+        return self.input_objects.get(name, None)
+
+    def get_type(self, name: str) -> QtGqlTypeABC:
+        """
+        :param name: Any type name
+        :return: Scalar / Input / Object / Interface based on that name
+        """
+        return require(
+            BuiltinScalars.by_graphql_name(name)
+            or self.get_object_type(name)
+            or self.get_interface(name)
+            or self.get_enum(name)
+            or self.get_input(name),
+        )
 
     def add_objecttype(self, objecttype: QtGqlObjectType) -> None:
         self.object_types[objecttype.name] = objecttype
