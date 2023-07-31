@@ -66,10 +66,8 @@ def schemas_server() -> MiniServer:
         ],
         env=os.environ.copy(),
         cwd=Path(__file__).parent.parent,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
     )
-    address = f"://localhost:{port}/graphql"
+    address = f"://localhost:{port}/"
     time.sleep(5)
     assert not p.poll(), p.stdout.read().decode("utf-8")
     ms = MiniServer(process=p, address=address, port=port)
