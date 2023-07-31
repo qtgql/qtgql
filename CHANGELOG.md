@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+0.131.0 - 2023-07-31
+--------------------
+
+This release adds support for [GraphQL over HTTP](https://graphql.github.io/graphql-over-http/draft/) protocol
+with a protocol router.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #337](https://github.com/qtgql/qtgql/pull/337/)
+
+
 0.130.9 - 2023-07-24
 --------------------
 
