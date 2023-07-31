@@ -1,11 +1,8 @@
 #pragma once
+#include "environment.hpp"
 #include <QObject>
 
-#include "gqlwstransport.hpp"
-#include "qtgql/bases/bases.hpp"
-
-namespace qtgql {
-namespace gqlwstransport {
+namespace qtgql::bases {
 
 class _OperationHandlerABCSignals : public QObject {
   Q_OBJECT
@@ -35,35 +32,38 @@ protected slots:
 public:
   using QObject::QObject;
 
-  [[nodiscard]] bool completed() const;
+  [[nodiscard]] inline bool completed() const { return m_completed; };
 
-  bool operation_on_flight();
+  [[nodiscard]] inline bool operation_on_flight() const {
+    return m_operation_on_the_fly;
+  }
 };
 
-// NOTE: This class should not be defined in the .cpp since it is abstract.
+// Must be extended in the templates.
 class OperationHandlerABC
     : public _OperationHandlerABCSignals,
-
       public bases::HandlerABC,
       public std::enable_shared_from_this<OperationHandlerABC> {
 protected:
-  QUuid m_operation_id = QUuid::createUuid();
-
-  const std::shared_ptr<bases::Environment> &environment() {
-    static auto m_env = bases::Environment::get_env(ENV_NAME());
-    return m_env.value();
-  };
-  QJsonObject m_variables;
-  GqlWsTrnsMsgWithID m_message_template = GqlWsTrnsMsgWithID{{}};
+  GraphQLMessage m_message_template;
 
 public:
-  explicit OperationHandlerABC(GqlWsTrnsMsgWithID message)
+  explicit OperationHandlerABC(GraphQLMessage message)
       : _OperationHandlerABCSignals(), m_message_template(std::move(message)) {}
 
-  QJsonObject variables() const { return m_variables; }
+  QJsonObject variables() const {
+    if (m_message_template.variables.has_value())
+      return m_message_template.variables.value();
+    else {
+      return {};
+    }
+  }
   // abstract functions.
   virtual const QString &ENV_NAME() = 0;
   // end abstract functions.
+  std::shared_ptr<Environment> environment() {
+    return Environment::get_env_strict(ENV_NAME());
+  };
 
   void fetch() {
     if (!m_operation_on_the_fly && !m_completed) {
@@ -72,17 +72,26 @@ public:
       Q_ASSERT_X(a, "QtGqlOperationHandlerABC",
                  "Could not get a shared_ptr from `this` make sure to only "
                  "instantiate this with `std::make_shared`");
+
       environment()->execute(a);
     }
   }
 
   void refetch() {
-    set_completed(false);
-    fetch();
+    if (m_completed) {
+      set_completed(false);
+      fetch();
+    } else {
+      qWarning() << "Tried to refetch operation "
+                 << m_message_template.operationName
+                 << " but the operation haven't completed yet.";
+    }
   };
+  void set_vars(const QJsonObject &vars) {
+    m_message_template.set_variables(vars);
+  }
 
-  const bases::HashAbleABC &message() override {
-    m_message_template.set_variables(m_variables);
+  const bases::GraphQLMessage &message() override {
     return m_message_template;
   };
 
@@ -93,5 +102,4 @@ public:
     emit error(errors);
   };
 };
-}; // namespace gqlwstransport
-} // namespace qtgql
+}; // namespace qtgql::bases

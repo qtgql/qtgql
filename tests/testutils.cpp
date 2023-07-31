@@ -3,27 +3,33 @@
 #include <memory>
 using namespace qtgql;
 
-QString get_server_address(const QString &suffix) {
-  auto env_addr = std::getenv("SCHEMAS_SERVER_ADDR");
-  QString addr = "ws://localhost:9000/";
+QString get_server_address(const QString &suffix, const QString &prefix) {
+  auto env_addr = getenv("SCHEMAS_SERVER_ADDR");
+  QString addr = "://localhost:9000/";
   if (env_addr) {
     addr = QString::fromUtf8(env_addr);
   }
-  return addr + suffix;
+  return prefix + addr + suffix;
 }
 
-std::shared_ptr<DebugAbleClient> get_valid_client() {
-  auto client = std::make_shared<DebugAbleClient>();
+std::shared_ptr<DebugAbleWsNetworkLayer> get_valid_ws_client() {
+  auto client = std::shared_ptr<DebugAbleWsNetworkLayer>(
+      new DebugAbleWsNetworkLayer({.url = get_server_address()}));
   client->wait_for_valid();
   return client;
 }
 
-bool DebugAbleClient::has_handler(
+bool DebugAbleWsNetworkLayer::has_handler(
     const std::shared_ptr<bases::HandlerABC> &handler) {
-  return m_handlers.contains(handler->operation_id());
+  for (const auto &uuid_handler_pair : m_connected_handlers) {
+    if (uuid_handler_pair.second == handler)
+      return true;
+  }
+  return false;
 }
 
-void DebugAbleClient::onTextMessageReceived(const QString &raw_message) {
+void DebugAbleWsNetworkLayer::onTextMessageReceived(
+    const QString &raw_message) {
   auto raw_data = QJsonDocument::fromJson(raw_message.toUtf8());
   if (raw_data.isObject()) {
     auto data = raw_data.object();
@@ -32,36 +38,35 @@ void DebugAbleClient::onTextMessageReceived(const QString &raw_message) {
     }
     if (data.contains("id")) {
       // Any that contains ID is directed to a single handler.
-      auto message = gqlwstransport::GqlWsTrnsMsgWithID(data);
-      if (message.type == qtgql::gqlwstransport::PROTOCOL::NEXT) {
+      auto message = gqltransportws::GqlTrnsWsMsgWithID(data);
+      if (message.type == qtgql::gqltransportws::PROTOCOL::NEXT) {
         m_current_message = message.payload;
-      } else if (message.type == qtgql::gqlwstransport::PROTOCOL::COMPLETE) {
+      } else if (message.type == qtgql::gqltransportws::PROTOCOL::COMPLETE) {
         if (m_settings.print_debug) {
           qDebug() << "Completed";
         }
       }
     } else {
-      auto message = gqlwstransport::BaseGqlWsTrnsMsg(data);
+      auto message = gqltransportws::BaseGqlTrnsWsMsg(data);
       auto message_type = message.type;
-      if (message_type == gqlwstransport::PROTOCOL::PONG) {
+      if (message_type == gqltransportws::PROTOCOL::PONG) {
         m_pong_received = true;
         if (!m_settings.handle_pong) {
           return;
         }
-      } else if (message_type == gqlwstransport::PROTOCOL::CONNECTION_ACK &&
+      } else if (message_type == gqltransportws::PROTOCOL::CONNECTION_ACK &&
                  !m_settings.handle_ack) {
         return;
       }
     }
   }
-  GqlWsTransportClient::onTextMessageReceived(raw_message);
+  GqlTransportWs::onTextMessageReceived(raw_message);
 }
 
 namespace test_utils {
 
 void wait_for_completion(
-    const std::shared_ptr<qtgql::gqlwstransport::OperationHandlerABC>
-        operation) {
+    const std::shared_ptr<qtgql::bases::OperationHandlerABC> &operation) {
   if (!QTest::qWaitFor([&]() -> bool { return operation->completed(); },
                        1500)) {
     auto error_message =
@@ -76,16 +81,16 @@ get_or_create_env(const QString &env_name, const DebugClientSettings &settings,
   if (!env.has_value()) {
     auto env_ = std::make_shared<bases::Environment>(
         env_name,
-        std::unique_ptr<qtgql::gqlwstransport::GqlWsTransportClient>(
-            new DebugAbleClient(settings)),
+        std::unique_ptr<qtgql::gqltransportws::GqlTransportWs>(
+            new DebugAbleWsNetworkLayer(settings)),
         std::unique_ptr<qtgql::bases::EnvCache>(
             new qtgql::bases::EnvCache{{cache_dur}}));
     bases::Environment::set_gql_env(env_);
-    DebugAbleClient::from_environment(env_)->wait_for_valid();
-    env = bases::Environment::get_env(env_name);
+    DebugAbleWsNetworkLayer::from_environment(env_)->wait_for_valid();
+    return env_;
   }
   return env.value();
-};
+}
 
 SignalCatcher::SignalCatcher(const SignalCatcherParams &params) {
   m_excludes = params.excludes;

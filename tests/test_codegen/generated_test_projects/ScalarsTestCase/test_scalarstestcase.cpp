@@ -6,10 +6,12 @@
 #include "graphql/__generated__/UserWithSameIDAndDifferentFieldsQuery.hpp"
 #include "testutils.hpp"
 
+#include "qtgql/gqloverhttp/gqloverhttp.hpp"
+
 namespace ScalarsTestCase {
 using namespace qtgql;
 auto ENV_NAME = QString("ScalarsTestCase");
-auto SCHEMA_ADDR = get_server_address("76177312");
+auto SCHEMA_ADDR = get_server_address("ScalarsTestCase");
 
 TEST_CASE("ScalarsTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
@@ -36,7 +38,8 @@ TEST_CASE("ScalarsTestCase", "[generated-testcase]") {
     auto previous_name = user->get_name();
     auto modified_user_op = userwithsameidanddifferentfieldsquery::
         UserWithSameIDAndDifferentFieldsQuery::shared();
-    auto catcher = test_utils::SignalCatcher({user});
+    auto catcher = test_utils::SignalCatcher(
+        {.source_obj = user, .excludes = {{"voidField"}}});
     modified_user_op->fetch();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(modified_user_op);
@@ -48,32 +51,5 @@ TEST_CASE("ScalarsTestCase", "[generated-testcase]") {
     REQUIRE(new_name != previous_name);
   };
 };
-
-std::shared_ptr<ScalarsTestCase::User> get_shared_user() {
-  auto mq = std::make_shared<mainquery::MainQuery>();
-  mq->fetch();
-  test_utils::wait_for_completion(mq);
-  auto node_id = mq->data()->get_constUser()->get_id();
-  REQUIRE(mq.use_count() == 1);
-  return ScalarsTestCase::User::get_node(node_id).value();
-}
-
-using namespace std::chrono_literals;
-
-TEST_CASE("Test Garbage collection") {
-
-  auto env = test_utils::get_or_create_env(
-      ENV_NAME,
-      DebugClientSettings{.prod_settings =
-                              {
-                                  .url = SCHEMA_ADDR,
-                              }},
-      100ms);
-  std::weak_ptr<ScalarsTestCase::User> weak_user = get_shared_user();
-  ScalarsTestCase::Query::instance()->m_constUser = {};
-  // at map
-  REQUIRE(weak_user.use_count() == 1);
-  REQUIRE(QTest::qWaitFor([&]() { return weak_user.use_count() == 0; }));
-}
 
 }; // namespace ScalarsTestCase

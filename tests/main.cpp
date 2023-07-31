@@ -14,5 +14,7 @@ int main(int argc, char **argv) {
 
   QTimer::singleShot(
       0, [app, argc, argv]() { app->exit(Catch::Session().run(argc, argv)); });
-  return app->exec();
+  auto ret = app->exec();
+  delete app;
+  return ret;
 }

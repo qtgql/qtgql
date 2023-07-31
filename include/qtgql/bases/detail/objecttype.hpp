@@ -3,6 +3,7 @@
 #include "QDebug"
 #include "QObject"
 #include "QSet"
+#include "exceptions.hpp"
 #include "metadata.hpp"
 
 namespace qtgql {

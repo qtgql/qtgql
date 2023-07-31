@@ -1,22 +1,17 @@
 from __future__ import annotations
 
-import hashlib
 import os
 import platform
 import socket
 import subprocess
 import time
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 import mimesis
 import pytest
 from attrs import define
 from faker import Faker
 from mimesis.locales import Locale
-
-if TYPE_CHECKING:
-    from strawberry import Schema
 
 fake = Faker()
 
@@ -28,8 +23,13 @@ class PATHS:
     QTGQLCODEGEN_ROOT = PROJECT_ROOT / "qtgqlcodegen"
 
 
+class PersonFactory(mimesis.Person):
+    def age(self, minimum: int = 0, maximum: int = 999999) -> int:
+        return super().age(minimum, maximum)
+
+
 class factory:
-    person = mimesis.Person(locale=Locale.DEFAULT)
+    person = PersonFactory(locale=Locale.DEFAULT)
     develop = mimesis.Development()
     numeric = mimesis.Numeric()
     text = mimesis.Text()
@@ -37,10 +37,6 @@ class factory:
 
 IS_WINDOWS = platform.system() == "Windows"
 IS_GITHUB_ACTION = os.environ.get("CI", False)
-
-
-def hash_schema(schema: Schema) -> int:
-    return int(hashlib.sha256(str(schema).encode("utf-8")).hexdigest(), 16) % 10**8
 
 
 @define
@@ -70,10 +66,8 @@ def schemas_server() -> MiniServer:
         ],
         env=os.environ.copy(),
         cwd=Path(__file__).parent.parent,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
     )
-    address = f"ws://localhost:{port}/graphql"
+    address = f"://localhost:{port}/"
     time.sleep(5)
     assert not p.poll(), p.stdout.read().decode("utf-8")
     ms = MiniServer(process=p, address=address, port=port)

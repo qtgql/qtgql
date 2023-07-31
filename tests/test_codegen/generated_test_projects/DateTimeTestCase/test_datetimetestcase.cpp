@@ -8,7 +8,7 @@
 namespace DateTimeTestCase {
 using namespace qtgql;
 auto ENV_NAME = QString("DateTimeTestCase");
-auto SCHEMA_ADDR = get_server_address("2685696");
+auto SCHEMA_ADDR = get_server_address("DateTimeTestCase");
 
 TEST_CASE("DateTimeTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(

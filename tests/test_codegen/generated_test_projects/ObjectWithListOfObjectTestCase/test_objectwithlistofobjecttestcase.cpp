@@ -8,12 +8,11 @@
 namespace ObjectWithListOfObjectTestCase {
 using namespace qtgql;
 auto ENV_NAME = QString("ObjectWithListOfObjectTestCase");
-auto SCHEMA_ADDR = get_server_address("46038122");
+auto SCHEMA_ADDR = get_server_address("ObjectWithListOfObjectTestCase");
 
 TEST_CASE("ObjectWithListOfObjectTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
-      ENV_NAME, DebugClientSettings{.print_debug = true,
-                                    .prod_settings = {.url = SCHEMA_ADDR}});
+      ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = std::make_shared<mainquery::MainQuery>();
   mq->fetch();
   test_utils::wait_for_completion(mq);
@@ -39,10 +38,8 @@ TEST_CASE("ObjectWithListOfObjectTestCase", "[generated-testcase]") {
   }
 }
 
-TEST_CASE(
-    "default ListModelABC modifications and operations (not specific to this "
-    "testcase)",
-    "") {
+TEST_CASE("default ListModelABC modifications and operations",
+          "[listmodel testcase]") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = std::make_shared<mainquery::MainQuery>();
@@ -52,7 +49,8 @@ TEST_CASE(
   typedef qtgql::bases::ListModelABC<ObjectType> ModelType;
 
   auto model_with_data = mq->data()->get_user()->m_friends;
-  auto raw_message = DebugAbleClient::from_environment(env)->m_current_message;
+  auto raw_message =
+      DebugAbleWsNetworkLayer::from_environment(env)->m_current_message;
   auto raw_friends_list = raw_message.value("data")
                               .toObject()
                               .value("user")
@@ -119,7 +117,8 @@ TEST_CASE(
   }
 
   SECTION("test append") {
-    auto new_obj = new mainquery::Person__userfriends(mq.get(), {});
+    auto new_obj = new mainquery::Person__userfriends(
+        mq.get(), std::make_shared<ObjectWithListOfObjectTestCase::Person>());
     auto before_count = model_with_data->rowCount();
     model_with_data->append(new_obj);
     insert_spy.validate();
@@ -128,17 +127,19 @@ TEST_CASE(
     REQUIRE(model_with_data->last() == new_obj);
   }
   SECTION("test insert") {
-    auto new_obj = new mainquery::Person__userfriends(mq.get(), {});
+    auto new_obj = new mainquery::Person__userfriends(
+        mq.get(), std::make_shared<ObjectWithListOfObjectTestCase::Person>());
     auto before_count = model_with_data->rowCount();
-    model_with_data->insert(0, new_obj);
+    model_with_data->insert(24234124, new_obj);
     insert_spy.validate();
     auto after_count = model_with_data->rowCount();
     REQUIRE(before_count == after_count - 1);
-    REQUIRE(model_with_data->first() == new_obj);
+    REQUIRE(model_with_data->last() == new_obj);
   }
   SECTION("test insert after max index") {
     QSignalSpy spy(model_with_data, &ModelType ::rowsAboutToBeInserted);
-    auto new_obj = new mainquery::Person__userfriends(mq.get(), {});
+    auto new_obj = new mainquery::Person__userfriends(
+        mq.get(), std::make_shared<ObjectWithListOfObjectTestCase::Person>());
     auto before_count = model_with_data->rowCount();
     model_with_data->insert(20000, new_obj);
     insert_spy.validate();

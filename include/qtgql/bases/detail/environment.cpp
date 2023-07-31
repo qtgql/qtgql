@@ -28,8 +28,8 @@ void NodeInstanceStore::collect_garbage() {
     }
 }
 
-void Environment::set_gql_env(SharedQtGqlEnv env) {
-  ENV_MAP[env->m_name] = env;
+void Environment::set_gql_env(const SharedQtGqlEnv &env) {
+  ENV_MAP.insert(env->m_name, env);
 }
 
 std::optional<Environment::SharedQtGqlEnv>

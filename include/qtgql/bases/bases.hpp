@@ -7,3 +7,4 @@
 #include "detail/metadata.hpp"
 #include "detail/networklayer.hpp"
 #include "detail/objecttype.hpp"
+#include "detail/operationhandler.hpp"

@@ -32,6 +32,7 @@ target_link_libraries(
         PUBLIC
         Qt6::Core
         Qt6::WebSockets
+        Qt6::Network
 )
 
 

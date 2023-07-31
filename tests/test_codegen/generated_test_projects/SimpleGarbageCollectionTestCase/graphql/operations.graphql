@@ -1,0 +1,23 @@
+
+        query MainQuery {
+          constUser {
+            id
+            name
+            age
+            agePoint
+            male
+            id
+            uuid
+            voidField
+          }
+        }
+        query UserWithSameIDAndDifferentFieldsQuery {
+          constUserWithModifiedFields {
+            age
+            agePoint
+            id
+            male
+            name
+            uuid
+          }
+        }

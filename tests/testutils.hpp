@@ -9,9 +9,10 @@
 #include <QQuickView>
 
 #include <filesystem>
+#include <memory>
 
 #include "qtgql/bases/bases.hpp"
-#include "qtgql/gqlwstransport/gqlwstransport.hpp"
+#include "qtgql/gqltransportws/gqltransportws.hpp"
 
 using namespace qtgql;
 namespace fs = std::filesystem;
@@ -22,17 +23,20 @@ namespace fs = std::filesystem;
   }                                                                            \
   assert(cond);
 
-QString get_server_address(const QString &suffix = "graphql");
+QString get_server_address(const QString &suffix = "graphql",
+                           const QString &prefix = "ws");
 
 struct DebugClientSettings {
+  QString url;
   bool handle_ack = true;
   bool handle_pong = true;
   bool print_debug = false;
-  gqlwstransport::GqlWsTransportClientSettings prod_settings = {
-      .url = get_server_address()};
+
+  gqltransportws::GqlTransportWsClientSettings prod_settings = {
+      .url = url, .auto_reconnect = true, .reconnect_timeout = 500};
 };
 
-class DebugAbleClient : public gqlwstransport::GqlWsTransportClient {
+class DebugAbleWsNetworkLayer : public gqltransportws::GqlTransportWs {
   void onTextMessageReceived(const QString &raw_message);
 
 public:
@@ -40,9 +44,11 @@ public:
   DebugClientSettings m_settings;
   QJsonObject m_current_message;
 
-  DebugAbleClient(DebugClientSettings settings = DebugClientSettings())
-      : GqlWsTransportClient(settings.prod_settings), m_settings{settings} {};
-  const void wait_for_valid() {
+  DebugAbleWsNetworkLayer(
+      const DebugClientSettings &settings = DebugClientSettings())
+      : gqltransportws::GqlTransportWs(settings.prod_settings),
+        m_settings{settings} {};
+  void wait_for_valid() {
     if (!QTest::qWaitFor([&]() { return gql_is_valid(); }, 1000)) {
       throw "Client could not connect to the GraphQL server";
     }
@@ -50,18 +56,21 @@ public:
   bool is_reconnect_timer_active() { return m_reconnect_timer->isActive(); }
   bool has_handler(const std::shared_ptr<bases::HandlerABC> &handler);
 
-  static DebugAbleClient *
+  static DebugAbleWsNetworkLayer *
   from_environment(std::shared_ptr<bases::Environment> env) {
-    return dynamic_cast<DebugAbleClient *>(env->get_network_layer());
+    return dynamic_cast<DebugAbleWsNetworkLayer *>(env->get_network_layer());
   };
 };
 
-std::shared_ptr<DebugAbleClient> get_valid_client();
+std::shared_ptr<DebugAbleWsNetworkLayer> get_valid_ws_client();
 
 namespace test_utils {
 using namespace std::chrono_literals;
+inline QString get_http_server_addr(const QString &suffix) {
+  return get_server_address(suffix, "http");
+}
 void wait_for_completion(
-    const std::shared_ptr<gqlwstransport::OperationHandlerABC> handler);
+    const std::shared_ptr<bases::OperationHandlerABC> &handler);
 class QCleanerObject : public QObject {};
 
 struct ModelSignalSpy {
@@ -89,6 +98,7 @@ struct SignalCatcherParams {
 std::shared_ptr<qtgql::bases::Environment>
 get_or_create_env(const QString &env_name, const DebugClientSettings &settings,
                   std::chrono::milliseconds cache_dur = 5s);
+void remove_env(const QString &env_name);
 
 class SignalCatcher {
   std::list<std::pair<QSignalSpy *, QString>> m_spys = {};
@@ -135,4 +145,5 @@ struct QmlBot {
     delete qquick_view;
   }
 };
+
 }; // namespace test_utils

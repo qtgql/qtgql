@@ -12,7 +12,7 @@ auto operation = m_operation;
         👉field.private_name👈->removeRows(prev_len - 1, prev_len - new_len);
     }
     for (int i = 0; i < new_len; i++){
-        auto concrete = new_data.at(i);
+        const auto& concrete = new_data.at(i);
     {% if field.type.of_type.is_queried_object_type -%}
         if (i > prev_len){
             👉field.private_name👈->insert(i, new 👉field.type.of_type.name👈(operation, concrete));

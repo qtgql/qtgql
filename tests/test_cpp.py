@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 @pytest.mark.parametrize("ctest_command", collect_tests(), ids=lambda v: v.test_name)
 def test_generated_tests(ctest_command: CtestTestCommand, schemas_server: MiniServer):
-    os.environ.setdefault("SCHEMAS_SERVER_ADDR", schemas_server.address.replace("graphql", ""))
+    os.environ.setdefault("SCHEMAS_SERVER_ADDR", schemas_server.address)
     ctest_command.run()
     if log_file := ctest_command.failed_log:
         if "All tests passed" not in log_file:

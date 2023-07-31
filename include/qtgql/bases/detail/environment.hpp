@@ -8,8 +8,7 @@
 #include "QString"
 #include "objecttype.hpp"
 
-namespace qtgql {
-namespace bases {
+namespace qtgql::bases {
 using namespace std::chrono_literals;
 
 class NodeInstanceStore {
@@ -67,7 +66,7 @@ by the generated handlers based on the configurations.
 class Environment {
   typedef std::shared_ptr<Environment> SharedQtGqlEnv;
   //  using a ptr here since client is to be extended by implementors.
-  typedef std::unique_ptr<NetworkLayer> UniqueNetworkLayer;
+  typedef std::unique_ptr<NetworkLayerABC> UniqueNetworkLayer;
   typedef std::unique_ptr<EnvCache> UniqueCache;
 
   UniqueNetworkLayer m_network_layer;
@@ -77,7 +76,7 @@ class Environment {
 
 public:
   // static members
-  static void set_gql_env(SharedQtGqlEnv env);
+  static void set_gql_env(const SharedQtGqlEnv &env);
   static std::optional<Environment::SharedQtGqlEnv>
   get_env(const QString &name);
   static Environment::SharedQtGqlEnv get_env_strict(const QString &name);
@@ -100,12 +99,11 @@ public:
    * You would generally not be needed for this method.
    * Though it might be of use for testing purposes.
    */
-  [[nodiscard]] NetworkLayer *get_network_layer() const {
+  [[nodiscard]] NetworkLayerABC *get_network_layer() const {
     return m_network_layer.get();
   };
 
   EnvCache *get_cache() { return m_cache.get(); }
 };
 
-} // namespace bases
-} // namespace qtgql
+} // namespace qtgql::bases

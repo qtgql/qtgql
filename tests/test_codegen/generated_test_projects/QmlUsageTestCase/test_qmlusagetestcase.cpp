@@ -3,6 +3,7 @@
 #include <QSignalSpy>
 #include <catch2/catch_test_macros.hpp>
 #include <filesystem>
+
 namespace fs = std::filesystem;
 
 namespace QmlUsageTestCase {
@@ -10,7 +11,7 @@ using namespace qtgql;
 
 auto ENV_NAME = QString("QmlUsageTestCase");
 
-auto SCHEMA_ADDR = get_server_address("46038122");
+auto SCHEMA_ADDR = get_server_address("QmlUsageTestCase");
 
 TEST_CASE("QmlUsageTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
@@ -22,5 +23,4 @@ TEST_CASE("QmlUsageTestCase", "[generated-testcase]") {
   REQUIRE(res->objectName().toStdString() == "foobar");
   REQUIRE(QTest::qWaitFor([&] { return res->property("success").toBool(); }));
 }
-
 }; // namespace QmlUsageTestCase

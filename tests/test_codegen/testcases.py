@@ -17,7 +17,6 @@ from qtgqlcodegen.generator import SchemaGenerator
 from qtgqlcodegen.types import CustomScalarDefinition
 from typer.testing import CliRunner
 
-from tests.conftest import hash_schema
 from tests.test_codegen import schemas
 from tests.test_codegen.utils import temp_cwd
 
@@ -135,7 +134,7 @@ class QtGqlTestCase:
 
     @cached_property
     def url_suffix(self):
-        return str(hash_schema(self.schema))
+        return self.test_name
 
     @contextlib.contextmanager
     def virtual_generate(self) -> None:
@@ -164,7 +163,7 @@ class QtGqlTestCase:
             )
         else:
             updated = re.sub(
-                'get_server_address\\("([0-9])*"\\)',
+                'get_server_address\\("([A-Za-z])*"\\)',
                 f'get_server_address("{self.url_suffix}")',
                 self.testcase_file.read_text("utf-8"),
             )
@@ -211,6 +210,26 @@ ScalarsTestCase = QtGqlTestCase(
         }
         """,
     test_name="ScalarsTestCase",
+)
+
+SimpleGarbageCollectionTestCase = QtGqlTestCase(
+    schema=schemas.object_with_scalar.schema,
+    operations=ScalarsTestCase.operations,
+    test_name="SimpleGarbageCollectionTestCase",
+    metadata=TestCaseMetadata(
+        should_test_updates=BoolWithReason.false("tested in scalar testcase"),
+        should_test_deserialization=BoolWithReason.false("tested in scalar testcase"),
+    ),
+)
+
+GqlOverHttpAsEnvTestCase = QtGqlTestCase(
+    schema=schemas.object_with_scalar.schema,
+    operations=ScalarsTestCase.operations,
+    test_name="GqlOverHttpAsEnvTestCase",
+    metadata=TestCaseMetadata(
+        should_test_updates=BoolWithReason.false("tested in scalar testcase"),
+        should_test_deserialization=BoolWithReason.false("tested in scalar testcase"),
+    ),
 )
 
 OptionalScalarsTestCase = QtGqlTestCase(
@@ -896,6 +915,8 @@ QmlUsageTestCase = QtGqlTestCase(
 
 all_test_cases = [
     ScalarsTestCase,
+    SimpleGarbageCollectionTestCase,
+    GqlOverHttpAsEnvTestCase,
     OptionalScalarsTestCase,
     NoIdOnQueryTestCase,
     DateTimeTestCase,
@@ -928,6 +949,8 @@ all_test_cases = [
 
 implemented_testcases = [
     ScalarsTestCase,
+    SimpleGarbageCollectionTestCase,
+    GqlOverHttpAsEnvTestCase,
     NoIdOnQueryTestCase,
     DateTimeTestCase,
     DecimalTestCase,
@@ -966,4 +989,7 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 
 if __name__ == "__main__":
-    generate_testcases(ListOfUnionTestCase)
+    generate_testcases(
+        FragmentTestCase,
+        NoIdOnQueryTestCase,
+    )

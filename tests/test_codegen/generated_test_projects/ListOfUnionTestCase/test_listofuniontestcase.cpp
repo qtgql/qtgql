@@ -10,7 +10,7 @@ namespace ListOfUnionTestCase {
 using namespace qtgql;
 
 auto ENV_NAME = QString("ListOfUnionTestCase");
-auto SCHEMA_ADDR = get_server_address("87764004");
+auto SCHEMA_ADDR = get_server_address("ListOfUnionTestCase");
 
 TEST_CASE("ListOfUnionTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
