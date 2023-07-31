@@ -25,22 +25,9 @@ signals:
 
 protected slots:
 
-  void set_completed(bool v) {
-    if (m_completed != v) {
-      m_completed = v;
-      emit completedChanged();
-    }
-    if (m_completed) {
-      set_operation_on_flight(false);
-    }
-  }
+  void set_completed(bool v);
 
-  void set_operation_on_flight(bool v) {
-    if (m_operation_on_the_fly != v) {
-      m_operation_on_the_fly = v;
-      emit operationOnFlightChanged();
-    }
-  }
+  void set_operation_on_flight(bool v);
 
 public:
   using QObject::QObject;
@@ -75,7 +62,7 @@ public:
   virtual const QString &ENV_NAME() = 0;
   // end abstract functions.
   std::shared_ptr<Environment> environment() {
-    return Environment::get_env(ENV_NAME()).value();
+    return Environment::get_env_strict(ENV_NAME());
   };
 
   void fetch() {
