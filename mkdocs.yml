@@ -28,6 +28,7 @@ theme:
   logo: assets/logo.svg
   favicon: assets/logo.svg
   features:
+    - content.code.copy
     - navigation.tabs
     - navigation.tabs.sticky
 
@@ -54,6 +55,8 @@ nav:
         - Create a Scalar: ./codegen/scalars/create_scalar.md
       - Contributing: ./contributing.md
       - Server requirements: ./server-requirements.md
+  - Tutorials:
+    - Countries: ./tutorials/countries.md
 
 markdown_extensions:
   - def_list
