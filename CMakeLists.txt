@@ -20,9 +20,9 @@ qt_standard_project_setup()
 
 
 
-file(GLOB_RECURSE QTGQL_SOURCES "include/*.cpp" "include/*.hpp")
+file(GLOB_RECURSE QTGQL_SOURCES "src/*.cpp" "src/*.hpp")
 
-file(GLOB_RECURSE QTGQL_HEADERS "include/*.hpp")
+file(GLOB_RECURSE QTGQL_HEADERS "src/*.hpp")
 
 add_library(${PROJECT_NAME} SHARED ${QTGQL_SOURCES})
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
@@ -40,7 +40,7 @@ target_link_libraries(
 # BASE_DIR should point to the same directory that is used as the
 # target_include_directory, otherwise the install paths may be off.
 target_sources(${PROJECT_NAME} PUBLIC FILE_SET HEADERS
-        BASE_DIRS include
+        BASE_DIRS src
         FILES
         ${QTGQL_HEADERS}
         )
