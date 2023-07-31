@@ -267,7 +267,7 @@ Now you should see something like this:
 
 ![screenshot](../assets/red_win.png)
 
-### Using the [countries](https://countries.trevorblades.com/) schema.
+### Using the [countries'](https://countries.trevorblades.com/) schema.
 
 Create a directory for graphql, we'll call it `graphql`
 
