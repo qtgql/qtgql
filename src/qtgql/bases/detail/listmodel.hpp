@@ -17,7 +17,7 @@ class ListModelMixin : public QAbstractListModel {
 private:
   static QHash<int, QByteArray> default_roles() {
     QHash<int, QByteArray> roles;
-    roles.insert(Qt::UserRole + 1, "qtObject");
+    roles.insert(Qt::UserRole + 1, "data");
     return roles;
   }
 
@@ -59,11 +59,11 @@ signals:
 };
 
 template <typename T> class ListModelABC : public ListModelMixin {
-  typedef std::unique_ptr<std::list<T>> T_List;
+  typedef std::vector<T> T_VEC;
 
 private:
   void update_count() {
-    auto cur_count = m_data->count();
+    auto cur_count = m_data.size();
     if (m_count != cur_count) {
       m_count = cur_count;
       emit countChanged();
@@ -71,7 +71,7 @@ private:
   };
 
 protected:
-  T_List m_data;
+  T_VEC m_data;
 
   void insert_common(const int from, const int to) {
     beginInsertRows(invalid_index(), from, to);
@@ -92,9 +92,9 @@ protected:
   }
 
 public:
-  explicit ListModelABC(QObject *parent, T_List data = {})
+  explicit ListModelABC(QObject *parent, T_VEC data = {})
       : ListModelMixin(parent), m_data{std::move(data)} {
-    m_count = m_data->length();
+    m_count = m_data.length();
   };
 
   [[nodiscard]] QVariant data(const QModelIndex &index,
@@ -102,45 +102,31 @@ public:
     auto row = index.row();
     if (row < m_count && index.isValid()) {
       if (role == DATA_ROLE) {
-        return QVariant::fromValue(static_cast<QObject *>(m_data->value(row)));
+        return QVariant::fromValue(static_cast<QObject *>(m_data.value(row)));
       }
     }
     return {};
   }
 
-  [[nodiscard]] const T &get(int index) const { return m_data->value(index); }
+  [[nodiscard]] const T &get(int index) const { return m_data.at(index); }
 
-  [[nodiscard]] const T &first() const { return m_data->first(); }
+  [[nodiscard]] const T &first() const { return m_data.front(); }
 
-  [[nodiscard]] const T &last() const { return m_data->last(); }
+  [[nodiscard]] const T &last() const { return m_data.back(); }
 
   int rowCount(const QModelIndex &parent = {}) const override {
     return m_count;
   }
 
-  void insert(int index, T *object) {
-    if (index > m_count) {
-      qWarning() << "index " << index << " is greater than count " << m_count
-                 << ". "
-                 << "The item will be inserted at the end of the list";
-      index = m_count;
-    } else if (index < 0) {
-      qWarning() << "index " << index << " is lower than 0. "
-                 << "The item will be inserted at the beginning of the list";
-      index = 0;
-    }
-    insert_common(index, index);
-    if (index < m_count) {
-      m_data->replace(index, object);
-    } else {
-      m_data->insert(index, object);
-    }
+  void replace(std::size_t i, const T &value) {
+    insert_common(i, i);
+    m_data.at(i) = value;
     end_insert_common();
   }
 
-  void append(T *object) {
+  void append(const T &element) {
     insert_common(m_count, m_count);
-    m_data->append(object);
+    m_data.push_back(element);
     end_insert_common();
   }
 
@@ -148,14 +134,14 @@ public:
     bool index_is_valid = (-1 < index && index < m_count);
     int real_index = index_is_valid ? index : (m_count - 1);
     remove_common(real_index, real_index);
-    m_data->remove(real_index);
+    m_data.remove(real_index);
     end_remove_common();
   }
 
   void clear() {
-    if (!m_data->isEmpty()) {
+    if (!m_data.isEmpty()) {
       remove_common(0, m_count - 1);
-      m_data->clear();
+      m_data.clear();
       end_remove_common();
     }
   }
@@ -167,7 +153,7 @@ public:
                   const QModelIndex &parent = QModelIndex()) override {
     if ((row + count) <= m_count) {
       remove_common(row, count);
-      m_data->remove(row, count);
+      m_data.erase(std::next(m_data.begin(), row), m_data.begin() + count);
       end_remove_common();
       return true;
     }

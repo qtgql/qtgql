@@ -60,7 +60,26 @@ if (👉current👈 != new_👉proxy_field.name👈){
     👉proxy_field.type.updater_name👈(👉current👈, 👉f_concrete.name👈_data,  👉operation_pointer👈);
     {% endif %}
 {% elif proxy_field.type.is_model %}
-👉deserialize_concrete_field(proxy_field)👈
+    {% if proxy_field.type.of_type.is_builtin_scalar %}
+    auto 👉f_concrete.name👈_data = data.value("👉f_concrete.name👈").toArray();
+    auto new_len = 👉f_concrete.name👈_data.size();
+    auto prev_len = 👉current👈->rowCount();
+    if (new_len < prev_len){
+        👉current👈->removeRows(prev_len - 1, prev_len - new_len);
+    }
+    for (int  i = 0; i < 👉f_concrete.name👈_data.size(); i++){
+        auto node_data = 👉f_concrete.name👈_data.at(i).👉 f_concrete.type.of_type.from_json_convertor 👈;
+        if (i > prev_len){
+            👉current👈->append(node_data);
+        } else if (node_data != 👉current👈->get(i)){
+            👉current👈->replace(i, node_data);
+        }
+    }
+
+
+{% else %}
+    👉deserialize_concrete_field(proxy_field)👈
+    {% endif %}
 {% elif proxy_field.type.is_enum %}
 auto new_👉f_concrete.name👈= Enums::👉proxy_field.type.is_enum.map_name👈::by_name(data.value("👉proxy_field.name👈").toString());
 if (👉current👈 != new_👉f_concrete.name👈){

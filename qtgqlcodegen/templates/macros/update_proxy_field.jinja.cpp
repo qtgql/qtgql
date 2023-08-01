@@ -4,7 +4,7 @@
 m_inst->👉field.concrete.getter_name👈(👉field.build_variables_tuple_for_field_arguments 👈)
 {%- endset -%}
 auto operation = m_operation;
-{% if field.type.is_model -%}
+{% if field.type.is_model and not field.type.of_type.is_builtin_scalar -%}
     auto new_data = 👉new_concrete👈;
     auto new_len = new_data.size();
     auto prev_len = 👉field.private_name👈->rowCount();
