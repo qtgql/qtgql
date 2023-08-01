@@ -49,6 +49,20 @@ TEST_CASE("ListOfScalarTestCase", "[generated-testcase]") {
     auto model = rnd_post->data()->get_post()->get_tags();
     REQUIRE(model->rowCount() < prev_ln);
   };
+
+  SECTION("test update modify") {
+    auto replace_tag_mut = replaceposttag::ReplacePostTag::shared();
+    QString new_tag("foobar");
+    replace_tag_mut->set_variables(
+        {.postID = rnd_post->data()->get_post()->get_id(),
+         .at = 2,
+         .newTag = new_tag});
+    replace_tag_mut->fetch();
+    test_utils::wait_for_completion(replace_tag_mut);
+    auto model = rnd_post->data()->get_post()->get_tags();
+    REQUIRE(model->data(model->index(2), 257).toString().toStdString() ==
+            new_tag.toStdString());
+  };
 }
 
 }; // namespace ListOfScalarTestCase

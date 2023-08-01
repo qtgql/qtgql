@@ -77,7 +77,7 @@ private:
     if constexpr (is_shared_ptr<T>::value)
       return QVariant::fromValue(static_cast<QObject *>(node.get()));
     else
-      return QVariant::fromValue(node);
+      return node;
   };
 
 protected:
