@@ -74,8 +74,8 @@ private:
     }
   };
   QVariant p_dataFn(const T &node) const {
-    if constexpr (is_shared_ptr<T>::value)
-      return QVariant::fromValue(static_cast<QObject *>(node.get()));
+    if constexpr (std::is_pointer_v<T>)
+      return QVariant::fromValue(qobject_cast<QObject *>(node));
     else
       return node;
   };
@@ -136,9 +136,11 @@ public:
   }
 
   void replace(std::size_t i, const T &value) {
-    insert_common(i, i);
-    m_data.at(i) = value;
-    end_insert_common();
+    if (i < m_count) {
+      insert_common(i, i);
+      m_data.at(i) = value;
+      end_insert_common();
+    }
   }
 
   void append(const T &element) {
@@ -151,12 +153,12 @@ public:
     bool index_is_valid = (-1 < index && index < m_count);
     int real_index = index_is_valid ? index : (m_count - 1);
     remove_common(real_index, real_index);
-    m_data.remove(real_index);
+    m_data.erase(std::next(m_data.begin() + real_index));
     end_remove_common();
   }
 
   void clear() {
-    if (!m_data.isEmpty()) {
+    if (!m_data.empty()) {
       remove_common(0, m_count - 1);
       m_data.clear();
       end_remove_common();

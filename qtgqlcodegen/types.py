@@ -174,7 +174,7 @@ class QtGqlList(QtGqlTypeABC):
     @property
     def property_type(self) -> str:
         if self.of_type.is_queried_object_type or self.of_type.is_queried_interface:
-            return f"{QtGqlTypes.ListModelABC.name}<{self.of_type.property_type}> *"  # TODO: check what would this return now.
+            return f"{QtGqlTypes.ListModelABC.name}<{self.of_type.property_type}> *"
         if self.of_type.is_queried_union:
             return f"{QtGqlTypes.ListModelABC.name}<{self.of_type.property_type}> *"
         if bs := self.of_type.is_builtin_scalar:

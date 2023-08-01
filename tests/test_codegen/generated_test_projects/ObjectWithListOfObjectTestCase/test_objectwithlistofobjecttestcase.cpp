@@ -75,8 +75,8 @@ TEST_CASE("default ListModelABC modifications and operations",
   }
 
   SECTION("test returns data") {
-    auto res = model_with_data->data(model_with_data->index(0),
-                                     ModelType ::QOBJECT_ROLE);
+    auto res =
+        model_with_data->data(model_with_data->index(0), ModelType ::DATA_ROLE);
     REQUIRE(res.canConvert<ObjectType>());
     auto v = res.value<ObjectType *>();
     REQUIRE(v->get_name() ==
@@ -126,22 +126,11 @@ TEST_CASE("default ListModelABC modifications and operations",
     REQUIRE(before_count == after_count - 1);
     REQUIRE(model_with_data->last() == new_obj);
   }
-  SECTION("test insert") {
+  SECTION("test replace") {
     auto new_obj = new mainquery::Person__userfriends(
         mq.get(), std::make_shared<ObjectWithListOfObjectTestCase::Person>());
     auto before_count = model_with_data->rowCount();
-    model_with_data->insert(24234124, new_obj);
-    insert_spy.validate();
-    auto after_count = model_with_data->rowCount();
-    REQUIRE(before_count == after_count - 1);
-    REQUIRE(model_with_data->last() == new_obj);
-  }
-  SECTION("test insert after max index") {
-    QSignalSpy spy(model_with_data, &ModelType ::rowsAboutToBeInserted);
-    auto new_obj = new mainquery::Person__userfriends(
-        mq.get(), std::make_shared<ObjectWithListOfObjectTestCase::Person>());
-    auto before_count = model_with_data->rowCount();
-    model_with_data->insert(20000, new_obj);
+    model_with_data->replace(model_with_data->rowCount() - 1, new_obj);
     insert_spy.validate();
     auto after_count = model_with_data->rowCount();
     REQUIRE(before_count == after_count - 1);

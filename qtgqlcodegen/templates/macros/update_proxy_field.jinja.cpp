@@ -15,14 +15,14 @@ auto operation = m_operation;
         const auto& concrete = new_data.at(i);
     {% if field.type.of_type.is_queried_object_type -%}
         if (i > prev_len){
-            👉field.private_name👈->insert(i, new 👉field.type.of_type.name👈(operation, concrete));
+            👉field.private_name👈->append(new 👉field.type.of_type.name👈(operation, concrete));
         } else {
             auto proxy_to_update = 👉field.private_name👈->get(i);
             if(proxy_to_update){
                 proxy_to_update->qtgql_replace_concrete(concrete);
             }
             else{ {#// handle optionals no need to delete -#}
-                👉field.private_name👈->insert(i, new 👉field.type.of_type.name👈(operation, concrete));
+                👉field.private_name👈->replace(i, new 👉field.type.of_type.name👈(operation, concrete));
             }
         }
 
@@ -32,14 +32,14 @@ auto operation = m_operation;
         {% for choice in field.type.of_type.choices %}
         {% set do_on_meets -%}
         if (i > prev_len){
-            👉field.private_name👈->insert(i, new 👉choice.name👈(operation, std::static_pointer_cast<👉choice.concrete.name👈>(concrete)));
+            👉field.private_name👈->append(new 👉choice.name👈(operation, std::static_pointer_cast<👉choice.concrete.name👈>(concrete)));
         } else{
             auto proxy_to_update = 👉field.private_name👈->get(i);
             if (proxy_to_update && proxy_to_update->__typename() == "👉choice.concrete.name👈"){
                 qobject_cast<👉choice.property_type👈>(proxy_to_update)->qtgql_replace_concrete(std::static_pointer_cast<👉choice.concrete.name👈>(concrete));
             }
             else{
-                👉field.private_name👈->insert(i, new 👉choice.name👈(operation, std::static_pointer_cast<👉choice.concrete.name👈>(concrete)));
+                👉field.private_name👈->replace(i, new 👉choice.name👈(operation, std::static_pointer_cast<👉choice.concrete.name👈>(concrete)));
                 delete proxy_to_update; {# // might have been optional or the type_name changed #}
             }
 
