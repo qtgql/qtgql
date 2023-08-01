@@ -17,6 +17,11 @@ TEST_CASE("ListOfScalarTestCase", "[generated-testcase]") {
   SECTION("test deserialize") {
     rnd_post->fetch();
     test_utils::wait_for_completion(rnd_post);
+    auto tags_model = rnd_post->data()->get_post()->get_tags();
+    REQUIRE(tags_model->rowCount() > 0);
+    for (const auto &tag : *tags_model) {
+      REQUIRE(!tag.isEmpty());
+    }
   };
   SECTION("test update") { REQUIRE(false); };
 }

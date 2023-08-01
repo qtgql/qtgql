@@ -157,16 +157,18 @@ class QtGqlList(QtGqlTypeABC):
 
     @property
     def member_type(self) -> str:
-        if bs := self.of_type.is_builtin_scalar:
+        if self.of_type.is_builtin_scalar:
             # scalars has no underlying fields hence they don't need to be
             # proxied. So each proxy would get an instance to the model.
-            return f"std::shared_ptr<{QtGqlTypes.ListModelABC.name}<{bs.member_type}>>"
+            return f"std::shared_ptr<{self.type_name()}>"
 
-        return f"std::list<{self.of_type.member_type}>"
+        return f"std::vector<{self.of_type.member_type}>"
 
     def type_name(self) -> str:
+        if bs := self.of_type.is_builtin_scalar:
+            return f"{QtGqlTypes.ListModelABC.name}<{bs.member_type}>"
         raise NotImplementedError(
-            "models have no valid type for schema concretes, call member_type",
+            "complex models have no valid type for schema concretes, call member_type",
         )
 
     @property

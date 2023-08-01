@@ -94,7 +94,7 @@ protected:
 public:
   explicit ListModelABC(QObject *parent, T_VEC data = {})
       : ListModelMixin(parent), m_data{std::move(data)} {
-    m_count = m_data.length();
+    m_count = m_data.size();
   };
 
   [[nodiscard]] QVariant data(const QModelIndex &index,
@@ -102,12 +102,19 @@ public:
     auto row = index.row();
     if (row < m_count && index.isValid()) {
       if (role == DATA_ROLE) {
-        return QVariant::fromValue(static_cast<QObject *>(m_data.value(row)));
+        return m_data.at(row);
       }
     }
     return {};
   }
+  // ──────── ITERATOR ──────────
+public:
+  using T_const_iterator = T_VEC::const_iterator;
+  T_const_iterator begin() const { return m_data.begin(); }
+  T_const_iterator end() const { return m_data.end(); }
 
+  // C++ API
+public:
   [[nodiscard]] const T &get(int index) const { return m_data.at(index); }
 
   [[nodiscard]] const T &first() const { return m_data.front(); }
