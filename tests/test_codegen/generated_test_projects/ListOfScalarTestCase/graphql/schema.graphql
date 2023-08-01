@@ -1,3 +1,7 @@
+type Mutation {
+  addTag(postId: ID!, tag: String!): Post!
+}
+
 interface Node {
   id: ID!
 }

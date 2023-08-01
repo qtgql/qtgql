@@ -1,4 +1,5 @@
-#include "graphql/__generated__/getRndPost.hpp"
+#include "graphql/__generated__/AddPostTag.hpp"
+#include "graphql/__generated__/GetRndPost.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>
 #include <catch2/catch_test_macros.hpp>
@@ -12,18 +13,28 @@ auto SCHEMA_ADDR = get_server_address("ListOfScalarTestCase");
 TEST_CASE("ListOfScalarTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
-  auto rnd_post = getrndpost::getRndPost::shared();
-
+  auto rnd_post = getrndpost::GetRndPost::shared();
+  rnd_post->fetch();
+  test_utils::wait_for_completion(rnd_post);
   SECTION("test deserialize") {
-    rnd_post->fetch();
-    test_utils::wait_for_completion(rnd_post);
+
     auto tags_model = rnd_post->data()->get_post()->get_tags();
     REQUIRE(tags_model->rowCount() > 0);
     for (const auto &tag : *tags_model) {
       REQUIRE(!tag.isEmpty());
     }
   };
-  SECTION("test update") { REQUIRE(false); };
+  SECTION("test update append") {
+    auto add_tag_mut = addposttag::AddPostTag::shared();
+    QString new_tag("foobar");
+    add_tag_mut->set_variables(
+        {.postID = rnd_post->data()->get_post()->get_id(), .tag = new_tag});
+    add_tag_mut->fetch();
+    test_utils::wait_for_completion(add_tag_mut);
+    auto model = rnd_post->data()->get_post()->get_tags();
+    auto last = model->last();
+    REQUIRE(last.toStdString() == new_tag.toStdString());
+  };
 }
 
 }; // namespace ListOfScalarTestCase

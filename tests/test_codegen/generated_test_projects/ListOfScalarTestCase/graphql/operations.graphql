@@ -1,6 +1,13 @@
 
-    query getRndPost{
+    query GetRndPost{
       post{
+        content
+        tags
+      }
+    }
+
+    mutation AddPostTag($postID: ID!, $tag: String!){
+      addTag(postId: $postID, tag: $tag){
         content
         tags
       }

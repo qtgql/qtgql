@@ -3,7 +3,7 @@ from __future__ import annotations
 import strawberry
 
 from tests.conftest import factory
-from tests.test_codegen.schemas.node_interface import Node
+from tests.test_codegen.schemas.node_interface import NODE_DB, Node
 
 
 def create_tags() -> list[str]:
@@ -12,7 +12,7 @@ def create_tags() -> list[str]:
 
 @strawberry.type
 class Post(Node):
-    content: str = strawberry.field(default_factory=factory.text.answer)
+    content: str = strawberry.field(default_factory=factory.text.quote)
     tags: list[str] = strawberry.field(default_factory=create_tags)
 
 
@@ -23,4 +23,13 @@ class Query:
         return Post()
 
 
-schema = strawberry.Schema(query=Query)
+@strawberry.type()
+class Mutation:
+    @strawberry.field
+    def add_tag(self, post_id: strawberry.ID, tag: str) -> Post:
+        post: Post = NODE_DB.get(post_id)
+        post.tags.append(tag)
+        return post
+
+
+schema = strawberry.Schema(query=Query, mutation=Mutation)

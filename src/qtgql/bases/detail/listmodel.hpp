@@ -125,11 +125,11 @@ public:
 
   // C++ API
 public:
-  [[nodiscard]] const T &get(int index) const { return m_data.at(index); }
+  [[nodiscard]] const auto &get(int index) const { return m_data.at(index); }
 
-  [[nodiscard]] const T &first() const { return m_data.front(); }
+  [[nodiscard]] const auto &first() const { return m_data.front(); }
 
-  [[nodiscard]] const T &last() const { return m_data.back(); }
+  [[nodiscard]] const auto &last() const { return m_data.back(); }
 
   int rowCount(const QModelIndex &parent = {}) const override {
     return m_count;

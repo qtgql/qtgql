@@ -916,13 +916,19 @@ QmlUsageTestCase = QtGqlTestCase(
 ListOfScalarTestCase = QtGqlTestCase(
     schema=schemas.list_of_scalar.schema,
     operations="""
-    query getRndPost{
+    query GetRndPost{
       post{
         content
         tags
       }
     }
 
+    mutation AddPostTag($postID: ID!, $tag: String!){
+      addTag(postId: $postID, tag: $tag){
+        content
+        tags
+      }
+    }
     """,
     test_name="ListOfScalarTestCase",
 )
