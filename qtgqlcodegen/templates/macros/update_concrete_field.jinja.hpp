@@ -69,7 +69,7 @@ if (👉current👈 != new_👉proxy_field.name👈){
     }
     for (int  i = 0; i < 👉f_concrete.name👈_data.size(); i++){
         auto node_data = 👉f_concrete.name👈_data.at(i).👉 f_concrete.type.of_type.from_json_convertor 👈;
-        if (i > prev_len){
+        if (i >= prev_len){
             👉current👈->append(node_data);
         } else if (node_data != 👉current👈->get(i)){
             👉current👈->replace(i, node_data);

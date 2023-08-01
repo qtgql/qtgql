@@ -170,7 +170,8 @@ public:
                   const QModelIndex &parent = QModelIndex()) override {
     if ((row + count) <= m_count) {
       remove_common(row, count);
-      m_data.erase(std::next(m_data.begin(), row), m_data.begin() + count);
+      m_data.erase(std::next(m_data.begin(), row),
+                   std::next(m_data.begin(), row + count));
       end_remove_common();
       return true;
     }

@@ -31,5 +31,17 @@ class Mutation:
         post.tags.append(tag)
         return post
 
+    @strawberry.field
+    def remove_tag(self, post_id: strawberry.ID, at: int) -> Post:
+        post: Post = NODE_DB.get(post_id)
+        post.tags.pop(at)
+        return post
+
+    @strawberry.field()
+    def replace_tag(self, post_id: strawberry.ID, new_tag: str, at: int) -> Post:
+        post: Post = NODE_DB.get(post_id)
+        post.tags[at] = new_tag
+        return post
+
 
 schema = strawberry.Schema(query=Query, mutation=Mutation)

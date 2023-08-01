@@ -929,6 +929,20 @@ ListOfScalarTestCase = QtGqlTestCase(
         tags
       }
     }
+
+    mutation RemovePostTag($postID: ID!, $at: Int!){
+      removeTag(postId: $postID, at: $at){
+        content
+        tags
+      }
+    }
+
+    mutation ReplacePostTag($postID: ID!, $at: Int!, $newTag: String!){
+      replaceTag(postId: $postID, at: $at, newTag: $newTag){
+        content
+        tags
+      }
+    }
     """,
     test_name="ListOfScalarTestCase",
 )

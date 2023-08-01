@@ -1,5 +1,7 @@
 type Mutation {
   addTag(postId: ID!, tag: String!): Post!
+  removeTag(postId: ID!, at: Int!): Post!
+  replaceTag(postId: ID!, newTag: String!, at: Int!): Post!
 }
 
 interface Node {
