@@ -58,6 +58,10 @@ signals:
   void currentIndexChanged();
 };
 
+template <typename T> struct is_shared_ptr : std::false_type {};
+template <typename T>
+struct is_shared_ptr<std::shared_ptr<T>> : std::true_type {};
+
 template <typename T> class ListModelABC : public ListModelMixin {
   typedef std::vector<T> T_VEC;
 
@@ -68,6 +72,12 @@ private:
       m_count = cur_count;
       emit countChanged();
     }
+  };
+  QVariant p_dataFn(const T &node) const {
+    if constexpr (is_shared_ptr<T>::value)
+      return QVariant::fromValue(static_cast<QObject *>(node.get()));
+    else
+      return QVariant::fromValue(node);
   };
 
 protected:
@@ -102,7 +112,7 @@ public:
     auto row = index.row();
     if (row < m_count && index.isValid()) {
       if (role == DATA_ROLE) {
-        return m_data.at(row);
+        return p_dataFn(m_data.at(row));
       }
     }
     return {};
