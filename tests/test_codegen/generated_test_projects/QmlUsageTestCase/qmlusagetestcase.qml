@@ -23,7 +23,7 @@ Item {
             ListView {
                 model: main_query.data?.user.friends
                 delegate: Text {
-                    property Person__userfriends friend: model.qtObject
+                    property Person__userfriends friend: model.data
                     text: `name: ${friend.name} age: ${friend.age}`
                     Component.onCompleted: {
                         if (friend.name != "") {
