@@ -954,6 +954,9 @@ ListOfScalarArgumentTestCase = QtGqlTestCase(
     }
     """,
     test_name="ListOfScalarArgumentTestCase",
+    metadata=TestCaseMetadata(
+        should_test_updates=BoolWithReason.false("input types are not cached ATM"),
+    ),
 )
 all_test_cases = [
     ScalarsTestCase,
