@@ -1,6 +1,19 @@
 CHANGELOG
 =========
 
+0.132.0 - 2023-08-02
+--------------------
+
+This release adds support for list of scalars.
+
+### Breaking Changes
+
+- Models now expose `data` role instead of `qtObject` role since
+it can also be an `int` for example.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #348](https://github.com/qtgql/qtgql/pull/348/)
+
+
 0.131.0 - 2023-07-31
 --------------------
 
