@@ -13,7 +13,7 @@ auto SCHEMA_ADDR = get_server_address("ObjectWithListOfObjectTestCase");
 TEST_CASE("ObjectWithListOfObjectTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
-  auto mq = std::make_shared<mainquery::MainQuery>();
+  auto mq = mainquery::MainQuery::shared();
   mq->fetch();
   test_utils::wait_for_completion(mq);
   SECTION("test deserialize") {
@@ -64,10 +64,10 @@ TEST_CASE("default ListModelABC modifications and operations",
   QSignalSpy p_after_insert(model_with_data, &ModelType::rowsInserted);
   test_utils::ModelSignalSpy insert_spy(&p_pre_insert, &p_after_insert);
 
-  SECTION("object role is USER_ROLE + 1") {
+  SECTION("data role is USER_ROLE + 1") {
     int expected = Qt::UserRole + 1;
     auto roles = model_with_data->roleNames();
-    REQUIRE(roles.value(expected) == QByteArray("qtObject"));
+    REQUIRE(roles.value(expected) == QByteArray("data"));
   }
 
   SECTION("test row count") {
@@ -75,8 +75,8 @@ TEST_CASE("default ListModelABC modifications and operations",
   }
 
   SECTION("test returns data") {
-    auto res = model_with_data->data(model_with_data->index(0),
-                                     ModelType ::QOBJECT_ROLE);
+    auto res =
+        model_with_data->data(model_with_data->index(0), ModelType ::DATA_ROLE);
     REQUIRE(res.canConvert<ObjectType>());
     auto v = res.value<ObjectType *>();
     REQUIRE(v->get_name() ==
@@ -84,14 +84,20 @@ TEST_CASE("default ListModelABC modifications and operations",
   }
 
   SECTION("test pop") {
+    qDebug() << "Before";
+    qDebug() << "First: " << model_with_data->first()->get_name().toStdString();
+    qDebug() << "Last: " << model_with_data->last()->get_name().toStdString();
     model_with_data->pop();
+    qDebug() << "After";
+    qDebug() << "First: " << model_with_data->first()->get_name().toStdString();
+    qDebug() << "Last: " << model_with_data->last()->get_name().toStdString();
     REQUIRE(model_with_data->rowCount() == raw_friends_list.size() - 1);
-    auto val =
-        model_with_data->get(model_with_data->rowCount() - 1)->get_name();
+    auto val = model_with_data->last()->get_name().toStdString();
     auto val2 = raw_friends_list.at(model_with_data->rowCount() - 1)
                     .toObject()
                     .value("name")
-                    .toString();
+                    .toString()
+                    .toStdString();
     REQUIRE(val == val2);
     remove_spy.validate();
   }
@@ -107,7 +113,7 @@ TEST_CASE("default ListModelABC modifications and operations",
     remove_spy.validate();
   }
   SECTION("test remove rows inside") {
-    REQUIRE(model_with_data->rowCount() == 20);
+    REQUIRE(model_with_data->rowCount() == 5);
     auto first_item = model_with_data->first();
     REQUIRE(model_with_data->removeRows(1, model_with_data->rowCount() - 1));
     remove_spy.validate();
@@ -126,25 +132,14 @@ TEST_CASE("default ListModelABC modifications and operations",
     REQUIRE(before_count == after_count - 1);
     REQUIRE(model_with_data->last() == new_obj);
   }
-  SECTION("test insert") {
+  SECTION("test replace") {
     auto new_obj = new mainquery::Person__userfriends(
         mq.get(), std::make_shared<ObjectWithListOfObjectTestCase::Person>());
     auto before_count = model_with_data->rowCount();
-    model_with_data->insert(24234124, new_obj);
+    model_with_data->replace(model_with_data->rowCount() - 1, new_obj);
     insert_spy.validate();
     auto after_count = model_with_data->rowCount();
-    REQUIRE(before_count == after_count - 1);
-    REQUIRE(model_with_data->last() == new_obj);
-  }
-  SECTION("test insert after max index") {
-    QSignalSpy spy(model_with_data, &ModelType ::rowsAboutToBeInserted);
-    auto new_obj = new mainquery::Person__userfriends(
-        mq.get(), std::make_shared<ObjectWithListOfObjectTestCase::Person>());
-    auto before_count = model_with_data->rowCount();
-    model_with_data->insert(20000, new_obj);
-    insert_spy.validate();
-    auto after_count = model_with_data->rowCount();
-    REQUIRE(before_count == after_count - 1);
+    REQUIRE(before_count == after_count);
     REQUIRE(model_with_data->last() == new_obj);
   }
 

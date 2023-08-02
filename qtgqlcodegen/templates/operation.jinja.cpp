@@ -106,7 +106,10 @@ void 👉 t.updater_name 👈(👉 t.concrete.member_type_arg 👈 inst, const Q
 // 👉 t.name 👈 Getters
 {%for f in t.fields -%}
 [[nodiscard]] const 👉 f.type.property_type 👈  👉 t.name 👈::👉 f.concrete.getter_name 👈() const {
-{% if f.type.is_queried_object_type or f.type.is_model or f.type.is_queried_interface or f.type.is_queried_union %}
+
+{% if f.type.is_model and f.type.of_type.is_builtin_scalar -%}
+return m_inst->👉 f.concrete.getter_name 👈(👉f.build_variables_tuple_for_field_arguments.replace("operation", "m_operation")👈).get();
+{% elif f.type.is_queried_object_type or f.type.is_queried_interface or f.type.is_queried_union or f.type.is_model  -%}
 return 👉f.private_name👈;
 {% else -%}
 return m_inst->👉 f.concrete.getter_name 👈(👉f.build_variables_tuple_for_field_arguments.replace("operation", "m_operation")👈);

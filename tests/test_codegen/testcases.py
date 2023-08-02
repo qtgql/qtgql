@@ -913,6 +913,40 @@ QmlUsageTestCase = QtGqlTestCase(
     ),
 )
 
+ListOfScalarTestCase = QtGqlTestCase(
+    schema=schemas.list_of_scalar.schema,
+    operations="""
+    query GetRndPost{
+      post{
+        content
+        tags
+      }
+    }
+
+    mutation AddPostTag($postID: ID!, $tag: String!){
+      addTag(postId: $postID, tag: $tag){
+        content
+        tags
+      }
+    }
+
+    mutation RemovePostTag($postID: ID!, $at: Int!){
+      removeTag(postId: $postID, at: $at){
+        content
+        tags
+      }
+    }
+
+    mutation ReplacePostTag($postID: ID!, $at: Int!, $newTag: String!){
+      replaceTag(postId: $postID, at: $at, newTag: $newTag){
+        content
+        tags
+      }
+    }
+    """,
+    test_name="ListOfScalarTestCase",
+)
+
 all_test_cases = [
     ScalarsTestCase,
     SimpleGarbageCollectionTestCase,
@@ -941,10 +975,11 @@ all_test_cases = [
     FragmentsOnInterfaceTestCase,
     FragmentWithOperationVariable,
     NodeUnionTestCase,
+    QmlUsageTestCase,
+    ListOfScalarTestCase,
     CustomUserScalarTestCase,
     ObjectsThatReferenceEachOtherTestCase,
     RootListOfTestCase,
-    QmlUsageTestCase,
 ]
 
 implemented_testcases = [
@@ -976,6 +1011,7 @@ implemented_testcases = [
     FragmentWithOperationVariable,
     NodeUnionTestCase,
     QmlUsageTestCase,
+    ListOfScalarTestCase,
 ]
 
 
@@ -990,6 +1026,14 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 if __name__ == "__main__":
     generate_testcases(
+        NonNodeUnionTestCase,
+        ListOfNonNodeType,
+        ListOfUnionTestCase,
+        ListOfInterfaceTestcase,
         FragmentTestCase,
-        NoIdOnQueryTestCase,
+        FragmentsOnInterfaceTestCase,
+        FragmentWithOperationVariable,
+        NodeUnionTestCase,
+        QmlUsageTestCase,
+        ListOfScalarTestCase,
     )
