@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Hashable, Literal, TypeVar
+import functools
+from typing import TYPE_CHECKING, Any, Callable, Hashable, Literal, TypeVar
 
 from attr import define
 
@@ -15,27 +16,6 @@ class FileSpec:
 
     def dump(self) -> None:
         self.path.write_text(self.content, "UTF-8")
-
-
-class AntiForwardRef:
-    """i.e:
-
-    Union["someString"] would return a ForwardRef, this class is a
-    simple hack to just return a type contains the name. Also, this is a
-    workaround for types that reference each-other, otherwise it would
-    cause recursion error.
-    """
-
-    name: str
-    type_map: dict
-
-    @classmethod
-    def resolve(cls) -> Any:
-        return cls.type_map[cls.name]
-
-
-def anti_forward_ref(name: str, type_map: dict) -> type[AntiForwardRef]:
-    return type(name, (AntiForwardRef,), {"name": name, "type_map": type_map})
 
 
 UNSET: Any = Literal["UNSET"]
@@ -73,3 +53,28 @@ class HashAbleDict(dict[T_Key, T_Value]):
 
     def __hash__(self):
         return hash(frozenset(self.keys()))
+
+
+def cached_method():
+    def wrapper(fn: Callable):
+        cache_name = f"{fn.__name__}__cache"
+
+        @functools.wraps(fn)
+        def cacher(self, *args, **kwargs):
+            if kwargs:  # pragma: no cover
+                raise Exception(f"cached method must be used with kwargs. got {kwargs}")
+            cache: dict = getattr(self, cache_name, None)
+            if not cache:
+                cache = {}
+                setattr(self, cache_name, cache)
+
+            hashed = hash(args)
+            ret = cache.get(hashed, None)
+            if not ret:
+                ret = fn(self, *args)
+                cache[hashed] = ret
+            return ret
+
+        return cacher
+
+    return wrapper

@@ -122,7 +122,6 @@ public:
   using T_const_iterator = T_VEC::const_iterator;
   T_const_iterator begin() const { return m_data.begin(); }
   T_const_iterator end() const { return m_data.end(); }
-
   // C++ API
 public:
   [[nodiscard]] const auto &get(int index) const { return m_data.at(index); }
@@ -149,11 +148,16 @@ public:
     end_insert_common();
   }
 
+  // removes item at index. if index is -1 removes from the end of the vec.
   void pop(int index = -1) {
+    if (m_data.empty()) {
+      return;
+    }
     bool index_is_valid = (-1 < index && index < m_count);
     int real_index = index_is_valid ? index : (m_count - 1);
+
     remove_common(real_index, real_index);
-    m_data.erase(std::next(m_data.begin() + real_index));
+    m_data.erase(std::next(m_data.begin(), real_index));
     end_remove_common();
   }
 

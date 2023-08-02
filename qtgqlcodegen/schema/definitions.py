@@ -7,7 +7,7 @@ from attr import Factory, define
 from graphql import OperationType
 
 from qtgqlcodegen.types import BuiltinScalars
-from qtgqlcodegen.utils import require
+from qtgqlcodegen.utils import cached_method, require
 
 if TYPE_CHECKING:
     from graphql.type import definition as gql_def
@@ -133,9 +133,13 @@ class SchemaTypeInfo:
     def get_enum(self, name: str) -> QtGqlEnumDefinition | None:
         return self.enums.get(name, None)
 
-    def get_input(self, name: str) -> QtGqlInputObjectTypeDefinition | None:
+    def get_input_type(self, name: str) -> QtGqlInputObjectTypeDefinition | None:
         return self.input_objects.get(name, None)
 
+    def get_custom_scalar(self, name: str) -> CustomScalarDefinition | None:
+        return self.custom_scalars.get(name, None)
+
+    @cached_method()
     def get_type(self, name: str) -> QtGqlTypeABC:
         """
         :param name: Any type name
@@ -146,7 +150,8 @@ class SchemaTypeInfo:
             or self.get_object_type(name)
             or self.get_interface(name)
             or self.get_enum(name)
-            or self.get_input(name),
+            or self.get_input_type(name)
+            or self.get_custom_scalar(name),
         )
 
     def add_objecttype(self, objecttype: QtGqlObjectType) -> None:
