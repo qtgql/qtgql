@@ -13,7 +13,7 @@ auto SCHEMA_ADDR = get_server_address("ObjectWithListOfObjectTestCase");
 TEST_CASE("ObjectWithListOfObjectTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
-  auto mq = std::make_shared<mainquery::MainQuery>();
+  auto mq = mainquery::MainQuery::shared();
   mq->fetch();
   test_utils::wait_for_completion(mq);
   SECTION("test deserialize") {

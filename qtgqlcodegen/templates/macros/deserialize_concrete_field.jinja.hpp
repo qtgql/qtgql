@@ -46,8 +46,8 @@ auto 👉proxy_field.name👈_typename  = 👉proxy_field.name👈_data.value("_
         {% else %}
         throw qtgql::exceptions::NotImplementedError({"can't deserialize model of 👉proxy_field.type.of_type.__class__👈"});
         {% endif %}
-        👉 setter_name 👈(👉proxy_field.name👈_init_vec 👉 setter_end 👈);
         };
+        👉 setter_name 👈(👉proxy_field.name👈_init_vec 👉 setter_end 👈);
     {% endif %}
 {% elif proxy_field.type.is_builtin_scalar -%}
     {% if proxy_field.type.is_void -%}
