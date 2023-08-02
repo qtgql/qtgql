@@ -62,7 +62,7 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
 
     @cached_property
     def arguments_type(self) -> str:
-        return "std::tuple<" + ",".join([arg.type.type_name() for arg in self.arguments]) + ">"
+        return "std::tuple<" + ",".join([arg.type.member_type_arg for arg in self.arguments]) + ">"
 
     def index_for_argument(self, arg: str) -> int:
         return self.arguments.index(self.arguments_dict[arg])

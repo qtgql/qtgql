@@ -946,7 +946,15 @@ ListOfScalarTestCase = QtGqlTestCase(
     """,
     test_name="ListOfScalarTestCase",
 )
-
+ListOfScalarArgumentTestCase = QtGqlTestCase(
+    schema=schemas.list_of_scalar_argument.schema,
+    operations="""
+    query EchoArg($what: [String!]!){
+      echo(what: $what)
+    }
+    """,
+    test_name="ListOfScalarArgumentTestCase",
+)
 all_test_cases = [
     ScalarsTestCase,
     SimpleGarbageCollectionTestCase,
@@ -977,6 +985,7 @@ all_test_cases = [
     NodeUnionTestCase,
     QmlUsageTestCase,
     ListOfScalarTestCase,
+    ListOfScalarArgumentTestCase,
     CustomUserScalarTestCase,
     ObjectsThatReferenceEachOtherTestCase,
     RootListOfTestCase,
@@ -1012,6 +1021,7 @@ implemented_testcases = [
     NodeUnionTestCase,
     QmlUsageTestCase,
     ListOfScalarTestCase,
+    ListOfScalarArgumentTestCase,
 ]
 
 
@@ -1026,14 +1036,5 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 if __name__ == "__main__":
     generate_testcases(
-        NonNodeUnionTestCase,
-        ListOfNonNodeType,
-        ListOfUnionTestCase,
-        ListOfInterfaceTestcase,
-        FragmentTestCase,
-        FragmentsOnInterfaceTestCase,
-        FragmentWithOperationVariable,
-        NodeUnionTestCase,
-        QmlUsageTestCase,
-        ListOfScalarTestCase,
+        ListOfScalarArgumentTestCase,
     )

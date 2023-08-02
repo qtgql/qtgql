@@ -30,6 +30,7 @@ from qtgqlcodegen.schema.definitions import (
     SchemaTypeInfo,
 )
 from qtgqlcodegen.types import (
+    QtGqlInputList,
     QtGqlInterface,
     QtGqlList,
     QtGqlOptional,
@@ -80,7 +81,7 @@ def _evaluate_variable_node_type(
         is_optional = False
 
     if list_node := is_list_node(node):
-        ret = QtGqlList(
+        ret = QtGqlInputList(
             of_type=_evaluate_variable_node_type(type_info, list_node.type),
         )
 

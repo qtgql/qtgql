@@ -45,6 +45,10 @@ class QtGqlTypeABC(ABC):
         return None
 
     @property
+    def is_input_list(self) -> QtGqlInputList | None:
+        return None
+
+    @property
     def is_enum(self) -> QtGqlEnumDefinition | None:
         return None
 
@@ -180,6 +184,17 @@ class QtGqlList(QtGqlTypeABC):
         if bs := self.of_type.is_builtin_scalar:
             return f"{QtGqlTypes.ListModelABC.name}<{bs.member_type}> *"
         raise NotImplementedError
+
+
+@define
+class QtGqlInputList(QtGqlTypeABC):
+    of_type: QtGqlTypeABC
+
+    def is_input_list(self) -> QtGqlInputList | None:
+        return self
+
+    def type_name(self) -> str:
+        return f"std::list<{self.of_type.type_name()}>"
 
 
 @define
