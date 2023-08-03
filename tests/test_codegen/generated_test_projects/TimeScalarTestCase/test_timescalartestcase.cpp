@@ -20,7 +20,7 @@ TEST_CASE("TimeScalarTestCase", "[generated-testcase]") {
   SECTION("test deserialize") {
     auto user = mq->data()->get_user();
     auto now = QDateTime::currentDateTime(QTimeZone::utc()).time().toString();
-    REQUIRE(user->get_lunchTime() == now);
+    REQUIRE(user->get_lunchTime().toStdString() == now.toStdString());
   }
   SECTION("test update and as operation variables") {
     auto old_user = mq->data()->get_user();
