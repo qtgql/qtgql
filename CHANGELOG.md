@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+0.133.0 - 2023-08-03
+--------------------
+
+This release adds support for list of scalars argument.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #349](https://github.com/qtgql/qtgql/pull/349/)
+
+
 0.132.0 - 2023-08-02
 --------------------
 
