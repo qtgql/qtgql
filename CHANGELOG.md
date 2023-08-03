@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+0.133.1 - 2023-08-03
+--------------------
+
+This release adds padronizes serialization for input arguments and input objects.
+This solves a case that list of arguments in input object couldn't serialize.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #351](https://github.com/qtgql/qtgql/pull/351/)
+
+
 0.133.0 - 2023-08-03
 --------------------
 
