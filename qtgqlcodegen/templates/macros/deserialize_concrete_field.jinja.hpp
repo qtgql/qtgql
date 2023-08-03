@@ -32,7 +32,7 @@ auto 👉proxy_field.name👈_typename  = 👉proxy_field.name👈_data.value("_
         👉proxy_field.concrete.type.member_type👈 👉proxy_field.name👈_init_vec;
         for (const auto& node: data.value("👉proxy_field.name👈").toArray()){
         {% if proxy_field.type.is_model.of_type.is_queried_object_type %}
-            👉proxy_field.name👈_init_vec.push_back(👉 proxy_field.type.is_model.of_type.is_queried_object_type.deserializer_name 👈(node.toObject(), 👉operation_pointer👈));
+            👉proxy_field.name👈_init_vec.push_back(👉 proxy_field.type.of_type.is_queried_object_type.deserializer_name 👈(node.toObject(), 👉operation_pointer👈));
         {% elif proxy_field.type.is_model.of_type.is_queried_union or proxy_field.type.is_model.of_type.is_queried_interface %}
             auto node_data = node.toObject();
             auto 👉proxy_field.name👈_typename = node_data.value("__typename").toString();
