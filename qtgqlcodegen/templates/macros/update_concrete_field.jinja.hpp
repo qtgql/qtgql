@@ -2,7 +2,7 @@
 {%- from "macros/iterate_type_condition.jinja.hpp" import  iterate_type_condition -%}
 {% macro update_concrete_field(proxy_field,f_concrete, private_name, operation_pointer="operation") -%}
 {% if proxy_field.variable_uses  -%}
-auto 👉private_name👈_args = 👉proxy_field.build_variables_tuple_for_field_arguments.strip("{").strip("}")👈;
+👉f_concrete.arguments_type👈 👉private_name👈_args = 👉proxy_field.build_variables_tuple_for_field_arguments👈;
 {% endif %}
 {%- set current -%}
 {% if proxy_field.variable_uses  -%}
