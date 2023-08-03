@@ -160,6 +160,17 @@ class QtGqlList(QtGqlTypeABC):
         return self
 
     @property
+    def needs_proxy_model(self) -> bool:
+        """Model of scalars / enums.
+
+        have no further selections hence they are shared across the
+        schema.
+        """
+        if self.of_type.is_builtin_scalar or self.of_type.is_enum:
+            return True
+        return False
+
+    @property
     def member_type(self) -> str:
         if self.of_type.is_builtin_scalar:
             # scalars has no underlying fields hence they don't need to be

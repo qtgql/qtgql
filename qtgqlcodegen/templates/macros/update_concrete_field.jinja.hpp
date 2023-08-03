@@ -18,7 +18,8 @@ inst->👉private_name👈
 {%- endset -%}
 {%- set setter_name -%}inst->👉 proxy_field.concrete.setter_name 👈{% endset -%}
 
-{%- if proxy_field.is_root and f_concrete.type.is_object_type or f_concrete.type.is_interface or f_concrete.type.is_union or f_concrete.type.is_model -%}
+{%- if proxy_field.is_root and (f_concrete.type.is_object_type or f_concrete.type.is_interface or f_concrete.type.is_union
+or (f_concrete.type.is_model and f_concrete.type.needs_proxy_model)) -%}
 {#- // root fields that has no default value might not have value even if they are not optional -#}
 {% if proxy_field.variable_uses  -%}
 if (!inst->👉private_name👈.contains(👉private_name👈_args))
