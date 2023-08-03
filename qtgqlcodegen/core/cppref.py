@@ -64,6 +64,6 @@ def QtGqlBasesNs() -> CppAttribute:
 
 
 class QtGqlTypes:
-    QGraphQLList = QtGqlBasesNs().ns_add("ListModelABC")
+    ListModelABC = QtGqlBasesNs().ns_add("ListModelABC")
     NodeInterfaceABC = QtGqlBasesNs().ns_add("NodeInterfaceABC")
     ObjectTypeABC = QtGqlBasesNs().ns_add("ObjectTypeABC")

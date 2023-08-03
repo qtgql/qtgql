@@ -15,7 +15,7 @@ class User(Node):
         if ret := user_friends.get(self, None):
             return ret
 
-        user_friends[self] = ret = [Person() for _ in range(20)]
+        user_friends[self] = ret = [Person() for _ in range(5)]
         return ret
 
 

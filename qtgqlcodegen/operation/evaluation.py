@@ -11,6 +11,7 @@ from qtgqlcodegen.core.graphql_ref import (
     is_field_node,
     is_fragment_definition_node,
     is_inline_fragment,
+    is_list_node,
     is_named_type_node,
     is_nonnull_node,
     is_operation_def_node,
@@ -28,8 +29,8 @@ from qtgqlcodegen.schema.definitions import (
     QtGqlVariableDefinition,
     SchemaTypeInfo,
 )
-from qtgqlcodegen.schema.evaluation import evaluate_graphql_type
 from qtgqlcodegen.types import (
+    QtGqlInputList,
     QtGqlInterface,
     QtGqlList,
     QtGqlOptional,
@@ -73,19 +74,26 @@ def _evaluate_variable_node_type(
     type_info: SchemaTypeInfo,
     node: graphql.TypeNode,
 ) -> QtGqlTypeABC:
-    if nonnull := is_nonnull_node(node):
-        return evaluate_graphql_type(
-            type_info,
-            graphql.type.GraphQLNonNull(
-                type_info.schema_definition.get_type(nonnull.type.name.value),  # type: ignore
-            ),
+    ret: QtGqlTypeABC | None = None
+    is_optional: bool = True
+    if non_null := is_nonnull_node(node):
+        node = non_null.type
+        is_optional = False
+
+    if list_node := is_list_node(node):
+        ret = QtGqlInputList(
+            of_type=_evaluate_variable_node_type(type_info, list_node.type),
         )
 
-    if named_type := is_named_type_node(node):
-        gql_concrete = type_info.schema_definition.get_type(named_type.name.value)
-        assert gql_concrete
-        return evaluate_graphql_type(type_info, gql_concrete)
-    raise NotImplementedError(node, "Type is not supported as a variable ATM")
+    elif named_type := is_named_type_node(node):
+        ret = type_info.get_type(named_type.name.value)
+
+    if not ret:  # pragma: no cover
+        raise NotImplementedError(node, "Type is not supported as a variable ATM")
+
+    if is_optional:
+        return QtGqlOptional(of_type=ret)
+    return ret
 
 
 def _evaluate_variable(
@@ -105,7 +113,14 @@ def _evaluate_selection_set_type(
     path: str,
 ) -> QtGqlTypeABC:
     ret: QtGqlTypeABC | None = None
-    if not selection_set_node:
+    if lst := concrete_type.is_model:
+        ret = _evaluate_list(
+            type_info=type_info,
+            concrete=lst,
+            selection_set=selection_set_node,
+            path=path,
+        )
+    elif not selection_set_node:
         # these types have no selections
         assert (
             concrete_type.is_builtin_scalar
@@ -121,13 +136,7 @@ def _evaluate_selection_set_type(
             selection_set=selection_set_node,
             path=path,
         )
-    elif lst := concrete_type.is_model:
-        ret = _evaluate_list(
-            type_info=type_info,
-            concrete=lst,
-            selection_set=selection_set_node,
-            path=path,
-        )
+
     elif interface := concrete_type.is_interface:
         ret = _evaluate_interface(
             type_info=type_info,
@@ -142,6 +151,7 @@ def _evaluate_selection_set_type(
             selection_set=selection_set_node,
             path=path,
         )
+
     if not ret:  # pragma: no cover
         raise NotImplementedError(f"type {concrete_type} not supported yet")
 
@@ -176,7 +186,7 @@ def _evaluate_field(
 def _evaluate_list(
     type_info: OperationTypeInfo,
     concrete: QtGqlList,
-    selection_set: SelectionsSet,
+    selection_set: SelectionsSet | None,
     path: str,
 ) -> QtGqlList:
     return QtGqlList(

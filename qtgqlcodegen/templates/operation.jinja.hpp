@@ -76,7 +76,15 @@ std::optional<👉 var.type.member_type 👈> 👉 var.name 👈 = {};
     QJsonObject __ret;
     {% for var in context.operation.variables -%}
     if (👉 var.name 👈.has_value()){
-    __ret.insert("👉 var.name 👈",  👉 var.json_repr() 👈);
+    {% if var.type.is_input_list -%}
+        QJsonArray 👉 var.name 👈_json;
+        for (const auto& node: 👉 var.name 👈.value()){
+            👉 var.name 👈_json.append(👉 var.type.of_type.json_repr("node") 👈);
+        }
+        __ret.insert("👉 var.name 👈",  👉 var.name 👈_json);
+    {% else -%}
+        __ret.insert("👉 var.name 👈",  👉 var.json_repr() 👈);
+    {% endif -%}
     }
     {% endfor -%}
     return __ret;

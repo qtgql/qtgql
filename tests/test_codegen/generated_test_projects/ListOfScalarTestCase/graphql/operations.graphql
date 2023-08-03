@@ -1,0 +1,28 @@
+
+    query GetRndPost{
+      post{
+        content
+        tags
+      }
+    }
+
+    mutation AddPostTag($postID: ID!, $tag: String!){
+      addTag(postId: $postID, tag: $tag){
+        content
+        tags
+      }
+    }
+
+    mutation RemovePostTag($postID: ID!, $at: Int!){
+      removeTag(postId: $postID, at: $at){
+        content
+        tags
+      }
+    }
+
+    mutation ReplacePostTag($postID: ID!, $at: Int!, $newTag: String!){
+      replaceTag(postId: $postID, at: $at, newTag: $newTag){
+        content
+        tags
+      }
+    }

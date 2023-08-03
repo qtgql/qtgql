@@ -913,6 +913,51 @@ QmlUsageTestCase = QtGqlTestCase(
     ),
 )
 
+ListOfScalarTestCase = QtGqlTestCase(
+    schema=schemas.list_of_scalar.schema,
+    operations="""
+    query GetRndPost{
+      post{
+        content
+        tags
+      }
+    }
+
+    mutation AddPostTag($postID: ID!, $tag: String!){
+      addTag(postId: $postID, tag: $tag){
+        content
+        tags
+      }
+    }
+
+    mutation RemovePostTag($postID: ID!, $at: Int!){
+      removeTag(postId: $postID, at: $at){
+        content
+        tags
+      }
+    }
+
+    mutation ReplacePostTag($postID: ID!, $at: Int!, $newTag: String!){
+      replaceTag(postId: $postID, at: $at, newTag: $newTag){
+        content
+        tags
+      }
+    }
+    """,
+    test_name="ListOfScalarTestCase",
+)
+ListOfScalarArgumentTestCase = QtGqlTestCase(
+    schema=schemas.list_of_scalar_argument.schema,
+    operations="""
+    query EchoArg($what: [String!]!){
+      echo(what: $what)
+    }
+    """,
+    test_name="ListOfScalarArgumentTestCase",
+    metadata=TestCaseMetadata(
+        should_test_updates=BoolWithReason.false("input types are not cached ATM"),
+    ),
+)
 all_test_cases = [
     ScalarsTestCase,
     SimpleGarbageCollectionTestCase,
@@ -941,10 +986,12 @@ all_test_cases = [
     FragmentsOnInterfaceTestCase,
     FragmentWithOperationVariable,
     NodeUnionTestCase,
+    QmlUsageTestCase,
+    ListOfScalarTestCase,
+    ListOfScalarArgumentTestCase,
     CustomUserScalarTestCase,
     ObjectsThatReferenceEachOtherTestCase,
     RootListOfTestCase,
-    QmlUsageTestCase,
 ]
 
 implemented_testcases = [
@@ -976,6 +1023,8 @@ implemented_testcases = [
     FragmentWithOperationVariable,
     NodeUnionTestCase,
     QmlUsageTestCase,
+    ListOfScalarTestCase,
+    ListOfScalarArgumentTestCase,
 ]
 
 
@@ -990,6 +1039,34 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 if __name__ == "__main__":
     generate_testcases(
-        FragmentTestCase,
+        ScalarsTestCase,
+        SimpleGarbageCollectionTestCase,
+        GqlOverHttpAsEnvTestCase,
         NoIdOnQueryTestCase,
+        DateTimeTestCase,
+        DecimalTestCase,
+        DateTestCase,
+        TimeScalarTestCase,
+        OptionalScalarsTestCase,
+        NestedObjectTestCase,
+        OptionalNestedObjectTestCase,
+        ObjectWithListOfObjectTestCase,
+        EnumTestCase,
+        NonNodeInterfaceTestCase,
+        OperationVariablesTestcase,
+        RootScalarTestCase,
+        NonNodeTypeTestCase,
+        InputTypeOperationVariableTestCase,
+        NodeInterfaceFieldTestCase,
+        NonNodeUnionTestCase,
+        ListOfNonNodeType,
+        ListOfUnionTestCase,
+        ListOfInterfaceTestcase,
+        FragmentTestCase,
+        FragmentsOnInterfaceTestCase,
+        FragmentWithOperationVariable,
+        NodeUnionTestCase,
+        QmlUsageTestCase,
+        ListOfScalarTestCase,
+        ListOfScalarArgumentTestCase,
     )
