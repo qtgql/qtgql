@@ -1,4 +1,5 @@
 {%- from "macros/concrete_type_fields.jinja.hpp" import concrete_type_fields -%}
+{%- from "macros/serialize_input_variable.jinja.hpp" import  serialize_input_variable -%}
 #pragma once
 #include <QObject>
 #include <QJsonObject>
@@ -61,13 +62,11 @@ bool operator<(const 👉type.name👈& other) const {
 std::optional<👉f.type.member_type👈> 👉f.name👈 = {};
 {% endfor %}
 [[nodiscard]] QJsonObject to_json() const{
-    auto ret = QJsonObject();
-    {% for f in type.fields %}{% set attr_name %}👉f.name👈{% endset %}
-    if (👉attr_name👈.has_value()){
-        ret.insert("👉f.name👈", 👉f.json_repr(attr_name)👈);
-    }
-    {% endfor %}
-    return ret;
+    auto __ret = QJsonObject();
+    {% for arg in type.fields -%}
+    👉serialize_input_variable("__ret", arg)👈
+    {% endfor -%}
+    return __ret;
 }
 };
 {% endfor %}

@@ -958,6 +958,20 @@ ListOfScalarArgumentTestCase = QtGqlTestCase(
         should_test_updates=BoolWithReason.false("input types are not cached ATM"),
     ),
 )
+
+ListOfScalarInInputObjectTestCase = QtGqlTestCase(
+    schema=schemas.list_of_scalar_in_input_object.schema,
+    operations="""
+    query EchoArg($what: What!){
+      echo(what: $what)
+    }
+    """,
+    test_name="ListOfScalarInInputObjectTestCase",
+    metadata=TestCaseMetadata(
+        should_test_updates=BoolWithReason.false("input types are not cached ATM"),
+    ),
+)
+
 all_test_cases = [
     ScalarsTestCase,
     SimpleGarbageCollectionTestCase,
@@ -989,6 +1003,7 @@ all_test_cases = [
     QmlUsageTestCase,
     ListOfScalarTestCase,
     ListOfScalarArgumentTestCase,
+    ListOfScalarInInputObjectTestCase,
     CustomUserScalarTestCase,
     ObjectsThatReferenceEachOtherTestCase,
     RootListOfTestCase,
@@ -1025,6 +1040,7 @@ implemented_testcases = [
     QmlUsageTestCase,
     ListOfScalarTestCase,
     ListOfScalarArgumentTestCase,
+    ListOfScalarInInputObjectTestCase,
 ]
 
 
@@ -1039,34 +1055,5 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 if __name__ == "__main__":
     generate_testcases(
-        ScalarsTestCase,
-        SimpleGarbageCollectionTestCase,
-        GqlOverHttpAsEnvTestCase,
-        NoIdOnQueryTestCase,
-        DateTimeTestCase,
-        DecimalTestCase,
-        DateTestCase,
         TimeScalarTestCase,
-        OptionalScalarsTestCase,
-        NestedObjectTestCase,
-        OptionalNestedObjectTestCase,
-        ObjectWithListOfObjectTestCase,
-        EnumTestCase,
-        NonNodeInterfaceTestCase,
-        OperationVariablesTestcase,
-        RootScalarTestCase,
-        NonNodeTypeTestCase,
-        InputTypeOperationVariableTestCase,
-        NodeInterfaceFieldTestCase,
-        NonNodeUnionTestCase,
-        ListOfNonNodeType,
-        ListOfUnionTestCase,
-        ListOfInterfaceTestcase,
-        FragmentTestCase,
-        FragmentsOnInterfaceTestCase,
-        FragmentWithOperationVariable,
-        NodeUnionTestCase,
-        QmlUsageTestCase,
-        ListOfScalarTestCase,
-        ListOfScalarArgumentTestCase,
     )

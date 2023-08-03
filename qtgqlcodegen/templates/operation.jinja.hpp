@@ -1,6 +1,7 @@
 {%- from "macros/deserialize_concrete_field.jinja.hpp" import  deserialize_concrete_field -%}
 {%- from "macros/proxy_type_fields.jinja.hpp" import  proxy_type_fields -%}
 {%- from "macros/update_proxy_field.jinja.cpp" import  update_proxy_field -%}
+{%- from "macros/serialize_input_variable.jinja.hpp" import  serialize_input_variable -%}
 #pragma once
 #include "./schema.hpp"
 #include <qtgql/bases/bases.hpp>
@@ -75,17 +76,7 @@ std::optional<👉 var.type.member_type 👈> 👉 var.name 👈 = {};
     QJsonObject to_json() const{
     QJsonObject __ret;
     {% for var in context.operation.variables -%}
-    if (👉 var.name 👈.has_value()){
-    {% if var.type.is_input_list -%}
-        QJsonArray 👉 var.name 👈_json;
-        for (const auto& node: 👉 var.name 👈.value()){
-            👉 var.name 👈_json.append(👉 var.type.of_type.json_repr("node") 👈);
-        }
-        __ret.insert("👉 var.name 👈",  👉 var.name 👈_json);
-    {% else -%}
-        __ret.insert("👉 var.name 👈",  👉 var.json_repr() 👈);
-    {% endif -%}
-    }
+    👉 serialize_input_variable("__ret", var) 👈
     {% endfor -%}
     return __ret;
     }
