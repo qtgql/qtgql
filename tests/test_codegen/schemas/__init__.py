@@ -5,6 +5,7 @@ from . import (
     list_of_non_node,
     list_of_scalar,
     list_of_scalar_argument,
+    list_of_scalar_in_input_object,
     list_of_union,
     mutation_schema,
     node_interface_field,
@@ -68,4 +69,5 @@ __all__ = [  # noqa: PLE0604
     list_of_interface,
     list_of_scalar,
     list_of_scalar_argument,
+    list_of_scalar_in_input_object,
 ]
