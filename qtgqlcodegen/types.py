@@ -201,6 +201,7 @@ class QtGqlList(QtGqlTypeABC):
 class QtGqlInputList(QtGqlTypeABC):
     of_type: QtGqlTypeABC
 
+    @property
     def is_input_list(self) -> QtGqlInputList | None:
         return self
 

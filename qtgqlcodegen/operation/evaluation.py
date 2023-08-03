@@ -113,7 +113,16 @@ def _evaluate_selection_set_type(
     path: str,
 ) -> QtGqlTypeABC:
     ret: QtGqlTypeABC | None = None
-    if obj_type := concrete_type.is_object_type:
+    if not selection_set_node:
+        # these types have no selections
+        assert (
+            concrete_type.is_builtin_scalar
+            or concrete_type.is_custom_scalar
+            or concrete_type.is_enum
+        )
+        ret = concrete_type  # currently there is no need for a "proxied" type.
+
+    elif obj_type := concrete_type.is_object_type:
         ret = _evaluate_object_type(
             type_info=type_info,
             concrete=obj_type,
@@ -141,15 +150,6 @@ def _evaluate_selection_set_type(
             selection_set=selection_set_node,
             path=path,
         )
-
-    elif not selection_set_node:
-        # these types have no selections
-        assert (
-            concrete_type.is_builtin_scalar
-            or concrete_type.is_custom_scalar
-            or concrete_type.is_enum
-        )
-        ret = concrete_type  # currently there is no need for a "proxied" type.
 
     if not ret:  # pragma: no cover
         raise NotImplementedError(f"type {concrete_type} not supported yet")
