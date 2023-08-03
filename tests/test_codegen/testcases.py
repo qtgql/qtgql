@@ -949,7 +949,7 @@ ListOfScalarTestCase = QtGqlTestCase(
 ListOfScalarArgumentTestCase = QtGqlTestCase(
     schema=schemas.list_of_scalar_argument.schema,
     operations="""
-    query EchoArg($what: What!){
+    query EchoArg($what: [String!]!){
       echo(what: $what)
     }
     """,
@@ -1055,5 +1055,5 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 if __name__ == "__main__":
     generate_testcases(
-        ListOfScalarInInputObjectTestCase,
+        *implemented_testcases,
     )
