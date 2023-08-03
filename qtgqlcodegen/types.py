@@ -45,6 +45,10 @@ class QtGqlTypeABC(ABC):
         return None
 
     @property
+    def is_input_list(self) -> QtGqlInputList | None:
+        return None
+
+    @property
     def is_enum(self) -> QtGqlEnumDefinition | None:
         return None
 
@@ -156,6 +160,17 @@ class QtGqlList(QtGqlTypeABC):
         return self
 
     @property
+    def needs_proxy_model(self) -> bool:
+        """Model of scalars / enums.
+
+        have no further selections hence they are shared across the
+        schema.
+        """
+        if self.of_type.is_builtin_scalar or self.of_type.is_enum:
+            return True
+        return False
+
+    @property
     def member_type(self) -> str:
         if self.of_type.is_builtin_scalar:
             # scalars has no underlying fields hence they don't need to be
@@ -180,6 +195,18 @@ class QtGqlList(QtGqlTypeABC):
         if bs := self.of_type.is_builtin_scalar:
             return f"{QtGqlTypes.ListModelABC.name}<{bs.member_type}> *"
         raise NotImplementedError
+
+
+@define
+class QtGqlInputList(QtGqlTypeABC):
+    of_type: QtGqlTypeABC
+
+    @property
+    def is_input_list(self) -> QtGqlInputList | None:
+        return self
+
+    def type_name(self) -> str:
+        return f"std::list<{self.of_type.type_name()}>"
 
 
 @define

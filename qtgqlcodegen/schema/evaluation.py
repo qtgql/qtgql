@@ -27,6 +27,7 @@ from qtgqlcodegen.types import (
     EnumValue,
     QtGqlDeferredType,
     QtGqlEnumDefinition,
+    QtGqlInputList,
     QtGqlInputObjectTypeDefinition,
     QtGqlInterface,
     QtGqlList,
@@ -58,6 +59,7 @@ def evaluate_input_type(
 def evaluate_graphql_type(
     type_info: SchemaTypeInfo,
     t: gql_def.GraphQLType,
+    is_input: bool = False,
 ) -> QtGqlTypeABC:
     # even though every type in qtgql has a default constructor,
     # hence there is no "real" non-null values
@@ -69,9 +71,14 @@ def evaluate_graphql_type(
         is_optional = False
 
     if list_def := is_list_definition(t):
-        ret = QtGqlList(
-            of_type=evaluate_graphql_type(type_info, list_def.of_type),
-        )
+        if is_input:
+            ret = QtGqlInputList(
+                of_type=evaluate_graphql_type(type_info, list_def.of_type, is_input=True),
+            )
+        else:
+            ret = QtGqlList(
+                of_type=evaluate_graphql_type(type_info, list_def.of_type),
+            )
     elif scalar_def := is_scalar_definition(t):
         if builtin_scalar := BuiltinScalars.by_graphql_name(scalar_def.name):
             ret = builtin_scalar
@@ -132,7 +139,7 @@ def _evaluate_argument_field(
     field: gql_def.GraphQLInputField | gql_def.GraphQLArgument,
 ) -> QtGqlArgumentDefinition:
     return QtGqlArgumentDefinition(
-        type=evaluate_graphql_type(type_info, field.type),
+        type=evaluate_graphql_type(type_info, field.type, is_input=True),
         name=name,
         description=field.description,
     )

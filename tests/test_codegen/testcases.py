@@ -946,7 +946,18 @@ ListOfScalarTestCase = QtGqlTestCase(
     """,
     test_name="ListOfScalarTestCase",
 )
-
+ListOfScalarArgumentTestCase = QtGqlTestCase(
+    schema=schemas.list_of_scalar_argument.schema,
+    operations="""
+    query EchoArg($what: [String!]!){
+      echo(what: $what)
+    }
+    """,
+    test_name="ListOfScalarArgumentTestCase",
+    metadata=TestCaseMetadata(
+        should_test_updates=BoolWithReason.false("input types are not cached ATM"),
+    ),
+)
 all_test_cases = [
     ScalarsTestCase,
     SimpleGarbageCollectionTestCase,
@@ -977,6 +988,7 @@ all_test_cases = [
     NodeUnionTestCase,
     QmlUsageTestCase,
     ListOfScalarTestCase,
+    ListOfScalarArgumentTestCase,
     CustomUserScalarTestCase,
     ObjectsThatReferenceEachOtherTestCase,
     RootListOfTestCase,
@@ -1012,6 +1024,7 @@ implemented_testcases = [
     NodeUnionTestCase,
     QmlUsageTestCase,
     ListOfScalarTestCase,
+    ListOfScalarArgumentTestCase,
 ]
 
 
@@ -1026,6 +1039,25 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 if __name__ == "__main__":
     generate_testcases(
+        ScalarsTestCase,
+        SimpleGarbageCollectionTestCase,
+        GqlOverHttpAsEnvTestCase,
+        NoIdOnQueryTestCase,
+        DateTimeTestCase,
+        DecimalTestCase,
+        DateTestCase,
+        TimeScalarTestCase,
+        OptionalScalarsTestCase,
+        NestedObjectTestCase,
+        OptionalNestedObjectTestCase,
+        ObjectWithListOfObjectTestCase,
+        EnumTestCase,
+        NonNodeInterfaceTestCase,
+        OperationVariablesTestcase,
+        RootScalarTestCase,
+        NonNodeTypeTestCase,
+        InputTypeOperationVariableTestCase,
+        NodeInterfaceFieldTestCase,
         NonNodeUnionTestCase,
         ListOfNonNodeType,
         ListOfUnionTestCase,
@@ -1036,4 +1068,5 @@ if __name__ == "__main__":
         NodeUnionTestCase,
         QmlUsageTestCase,
         ListOfScalarTestCase,
+        ListOfScalarArgumentTestCase,
     )

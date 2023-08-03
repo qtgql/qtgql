@@ -30,6 +30,7 @@ from qtgqlcodegen.schema.definitions import (
     SchemaTypeInfo,
 )
 from qtgqlcodegen.types import (
+    QtGqlInputList,
     QtGqlInterface,
     QtGqlList,
     QtGqlOptional,
@@ -80,7 +81,7 @@ def _evaluate_variable_node_type(
         is_optional = False
 
     if list_node := is_list_node(node):
-        ret = QtGqlList(
+        ret = QtGqlInputList(
             of_type=_evaluate_variable_node_type(type_info, list_node.type),
         )
 
@@ -112,20 +113,30 @@ def _evaluate_selection_set_type(
     path: str,
 ) -> QtGqlTypeABC:
     ret: QtGqlTypeABC | None = None
-    if obj_type := concrete_type.is_object_type:
-        ret = _evaluate_object_type(
-            type_info=type_info,
-            concrete=obj_type,
-            selection_set=selection_set_node,
-            path=path,
-        )
-    elif lst := concrete_type.is_model:
+    if lst := concrete_type.is_model:
         ret = _evaluate_list(
             type_info=type_info,
             concrete=lst,
             selection_set=selection_set_node,
             path=path,
         )
+    elif not selection_set_node:
+        # these types have no selections
+        assert (
+            concrete_type.is_builtin_scalar
+            or concrete_type.is_custom_scalar
+            or concrete_type.is_enum
+        )
+        ret = concrete_type  # currently there is no need for a "proxied" type.
+
+    elif obj_type := concrete_type.is_object_type:
+        ret = _evaluate_object_type(
+            type_info=type_info,
+            concrete=obj_type,
+            selection_set=selection_set_node,
+            path=path,
+        )
+
     elif interface := concrete_type.is_interface:
         ret = _evaluate_interface(
             type_info=type_info,
@@ -140,15 +151,6 @@ def _evaluate_selection_set_type(
             selection_set=selection_set_node,
             path=path,
         )
-
-    elif not selection_set_node:
-        # these types have no selections
-        assert (
-            concrete_type.is_builtin_scalar
-            or concrete_type.is_custom_scalar
-            or concrete_type.is_enum
-        )
-        ret = concrete_type  # currently there is no need for a "proxied" type.
 
     if not ret:  # pragma: no cover
         raise NotImplementedError(f"type {concrete_type} not supported yet")
@@ -184,7 +186,7 @@ def _evaluate_field(
 def _evaluate_list(
     type_info: OperationTypeInfo,
     concrete: QtGqlList,
-    selection_set: SelectionsSet,
+    selection_set: SelectionsSet | None,
     path: str,
 ) -> QtGqlList:
     return QtGqlList(
