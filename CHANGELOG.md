@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+0.133.2 - 2023-08-06
+--------------------
+
+This release fixes a bug where optional lists wouldn't be evaluated correctly.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #353](https://github.com/qtgql/qtgql/pull/353/)
+
+
 0.133.1 - 2023-08-03
 --------------------
 
