@@ -28,6 +28,7 @@ theme:
   logo: assets/logo.svg
   favicon: assets/logo.svg
   features:
+    - content.code.copy
     - navigation.tabs
     - navigation.tabs.sticky
 
@@ -46,7 +47,6 @@ plugins:
 nav:
   - QtGql:
       - Overview: ./index.md
-      - Tutorial: ./codegen/tutorial.md
       - Configurations: ./codegen/config.md
       - Scalars:
         - Index: ./codegen/scalars/index.md
@@ -54,6 +54,8 @@ nav:
         - Create a Scalar: ./codegen/scalars/create_scalar.md
       - Contributing: ./contributing.md
       - Server requirements: ./server-requirements.md
+  - Tutorials:
+    - Countries: ./tutorials/countries.md
 
 markdown_extensions:
   - def_list
