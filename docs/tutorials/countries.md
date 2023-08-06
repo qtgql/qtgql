@@ -1,11 +1,12 @@
 This Tutorial will walk you threw creating a Qt project using qtgql
 from ground up.
-<!-- TODO: add link Final code at github -->
+
 
 This subject of this project will be a QML application that shows
 countries information using a public GraphQL API that can be found [here](https://countries.trevorblades.com/)
 
-<!-- TODO: add link to code -->
+Final code at [GitHub](https://github.com/qtgql/examples/tree/main/countries).
+
 ### Prerequisites
 * Required by QtGql:
     - Python >= 3.8
@@ -269,7 +270,7 @@ Create a directory for graphql, we'll call it `graphql`
 Inside `graphql` create 3 files:
 
 - `schema.graphql`  This file describes your server schema.
-  TODO add link (You can use the script below to fill it or copy it from the `qtgql/examples/countries` repo)
+  TODO add link (You can use the script below to fill it or copy it from [here](https://github.com/qtgql/examples/blob/main/countries/src/graphql/schema.graphql))
 - `operations.graphql` - Here you would define your operations.
 - `qtgqlconfig.py` - Here you would define configurations for `qtgql`
 
