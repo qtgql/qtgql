@@ -92,7 +92,7 @@ def _evaluate_variable_node_type(
         raise NotImplementedError(node, "Type is not supported as a variable ATM")
 
     if is_optional:
-        return QtGqlOptional(of_type=ret)
+        return QtGqlOptional(wrapped_type__=ret)
     return ret
 
 
@@ -156,7 +156,7 @@ def _evaluate_selection_set_type(
         raise NotImplementedError(f"type {concrete_type} not supported yet")
 
     if concrete_type.is_optional:
-        return QtGqlOptional(of_type=ret)
+        return QtGqlOptional(wrapped_type__=ret)
     return ret
 
 

@@ -114,7 +114,7 @@ def evaluate_graphql_type(
         raise NotImplementedError(f"type {t} not supported yet")
 
     if is_optional:
-        return QtGqlOptional(of_type=ret)
+        return QtGqlOptional(wrapped_type__=ret)
     return ret
 
 
