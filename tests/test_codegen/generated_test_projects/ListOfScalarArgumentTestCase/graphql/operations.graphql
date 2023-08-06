@@ -2,4 +2,3 @@
     query EchoArg($what: [String!]!){
       echo(what: $what)
     }
-    
