@@ -270,7 +270,7 @@ Create a directory for graphql, we'll call it `graphql`
 Inside `graphql` create 3 files:
 
 - `schema.graphql`  This file describes your server schema.
-  TODO add link (You can use the script below to fill it or copy it from [here](https://github.com/qtgql/examples/blob/main/countries/src/graphql/schema.graphql))
+  (You can use the script below to fill it or copy it from [here](https://github.com/qtgql/examples/blob/main/countries/src/graphql/schema.graphql))
 - `operations.graphql` - Here you would define your operations.
 - `qtgqlconfig.py` - Here you would define configurations for `qtgql`
 
