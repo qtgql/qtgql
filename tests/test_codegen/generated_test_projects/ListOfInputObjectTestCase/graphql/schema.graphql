@@ -1,0 +1,11 @@
+input Echo {
+  value: String!
+}
+
+type Query {
+  echo(what: What = null): [String!]!
+}
+
+input What {
+  echo: [Echo!]
+}

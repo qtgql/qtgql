@@ -1,0 +1,5 @@
+
+    query Echo($what: What!){
+      echo(what: $what)
+    }
+    
