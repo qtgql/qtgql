@@ -134,15 +134,15 @@ class QtGqlTypeABC(ABC):
 class QtGqlOptional(QtGqlTypeABC):
     """Represents GraphQL types that are not marked with "!"."""
 
-    of_type: QtGqlTypeABC
+    wrapped_type__: QtGqlTypeABC
 
     def __getattr__(self, item):
         if item == "is_optional":
             return True
-        return getattr(self.of_type, item)
+        return getattr(self.wrapped_type__, item)
 
     def __getattribute__(self, name):
-        if name not in ("of_type"):
+        if name not in ("wrapped_type__"):
             raise AttributeError
         else:
             return super().__getattribute__(name)

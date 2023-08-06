@@ -17,7 +17,7 @@ from qtgqlcodegen.generator import SchemaGenerator
 from qtgqlcodegen.types import CustomScalarDefinition
 from typer.testing import CliRunner
 
-from tests.test_codegen import schemas
+import tests.test_codegen.schemas as schemas
 from tests.test_codegen.utils import temp_cwd
 
 if TYPE_CHECKING:
@@ -972,6 +972,19 @@ ListOfScalarInInputObjectTestCase = QtGqlTestCase(
     ),
 )
 
+ListOfInputObjectTestCase = QtGqlTestCase(
+    schema=schemas.list_of_input_object.schema,
+    operations="""
+    query MainQuery($what: What!){
+      echo(what: $what)
+    }
+    """,
+    test_name="ListOfInputObjectTestCase",
+    metadata=TestCaseMetadata(
+        should_test_updates=BoolWithReason.false("input types are not cached ATM"),
+    ),
+)
+
 all_test_cases = [
     ScalarsTestCase,
     SimpleGarbageCollectionTestCase,
@@ -1004,6 +1017,7 @@ all_test_cases = [
     ListOfScalarTestCase,
     ListOfScalarArgumentTestCase,
     ListOfScalarInInputObjectTestCase,
+    ListOfInputObjectTestCase,
     CustomUserScalarTestCase,
     ObjectsThatReferenceEachOtherTestCase,
     RootListOfTestCase,
@@ -1041,6 +1055,7 @@ implemented_testcases = [
     ListOfScalarTestCase,
     ListOfScalarArgumentTestCase,
     ListOfScalarInInputObjectTestCase,
+    ListOfInputObjectTestCase,
 ]
 
 
@@ -1055,5 +1070,5 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 if __name__ == "__main__":
     generate_testcases(
-        TimeScalarTestCase,
+        ListOfInputObjectTestCase,
     )
