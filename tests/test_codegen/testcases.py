@@ -975,7 +975,7 @@ ListOfScalarInInputObjectTestCase = QtGqlTestCase(
 ListOfInputObjectTestCase = QtGqlTestCase(
     schema=schemas.list_of_input_object.schema,
     operations="""
-    query Echo($what: What!){
+    query MainQuery($what: What!){
       echo(what: $what)
     }
     """,

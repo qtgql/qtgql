@@ -1,5 +1,5 @@
 
-    query Echo($what: What!){
+    query MainQuery($what: What!){
       echo(what: $what)
     }
     

@@ -2,6 +2,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include "testutils.hpp"
 #include "graphql/__generated__/MainQuery.hpp"
+#include <list>
 
 namespace ListOfInputObjectTestCase{
 using namespace qtgql;
@@ -14,11 +15,21 @@ TEST_CASE("ListOfInputObjectTestCase", "[generated-testcase]") {
             ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
 
     SECTION("test deserialize"){
-        REQUIRE(false);
+        auto echo_query = mainquery::MainQuery::shared();
+        std::list<ListOfInputObjectTestCase::Echo> what_list = {{"What"}, {"Am"}, {"I"}};
+        echo_query->set_variables({.what= ListOfInputObjectTestCase::What(what_list)});
+        echo_query->fetch();
+        test_utils::wait_for_completion(echo_query);
+            auto model = echo_query->data()->get_echo();
+            REQUIRE(model->rowCount() > 0);
+            int i = 0;
+            for (const auto &expected : what_list) {
+                REQUIRE(model->get(i) == expected.value);
+                i++;
+            }
+
     };
-    SECTION("test update"){
-        REQUIRE(false);
-    };
+
 
 }
 
