@@ -8,7 +8,7 @@ countries information using a public GraphQL API that can be found [here](https:
 <!-- TODO: add link to code -->
 ### Prerequisites
 * Required by QtGql:
-    - Python <= 3.8
+    - Python >= 3.8
     - CMake
 * Required for this tutorial:
     - Conan C++ Package manager
@@ -186,7 +186,8 @@ for cmake, see the following note.
     poetry run conan install .
     ```
 
-To install the `qtgql` codegenerator we need to add it as a Python dependency:
+To install the `qtgql` code-generator we need to add it as a Python dependency.
+We'll use Python-Poetry:
 ```bash
 poetry add "3rdparty/qtgql/"
 ```
@@ -204,19 +205,19 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_subdirectory(3rdparty/qtgql)
 
-file(GLOB_RECURSE SOURCES "src/*.cpp" "src/*.hpp")
 
-file(GLOB_RECURSE HEADERS "src/*.hpp")
 find_package(Qt6 REQUIRED COMPONENTS Core Quick)
 
-add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
+add_executable(${PROJECT_NAME}
+    "src/main.cpp"
+)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE qtgql::qtgql
         Qt6::Core Qt6::Quick
         )
 ```
 
-### Setup a QML window
+### Set up a QML window
 
 Inside `main.cpp` past this code
 
@@ -231,13 +232,7 @@ int main(int argc, char *argv[]){
     QGuiApplication app(argc, argv);
     QQmlApplicationEngine engine;
     QUrl url((fs::path(__FILE__).parent_path() / "qml" / "main.qml").c_str());
-    QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
-                     &app, [url](QObject *obj, const QUrl &objUrl) {
-                if (!obj && url == objUrl)
-                    QCoreApplication::exit(-1);
-            }, Qt::QueuedConnection);
     engine.load(url);
-
     return QGuiApplication::exec();
 }
 ```
@@ -271,11 +266,28 @@ Now you should see something like this:
 
 Create a directory for graphql, we'll call it `graphql`
 
-Inside `graphql` create 3 files
-- `schema.graphql` - Copy the SDL from [here](https://github.com/Urigo/graphql-cli/blob/master/integration/test-project/schema/schema.graphql)
+Inside `graphql` create 3 files:
+
+- `schema.graphql`  This file describes your server schema.
+  TODO add link (You can use the script below to fill it or copy it from the `qtgql/examples/countries` repo)
 - `operations.graphql` - Here you would define your operations.
 - `qtgqlconfig.py` - Here you would define configurations for `qtgql`
 
+??? note "script to fetch the schema"
+    ```py
+    from pathlib import Path
+
+    from graphql import build_client_schema, get_introspection_query, print_schema
+    import requests
+
+    res = requests.post("https://countries.trevorblades.com/", json={"query": get_introspection_query()})
+    res.raise_for_status()
+    d = res.json()['data']
+
+    client_schema = build_client_schema(d)
+    schema_file = Path(__file__).parent / "schema.graphql"
+    schema_file.resolve(True).write_text(print_schema(client_schema))
+    ```
 by now you should have the following tree:
 ```bash
 countries
@@ -321,15 +333,139 @@ inside `schema.hpp`
 Inside `operations.graphql` create an operation that will query for all available countries:
 
 ```graphql
-query AllCountries{
-  countries{
-    capital
-    emoji
-    code
+query ContinentQuery($code: ID!){
+  continent(code:$code){
+    name
+    countries{
+      capital
+      emoji
+    }
   }
 }
 ```
-Now run the codegen:
+Now run the codegen from `src` dir:
 ```bash
-poetry run qtgql gen
+cd src && poetry run qtgql gen
 ```
+
+Now under `src/graphql` you should have
+the following:
+```bash
+graphql
+├── __generated__
+│   ├── CMakeLists.txt
+│   ├── ContinentQuery.cpp
+│   ├── ContinentQuery.hpp
+│   └── schema.hpp
+├── operations.graphql
+├── qtgqlconfig.py
+└── schema.graphql
+```
+### Use the generated code
+
+First lets link our executable to the generated target.
+Update `CMakeLists.txt`
+```cmake hl_lines="21"
+cmake_minimum_required(VERSION 3.25.0)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+project(countries VERSION 0.1.0
+        LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+add_subdirectory(3rdparty/qtgql)
+
+
+find_package(Qt6 REQUIRED COMPONENTS Core Quick)
+
+add_executable(${PROJECT_NAME}
+        "src/main.cpp"
+)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE
+        qtgql::qtgql
+        Qt6::Core Qt6::Quick
+        Countries # Name of our environment
+)
+```
+Now we'll set up the environment in C++ and fetch the first query.
+**main.cpp**
+```cpp
+#include <QtGui>
+#include <QtQuick>
+#include <filesystem>
+#include <memory>
+#include <qtgql/bases/bases.hpp>
+#include <qtgql/gqloverhttp/gqloverhttp.hpp>
+
+#include "graphql/__generated__/ContinentQuery.hpp"
+
+
+namespace fs = std::filesystem;
+
+int main(int argc, char *argv[]){
+    QGuiApplication app(argc, argv);
+    QQmlApplicationEngine engine;
+    // set up an environment
+    auto env = std::shared_ptr<qtgql::bases::Environment>(
+        new qtgql::bases::Environment("Countries",
+
+        std::unique_ptr<qtgql::bases::NetworkLayerABC>(new qtgql::gqloverhttp::GraphQLOverHttp({"https://countries.trevorblades.com/"})))
+    );
+    // Export it
+    qtgql::bases::Environment::set_gql_env(env);
+    // Create an operation handler
+    auto cont_query = Countries::continentquery::ContinentQuery::shared();
+    cont_query->set_variables(Countries::continentquery::ContinentQueryVariables{.code="EU"});
+    cont_query->fetch();
+    engine.rootContext()->setContextProperty("query", cont_query.get());
+    QUrl url((fs::path(__FILE__).parent_path() / "qml" / "main.qml").c_str());
+    engine.load(url);
+    return QGuiApplication::exec();
+}
+```
+now update `main.qml` to show the data.
+```qml
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Controls.Material
+
+ApplicationWindow {id:root
+    width: 500;
+    height: 400;
+    visible: true;
+    Material.theme: Material.Dark
+    Material.accent: Material.Orange
+    property var continent: query?.data?.continent;
+
+    ListView{id: countries_view
+    anchors.fill: parent;
+        model: root.continent?.countries;
+        header:Rectangle{
+            color: Material.color(Material.Indigo)
+            width: ListView.view.width;
+            height: 50;
+            Label{
+                anchors.centerIn: parent;
+                text: `Countries in Continent ${root.continent?.name} (${countries_view.count}):`
+            }
+        }
+        delegate: Rectangle{
+            id: country_delegate
+            required property var model;
+            color: (model.index % 2 == 0)? Material.color(Material.Grey):  Material.color(Material.BlueGrey)
+            property var view: ListView.view;
+            width: view.width;
+            height: 50;
+            Label{
+                anchors.left: parent.left;
+                property var country: country_delegate.model.data;
+                text: `${country_delegate.model.index + 1}:  ${country.emoji} capital: ${country.capital}`
+            }
+        }
+    }
+}
+```
+Should look like this:
+![img.png](../assets/countries.png)
