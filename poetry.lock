@@ -3002,13 +3002,13 @@ files = [
 
 [[package]]
 name = "strawberry-graphql"
-version = "0.195.3"
+version = "0.201.0"
 description = "A library for creating GraphQL APIs"
 optional = false
-python-versions = ">=3.7,<4.0"
+python-versions = ">=3.8,<4.0"
 files = [
-    {file = "strawberry_graphql-0.195.3-py3-none-any.whl", hash = "sha256:baba79ef5fc0ab1bd5f77019b081b8b9780e2a2b0e6e7dc0fcf15fdd458b3d0e"},
-    {file = "strawberry_graphql-0.195.3.tar.gz", hash = "sha256:bcae81e3d2a81f3db4ed1856c93bc0c3ef4c17579a07f8b4d1b7aa7a19ea9429"},
+    {file = "strawberry_graphql-0.201.0-py3-none-any.whl", hash = "sha256:168093e720a53fb6ad76c1098526fd8a9ce35d0701ff8b7a4cf627b094c12225"},
+    {file = "strawberry_graphql-0.201.0.tar.gz", hash = "sha256:376b7ed780049627a53ac67209a1284fa879a18192c061c23d4bca436453998c"},
 ]
 
 [package.dependencies]
@@ -3029,7 +3029,7 @@ django = ["Django (>=3.2)", "asgiref (>=3.2,<4.0)"]
 fastapi = ["fastapi (>=0.65.2)", "python-multipart (>=0.0.5,<0.0.7)"]
 flask = ["flask (>=1.1)"]
 opentelemetry = ["opentelemetry-api (<2)", "opentelemetry-sdk (<2)"]
-pydantic = ["pydantic (<2)"]
+pydantic = ["pydantic (>1.6.1)"]
 pyinstrument = ["pyinstrument (>=4.0.0)"]
 sanic = ["sanic (>=20.12.2)"]
 starlite = ["starlite (>=1.48.0)"]
