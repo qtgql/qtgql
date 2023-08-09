@@ -1,8 +1,8 @@
 {%- from "macros/deserialize_concrete_field.jinja.hpp" import  deserialize_concrete_field -%}
 {%- from "macros/iterate_type_condition.jinja.hpp" import  iterate_type_condition -%}
-{% macro update_concrete_field(proxy_field,f_concrete, private_name, operation_pointer="operation") -%}
+{% macro update_concrete_field(parent_proxy_type, proxy_field,f_concrete, private_name, operation_pointer="operation") -%}
 {% if proxy_field.variable_uses  -%}
-👉f_concrete.arguments_type👈 👉private_name👈_args = 👉proxy_field.build_variables_tuple_for_field_arguments👈;
+👉f_concrete.arguments_type👈 👉private_name👈_args = 👉 parent_proxy_type.name 👈::👉proxy_field.variable_builder_name 👈(👉 operation_pointer 👈);
 {% endif %}
 {%- set current -%}
 {% if proxy_field.variable_uses  -%}

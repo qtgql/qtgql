@@ -1,8 +1,16 @@
 {%- from "macros/iterate_type_condition.jinja.hpp" import  iterate_type_condition -%}
-{% macro initialize_proxy_field(field, operation_pointer = "operation") -%}
+{% macro initialize_proxy_field(parent_type, field, operation_pointer = "operation") -%}
+
+{% if field.cached_by_args -%}
+auto args_for_👉field.name 👈 = 👉 parent_type.name 👈::👉field.variable_builder_name 👈( 👉 operation_pointer 👈);
 {%set instance_of_concrete -%}
-m_inst->👉field.concrete.getter_name 👈(👉field.build_variables_tuple_for_field_arguments 👈)
+m_inst->👉field.concrete.getter_name 👈(args_for_👉field.name 👈)
 {% endset -%}
+{% else %}
+{%set instance_of_concrete -%}
+m_inst->👉field.concrete.getter_name 👈()
+{% endset -%}
+{% endif %}
 
 {% if field.type.is_queried_object_type  and field.type.is_optional %}
 if (👉 instance_of_concrete 👈){

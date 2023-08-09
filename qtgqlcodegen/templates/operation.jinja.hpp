@@ -48,6 +48,17 @@ class 👉 t.name 👈: public 👉 context.qtgql_types.ObjectTypeABC.name if no
 
 👉 proxy_type_fields(t, context) 👈
 public:
+// args builders
+{%for f in t.fields_with_args -%}
+static 👉 f.concrete.arguments_type 👈  👉 f.variable_builder_name 👈(const 👉context.operation.name👈* operation){
+return {
+{%for arg in f.variable_uses -%}
+operation->vars_inst.👉 arg.variable.name 👈
+{% if not loop.last -%}, {% endif -%}
+{% endfor -%}
+};
+{% endfor %}
+
 {% if t.concrete.is_root -%}
 👉 t.name 👈(👉 context.operation.name 👈 * operation);
 {% else -%}
@@ -71,7 +82,11 @@ public:
 
 struct 👉 context.operation.generated_variables_type 👈{
 {% for var in context.operation.variables -%}
+{% if var.type.is_optional -%}
 std::optional<👉 var.type.member_type 👈> 👉 var.name 👈 = {};
+{% else -%}
+var.type.member_type 👈> 👉 var.name 👈;
+{% endif -%}
 {% endfor -%}
     QJsonObject to_json() const{
     QJsonObject __ret;

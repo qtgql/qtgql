@@ -1,10 +1,12 @@
 #include "utils.hpp"
+#include <qtgql/bases/bases.hpp>
+
 using namespace qtgql;
 
 TEST_CASE("get operation name", "[gqlwstransport][ws-client]") {
   const QString operation_name = "SampleOperation";
   auto res_op_name =
-      utils::get_operation_name("query SampleOperation {field1 field2}");
+      bases::get_operation_name("query SampleOperation {field1 field2}");
   REQUIRE(res_op_name);
   REQUIRE(res_op_name.value() == operation_name);
 };

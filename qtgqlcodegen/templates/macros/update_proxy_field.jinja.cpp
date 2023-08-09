@@ -1,8 +1,17 @@
 {%- from "macros/iterate_type_condition.jinja.hpp" import  iterate_type_condition -%}
-{% macro update_proxy_field(field, operation) -%}
+{% macro update_proxy_field(parent_type, field, operation) -%}
+{% if field.cached_by_args -%}
+auto args_for_👉field.name 👈 = 👉 parent_type.name 👈::👉field.variable_builder_name 👈(operation);
 {% set new_concrete -%}
-m_inst->👉field.concrete.getter_name👈(👉field.build_variables_tuple_for_field_arguments 👈)
+m_inst->👉field.concrete.getter_name👈(args_for_👉field.name 👈 )
 {%- endset -%}
+{% else %}
+{% set new_concrete -%}
+m_inst->👉field.concrete.getter_name👈()
+{%- endset -%}
+{% endif %}
+
+
 auto operation = m_operation;
 {% if field.type.is_model and not field.type.of_type.is_builtin_scalar -%}
     auto new_data = 👉new_concrete👈;

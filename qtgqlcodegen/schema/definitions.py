@@ -62,7 +62,16 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
 
     @cached_property
     def arguments_type(self) -> str:
-        return "std::tuple<" + ",".join([arg.type.member_type for arg in self.arguments]) + ">"
+        return (
+            "std::tuple<"
+            + ",".join(
+                [
+                    ("std::optional<QJsonValue>" if arg.type.is_optional else "QJsonValue")
+                    for arg in self.arguments
+                ],
+            )
+            + ">"
+        )
 
     def index_for_argument(self, arg: str) -> int:
         return self.arguments.index(self.arguments_dict[arg])

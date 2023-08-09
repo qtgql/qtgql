@@ -47,7 +47,7 @@ throw qtgql::exceptions::InterfaceDeserializationError(type_name.toStdString());
     {% endif -%}
     m_operation = operation;
     {%- for field in t.fields -%}
-    👉 initialize_proxy_field(field) 👈
+    👉 initialize_proxy_field(t, field) 👈
     {% endfor -%}
     _qtgql_connect_signals();
 }
@@ -63,7 +63,7 @@ Q_ASSERT_X(m_inst_ptr, __FILE__, "Tried to instantiate a proxy object with an em
 {% for field in t.fields -%}
 connect(m_inst_ptr, &👉context.schema_ns👈::👉t.concrete.name👈::👉 field.concrete.signal_name 👈, this,
 [&](){
-👉update_proxy_field(field, context.operation)👈
+👉update_proxy_field(t, field, context.operation)👈
 });
 {% endfor -%}
 };
@@ -97,7 +97,7 @@ return inst;
 void 👉 t.updater_name 👈(👉 t.concrete.member_type_arg 👈 inst, const QJsonObject &data, const 👉 context.operation.name 👈 * operation)
 {
 {%for f in t.fields -%}
-👉update_concrete_field(f,f.concrete, private_name=f.private_name, operation_pointer="operation")👈
+👉update_concrete_field(t, f,f.concrete, private_name=f.private_name, operation_pointer="operation")👈
 {% endfor %}
 };
 
@@ -108,11 +108,19 @@ void 👉 t.updater_name 👈(👉 t.concrete.member_type_arg 👈 inst, const Q
 [[nodiscard]] const 👉 f.type.property_type 👈  👉 t.name 👈::👉 f.concrete.getter_name 👈() const {
 
 {% if f.type.is_model and f.type.of_type.is_builtin_scalar -%}
-return m_inst->👉 f.concrete.getter_name 👈(👉f.build_variables_tuple_for_field_arguments.replace("operation", "m_operation")👈).get();
+return m_inst->👉 f.concrete.getter_name 👈(
+        {% if f.cached_by_args -%}
+        👉f.variable_builder_name 👈(m_operation);
+        {% endif -%}
+        ).get();
 {% elif f.type.is_queried_object_type or f.type.is_queried_interface or f.type.is_queried_union or f.type.is_model  -%}
 return 👉f.private_name👈;
 {% else -%}
-return m_inst->👉 f.concrete.getter_name 👈(👉f.build_variables_tuple_for_field_arguments.replace("operation", "m_operation")👈);
+return m_inst->👉 f.concrete.getter_name 👈(
+        {% if f.cached_by_args -%}
+        👉f.variable_builder_name 👈(m_operation);
+        {% endif -%}
+        );
 {%- endif -%}
 };
 {% endfor %}

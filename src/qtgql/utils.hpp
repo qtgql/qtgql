@@ -1,18 +1,13 @@
 #pragma once
-#include <QRegularExpression>
 
 namespace qtgql {
 namespace utils {
-
-inline std::optional<QString> get_operation_name(const QString &query) {
-  static QRegularExpression re("(subscription|mutation|query)( [0-9a-zA-Z]+)*");
-  auto match = re.match(query);
-  if (match.hasMatch()) {
-    return match.captured(2).trimmed();
+template <class... Types> struct TupleQJsonValueComparator {
+  bool operator()(const std::tuple<Types...> &lhs,
+                  const std::tuple<Types...> &rhs) const {
+    return lhs == rhs;
   }
-  return {};
-}
-
+};
 } // namespace utils
 
 } // namespace qtgql

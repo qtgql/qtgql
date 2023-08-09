@@ -14,11 +14,21 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <QRegularExpression>
 #include <QString>
 #include <optional>
 #include <utility>
 
 namespace qtgql::bases {
+
+inline std::optional<QString> get_operation_name(const QString &query) {
+  static QRegularExpression re("(subscription|mutation|query)( [0-9a-zA-Z]+)*");
+  auto match = re.match(query);
+  if (match.hasMatch()) {
+    return match.captured(2).trimmed();
+  }
+  return {};
+}
 
 struct HashAbleABC {
   [[nodiscard]] virtual QJsonObject serialize() const {
@@ -33,7 +43,7 @@ struct GraphQLMessage : public bases::HashAbleABC {
 
   explicit GraphQLMessage(QString _query, std::optional<QJsonObject> vars = {})
       : query{std::move(_query)}, variables{std::move(vars)} {
-    auto op_name = utils::get_operation_name(query);
+    auto op_name = get_operation_name(query);
     Q_ASSERT_X(op_name.has_value(), "OperationPayload",
                "qtgql enforces operations to have names your query has no "
                "operation name");

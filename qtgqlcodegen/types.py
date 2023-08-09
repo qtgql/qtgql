@@ -512,6 +512,10 @@ class QtGqlQueriedObjectType(QtGqlQueriedTypeABC, QtGqlTypeABC):
     def fields(self) -> tuple[QtGqlQueriedField, ...]:
         return tuple(self.fields_dict.values())
 
+    @cached_property
+    def fields_with_args(self) -> tuple[QtGqlQueriedField, ...]:
+        return tuple([field for field in self.fields if field.cached_by_args])
+
     @property
     def deserializer_name(self) -> str:
         return f"deserializers::des_{self.name}"
