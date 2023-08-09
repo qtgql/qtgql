@@ -124,7 +124,17 @@ return m_inst->👉 f.concrete.getter_name 👈(
 {%- endif -%}
 };
 {% endfor %}
-
+// args builders
+{%for f in t.fields_with_args -%}
+👉 f.concrete.arguments_type 👈  👉 t.name 👈::👉 f.variable_builder_name 👈(const 👉context.operation.name👈* operation){
+    return {
+    {%for arg in f.variable_uses -%}
+    operation->vars_inst.👉 arg.variable.name 👈
+    {% if not loop.last -%}, {% endif -%}
+    {% endfor -%}
+    };
+}
+{% endfor %}
 
 {% if  not t.concrete.is_root -%}
 void 👉 t.name 👈::qtgql_replace_concrete(const std::shared_ptr<👉 t.concrete.name 👈> & new_inst){

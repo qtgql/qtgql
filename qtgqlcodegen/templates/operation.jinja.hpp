@@ -50,13 +50,7 @@ class 👉 t.name 👈: public 👉 context.qtgql_types.ObjectTypeABC.name if no
 public:
 // args builders
 {%for f in t.fields_with_args -%}
-static 👉 f.concrete.arguments_type 👈  👉 f.variable_builder_name 👈(const 👉context.operation.name👈* operation){
-return {
-{%for arg in f.variable_uses -%}
-operation->vars_inst.👉 arg.variable.name 👈
-{% if not loop.last -%}, {% endif -%}
-{% endfor -%}
-};
+static 👉 f.concrete.arguments_type 👈  👉 f.variable_builder_name 👈(const 👉context.operation.name👈* operation);
 {% endfor %}
 
 {% if t.concrete.is_root -%}
