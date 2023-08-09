@@ -985,6 +985,7 @@ ListOfInputObjectTestCase = QtGqlTestCase(
     ),
 )
 
+
 all_test_cases = [
     ScalarsTestCase,
     SimpleGarbageCollectionTestCase,
@@ -1018,6 +1019,7 @@ all_test_cases = [
     ListOfScalarArgumentTestCase,
     ListOfScalarInInputObjectTestCase,
     ListOfInputObjectTestCase,
+    OptionalInputTestCase,
     CustomUserScalarTestCase,
     ObjectsThatReferenceEachOtherTestCase,
     RootListOfTestCase,
@@ -1056,6 +1058,7 @@ implemented_testcases = [
     ListOfScalarArgumentTestCase,
     ListOfScalarInInputObjectTestCase,
     ListOfInputObjectTestCase,
+    OptionalInputTestCase,
 ]
 
 
@@ -1070,5 +1073,5 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 if __name__ == "__main__":
     generate_testcases(
-        ListOfInputObjectTestCase,
+        OptionalInputTestCase,
     )

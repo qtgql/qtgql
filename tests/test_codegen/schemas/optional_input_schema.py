@@ -11,6 +11,3 @@ class Query:
 
 
 schema = strawberry.Schema(query=Query)
-
-if __name__ == "__main__":
-    ...
