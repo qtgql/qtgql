@@ -110,7 +110,7 @@ void 👉 t.updater_name 👈(👉 t.concrete.member_type_arg 👈 inst, const Q
 {% if f.type.is_model and f.type.of_type.is_builtin_scalar -%}
 return m_inst->👉 f.concrete.getter_name 👈(
         {% if f.cached_by_args -%}
-        👉f.variable_builder_name 👈(m_operation);
+        👉f.variable_builder_name 👈(m_operation)
         {% endif -%}
         ).get();
 {% elif f.type.is_queried_object_type or f.type.is_queried_interface or f.type.is_queried_union or f.type.is_model  -%}
@@ -118,7 +118,7 @@ return 👉f.private_name👈;
 {% else -%}
 return m_inst->👉 f.concrete.getter_name 👈(
         {% if f.cached_by_args -%}
-        👉f.variable_builder_name 👈(m_operation);
+        👉f.variable_builder_name 👈(m_operation)
         {% endif -%}
         );
 {%- endif -%}
@@ -127,12 +127,17 @@ return m_inst->👉 f.concrete.getter_name 👈(
 // args builders
 {%for f in t.fields_with_args -%}
 👉 f.concrete.arguments_type 👈  👉 t.name 👈::👉 f.variable_builder_name 👈(const 👉context.operation.name👈* operation){
-    return {
-    {%for arg in f.variable_uses -%}
-    operation->vars_inst.👉 arg.variable.name 👈
-    {% if not loop.last -%}, {% endif -%}
+    👉 f.concrete.arguments_type 👈 ret;
+    {%for var_use in f.variable_uses -%}
+    {% if var_use.variable.type.is_optional -%}
+    if(operation->vars_inst.👉 var_use.variable.name 👈.has_value()){
+        ret.emplace("👉 var_use.variable.name 👈", QJsonValue(operation->vars_inst.👉 var_use.variable.name 👈.value()));
+    }
+    {% else %}
+    ret.insert("👉 var_use.variable.name 👈", QJsonValue(operation->vars_inst.👉 var_use.variable.name 👈));
+    {% endif -%}
     {% endfor -%}
-    };
+    return ret;
 }
 {% endfor %}
 

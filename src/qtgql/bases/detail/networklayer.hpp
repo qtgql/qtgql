@@ -8,7 +8,6 @@
 #include "QJsonObject"
 #include "QUuid"
 #include "exceptions.hpp"
-#include "qtgql/utils.hpp"
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QNetworkAccessManager>

@@ -8,3 +8,4 @@
 #include "detail/networklayer.hpp"
 #include "detail/objecttype.hpp"
 #include "detail/operationhandler.hpp"
+#include "detail/tools.hpp"

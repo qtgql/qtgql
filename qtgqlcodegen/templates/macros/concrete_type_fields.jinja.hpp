@@ -3,7 +3,7 @@ public:
 {% for f in type.unique_fields -%}
 {% set f_member_type -%}
 {% if f.arguments -%}
-std::map<👉f.arguments_type👈, 👉f.type.member_type👈>
+std::unordered_map<👉f.arguments_type👈, 👉f.type.member_type👈>
 {% else -%}
 👉f.type.member_type👈
 {% endif -%}
