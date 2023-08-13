@@ -69,5 +69,6 @@ template <> struct std::hash<qtgql::bases::tools::ArgsMap> {
       hash_combine(ret, std::hash<std::string>{}(k));
       hash_combine(ret, std::hash<QJsonValue>{}(inst.m_map.at(k)));
     }
+    return ret;
   }
 };

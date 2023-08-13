@@ -2,3 +2,4 @@
     query HelloOrEchoQuery($echo: String){
       echoOrHello(echo: $echo)
     }
+    
