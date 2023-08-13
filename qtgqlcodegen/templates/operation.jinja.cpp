@@ -84,7 +84,7 @@ if(cached_maybe.has_value()){
 {% endif -%}
 auto inst = 👉 t.concrete.name 👈::shared();
 {% for f in t.fields -%}
-👉deserialize_concrete_field(f)👈
+👉deserialize_concrete_field(t, f)👈
 {% endfor %}
 {% if t.concrete. implements_node %}
 👉 t.concrete.name 👈::ENV_CACHE()->add_node(inst);

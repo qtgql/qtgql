@@ -1,10 +1,10 @@
 {%- from "macros/iterate_type_condition.jinja.hpp" import  iterate_type_condition -%}
-{% macro deserialize_concrete_field(proxy_field, operation_pointer = "operation",
+{% macro deserialize_concrete_field(parent_proxy_type, proxy_field, operation_pointer = "operation",
                            do_after_deserialized = "") -%}
 {% set setter_name %}inst->👉 proxy_field.concrete.setter_name 👈{% endset %}
 {% set setter_end -%}
 {% if proxy_field.cached_by_args %}
-, 👉proxy_field.build_variables_tuple_for_field_arguments👈
+, 👉 parent_proxy_type.name 👈::👉proxy_field.variable_builder_name 👈(👉 operation_pointer 👈)
 {% endif -%}
 {% endset -%}
 if (!data.value("👉proxy_field.name👈").isNull()){

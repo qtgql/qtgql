@@ -60,7 +60,7 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
     def arguments(self) -> tuple[QtGqlArgumentDefinition, ...]:
         return tuple(self.arguments_dict.values())
 
-    @cached_property
+    @property
     def arguments_type(self) -> str:
         return "qtgql::bases::tools::ArgsMap"
 

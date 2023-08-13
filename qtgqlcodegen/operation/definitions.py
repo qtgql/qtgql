@@ -63,7 +63,7 @@ class QtGqlQueriedField:
 
     @property
     def variable_builder_name(self) -> str:
-        return f"build_tuple_args_for_{self.name}"
+        return f"build_args_for_{self.name}"
 
     @property
     def name(self) -> str:

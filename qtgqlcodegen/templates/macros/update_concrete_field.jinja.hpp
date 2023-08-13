@@ -17,18 +17,15 @@ inst->👉private_name👈
 {% endif -%}
 {%- endset -%}
 {%- set setter_name -%}inst->👉 proxy_field.concrete.setter_name 👈{% endset -%}
-
-{%- if proxy_field.is_root and (f_concrete.type.is_object_type or f_concrete.type.is_interface or f_concrete.type.is_union
-or (f_concrete.type.is_model and f_concrete.type.needs_proxy_model)) -%}
-{#- // root fields that has no default value might not have value even if they are not optional -#}
+{%- if TemplatesLogic.field_might_not_exists_on_update(proxy_field) -%}
 {% if proxy_field.variable_uses  -%}
-if (!inst->👉private_name👈.contains(👉private_name👈_args))
+if (!qtgql::bases::backports::map_contains(inst->👉private_name👈, 👉private_name👈_args))
 {% else -%}
 if (!👉current👈)
 {% endif %}
 {
     {#- // Note: we can't use deserializer name since it might not be an object type. -#}
-    👉deserialize_concrete_field(proxy_field)👈
+    👉deserialize_concrete_field(parent_proxy_type, proxy_field)👈
 }
 else
 {% endif -%}
@@ -79,7 +76,7 @@ if (👉current👈 != new_👉proxy_field.name👈){
 
 
 {% else %}
-    👉deserialize_concrete_field(proxy_field)👈
+    👉deserialize_concrete_field(parent_proxy_type, proxy_field)👈
     {% endif %}
 {% elif proxy_field.type.is_enum %}
 auto new_👉f_concrete.name👈= Enums::👉proxy_field.type.is_enum.map_name👈::by_name(data.value("👉proxy_field.name👈").toString());
