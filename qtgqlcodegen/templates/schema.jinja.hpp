@@ -59,7 +59,7 @@ std::optional<👉 arg.type.member_type 👈> 👉 arg.name 👈 = {};
 [[nodiscard]] QJsonObject to_json() const{
     auto __ret = QJsonObject();
     {% for arg in type.fields -%}
-    👉serialize_input_variable("__ret", arg)👈
+    👉serialize_input_variable("__ret", arg, attr_name=arg.name, json_name=arg.name)👈
     {% endfor -%}
     return __ret;
 }

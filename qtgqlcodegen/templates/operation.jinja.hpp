@@ -81,7 +81,7 @@ std::optional<👉 var.type.member_type 👈> 👉 var.name 👈 = {};
     QJsonObject to_json() const{
     QJsonObject __ret;
     {% for var in context.operation.variables -%}
-    👉 serialize_input_variable("__ret", var) 👈
+    👉 serialize_input_variable("__ret", var, attr_name=var.name, json_name=var.name) 👈
     {% endfor -%}
     return __ret;
     }
