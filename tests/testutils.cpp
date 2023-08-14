@@ -84,9 +84,7 @@ get_or_create_env(const QString &env_name, const DebugClientSettings &settings,
         std::unique_ptr<qtgql::gqltransportws::GqlTransportWs>(
             new DebugAbleWsNetworkLayer(settings)),
         std::unique_ptr<qtgql::bases::EnvCache>(
-            new qtgql::bases::EnvCache{{cache_dur}}
-            )
-            );
+            new qtgql::bases::EnvCache{{cache_dur}}));
     bases::Environment::set_gql_env(env_);
     DebugAbleWsNetworkLayer::from_environment(env_)->wait_for_valid();
     return env_;

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import mimesis
 import strawberry
 
 from tests.conftest import factory

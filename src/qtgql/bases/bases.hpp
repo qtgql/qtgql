@@ -1,4 +1,5 @@
 #pragma once
+#include "detail/backports.hpp"
 #include "detail/constants.hpp"
 #include "detail/environment.hpp"
 #include "detail/exceptions.hpp"
@@ -9,4 +10,3 @@
 #include "detail/objecttype.hpp"
 #include "detail/operationhandler.hpp"
 #include "detail/tools.hpp"
-#include "detail/backports.hpp"

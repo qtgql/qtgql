@@ -7,11 +7,10 @@ import jinja2
 from attrs import define
 from jinja2 import Environment, PackageLoader, select_autoescape
 
-from qtgqlcodegen.operation.definitions import QtGqlQueriedField
-
 if TYPE_CHECKING:  # pragma: no cover
     from qtgqlcodegen.config import QtGqlConfig
     from qtgqlcodegen.generator import GenerationOutput
+    from qtgqlcodegen.operation.definitions import QtGqlQueriedField
 
 template_env: Environment = Environment(
     loader=PackageLoader("qtgqlcodegen"),
@@ -26,9 +25,10 @@ def debug_jinja(obj: Any) -> None:  # pragma: no cover
     warnings.warn("jinja debug is called", stacklevel=2)
     return obj
 
+
 class TemplatesLogic:
-    """
-    some conditions are too complex to reside in the template.
+    """Some conditions are too complex to reside in the template.
+
     they will exist here and the templates would call them.
     """
 

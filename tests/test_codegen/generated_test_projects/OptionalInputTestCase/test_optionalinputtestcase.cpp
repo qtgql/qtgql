@@ -20,36 +20,38 @@ TEST_CASE("OptionalInputTestCase", "[generated-testcase]") {
     q->fetch();
     test_utils::wait_for_completion(q);
     REQUIRE(q->data()->get_echoOrHello().toStdString().starts_with(
-            to_compare.toStdString()));
+        to_compare.toStdString()));
   };
-  SECTION("test update with variable"){
+  SECTION("test update with variable") {
     auto q = helloorechoquery::HelloOrEchoQuery::shared();
     QString to_compare = "foobar";
     q->set_variables({{to_compare}});
     test_utils::wait_for_completion(q);
-    test_utils::SignalCatcher catcher({.source_obj=q->data(), .only="echoOrHello"});
+    test_utils::SignalCatcher catcher(
+        {.source_obj = q->data(), .only = "echoOrHello"});
     auto prev = q->data()->get_echoOrHello();
     q->refetch();
     REQUIRE(catcher.wait());
     REQUIRE(prev.toStdString() != q->data()->get_echoOrHello().toStdString());
   }
   SECTION("test deserialize no variable set.") {
-        auto q = helloorechoquery::HelloOrEchoQuery::shared();
-        q->fetch();
-        test_utils::wait_for_completion(q);
-        REQUIRE(q->data()->get_echoOrHello().toStdString().starts_with("Hello World!"));
+    auto q = helloorechoquery::HelloOrEchoQuery::shared();
+    q->fetch();
+    test_utils::wait_for_completion(q);
+    REQUIRE(
+        q->data()->get_echoOrHello().toStdString().starts_with("Hello World!"));
   };
-    SECTION("test update no variable"){
-            auto q = helloorechoquery::HelloOrEchoQuery::shared();
-            q->fetch();
-            test_utils::wait_for_completion(q);
-            test_utils::SignalCatcher catcher({.source_obj=q->data(), .only="echoOrHello"});
-            auto prev = q->data()->get_echoOrHello();
-            q->refetch();
-            REQUIRE(catcher.wait());
-            REQUIRE(prev.toStdString() != q->data()->get_echoOrHello().toStdString());
-    }
-
+  SECTION("test update no variable") {
+    auto q = helloorechoquery::HelloOrEchoQuery::shared();
+    q->fetch();
+    test_utils::wait_for_completion(q);
+    test_utils::SignalCatcher catcher(
+        {.source_obj = q->data(), .only = "echoOrHello"});
+    auto prev = q->data()->get_echoOrHello();
+    q->refetch();
+    REQUIRE(catcher.wait());
+    REQUIRE(prev.toStdString() != q->data()->get_echoOrHello().toStdString());
+  }
 }
 
 }; // namespace OptionalInputTestCase
