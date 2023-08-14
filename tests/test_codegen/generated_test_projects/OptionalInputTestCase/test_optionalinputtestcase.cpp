@@ -12,9 +12,8 @@ auto SCHEMA_ADDR = get_server_address("OptionalInputTestCase");
 TEST_CASE("OptionalInputTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
-
+  auto q = helloorechoquery::HelloOrEchoQuery::shared();
   SECTION("test deserialize") {
-    auto q = helloorechoquery::HelloOrEchoQuery::shared();
     QString to_compare = "foobar";
     q->set_variables({{to_compare}});
     q->fetch();
@@ -23,9 +22,9 @@ TEST_CASE("OptionalInputTestCase", "[generated-testcase]") {
         to_compare.toStdString()));
   };
   SECTION("test update with variable") {
-    auto q = helloorechoquery::HelloOrEchoQuery::shared();
     QString to_compare = "foobar";
     q->set_variables({{to_compare}});
+    q->fetch();
     test_utils::wait_for_completion(q);
     test_utils::SignalCatcher catcher(
         {.source_obj = q->data(), .only = "echoOrHello"});
@@ -35,14 +34,12 @@ TEST_CASE("OptionalInputTestCase", "[generated-testcase]") {
     REQUIRE(prev.toStdString() != q->data()->get_echoOrHello().toStdString());
   }
   SECTION("test deserialize no variable set.") {
-    auto q = helloorechoquery::HelloOrEchoQuery::shared();
     q->fetch();
     test_utils::wait_for_completion(q);
     REQUIRE(
         q->data()->get_echoOrHello().toStdString().starts_with("Hello World!"));
   };
   SECTION("test update no variable") {
-    auto q = helloorechoquery::HelloOrEchoQuery::shared();
     q->fetch();
     test_utils::wait_for_completion(q);
     test_utils::SignalCatcher catcher(
