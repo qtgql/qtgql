@@ -48,8 +48,7 @@ class TemplatesLogic:
 
         # Root fields that has no default value might not have value even if
         # they are not optional.
-        elif field.is_root and not f_concrete_type.is_builtin_scalar:
-            # builtin scalars have default constructor
+        elif field.is_root:
             return True
 
         return False

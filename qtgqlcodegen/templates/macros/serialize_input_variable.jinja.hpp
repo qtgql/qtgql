@@ -1,13 +1,13 @@
-{% macro serialize_input_variable(json_obj, variable, attr_name_overrid = "") -%}
+{% macro serialize_input_variable(json_obj, variable, attr_name_override = "") -%}
 {% set var_value_attr -%}
 {% if variable.type.is_optional -%}
-👉 attr_name_overrid or variable.name 👈.value()
+👉 attr_name_override or variable.name 👈.value()
 {% else -%}
-👉 attr_name_overrid or variable.name 👈
+👉 attr_name_override or variable.name 👈
 {% endif -%}
 {% endset -%}
 {% if variable.type.is_optional %}
-if (👉 variable.name 👈.has_value()){
+if (👉 attr_name_override or variable.name 👈.has_value()){
 {% endif %}
 {% if variable.type.is_input_list -%}
 QJsonArray qtgql__👉 variable.name 👈_json;
