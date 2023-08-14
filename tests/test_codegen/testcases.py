@@ -367,8 +367,8 @@ OperationVariablesTestcase = QtGqlTestCase(
     }
   }
 
-  mutation ChangeFriendName($connected: Boolean!, $new_name: String!) {
-  changeFriendName(connected: $connected, newName: $new_name) {
+  mutation ChangeFriendName($connected: Boolean!, $new_name: String!, $user_id: ID! ) {
+  changeFriendName(connected: $connected, newName: $new_name, userId: $user_id) {
     friend(connectedArg: $connected) {
       name
     }
@@ -1073,14 +1073,14 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 if __name__ == "__main__":
     generate_testcases(
-        NestedObjectTestCase,
-        OptionalNestedObjectTestCase,
-        ObjectWithListOfObjectTestCase,
-        EnumTestCase,
-        NonNodeInterfaceTestCase,
+        # NestedObjectTestCase,
+        # OptionalNestedObjectTestCase,
+        # ObjectWithListOfObjectTestCase,
+        # EnumTestCase,
+        # NonNodeInterfaceTestCase,
         OperationVariablesTestcase,
-        RootScalarTestCase,
-        NonNodeTypeTestCase,
-        InputTypeOperationVariableTestCase,
-        NodeInterfaceFieldTestCase,
+        # RootScalarTestCase,
+        # NonNodeTypeTestCase,
+        # InputTypeOperationVariableTestCase,
+        # NodeInterfaceFieldTestCase,
     )

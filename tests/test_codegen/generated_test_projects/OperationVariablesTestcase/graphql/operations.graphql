@@ -10,8 +10,8 @@
     }
   }
 
-  mutation ChangeFriendName($connected: Boolean!, $new_name: String!) {
-  changeFriendName(connected: $connected, newName: $new_name) {
+  mutation ChangeFriendName($connected: Boolean!, $new_name: String!, $user_id: ID! ) {
+  changeFriendName(connected: $connected, newName: $new_name, userId: $user_id) {
     friend(connectedArg: $connected) {
       name
     }

@@ -93,7 +93,7 @@ class 👉 context.operation.name 👈: public qtgql::bases::OperationHandlerABC
     QML_ELEMENT
     QML_UNCREATABLE("Must be instantiated as shared pointer.")
 
-std::optional<👉 context.operation.root_type.name 👈 *> m_data = {};
+std::optional<👉 context.operation.root_type.name 👈 *> m_data = std::nullopt;
 
 
 

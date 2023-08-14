@@ -5,7 +5,6 @@
 #include <QJsonValue>
 #include <string>
 #include <unordered_map>
-
 namespace qtgql::bases::tools {
 
 // shamelessly copied from https://stackoverflow.com/a/2595226/16776498

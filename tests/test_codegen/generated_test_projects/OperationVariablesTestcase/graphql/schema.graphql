@@ -1,5 +1,5 @@
 type Mutation {
-  changeFriendName(connected: Boolean!, newName: String!): UserWithFriend!
+  changeFriendName(connected: Boolean!, newName: String!, userId: ID!): UserWithFriend!
 }
 
 interface Node {

@@ -121,7 +121,7 @@ return m_inst->👉 f.concrete.getter_name 👈(
     👉 f.concrete.arguments_type 👈 qtgql__ret;
     {%for var_use in f.variable_uses -%}
     {% set arg_attr_name -%} operation->vars_inst.👉 var_use.variable.name 👈 {% endset -%}
-    👉serialize_input_variable("qtgql__ret", var_use.variable, arg_attr_name ) 👈
+    👉serialize_input_variable("qtgql__ret", var_use.argument[1], arg_attr_name ) 👈
     {% endfor -%}
     return qtgql__ret;
 }
