@@ -9,7 +9,7 @@ from tests.conftest import factory
 class Query:
     @strawberry.field
     @staticmethod
-    def name(self) -> str:
+    def name() -> str:
         return factory.person.name()
 
 
