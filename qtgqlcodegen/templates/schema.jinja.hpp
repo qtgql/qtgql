@@ -101,11 +101,13 @@ Q_OBJECT
 public:
 {% if type.is_root %} {# root types should be singletons #}
 [[nodiscard]] static std::shared_ptr<👉 type.name 👈> instance(){
-    static std::weak_ptr<👉 type.name 👈> inst;
-    if (inst.expired()){
-        inst = std::make_shared<👉 type.name 👈>();
+    static std::weak_ptr<👉 type.name 👈> observer_inst;
+    if (observer_inst.expired()){
+        auto ret = std::make_shared<👉 type.name 👈>();
+        observer_inst = ret;
+        return ret;
     }
-    return inst.lock();
+    return observer_inst.lock();
 }
 {% else %}
 QTGQL_STATIC_MAKE_SHARED(👉 type.name 👈)
