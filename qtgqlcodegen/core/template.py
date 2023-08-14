@@ -32,14 +32,26 @@ class TemplatesLogic:
     they will exist here and the templates would call them.
     """
 
-    def field_might_not_exists_on_update(self, field: QtGqlQueriedField) -> bool:
-        """Root fields that has no default value might not have value even if
-        they are not optional."""
+    @staticmethod
+    def field_might_not_exists_on_update(field: QtGqlQueriedField) -> bool:
+        """This is used when updating a concrete field. Some fields are not
+        "update-able" or we just deserialize them instead of update.
+
+        This method would determine the needed behaviour.
+        """
         f_concrete_type = field.concrete.type
-        if field.is_root and not field.type.is_builtin_scalar:
-            return True
+
+        # concrete model fields currently doesn't update rather we just always deserialize the whole list and
+        # proxies would update themselves correspondingly.
         if model := f_concrete_type.is_model:
             return model.needs_proxy_model
+
+        # Root fields that has no default value might not have value even if
+        # they are not optional.
+        elif field.is_root and not f_concrete_type.is_builtin_scalar:
+            # builtin scalars have default constructor
+            return True
+
         return False
 
 
