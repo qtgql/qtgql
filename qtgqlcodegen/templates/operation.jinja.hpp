@@ -75,7 +75,7 @@ struct 👉 context.operation.generated_variables_type 👈{
 {% if var.type.is_optional -%}
 std::optional<👉 var.type.member_type 👈> 👉 var.name 👈 = {};
 {% else -%}
-var.type.member_type 👈> 👉 var.name 👈;
+👉 var.type.member_type 👈 👉 var.name 👈;
 {% endif -%}
 {% endfor -%}
     QJsonObject to_json() const{

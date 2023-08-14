@@ -8,20 +8,6 @@
 
 namespace qtgql::bases::tools {
 
-struct ArgsMap {
-  std::unordered_map<std::string, QJsonValue> m_map;
-
-public:
-  inline bool operator==(const ArgsMap &rhs) const {
-    return m_map == rhs.m_map;
-  }
-
-  QJsonValue at(const std::string &key) { return m_map.at(key); }
-
-  void emplace(const std::string &key, const QJsonValue &value) {
-    m_map.emplace(key, value);
-  }
-};
 // shamelessly copied from https://stackoverflow.com/a/2595226/16776498
 template <class T> inline void hash_combine(std::size_t &seed, const T &v) {
   std::hash<T> hasher;
@@ -60,17 +46,6 @@ struct QJsonValueHasher {
   }
 };
 
-struct ArgsMapHasher {
-  std::size_t
-  operator()(const qtgql::bases::tools::ArgsMap &inst) const noexcept {
-    std::size_t ret = 0;
-    for (const auto &[k, v] : inst.m_map) {
-      hash_combine(ret, std::hash<std::string>{}(k));
-      hash_combine(ret, QJsonValueHasher()(inst.m_map.at(k)));
-    }
-    return ret;
-  }
-};
 template <typename T_MAP, typename T_KeyType>
 auto get_or_nullopt(const T_MAP &map, const T_KeyType &key) {
   if (backports::map_contains(map, key)) {

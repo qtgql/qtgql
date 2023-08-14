@@ -72,7 +72,7 @@ class QtGqlTypeABC(ABC):
     def is_queried_union(self) -> QtGqlQueriedUnion | None:
         return None
 
-    def json_repr(self, attr_name: str | None = None) -> str:
+    def json_repr(self, attr_name: str) -> str:
         raise NotImplementedError(f"{self} is not supported as an input type ATM")
 
     @abstractmethod
@@ -260,7 +260,7 @@ class BuiltinScalar(QtGqlTypeABC):
     def property_type(self) -> str:
         return self.type_name()
 
-    def json_repr(self, attr_name: str | None = None) -> str:
+    def json_repr(self, attr_name: str) -> str:
         return f"{attr_name}"
 
 
@@ -276,7 +276,7 @@ class CustomScalarDefinition(QtGqlTypeABC):
     def is_custom_scalar(self) -> CustomScalarDefinition | None:
         return self
 
-    def json_repr(self, attr_name: str | None = None) -> str:
+    def json_repr(self, attr_name: str) -> str:
         return f"{attr_name}.serialize()"
 
     def type_name(self) -> str:
@@ -443,7 +443,7 @@ class QtGqlInputObjectTypeDefinition(BaseQtGqlObjectType):
     def type_name(self) -> str:
         return self.name
 
-    def json_repr(self, attr_name: str | None = None) -> str:
+    def json_repr(self, attr_name: str) -> str:
         return f"{attr_name}.to_json()"
 
 
@@ -480,7 +480,7 @@ class QtGqlEnumDefinition(QtGqlTypeABC):
     def default_value(self) -> str:
         return f"{self.namespaced_name}(0)"
 
-    def json_repr(self, attr_name: str | None = None) -> str:
+    def json_repr(self, attr_name: str) -> str:
         return f"Enums::{self.map_name}::name_by_value({attr_name})"
 
 

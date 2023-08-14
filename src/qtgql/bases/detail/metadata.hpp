@@ -3,8 +3,7 @@
 #include <QUuid>
 #include <utility>
 
-namespace qtgql {
-namespace bases {
+namespace qtgql::bases {
 
 struct SelectionsConfig {
   // describes selections of a graphql operation.
@@ -15,5 +14,4 @@ struct SelectionsConfig {
   SelectionsMap choices = SelectionsMap();
 };
 
-} // namespace bases
-} // namespace qtgql
+} // namespace qtgql::bases

@@ -3,6 +3,7 @@
 {%- from "macros/update_concrete_field.jinja.hpp" import  update_concrete_field -%}
 {%- from "macros/update_proxy_field.jinja.cpp" import  update_proxy_field -%}
 {%- from "macros/iterate_type_condition.jinja.hpp" import  iterate_type_condition -%}
+{%- from "macros/serialize_input_variable.jinja.hpp" import  serialize_input_variable -%}
 
 #include "./👉 context.operation.name 👈.hpp"
 
@@ -117,17 +118,12 @@ return m_inst->👉 f.concrete.getter_name 👈(
 // args builders
 {%for f in t.fields_with_args -%}
 👉 f.concrete.arguments_type 👈  👉 t.name 👈::👉 f.variable_builder_name 👈(const 👉context.operation.name👈* operation){
-    👉 f.concrete.arguments_type 👈 ret;
+    👉 f.concrete.arguments_type 👈 qtgql__ret;
     {%for var_use in f.variable_uses -%}
-    {% if var_use.variable.type.is_optional -%}
-    if(operation->vars_inst.👉 var_use.variable.name 👈.has_value()){
-        ret.emplace("👉 var_use.variable.name 👈", QJsonValue(operation->vars_inst.👉 var_use.variable.name 👈.value()));
-    }
-    {% else %}
-    ret.insert("👉 var_use.variable.name 👈", QJsonValue(operation->vars_inst.👉 var_use.variable.name 👈));
-    {% endif -%}
+    {% set arg_attr_name %} operation->vars_inst.👉 var_use.variable.name 👈 {% endset %};
+    👉serialize_input_variable("qtgql__ret", var_use.variable, arg_attr_name ) 👈
     {% endfor -%}
-    return ret;
+    return qtgql__ret;
 }
 {% endfor %}
 
@@ -139,7 +135,7 @@ void 👉 t.name 👈::qtgql_replace_concrete(const std::shared_ptr<👉 t.concr
     m_inst->disconnect(this);
     {% for field in t.fields -%}
     if(m_inst->👉 field.private_name 👈 != new_inst->👉 field.private_name 👈){
-    👉update_proxy_field(field, context.operation)👈
+    👉update_proxy_field(t, field, context.operation)👈
     };
     {% endfor -%}
     m_inst = new_inst;

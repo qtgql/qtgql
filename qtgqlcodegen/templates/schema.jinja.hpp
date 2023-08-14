@@ -49,18 +49,13 @@ inline static const std::vector<std::pair<QString, 👉enum.name👈>> members =
 struct 👉type.name👈{
 
 public:
-{# // this is doubtfully needed, but std::map requires comparison for ordering. #}
-bool operator<(const 👉type.name👈& other) const {
-    {% for f in type.fields -%}
-    if(👉f.name👈 < other.👉f.name👈){
-        return true;
-    }
-    {% endfor -%}
-    return false;
-}
-{% for f in type.fields -%}
-std::optional<👉f.type.member_type👈> 👉f.name👈 = {};
-{% endfor %}
+{% for arg in type.fields -%}
+{% if arg.type.is_optional -%}
+std::optional<👉 arg.type.member_type 👈> 👉 arg.name 👈 = {};
+{% else -%}
+👉 arg.type.member_type 👈 👉 arg.name 👈;
+{% endif -%}
+{% endfor -%}
 [[nodiscard]] QJsonObject to_json() const{
     auto __ret = QJsonObject();
     {% for arg in type.fields -%}
