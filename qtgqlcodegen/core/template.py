@@ -33,9 +33,10 @@ class TemplatesLogic:
     """
 
     def field_might_not_exists_on_update(self, field: QtGqlQueriedField) -> bool:
-        # root fields that has no default value might not have value even if they are not optional
+        """Root fields that has no default value might not have value even if
+        they are not optional."""
         f_concrete_type = field.concrete.type
-        if field.is_root:
+        if field.is_root and not field.type.is_builtin_scalar:
             return True
         if model := f_concrete_type.is_model:
             return model.needs_proxy_model
