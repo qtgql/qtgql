@@ -100,9 +100,12 @@ Q_OBJECT
 👉 concrete_type_fields(type) 👈
 public:
 {% if type.is_root %} {# root types should be singletons #}
-[[nodiscard]] static 👉 type.name 👈* instance(){
-static 👉 type.name 👈 inst;
-return &inst;
+[[nodiscard]] static std::shared_ptr<👉 type.name 👈> instance(){
+    static std::weak_ptr<👉 type.name 👈> inst;
+    if (inst.expired()){
+        inst = std::make_shared<👉 type.name 👈>();
+    }
+    return inst.lock();
 }
 {% else %}
 QTGQL_STATIC_MAKE_SHARED(👉 type.name 👈)

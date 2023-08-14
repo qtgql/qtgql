@@ -372,14 +372,10 @@ class QtGqlObjectType(BaseQtGqlObjectType):
 
     @property
     def member_type(self) -> str:
-        if self.is_root:
-            return self.type_name()  # root types are singletons
         return f"std::shared_ptr<{self.type_name()}>"
 
     @property
     def member_type_arg(self) -> str:
-        if self.is_root:
-            return f"{self.member_type} *"
         return f"const {self.member_type} &"
 
     def __attrs_post_init__(self):
