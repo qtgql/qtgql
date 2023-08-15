@@ -14,10 +14,10 @@ m_inst->👉field.concrete.getter_name 👈()
 
 {% if field.type.is_queried_object_type  and field.type.is_optional %}
 if (👉 instance_of_concrete 👈){
-👉field.private_name👈 = new 👉field.type_name👈(👉operation_pointer👈, 👉 instance_of_concrete 👈);
+👉field.private_name👈 = new 👉 field.type.type_name() 👈(👉operation_pointer👈, 👉 instance_of_concrete 👈);
 }
 {% elif field.type.is_queried_object_type %}
-👉field.private_name👈 = new 👉field.type_name👈(👉operation_pointer👈, 👉 instance_of_concrete 👈);
+👉field.private_name👈 = new 👉field.type.type_name()👈(👉operation_pointer👈, 👉 instance_of_concrete 👈);
 {% elif field.type.is_model and not field.type.of_type.is_builtin_scalar %}
     {% if  field.type.is_model.of_type.is_queried_object_type %}
     auto init_vec_👉 field.name 👈 =  std::vector<👉field.type.of_type.name👈*>();

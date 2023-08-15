@@ -5,7 +5,7 @@ using namespace qtgql::bases;
 void NodeInstanceStore::add_node(
     const std::shared_ptr<qtgql::bases::NodeInterfaceABC> &node) {
   if (node.get()) {
-    m_nodes.emplace(node->get_id(), node);
+    m_nodes.emplace(*node->get_id(), node);
   }
 }
 

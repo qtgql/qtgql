@@ -250,7 +250,7 @@ class BuiltinScalar(QtGqlTypeABC):
 
     @property
     def property_type(self) -> str:
-        return f"{self.type_name()} *"
+        return f"{self.type_name()}"
 
     def json_repr(self, attr_name: str) -> str:
         return f"{attr_name}"

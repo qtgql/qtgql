@@ -48,7 +48,7 @@ if (👉current👈 != new_👉proxy_field.name👈){
 {% elif proxy_field.type.is_queried_object_type %}
     auto 👉f_concrete.name👈_data = data.value("👉f_concrete.name👈").toObject();
     {% if f_concrete.implements_node %}
-    if (👉current👈 && 👉current👈->get_id() == 👉f_concrete.name👈_data.value("id").toString()){
+    if (👉current👈 && *👉current👈->get_id() == 👉f_concrete.name👈_data.value("id").toString()){
     👉proxy_field.type.updater_name👈(👉current👈, 👉f_concrete.name👈_data,  👉operation_pointer👈);
     }
     else{

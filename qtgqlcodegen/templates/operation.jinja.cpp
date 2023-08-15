@@ -102,7 +102,7 @@ return m_inst->👉 f.concrete.getter_name 👈(
         {% if f.cached_by_args -%}
         👉f.variable_builder_name 👈(m_operation)
         {% endif -%}
-        ).get();
+        );
 {% elif f.type.is_queried_object_type or f.type.is_queried_interface or f.type.is_queried_union or f.type.is_model  -%}
 return 👉f.private_name👈;
 {% else -%}
@@ -113,15 +113,15 @@ return 👉f.private_name👈;
         {% endif -%}
         );
     if (ret)
-        return ret.get();
+        return *ret;
     else
-        return {};
+        return 👉f.type.default_value👈;
     {% else %}
-    return m_inst->👉 f.concrete.getter_name 👈(
+    return *m_inst->👉 f.concrete.getter_name 👈(
             {% if f.cached_by_args -%}
             👉f.variable_builder_name 👈(m_operation)
             {% endif -%}
-            ).get();
+            );
     {% endif %}
 {%- endif -%}
 };
