@@ -187,6 +187,12 @@ class QtGqlList(QtGqlTypeABC):
         )
 
     @property
+    def default_value(self) -> str:
+        if self.of_type.is_builtin_scalar:
+            return "nullptr"
+        return "{}"
+
+    @property
     def property_type(self) -> str:
         if self.of_type.is_queried_object_type or self.of_type.is_queried_interface:
             return f"{QtGqlTypes.ListModelABC.name}<{self.of_type.property_type}> *"
