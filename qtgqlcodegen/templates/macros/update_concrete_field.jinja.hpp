@@ -34,8 +34,8 @@ if (!data.value("👉f_concrete.name👈").isNull()){
 {% if proxy_field.type.is_void -%}
 /* deliberately empty */
 {% else -%}
-auto new_👉f_concrete.name👈 = data.value("👉f_concrete.name👈").👉 proxy_field.type.is_builtin_scalar.from_json_convertor 👈;
-if (👉current👈 != new_👉f_concrete.name👈){
+auto new_👉f_concrete.name👈 = std::make_shared<👉f_concrete.type.type_name()👈>(data.value("👉f_concrete.name👈").👉 proxy_field.type.is_builtin_scalar.from_json_convertor 👈);
+if (*👉current👈 != *new_👉f_concrete.name👈){
 👉 setter_name 👈(new_👉f_concrete.name👈 👉 setter_end 👈);
 }
 {% endif %}

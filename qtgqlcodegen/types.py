@@ -95,7 +95,7 @@ class QtGqlTypeABC(ABC):
 
         :return: C++ default value initializer for this type
         """
-        return "{}"
+        return "nullptr"
 
     @property
     def member_type(self) -> str:
@@ -103,7 +103,7 @@ class QtGqlTypeABC(ABC):
         :returns: The C++ type of the concrete instance member.
         """
         # Usually `type_name` should suffice, if the type needs to return something else this is overridden.
-        return self.type_name()
+        return f"std::shared_ptr<{self.type_name()}>"
 
     @property
     def member_type_arg(self) -> str:
@@ -224,10 +224,6 @@ class QtGqlUnion(QtGqlTypeABC):
     def member_type(self) -> str:
         return f"std::shared_ptr<{self.type_name()}>"
 
-    @property
-    def default_value(self) -> str:
-        return "{}"
-
     def get_by_name(self, name: str) -> QtGqlObjectType | None:
         for possible in self.types:
             if possible.name == name:
@@ -242,10 +238,6 @@ class BuiltinScalar(QtGqlTypeABC):
     from_json_convertor: str
 
     @property
-    def default_value(self) -> str:
-        return self.default_value_.name
-
-    @property
     def is_builtin_scalar(self) -> BuiltinScalar | None:
         return self
 
@@ -258,7 +250,7 @@ class BuiltinScalar(QtGqlTypeABC):
 
     @property
     def property_type(self) -> str:
-        return self.type_name()
+        return f"{self.type_name()} *"
 
     def json_repr(self, attr_name: str) -> str:
         return f"{attr_name}"
@@ -475,10 +467,6 @@ class QtGqlEnumDefinition(QtGqlTypeABC):
 
     def type_name(self) -> str:
         return self.namespaced_name
-
-    @property
-    def default_value(self) -> str:
-        return f"{self.namespaced_name}(0)"
 
     def json_repr(self, attr_name: str) -> str:
         return f"Enums::{self.map_name}::name_by_value({attr_name})"

@@ -53,7 +53,7 @@ auto 👉proxy_field.name👈_typename  = 👉proxy_field.name👈_data.value("_
     {% if proxy_field.type.is_void -%}
     /* deliberately empty */
     {% else -%}
-    👉 setter_name 👈(data.value("👉proxy_field.name👈").👉 proxy_field.type.is_builtin_scalar.from_json_convertor 👈 👉 setter_end 👈);
+    👉 setter_name 👈(std::make_shared<👉proxy_field.type.type_name()👈>(data.value("👉proxy_field.name👈").👉 proxy_field.type.is_builtin_scalar.from_json_convertor 👈) 👉 setter_end 👈);
     {% endif %}
     {% elif proxy_field.type.is_custom_scalar -%}
     auto new_👉proxy_field.name👈 = 👉 proxy_field.type.is_custom_scalar.type_name() 👈();
