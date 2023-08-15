@@ -15,7 +15,7 @@ TEST_CASE("RootScalarTestCase", "[generated-testcase]") {
   auto mq = mainquery::MainQuery::shared();
   mq->fetch();
   test_utils::wait_for_completion(mq);
-  SECTION("test deserialize") { REQUIRE(!mq->data()->get_name()->isEmpty()); };
+  SECTION("test deserialize") { REQUIRE(!mq->data()->get_name().isEmpty()); };
   SECTION("test update") {
     auto prev_name = mq->data()->get_name();
     auto catcher =
