@@ -56,8 +56,8 @@ auto 👉proxy_field.name👈_typename  = 👉proxy_field.name👈_data.value("_
     👉 setter_name 👈(std::make_shared<👉proxy_field.type.type_name()👈>(data.value("👉proxy_field.name👈").👉 proxy_field.type.is_builtin_scalar.from_json_convertor 👈) 👉 setter_end 👈);
     {% endif %}
     {% elif proxy_field.type.is_custom_scalar -%}
-    auto new_👉proxy_field.name👈 = 👉 proxy_field.type.is_custom_scalar.type_name() 👈();
-    new_👉proxy_field.name👈.deserialize(data.value("👉proxy_field.name👈"));
+    auto new_👉proxy_field.name👈 = std::make_shared<👉 proxy_field.type.is_custom_scalar.type_name() 👈>();
+    new_👉proxy_field.name👈->deserialize(data.value("👉proxy_field.name👈"));
     👉 setter_name 👈(new_👉proxy_field.name👈 👉 setter_end 👈);
 {% elif proxy_field.type.is_enum -%}
 👉 setter_name 👈(Enums::👉proxy_field.type.is_enum.map_name👈::by_name(data.value("👉proxy_field.name👈").toString())👉 setter_end 👈);

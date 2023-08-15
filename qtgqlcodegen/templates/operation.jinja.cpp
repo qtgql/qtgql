@@ -105,10 +105,16 @@ return m_inst->👉 f.concrete.getter_name 👈(
         );
 {% elif f.type.is_queried_object_type or f.type.is_queried_interface or f.type.is_queried_union or f.type.is_model  -%}
 return 👉f.private_name👈;
+{% elif f.type.is_custom_scalar %}
+return m_inst->👉 f.concrete.getter_name 👈(
+{%- if f.cached_by_args -%}
+👉f.variable_builder_name 👈(m_operation)
+{% endif -%}
+)->to_qt();
 {% else -%}
     {% if f.type.is_optional -%}
     auto ret = m_inst->👉 f.concrete.getter_name 👈(
-        {% if f.cached_by_args -%}
+        {%- if f.cached_by_args -%}
         👉f.variable_builder_name 👈(m_operation)
         {% endif -%}
         );

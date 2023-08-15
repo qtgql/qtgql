@@ -1073,10 +1073,9 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 if __name__ == "__main__":
     generate_testcases(
-        RootScalarTestCase,
-        # ScalarsTestCase,
         # SimpleGarbageCollectionTestCase,
         # GqlOverHttpAsEnvTestCase,
         # NoIdOnQueryTestCase,
-        # DateTimeTestCase,
+        DateTimeTestCase,
+        # DecimalTestCase,
     )

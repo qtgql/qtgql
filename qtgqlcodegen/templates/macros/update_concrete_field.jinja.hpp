@@ -40,9 +40,9 @@ if (*👉current👈 != *new_👉f_concrete.name👈){
 }
 {% endif %}
 {% elif proxy_field.type.is_custom_scalar %}
-auto new_👉proxy_field.name👈 = 👉 proxy_field.type.is_custom_scalar.type_name() 👈();
-new_👉proxy_field.name👈.deserialize(data.value("👉f_concrete.name👈"));
-if (👉current👈 != new_👉proxy_field.name👈){
+auto new_👉proxy_field.name👈 = std::make_shared<👉 proxy_field.type.type_name() 👈>();
+new_👉proxy_field.name👈->deserialize(data.value("👉f_concrete.name👈"));
+if (*👉current👈 != *new_👉proxy_field.name👈){
 👉 setter_name 👈(new_👉f_concrete.name👈 👉 setter_end 👈);
 }
 {% elif proxy_field.type.is_queried_object_type %}

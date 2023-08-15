@@ -276,7 +276,7 @@ class CustomScalarDefinition(QtGqlTypeABC):
 
     @property
     def fget_type(self) -> str:
-        return self.to_qt_type
+        return f"std::shared_ptr<{self.type_name()}>"
 
     @property
     def getter_is_constable(self) -> bool:

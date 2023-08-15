@@ -26,7 +26,7 @@ public:
 {% set f_private_name %}👉 f.private_name 👈{% endset %}
 {% endif -%}
 {% if f.is_custom_scalar -%}
-return 👉 f_private_name 👈.to_qt();
+return 👉 f_private_name 👈;
 {% else -%}
 return 👉 f_private_name 👈;
 {% endif -%}
