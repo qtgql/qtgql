@@ -2,7 +2,8 @@
 scalar DateTime
 
 type Mutation {
-  modifyName(userId: ID!, newName: String!): User
+  fillUser(userId: ID!): User!
+  nullifyUser(userId: ID!): User!
 }
 
 interface Node {

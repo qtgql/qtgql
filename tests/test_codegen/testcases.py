@@ -245,16 +245,25 @@ OptionalScalarsTestCase = QtGqlTestCase(
       }
     }
 
-    mutation ChangeName($userId: ID!, $newName: String!){
-      modifyName(userId: $userId, newName: $newName) {
+    mutation FillUser($userId: ID!){
+      fillUser(userId: $userId) {
         uuid
         name
-        id
         birth
         agePoint
         age
       }
     }
+    mutation NullifyUser($userId: ID!){
+      nullifyUser(userId: $userId) {
+        uuid
+        name
+        birth
+        agePoint
+        age
+      }
+    }
+
     """,
     test_name="OptionalScalarsTestCase",
 )

@@ -280,7 +280,7 @@ class CustomScalarDefinition(QtGqlTypeABC):
     name: str
     graphql_name: str
     deserialized_type: str
-    to_qt_type: BuiltinScalar
+    to_qt_type: str
     include_path: str
 
     @property
@@ -303,11 +303,11 @@ class CustomScalarDefinition(QtGqlTypeABC):
 
     @property
     def property_type(self) -> str:
-        return self.to_qt_type.type_name()
+        return self.to_qt_type
 
     @property
     def default_value_for_proxy(self) -> str:
-        return self.to_qt_type.default_value_for_proxy
+        return f"{self.name}().to_qt()"
 
 
 @define(slots=False)
@@ -671,28 +671,28 @@ DateTimeScalarDefinition = CustomScalarDefinition(
     name="qtgql::customscalars::DateTimeScalar",
     graphql_name="DateTime",
     deserialized_type="QDateTime",
-    to_qt_type=BuiltinScalars.STRING,
+    to_qt_type="QString",
     include_path="<qtgql/customscalars/customscalars.hpp>",
 )
 DateScalarDefinition = CustomScalarDefinition(
     name="qtgql::customscalars::DateScalar",
     graphql_name="Date",
     deserialized_type="QDate",
-    to_qt_type=BuiltinScalars.STRING,
+    to_qt_type="QString",
     include_path="<qtgql/customscalars/customscalars.hpp>",
 )
 TimeScalarDefinition = CustomScalarDefinition(
     name="qtgql::customscalars::TimeScalar",
     graphql_name="Time",
     deserialized_type="QTime",
-    to_qt_type=BuiltinScalars.STRING,
+    to_qt_type="QString",
     include_path="<qtgql/customscalars/customscalars.hpp>",
 )
 DecimalScalarDefinition = CustomScalarDefinition(
     name="qtgql::customscalars::DecimalScalar",
     graphql_name="Decimal",
     deserialized_type="QString",
-    to_qt_type=BuiltinScalars.STRING,
+    to_qt_type="QString",
     include_path="<qtgql/customscalars/customscalars.hpp>",
 )
 CUSTOM_SCALARS: CustomScalarMap = {
