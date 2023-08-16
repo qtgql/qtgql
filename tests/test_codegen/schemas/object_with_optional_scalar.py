@@ -1,16 +1,13 @@
 from __future__ import annotations
 
 import uuid
-from typing import TYPE_CHECKING
+from datetime import datetime  # noqa
 from uuid import UUID
 
 import strawberry
 
 from tests.conftest import factory
 from tests.test_codegen.schemas.node_interface import NODE_DB, Node
-
-if TYPE_CHECKING:
-    from datetime import datetime
 
 
 @strawberry.type
@@ -34,7 +31,7 @@ def create_nonnull_user() -> User:
 
 @strawberry.type
 class Query:
-    @strawberry.field
+    @strawberry.field()
     def user(self, ret_none: bool = False) -> User:
         if ret_none:
             return User()
