@@ -31,14 +31,14 @@ else
 {% endif -%}
 if (!data.value("👉f_concrete.name👈").isNull()){
 {% if proxy_field.type.is_builtin_scalar -%}
-{% if proxy_field.type.is_void -%}
-/* deliberately empty */
-{% else -%}
-auto new_👉f_concrete.name👈 = std::make_shared<👉f_concrete.type.type_name()👈>(data.value("👉f_concrete.name👈").👉 proxy_field.type.is_builtin_scalar.from_json_convertor 👈);
-if (*👉current👈 != *new_👉f_concrete.name👈){
-👉 setter_name 👈(new_👉f_concrete.name👈 👉 setter_end 👈);
-}
-{% endif %}
+    {% if proxy_field.type.is_void -%}
+    /* deliberately empty */
+    {% else -%}
+    auto new_👉f_concrete.name👈 = std::make_shared<👉f_concrete.type.type_name()👈>(data.value("👉f_concrete.name👈").👉 proxy_field.type.is_builtin_scalar.from_json_convertor 👈);
+    if ({% if proxy_field.type.is_optional -%}!👉current👈 || {% endif %}*👉current👈 != *new_👉f_concrete.name👈){
+    👉 setter_name 👈(new_👉f_concrete.name👈 👉 setter_end 👈);
+    }
+    {% endif %}
 {% elif proxy_field.type.is_custom_scalar %}
 auto new_👉proxy_field.name👈 = std::make_shared<👉 proxy_field.type.type_name() 👈>();
 new_👉proxy_field.name👈->deserialize(data.value("👉f_concrete.name👈"));
