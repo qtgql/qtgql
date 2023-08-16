@@ -60,7 +60,7 @@ auto 👉proxy_field.name👈_typename  = 👉proxy_field.name👈_data.value("_
     new_👉proxy_field.name👈->deserialize(data.value("👉proxy_field.name👈"));
     👉 setter_name 👈(new_👉proxy_field.name👈 👉 setter_end 👈);
 {% elif proxy_field.type.is_enum -%}
-👉 setter_name 👈(Enums::👉proxy_field.type.is_enum.map_name👈::by_name(data.value("👉proxy_field.name👈").toString())👉 setter_end 👈);
+👉 setter_name 👈(std::make_shared<👉proxy_field.type.namespaced_name👈>(Enums::👉proxy_field.type.is_enum.map_name👈::by_name(data.value("👉proxy_field.name👈").toString()))👉 setter_end 👈);
 {% endif -%} 👉 do_after_deserialized 👈
 };
 {%- endmacro %}

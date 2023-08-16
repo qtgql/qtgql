@@ -476,11 +476,11 @@ class QtGqlEnumDefinition(QtGqlTypeABC):
     name: str
     members: list[EnumValue]
 
-    @cached_property
+    @property
     def map_name(self) -> str:
         return f"{self.name}EnumMap"
 
-    @cached_property
+    @property
     def namespaced_name(self) -> str:
         return f"Enums::{self.name}"
 

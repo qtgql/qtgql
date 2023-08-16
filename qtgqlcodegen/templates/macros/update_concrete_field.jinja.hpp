@@ -79,8 +79,8 @@ if ({% if proxy_field.type.is_optional -%}!👉current👈 || {% endif %}*👉cu
     👉deserialize_concrete_field(parent_proxy_type, proxy_field)👈
     {% endif %}
 {% elif proxy_field.type.is_enum %}
-auto new_👉f_concrete.name👈= Enums::👉proxy_field.type.is_enum.map_name👈::by_name(data.value("👉proxy_field.name👈").toString());
-if (👉current👈 != new_👉f_concrete.name👈){
+auto new_👉f_concrete.name👈= std::make_shared<👉proxy_field.type.namespaced_name👈>(Enums::👉proxy_field.type.map_name👈::by_name(data.value("👉proxy_field.name👈").toString()));
+if (*👉current👈 != *new_👉f_concrete.name👈){
 👉 setter_name 👈(new_👉f_concrete.name👈 👉 setter_end 👈);
 }
 {% elif proxy_field.type.is_queried_interface or proxy_field.type.is_queried_union %}
