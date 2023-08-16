@@ -106,29 +106,39 @@ return m_inst->👉 f.concrete.getter_name 👈(
 {% elif f.type.is_queried_object_type or f.type.is_queried_interface or f.type.is_queried_union or f.type.is_model  -%}
 return 👉f.private_name👈;
 {% elif f.type.is_custom_scalar %}
-return m_inst->👉 f.concrete.getter_name 👈(
-{%- if f.cached_by_args -%}
-👉f.variable_builder_name 👈(m_operation)
-{% endif -%}
-)->to_qt();
-{% else -%}
+    {%- set value_or_null -%}
+    m_inst->👉 f.concrete.getter_name 👈(
+    {%- if f.cached_by_args -%}
+    👉f.variable_builder_name 👈(m_operation)
+    {% endif -%}
+    );
+    {%- endset -%}
     {% if f.type.is_optional -%}
-    auto ret = m_inst->👉 f.concrete.getter_name 👈(
-        {%- if f.cached_by_args -%}
-        👉f.variable_builder_name 👈(m_operation)
-        {% endif -%}
-        );
+    auto ret = 👉 value_or_null 👈
+    if (ret)
+    return ret->to_qt();
+    else
+    return 👉f.type.default_value_for_proxy 👈;
+    {% else -%}
+    return *👉 value_or_null 👈;
+    {% endif -%}
+{% else -%}
+    {%- set value_or_null -%}
+    m_inst->👉 f.concrete.getter_name 👈(
+    {%- if f.cached_by_args -%}
+    👉f.variable_builder_name 👈(m_operation)
+    {% endif -%}
+    );
+    {%- endset -%}
+    {% if f.type.is_optional -%}
+    auto ret = 👉 value_or_null 👈
     if (ret)
         return *ret;
     else
-        return 👉f.type.default_value👈;
-    {% else %}
-    return *m_inst->👉 f.concrete.getter_name 👈(
-            {% if f.cached_by_args -%}
-            👉f.variable_builder_name 👈(m_operation)
-            {% endif -%}
-            );
-    {% endif %}
+        return 👉f.type.default_value_for_proxy 👈;
+    {% else -%}
+    return *👉 value_or_null 👈;
+    {% endif -%}
 {%- endif -%}
 };
 {% endfor %}

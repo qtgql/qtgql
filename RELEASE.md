@@ -15,4 +15,7 @@ that would be collected if there is no operation using this concrete root type.
 might be empty (if this operation is the first to use this root type) so we need to use either
 shared pointer or std::optional.
 Another reason to move to `sp` is because the scalars won't get copied all the time.
-Also in the future we'll might use this for garbage collection.
+Also, this might pave the way for correct garbage collection.
+
+- Custom scalars now must provide a `to_qt_type: BuiltinScalar` due to the need of default values.
+We might add support custom types in the future.
