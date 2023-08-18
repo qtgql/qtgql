@@ -51,9 +51,9 @@ struct 👉type.name👈{
 public:
 {% for arg in type.fields -%}
 {% if arg.type.is_optional -%}
-std::optional<👉 arg.type.member_type 👈> 👉 arg.name 👈 = {};
+std::optional<👉 arg.type.type_name() 👈> 👉 arg.name 👈 = {};
 {% else -%}
-👉 arg.type.member_type 👈 👉 arg.name 👈;
+👉 arg.type.type_name() 👈 👉 arg.name 👈;
 {% endif -%}
 {% endfor -%}
 [[nodiscard]] QJsonObject to_json() const{
