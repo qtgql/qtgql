@@ -31,13 +31,11 @@ def main() -> None:
     def tst_names(tests: list[QtGqlTestCase]) -> list[str]:
         return [tst.test_name for tst in tests]
 
-    matrix = [
-        attrs.asdict(
-            Matrix(
-                testcases=[(tst_names(chunk)) for chunk in chunked_testcases],
-            ),
+    matrix = attrs.asdict(
+        Matrix(
+            testcases=[(tst_names(chunk)) for chunk in chunked_testcases],
         ),
-    ]
+    )
 
     print(json.dumps(matrix))  # noqa
 
