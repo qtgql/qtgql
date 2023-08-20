@@ -36,7 +36,7 @@ def main() -> None:
         for chunk in chunked_testcases
     ]
 
-    print(f"'{json.dumps(ubuntu_runners, indent=4)}'")  # noqa
+    print(f"{json.dumps(ubuntu_runners, indent=4)}")  # noqa
 
 
 if __name__ == "__main__":
