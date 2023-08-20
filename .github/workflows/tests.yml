@@ -31,7 +31,8 @@ jobs:
 
       - name: Set up Python ${{ matrix.python_version }}
         uses: actions/setup-python@v4
-
+        with:
+          python-version: 3.11
       - uses: actions/cache@v3
         with:
           path: ~/.cache/pip
@@ -43,12 +44,13 @@ jobs:
           pip install poetry
           poetry install
 
-      - id: set-matrix
-        run: echo "matrix=$(poetry run python -m workflows.scripts.create_testcases_matrix)" >> $GITHUB_OUTPUT
-
+      - id: set_matrix
+        run: |
+          echo "matrix=$(poetry run python -m workflows.scripts.create_testcases_matrix)" >> $GITHUB_OUTPUT
+          echo ${{ outputs.matrix }}
     # here, we save the result of this 1st phase to the "outputs"
     outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      matrix: ${{ steps.set_matrix.outputs.matrix }}
 
   tests:
     runs-on: ${{ matrix.os }}
