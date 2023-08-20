@@ -28,7 +28,7 @@ class NodeInterfaceABC : public ObjectTypeABC {
 public:
   using ObjectTypeABC::ObjectTypeABC;
 
-  [[nodiscard]] virtual const scalars::Id &get_id() const = 0;
+  [[nodiscard]] virtual const std::shared_ptr<scalars::Id> &get_id() const = 0;
 };
 
 } // namespace bases

@@ -45,15 +45,19 @@ plugins:
 
 
 nav:
-  - QtGql:
+  - Docs:
       - Overview: ./index.md
       - Configurations: ./codegen/config.md
       - Scalars:
         - Index: ./codegen/scalars/index.md
         - Custom Scalars: ./codegen/scalars/custom_scalars.md
         - Create a Scalar: ./codegen/scalars/create_scalar.md
-      - Contributing: ./contributing.md
       - Server requirements: ./server-requirements.md
+
+  - Developers:
+      - Contributing: ./dev/contributing.md
+      - Architecture: ./dev/architecture.md
+
   - Tutorials:
     - Countries: ./tutorials/countries.md
 

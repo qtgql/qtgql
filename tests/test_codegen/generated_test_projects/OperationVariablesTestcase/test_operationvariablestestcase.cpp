@@ -10,6 +10,7 @@ using namespace qtgql;
 auto ENV_NAME = QString("OperationVariablesTestcase");
 auto SCHEMA_ADDR = get_server_address("OperationVariablesTestcase");
 
+// simple operation variables test case
 TEST_CASE("OperationVariablesTestcase", "[generated-testcase]") {
 
   auto env = test_utils::get_or_create_env(
@@ -27,7 +28,7 @@ TEST_CASE("OperationVariablesTestcase", "[generated-testcase]") {
   SECTION("test update") {
     auto user = mq->data()->get_user();
     auto change_name_mut = changefriendname::ChangeFriendName::shared();
-    change_name_mut->set_variables({true, "Yehoshua"});
+    change_name_mut->set_variables({true, "Yehoshua", user->get_id()});
     test_utils::SignalCatcher catcher(
         {.source_obj = user->get_friend(), .only = "name"});
     change_name_mut->fetch();

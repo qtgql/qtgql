@@ -35,10 +35,7 @@ class QtGqlBaseTypedNode:
 
 @define(slots=False)
 class QtGqlVariableDefinition(QtGqlBaseTypedNode):
-    def json_repr(self, attr_name: str | None = None) -> str:
-        if not attr_name:
-            attr_name = self.name
-        attr_name += ".value()"  # unwrap optional
+    def json_repr(self, attr_name: str) -> str:
         return self.type.json_repr(attr_name)
 
 
@@ -60,9 +57,9 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
     def arguments(self) -> tuple[QtGqlArgumentDefinition, ...]:
         return tuple(self.arguments_dict.values())
 
-    @cached_property
+    @property
     def arguments_type(self) -> str:
-        return "std::tuple<" + ",".join([arg.type.member_type for arg in self.arguments]) + ">"
+        return "QJsonObject"
 
     def index_for_argument(self, arg: str) -> int:
         return self.arguments.index(self.arguments_dict[arg])

@@ -57,27 +57,9 @@ class QtGqlQueriedField:
     def is_root(self) -> bool:
         return self.origin.name in self.type_info.schema_type_info.root_types_names
 
-    @cached_property
-    def type_name(self) -> str:
-        return self.type.member_type
-
-    @cached_property
-    def build_variables_tuple_for_field_arguments(self) -> str:
-        # operation might not use an argument that has default value, ignore what's ignored.
-        # see https://github.com/qtgql/qtgql/issues/272 for more details.
-        if self.cached_by_args and self.variable_uses:
-            assert len(self.concrete.arguments) == len(self.variable_uses)
-            return (
-                "{"
-                + ",".join(
-                    [
-                        f"operation->vars_inst.{arg.variable.name}.value()"
-                        for arg in self.variable_uses
-                    ],
-                )
-                + "}"
-            )
-        return ""
+    @property
+    def variable_builder_name(self) -> str:
+        return f"build_args_for_{self.name}"
 
     @property
     def name(self) -> str:

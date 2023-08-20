@@ -3,7 +3,7 @@ public:
 {% for f in type.unique_fields -%}
 {% set f_member_type -%}
 {% if f.arguments -%}
-std::map<👉f.arguments_type👈, 👉f.type.member_type👈>
+std::unordered_map<👉f.arguments_type👈, 👉f.type.member_type👈, qtgql::bases::tools::QJsonValueHasher>
 {% else -%}
 👉f.type.member_type👈
 {% endif -%}
@@ -18,7 +18,7 @@ void 👉 f.signal_name 👈();
 public:
 {%for f in type.unique_fields %}
 [[nodiscard]] const 👉 f.type.fget_type 👈 &👉 f.getter_name 👈(
-{%- if f.arguments -%}👉 f.arguments_type 👈 args {% endif -%}
+{%- if f.arguments -%}const 👉 f.arguments_type 👈 & args {% endif -%}
 ) {%- if f.type.getter_is_constable -%}const{% endif %}{
 {%- if f.arguments -%}
 {% set f_private_name %}👉 f.private_name 👈.at(args){% endset %}
@@ -26,12 +26,12 @@ public:
 {% set f_private_name %}👉 f.private_name 👈{% endset %}
 {% endif -%}
 {% if f.is_custom_scalar -%}
-return 👉 f_private_name 👈.to_qt();
+return 👉 f_private_name 👈;
 {% else -%}
 return 👉 f_private_name 👈;
 {% endif -%}
 }
-void 👉 f.setter_name 👈(👉 f.type.member_type_arg 👈 v{% if f.arguments %}, 👉 f.arguments_type 👈 args {% endif %})
+void 👉 f.setter_name 👈(👉 f.type.member_type_arg 👈 v{% if f.arguments %}, const 👉 f.arguments_type 👈 & args {% endif %})
 {
 {%- if f.arguments -%}
 {% set f_private_name %}👉 f.private_name 👈[args]{% endset %}

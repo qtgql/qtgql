@@ -49,22 +49,17 @@ inline static const std::vector<std::pair<QString, 👉enum.name👈>> members =
 struct 👉type.name👈{
 
 public:
-{# // this is doubtfully needed, but std::map requires comparison for ordering. #}
-bool operator<(const 👉type.name👈& other) const {
-    {% for f in type.fields -%}
-    if(👉f.name👈 < other.👉f.name👈){
-        return true;
-    }
-    {% endfor -%}
-    return false;
-}
-{% for f in type.fields -%}
-std::optional<👉f.type.member_type👈> 👉f.name👈 = {};
-{% endfor %}
+{% for arg in type.fields -%}
+{% if arg.type.is_optional -%}
+std::optional<👉 arg.type.type_name() 👈> 👉 arg.name 👈 = {};
+{% else -%}
+👉 arg.type.type_name() 👈 👉 arg.name 👈;
+{% endif -%}
+{% endfor -%}
 [[nodiscard]] QJsonObject to_json() const{
     auto __ret = QJsonObject();
     {% for arg in type.fields -%}
-    👉serialize_input_variable("__ret", arg)👈
+    👉serialize_input_variable("__ret", arg, attr_name=arg.name, json_name=arg.name)👈
     {% endfor -%}
     return __ret;
 }
@@ -100,9 +95,14 @@ Q_OBJECT
 👉 concrete_type_fields(type) 👈
 public:
 {% if type.is_root %} {# root types should be singletons #}
-[[nodiscard]] static 👉 type.name 👈* instance(){
-static 👉 type.name 👈 inst;
-return &inst;
+[[nodiscard]] static std::shared_ptr<👉 type.name 👈> instance(){
+    static std::weak_ptr<👉 type.name 👈> observer_inst;
+    if (observer_inst.expired()){
+        auto ret = std::make_shared<👉 type.name 👈>();
+        observer_inst = ret;
+        return ret;
+    }
+    return observer_inst.lock();
 }
 {% else %}
 QTGQL_STATIC_MAKE_SHARED(👉 type.name 👈)

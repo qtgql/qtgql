@@ -72,7 +72,7 @@ class QtGqlTypeABC(ABC):
     def is_queried_union(self) -> QtGqlQueriedUnion | None:
         return None
 
-    def json_repr(self, attr_name: str | None = None) -> str:
+    def json_repr(self, attr_name: str) -> str:
         raise NotImplementedError(f"{self} is not supported as an input type ATM")
 
     @abstractmethod
@@ -93,9 +93,18 @@ class QtGqlTypeABC(ABC):
     def default_value(self) -> str:
         """
 
-        :return: C++ default value initializer for this type
+        :return: C++ default value initializer for this type, mostly used at schema level.
         """
-        return "{}"
+        return "nullptr"
+
+    @property
+    def default_value_for_proxy(self) -> str:
+        """Used at proxy property getters.
+
+        Because some optionals can't just return nullptr
+        and QML doesn't support `std::optional`.
+        """
+        raise NotImplementedError("This type doesn't define a default value for proxy")
 
     @property
     def member_type(self) -> str:
@@ -103,7 +112,7 @@ class QtGqlTypeABC(ABC):
         :returns: The C++ type of the concrete instance member.
         """
         # Usually `type_name` should suffice, if the type needs to return something else this is overridden.
-        return self.type_name()
+        return f"std::shared_ptr<{self.type_name()}>"
 
     @property
     def member_type_arg(self) -> str:
@@ -181,10 +190,16 @@ class QtGqlList(QtGqlTypeABC):
 
     def type_name(self) -> str:
         if bs := self.of_type.is_builtin_scalar:
-            return f"{QtGqlTypes.ListModelABC.name}<{bs.member_type}>"
+            return f"{QtGqlTypes.ListModelABC.name}<{bs.type_name()}>"
         raise NotImplementedError(
             "complex models have no valid type for schema concretes, call member_type",
         )
+
+    @property
+    def default_value(self) -> str:
+        if self.of_type.is_builtin_scalar:
+            return "nullptr"
+        return "{}"
 
     @property
     def property_type(self) -> str:
@@ -192,8 +207,8 @@ class QtGqlList(QtGqlTypeABC):
             return f"{QtGqlTypes.ListModelABC.name}<{self.of_type.property_type}> *"
         if self.of_type.is_queried_union:
             return f"{QtGqlTypes.ListModelABC.name}<{self.of_type.property_type}> *"
-        if bs := self.of_type.is_builtin_scalar:
-            return f"{QtGqlTypes.ListModelABC.name}<{bs.member_type}> *"
+        if self.of_type.is_builtin_scalar:
+            return f"{self.type_name()} *"
         raise NotImplementedError
 
 
@@ -224,10 +239,6 @@ class QtGqlUnion(QtGqlTypeABC):
     def member_type(self) -> str:
         return f"std::shared_ptr<{self.type_name()}>"
 
-    @property
-    def default_value(self) -> str:
-        return "{}"
-
     def get_by_name(self, name: str) -> QtGqlObjectType | None:
         for possible in self.types:
             if possible.name == name:
@@ -242,12 +253,12 @@ class BuiltinScalar(QtGqlTypeABC):
     from_json_convertor: str
 
     @property
-    def default_value(self) -> str:
-        return self.default_value_.name
-
-    @property
     def is_builtin_scalar(self) -> BuiltinScalar | None:
         return self
+
+    @property
+    def default_value_for_proxy(self) -> str:
+        return self.default_value_.name
 
     def type_name(self) -> str:
         return self.attr.name
@@ -258,9 +269,9 @@ class BuiltinScalar(QtGqlTypeABC):
 
     @property
     def property_type(self) -> str:
-        return self.type_name()
+        return f"{self.type_name()} &"
 
-    def json_repr(self, attr_name: str | None = None) -> str:
+    def json_repr(self, attr_name: str) -> str:
         return f"{attr_name}"
 
 
@@ -276,7 +287,7 @@ class CustomScalarDefinition(QtGqlTypeABC):
     def is_custom_scalar(self) -> CustomScalarDefinition | None:
         return self
 
-    def json_repr(self, attr_name: str | None = None) -> str:
+    def json_repr(self, attr_name: str) -> str:
         return f"{attr_name}.serialize()"
 
     def type_name(self) -> str:
@@ -284,7 +295,7 @@ class CustomScalarDefinition(QtGqlTypeABC):
 
     @property
     def fget_type(self) -> str:
-        return self.to_qt_type
+        return f"std::shared_ptr<{self.type_name()}>"
 
     @property
     def getter_is_constable(self) -> bool:
@@ -293,6 +304,10 @@ class CustomScalarDefinition(QtGqlTypeABC):
     @property
     def property_type(self) -> str:
         return self.to_qt_type
+
+    @property
+    def default_value_for_proxy(self) -> str:
+        return f"{self.name}().to_qt()"
 
 
 @define(slots=False)
@@ -372,14 +387,10 @@ class QtGqlObjectType(BaseQtGqlObjectType):
 
     @property
     def member_type(self) -> str:
-        if self.is_root:
-            return self.type_name()  # root types are singletons
         return f"std::shared_ptr<{self.type_name()}>"
 
     @property
     def member_type_arg(self) -> str:
-        if self.is_root:
-            return f"{self.member_type} *"
         return f"const {self.member_type} &"
 
     def __attrs_post_init__(self):
@@ -447,7 +458,7 @@ class QtGqlInputObjectTypeDefinition(BaseQtGqlObjectType):
     def type_name(self) -> str:
         return self.name
 
-    def json_repr(self, attr_name: str | None = None) -> str:
+    def json_repr(self, attr_name: str) -> str:
         return f"{attr_name}.to_json()"
 
 
@@ -465,11 +476,11 @@ class QtGqlEnumDefinition(QtGqlTypeABC):
     name: str
     members: list[EnumValue]
 
-    @cached_property
+    @property
     def map_name(self) -> str:
         return f"{self.name}EnumMap"
 
-    @cached_property
+    @property
     def namespaced_name(self) -> str:
         return f"Enums::{self.name}"
 
@@ -480,11 +491,7 @@ class QtGqlEnumDefinition(QtGqlTypeABC):
     def type_name(self) -> str:
         return self.namespaced_name
 
-    @property
-    def default_value(self) -> str:
-        return f"{self.namespaced_name}(0)"
-
-    def json_repr(self, attr_name: str | None = None) -> str:
+    def json_repr(self, attr_name: str) -> str:
         return f"Enums::{self.map_name}::name_by_value({attr_name})"
 
 
@@ -511,6 +518,10 @@ class QtGqlQueriedObjectType(QtGqlQueriedTypeABC, QtGqlTypeABC):
     @cached_property
     def fields(self) -> tuple[QtGqlQueriedField, ...]:
         return tuple(self.fields_dict.values())
+
+    @cached_property
+    def fields_with_args(self) -> tuple[QtGqlQueriedField, ...]:
+        return tuple([field for field in self.fields if field.cached_by_args])
 
     @property
     def deserializer_name(self) -> str:

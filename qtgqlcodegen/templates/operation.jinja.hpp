@@ -48,11 +48,12 @@ class 👉 t.name 👈: public 👉 context.qtgql_types.ObjectTypeABC.name if no
 
 👉 proxy_type_fields(t, context) 👈
 public:
-{% if t.concrete.is_root -%}
-👉 t.name 👈(👉 context.operation.name 👈 * operation);
-{% else -%}
+// args builders
+{%for f in t.fields_with_args -%}
+static 👉 f.concrete.arguments_type 👈  👉 f.variable_builder_name 👈(const 👉context.operation.name👈* operation);
+{% endfor %}
+
 👉 t.name 👈(👉 context.operation.name 👈 * operation, const std::shared_ptr<👉 t.concrete.name 👈> &inst);
-{% endif %}
 {% if  not t.concrete.is_root -%}
 void qtgql_replace_concrete(const std::shared_ptr<👉 t.concrete.name 👈> & new_inst);
 {% endif %}
@@ -71,12 +72,16 @@ public:
 
 struct 👉 context.operation.generated_variables_type 👈{
 {% for var in context.operation.variables -%}
-std::optional<👉 var.type.member_type 👈> 👉 var.name 👈 = {};
+{% if var.type.is_optional -%}
+std::optional<👉 var.type.type_name() 👈> 👉 var.name 👈 = {};
+{% else -%}
+👉 var.type.type_name() 👈 👉 var.name 👈;
+{% endif -%}
 {% endfor -%}
     QJsonObject to_json() const{
     QJsonObject __ret;
     {% for var in context.operation.variables -%}
-    👉 serialize_input_variable("__ret", var) 👈
+    👉 serialize_input_variable("__ret", var, attr_name=var.name, json_name=var.name) 👈
     {% endfor -%}
     return __ret;
     }
@@ -88,7 +93,7 @@ class 👉 context.operation.name 👈: public qtgql::bases::OperationHandlerABC
     QML_ELEMENT
     QML_UNCREATABLE("Must be instantiated as shared pointer.")
 
-std::optional<👉 context.operation.root_type.name 👈 *> m_data = {};
+std::optional<👉 context.operation.root_type.name 👈 *> m_data = std::nullopt;
 
 
 
@@ -113,13 +118,14 @@ QTGQL_STATIC_MAKE_SHARED(👉 context.operation.name 👈)
 
 
 void on_next(const QJsonObject &data_) override{
+    auto root_instance = 👉 context.operation.root_type.concrete.name👈::instance();
     if (!m_data){
-        👉 context.operation.root_type.updater_name👈(👉 context.operation.root_type.concrete.name👈::instance(), data_, this);
-        m_data = new 👉 context.operation.root_type.name👈(this);
+        👉 context.operation.root_type.updater_name👈(root_instance, data_, this);
+        m_data = new 👉 context.operation.root_type.name👈(this, root_instance);
         emit dataChanged();
     }
     else{
-        👉 context.operation.root_type.updater_name👈(👉 context.operation.root_type.concrete.name👈::instance(), data_, this);
+        👉 context.operation.root_type.updater_name👈(root_instance, data_, this);
     }
 }
 

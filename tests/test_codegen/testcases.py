@@ -245,16 +245,25 @@ OptionalScalarsTestCase = QtGqlTestCase(
       }
     }
 
-    mutation ChangeName($userId: ID!, $newName: String!){
-      modifyName(userId: $userId, newName: $newName) {
+    mutation FillUser($userId: ID!){
+      fillUser(userId: $userId) {
         uuid
         name
-        id
         birth
         agePoint
         age
       }
     }
+    mutation NullifyUser($userId: ID!){
+      nullifyUser(userId: $userId) {
+        uuid
+        name
+        birth
+        agePoint
+        age
+      }
+    }
+
     """,
     test_name="OptionalScalarsTestCase",
 )
@@ -367,8 +376,8 @@ OperationVariablesTestcase = QtGqlTestCase(
     }
   }
 
-  mutation ChangeFriendName($connected: Boolean!, $new_name: String!) {
-  changeFriendName(connected: $connected, newName: $new_name) {
+  mutation ChangeFriendName($connected: Boolean!, $new_name: String!, $user_id: ID! ) {
+  changeFriendName(connected: $connected, newName: $new_name, userId: $user_id) {
     friend(connectedArg: $connected) {
       name
     }
@@ -802,15 +811,17 @@ FragmentWithOperationVariable = QtGqlTestCase(
       id
     }
 
-    fragment ModifyNameMutation on Mutation {
-      modifyName(userId: $userId, newName: $newName) {
+    mutation FillUser($userId: ID!){
+      fillUser(userId: $userId) {
+        ...UserFragment
+      }
+    }
+    mutation NullifyUser($userId: ID!){
+      nullifyUser(userId: $userId) {
         ...UserFragment
       }
     }
 
-    mutation ChangeName($userId: ID!, $newName: String!) {
-      ...ModifyNameMutation
-    }
 
     fragment GetUserQuery on Query {
       user(retNone: $returnNone) {
@@ -985,6 +996,7 @@ ListOfInputObjectTestCase = QtGqlTestCase(
     ),
 )
 
+
 all_test_cases = [
     ScalarsTestCase,
     SimpleGarbageCollectionTestCase,
@@ -1018,6 +1030,7 @@ all_test_cases = [
     ListOfScalarArgumentTestCase,
     ListOfScalarInInputObjectTestCase,
     ListOfInputObjectTestCase,
+    OptionalInputTestCase,
     CustomUserScalarTestCase,
     ObjectsThatReferenceEachOtherTestCase,
     RootListOfTestCase,
@@ -1056,6 +1069,7 @@ implemented_testcases = [
     ListOfScalarArgumentTestCase,
     ListOfScalarInInputObjectTestCase,
     ListOfInputObjectTestCase,
+    OptionalInputTestCase,
 ]
 
 
@@ -1070,5 +1084,11 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 if __name__ == "__main__":
     generate_testcases(
-        ListOfInputObjectTestCase,
+        # NodeUnionTestCase,
+        # QmlUsageTestCase,
+        # ListOfScalarTestCase,
+        # ListOfScalarArgumentTestCase,
+        ListOfScalarInInputObjectTestCase,
+        # ListOfInputObjectTestCase,
+        # OptionalInputTestCase,
     )

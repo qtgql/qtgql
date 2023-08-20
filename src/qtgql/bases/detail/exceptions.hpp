@@ -1,8 +1,7 @@
 #pragma once
 #include <stdexcept>
 
-namespace qtgql {
-namespace exceptions {
+namespace qtgql::exceptions {
 class NotImplementedError : public std::logic_error {
   struct Msg {
     const char *msg = "Function not yet implemented";
@@ -35,5 +34,4 @@ public:
                          "the environment before "
                          "you interact with any qtgql API"){};
 };
-} // namespace exceptions
-} // namespace qtgql
+} // namespace qtgql::exceptions

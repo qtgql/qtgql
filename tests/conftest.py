@@ -33,6 +33,7 @@ class factory:
     develop = mimesis.Development()
     numeric = mimesis.Numeric()
     text = mimesis.Text()
+    datetime = mimesis.Datetime()
 
 
 IS_WINDOWS = platform.system() == "Windows"
