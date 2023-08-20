@@ -1,8 +1,8 @@
-## Schema and operation reasoning - (concrete and proxy Schema)
+## Schema and operation reasoning—(concrete and proxy Schema)
 Each operation in QtGQL would generate a "proxy schema" that include only the used types
 in this operation and only the used fields in those types.
 
-## Cross-operation updates - (Root types are "singletons")
+## Cross-operation updates—(Root types are "singletons")
 If operation X fetched some data and operation Y is also relying on this data (or a fraction of it)
 it would be ideal that they would be able to update each other.
 
@@ -10,11 +10,11 @@ To achieve this the `Mutation` /  `Subscription` / `Query` types are singletons-
 They exist for as long as one operation is using them otherwise they are deleted and once
 an operation is instantiated a new instance would get created.
 
-## Memoized fields - (Basic caching)
+## Memoized fields—(Basic caching)
 - Concrete fields are cached on the concrete instances.
-- The concrete field type doesn't always (actually mostly doesn't) matches it's proxied type.
+- The concrete field type doesn't always (actually mostly doesn't) match its proxied type.
 - Concrete fields that have arguments are cached by arguments to avoid unwanted updates
-check [](../server-requirements.md#pure-fields) for more  details.
+check [server-requirements](../server-requirements.md#pure-fields) for more details.
 
 ## Garbage collection
 TBD
