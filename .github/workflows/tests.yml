@@ -4,6 +4,10 @@ on:
   push:
     branches: [cpp, main]
   pull_request:
+    inputs:
+      targets:
+        required: true
+        description: 'JSON of all your targets'
     branches: [cpp, main]
     paths:
       - "qtgql/**"
@@ -11,6 +15,7 @@ on:
       - "pyproject.toml"
       - "poetry.lock"
       - ".github/workflows/test.yml"
+
 env:
   IS_GITHUB_ACTION: 1
   QT_DEBUG_PLUGINS: 1
