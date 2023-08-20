@@ -811,15 +811,17 @@ FragmentWithOperationVariable = QtGqlTestCase(
       id
     }
 
-    fragment ModifyNameMutation on Mutation {
-      modifyName(userId: $userId, newName: $newName) {
+    mutation FillUser($userId: ID!){
+      fillUser(userId: $userId) {
+        ...UserFragment
+      }
+    }
+    mutation NullifyUser($userId: ID!){
+      nullifyUser(userId: $userId) {
         ...UserFragment
       }
     }
 
-    mutation ChangeName($userId: ID!, $newName: String!) {
-      ...ModifyNameMutation
-    }
 
     fragment GetUserQuery on Query {
       user(retNone: $returnNone) {
@@ -1082,15 +1084,13 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 if __name__ == "__main__":
     generate_testcases(
-        # NonNodeInterfaceTestCase,
-        # OperationVariablesTestcase,
-        # RootScalarTestCase,
-        # NonNodeTypeTestCase,
-        # InputTypeOperationVariableTestCase,
-        NodeInterfaceFieldTestCase,
-        # NonNodeUnionTestCase,
-        # ListOfNonNodeType,
-        # ListOfUnionTestCase,
-        # ListOfInterfaceTestcase,
-        # FragmentTestCase,
+        # FragmentsOnInterfaceTestCase,
+        FragmentWithOperationVariable,
+        # NodeUnionTestCase,
+        # QmlUsageTestCase,
+        # ListOfScalarTestCase,
+        # ListOfScalarArgumentTestCase,
+        # ListOfScalarInInputObjectTestCase,
+        # ListOfInputObjectTestCase,
+        # OptionalInputTestCase,
     )
