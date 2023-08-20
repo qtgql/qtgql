@@ -1,0 +1,4 @@
+
+    query MainQuery($inp: NestedInput!){
+        foobar(inp: $inp)
+    }

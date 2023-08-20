@@ -28,7 +28,7 @@ from qtgqlcodegen.types import (
     QtGqlDeferredType,
     QtGqlEnumDefinition,
     QtGqlInputList,
-    QtGqlInputObjectTypeDefinition,
+    QtGqlInputObject,
     QtGqlInterface,
     QtGqlList,
     QtGqlObjectType,
@@ -38,13 +38,12 @@ from qtgqlcodegen.types import (
 )
 
 
-def evaluate_input_type(
+def _evaluate_input_object(
     type_info: SchemaTypeInfo,
     type_: gql_def.GraphQLInputObjectType,
-) -> QtGqlInputObjectTypeDefinition:
-    ret = type_info.input_objects.get(type_.name, None)
-    if not ret:
-        ret = QtGqlInputObjectTypeDefinition(
+) -> QtGqlInputObject | None:
+    if not type_info.input_objects.get(type_.name, None):
+        return QtGqlInputObject(
             name=type_.name,
             docstring=type_.description,
             fields_dict={
@@ -52,8 +51,6 @@ def evaluate_input_type(
                 for name, field in type_.fields.items()
             },
         )
-        type_info.input_objects[ret.name] = ret
-    return ret
 
 
 def evaluate_graphql_type(
@@ -106,7 +103,11 @@ def evaluate_graphql_type(
     elif input_def := is_input_definition(t):
         concrete = type_info.schema_definition.get_type(input_def.name)
         assert isinstance(concrete, gql_def.GraphQLInputObjectType)
-        ret = evaluate_input_type(type_info, input_def)
+
+        ret = type_info.get_input_type(input_def.name) or QtGqlDeferredType(
+            name=input_def.name,
+            object_map__=type_info.input_objects,
+        )
 
     elif interface_def := is_interface_definition(t):
         ret = _evaluate_interface_type(type_info, interface_def)
@@ -267,5 +268,8 @@ def evaluate_schema(
         elif enum_def := is_enum_definition(type_):
             if enum := _evaluate_enum(type_info, enum_def):
                 type_info.enums[enum.name] = enum
+        elif input_obj_def := is_input_definition(type_):
+            if inp := _evaluate_input_object(type_info, input_obj_def):
+                type_info.input_objects[inp.name] = inp
 
     return type_info

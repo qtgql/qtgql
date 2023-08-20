@@ -865,6 +865,16 @@ OptionalInputTestCase = QtGqlTestCase(
     test_name="OptionalInputTestCase",
 )
 
+NestedInputObjectTestCase = QtGqlTestCase(
+    schema=schemas.nested_input_object.schema,
+    operations="""
+    query MainQuery($inp: NestedInput!){
+        foobar(inp: $inp)
+    }
+    """,
+    test_name="NestedInputObjectTestCase",
+)
+
 CustomScalarInputTestCase = QtGqlTestCase(
     schema=schemas.custom_scalar_input_schema.schema,
     operations="""
@@ -1070,6 +1080,7 @@ implemented_testcases = [
     ListOfScalarInInputObjectTestCase,
     ListOfInputObjectTestCase,
     OptionalInputTestCase,
+    NestedInputObjectTestCase,
 ]
 
 
@@ -1083,4 +1094,4 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 
 if __name__ == "__main__":
-    generate_testcases(ScalarsTestCase)
+    generate_testcases(NestedInputObjectTestCase)

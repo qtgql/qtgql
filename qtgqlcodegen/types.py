@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from functools import cached_property
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Generic, TypeVar, cast
 
 import attrs
 from attr import define
@@ -37,7 +37,7 @@ class QtGqlTypeABC(ABC):
         return None
 
     @property
-    def is_input_object_type(self) -> QtGqlInputObjectTypeDefinition | None:
+    def is_input_object_type(self) -> QtGqlInputObject | None:
         return None
 
     @property
@@ -226,7 +226,7 @@ class QtGqlInputList(QtGqlTypeABC):
 
 @define
 class QtGqlUnion(QtGqlTypeABC):
-    types: tuple[QtGqlObjectType | QtGqlDeferredType, ...]
+    types: tuple[QtGqlObjectType | QtGqlDeferredType[QtGqlObjectType], ...]
 
     @property
     def is_union(self) -> QtGqlUnion | None:
@@ -401,11 +401,14 @@ class QtGqlObjectType(BaseQtGqlObjectType):
                 base.implementations[self.name] = self
 
 
+T_QtGqlType = TypeVar("T_QtGqlType", bound=QtGqlTypeABC)
+
+
 @define
-class QtGqlDeferredType(QtGqlTypeABC):
+class QtGqlDeferredType(Generic[T_QtGqlType], QtGqlTypeABC):
     name: str
-    object_map__: dict[str, QtGqlObjectType]
-    cached_: QtGqlTypeABC | None = None
+    object_map__: dict[str, T_QtGqlType]
+    cached_: T_QtGqlType | None = None
 
     def __getattr__(self, item):
         if not self.cached_:
@@ -448,11 +451,11 @@ class QtGqlInterface(QtGqlObjectType):
 
 
 @define(slots=False)
-class QtGqlInputObjectTypeDefinition(BaseQtGqlObjectType):
+class QtGqlInputObject(BaseQtGqlObjectType):
     fields_dict: dict[str, QtGqlArgumentDefinition] = attrs.field(factory=dict)  # type: ignore
 
     @property
-    def is_input_object_type(self) -> QtGqlInputObjectTypeDefinition | None:
+    def is_input_object_type(self) -> QtGqlInputObject | None:
         return self
 
     def type_name(self) -> str:
