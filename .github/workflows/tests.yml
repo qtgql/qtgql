@@ -4,7 +4,10 @@ on:
   push:
     branches: [main]
   pull_request:
-
+    inputs:
+      targets:
+        required: true
+        description: 'JSON of all your targets'
     branches: [main]
     paths:
       - "qtgql/**"
