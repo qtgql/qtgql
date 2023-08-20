@@ -29,10 +29,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python ${{ matrix.python_version }}
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: ${{ matrix.python_version }}
       - uses: actions/cache@v3
         with:
           path: ~/.cache/pip
@@ -44,9 +44,8 @@ jobs:
           pip install poetry
           poetry install
 
-      # here we create the json, we need the "id:" so we can use it in "outputs" bellow
       - id: set-matrix
-        run: echo "::set-output name=matrix::$(poetry run python -m workflows.scripts.create_testcases_matrix)"
+        run: echo "matrix=$(poetry run python -m workflows.scripts.create_testcases_matrix)" >> $GITHUB_OUTPUT
 
     # here, we save the result of this 1st phase to the "outputs"
     outputs:
@@ -64,10 +63,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python ${{ matrix.python_version }}
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: ${{ matrix.python_version }}
 
       #----------------------------------------------
       #        load pip cache if cache exists
