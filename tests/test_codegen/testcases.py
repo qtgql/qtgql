@@ -869,7 +869,7 @@ RecursiveInputObjectTestCase = QtGqlTestCase(
     schema=schemas.recursive_input_object.schema,
     operations="""
     query MainQuery($inp: RecursiveInput!){
-        foobar(inp: $inp)
+        depth(inp: $inp)
     }
     """,
     test_name="RecursiveInputObjectTestCase",

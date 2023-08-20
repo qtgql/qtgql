@@ -1,8 +1,8 @@
 type Query {
-  foobar(inp: RecursiveInput!): Int!
+  depth(inp: RecursiveInput!): Int!
 }
 
 input RecursiveInput {
   inp: RecursiveInput = null
-  level: Int! = 0
+  depth: Int! = 0
 }

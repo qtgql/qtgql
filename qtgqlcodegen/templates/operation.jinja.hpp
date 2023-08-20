@@ -137,7 +137,7 @@ inline const 👉 context.operation.root_type.name 👈 * data() const{
 }
 
 {% if context.operation.variables %}
-void set_variables(std::unique_ptr<👉 context.operation.generated_variables_type 👈> & vars){
+void set_variables(std::unique_ptr<👉 context.operation.generated_variables_type 👈>  vars){
     vars_inst.swap(vars);
     qtgql::bases::OperationHandlerABC::set_vars(vars_inst->to_json());
 }

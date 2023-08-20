@@ -1,4 +1,4 @@
 
     query MainQuery($inp: RecursiveInput!){
-        foobar(inp: $inp)
+        depth(inp: $inp)
     }
