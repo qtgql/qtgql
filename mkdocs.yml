@@ -47,11 +47,12 @@ plugins:
 nav:
   - Docs:
       - Overview: ./index.md
-      - Configurations: ./codegen/config.md
+      - Configurations: ./config.md
+      - Network layers: ./network-layers.md
       - Scalars:
-        - Index: ./codegen/scalars/index.md
-        - Custom Scalars: ./codegen/scalars/custom_scalars.md
-        - Create a Scalar: ./codegen/scalars/create_scalar.md
+        - Index: ./scalars/index.md
+        - Custom Scalars: ./scalars/custom_scalars.md
+        - Create a Scalar: ./scalars/create_scalar.md
       - Server requirements: ./server-requirements.md
 
   - Developers:

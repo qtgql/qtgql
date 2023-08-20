@@ -15,10 +15,6 @@
 
 namespace qtgql::gqloverhttp {
 
-// The GraphQL over http sub-protocol for this specification is:
-// graphql-transport-
-// https://github.com/enisdenjo/graphql-ws/blob/master/PROTOCOL.md
-
 struct GraphQLResponse {
   std::optional<QJsonObject> data = {};
   std::optional<QJsonArray> errors = {};

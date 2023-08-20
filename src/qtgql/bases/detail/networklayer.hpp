@@ -74,7 +74,7 @@ struct HandlerABC {
 };
 
 /*
-class that should  support executing handlers
+class that should support executing handlers
  and expected to call the handler's `on_data` /
 `on_error` / 'on_completed' when the operation is completed.
 */

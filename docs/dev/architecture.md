@@ -1,5 +1,5 @@
 ## Schema and operation reasoning - (concrete and proxy Schema)
-Each operation in qtgql would generate a "proxy schema" that include only the used types
+Each operation in QtGQL would generate a "proxy schema" that include only the used types
 in this operation and only the used fields in those types.
 
 ## Cross-operation updates - (Root types are "singletons")
