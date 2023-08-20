@@ -5,7 +5,7 @@ import json
 
 import attrs
 from attr import Factory, define
-from tests.test_codegen.testcases import implemented_testcases
+from tests.test_codegen.testcases import QtGqlTestCase, implemented_testcases
 
 
 def chunks(lst: list, n: int):
@@ -18,7 +18,7 @@ TESTCASES_PER_RUNNER = 6
 
 
 @define
-class Runner:
+class Matrix:
     testcases: list[str]
     os: str = "ubuntu-latest"
     qt_version: list[str] = Factory(lambda: ["6.5.0"])
@@ -27,16 +27,19 @@ class Runner:
 
 def main() -> None:
     chunked_testcases = list(chunks(implemented_testcases, TESTCASES_PER_RUNNER))
-    ubuntu_runners = [
+
+    def tst_names(tests: list[QtGqlTestCase]) -> list[str]:
+        return [tst.test_name for tst in tests]
+
+    matrix = [
         attrs.asdict(
-            Runner(
-                testcases=[testcase.test_name for testcase in chunk],
+            Matrix(
+                testcases=[(tst_names(chunk)) for chunk in chunked_testcases],
             ),
-        )
-        for chunk in chunked_testcases
+        ),
     ]
 
-    print(json.dumps(ubuntu_runners))  # noqa
+    print(json.dumps(matrix))  # noqa
 
 
 if __name__ == "__main__":
