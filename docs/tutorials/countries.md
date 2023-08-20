@@ -1,4 +1,4 @@
-This Tutorial will walk you threw creating a Qt project using qtgql
+This Tutorial will walk you threw creating a Qt project using QtGQL
 from ground up.
 
 
@@ -32,12 +32,12 @@ countries
 ```
 
 ### Setup Build requirements and QtGql
-Add qtgql as a submodule to 3rdparty directory.
+Add QtGQL as a submodule to 3rdparty directory.
 ```bash
 cd 3rdparty/ && git submodule add https://github.com/qtgql/qtgql.git
 cd ..
 ```
-In order to build qtgql you'll need Qt installed.
+In order to build QtGQL you'll need Qt installed.
 for this tutorial we will use a conan recipe that will install Qt and set the needed variables
 for cmake, see the following note.
 ??? Note "Install Qt"
@@ -187,7 +187,7 @@ for cmake, see the following note.
     poetry run conan install .
     ```
 
-To install the `qtgql` code-generator we need to add it as a Python dependency.
+To install the `QtGQL` code-generator we need to add it as a Python dependency.
 We'll use Python-Poetry:
 ```bash
 poetry add "3rdparty/qtgql/"
@@ -322,7 +322,7 @@ from qtgqlcodegen.config import QtGqlConfig
 
 config = QtGqlConfig(graphql_dir=Path(__file__).parent, env_name="Countries")
 ```
-- `graphql_dir` - This would let qtgql know where to find your schema and operation definition.
+- `graphql_dir` - This would let QtGQL know where to find your schema and operation definition.
 - `env_name` - Will be used to namespace this schema at the generated code to avoid collisions
 with other potential schemas.
 

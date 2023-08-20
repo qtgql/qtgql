@@ -1,5 +1,5 @@
 !!! Note
-    This document contains assumptions that qtgql makes about your server.
+    This document contains assumptions that QtGQL makes about your server.
     If your server does not comply with these you might experience unwanted
     behaviours or the codegen will just not work.
 ___
@@ -15,7 +15,7 @@ interface Node {
 ```
 Any object that implements this interface
 is considered globally unique, thus allowing certain optimizations
-to be implemented by the client (in this case qtgql compiler).
+to be implemented by the client (in this case QtGQL compiler).
 
 For example for this schema:
 ```graphql

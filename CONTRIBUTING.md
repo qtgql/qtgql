@@ -18,11 +18,10 @@ Release type: <patch/minor/major>
 
 <description>
 ```
-### Generate tests files
-This would generate boilerplate code for the testcases in `tests/tests_codegen/testcases.py`
-```bash
-make generate_test_files
-```
+### Generate tests cases files
+Go to `tests/tests_codegen/testcases.py` call https://github.com/qtgql/qtgql/blob/a40852623739394dc3418df42831a17bb99997a5/tests/test_codegen/testcases.py#L1076
+with the desired testcases.
+
 ### Build
 conan would generate cmake presets for IDE's usage as well.
 ```bash
@@ -31,11 +30,11 @@ poetry run conan build . -o test=True
 ### Testing
 Run tests GraphQL server
 ```bash
-make serve_tests
+poetry run python -m tests.scripts.tests_server
 ```
 Run pytest, CTest is called from python and C++ tests are collected automatically.
 ```bash
-make test
+poetry run pytest
 ```
 
 ### Documenting

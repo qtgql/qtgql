@@ -2,39 +2,72 @@ name: 🔂 Unit tests
 
 on:
   push:
-    branches: [cpp, main]
+    branches: [main]
   pull_request:
-    branches: [cpp, main]
+    inputs:
+      targets:
+        required: true
+        description: 'JSON of all your targets'
+    branches: [main]
     paths:
       - "qtgql/**"
       - "tests/**"
       - "pyproject.toml"
       - "poetry.lock"
       - ".github/workflows/test.yml"
+
 env:
   IS_GITHUB_ACTION: 1
   QT_DEBUG_PLUGINS: 1
   QT_QPA_PLATFORM: "xcb"
 
 jobs:
+  provide_testcase_matrix:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python_version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+      - uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip
+          restore-keys: ${{ runner.os }}-pip
+
+      - name: Install Poetry
+        run: |
+          pip install poetry
+          poetry install
+
+      - id: set_matrix
+        run: |
+          echo "matrix=$(cd .github && poetry run python -m workflows.scripts.create_testcases_matrix)" >> $GITHUB_OUTPUT
+
+    # here, we save the result of this 1st phase to the "outputs"
+    outputs:
+      matrix: ${{ steps.set_matrix.outputs.matrix }}
+
   tests:
     runs-on: ${{ matrix.os }}
+    needs: provide_testcase_matrix
     strategy:
       fail-fast: false
-      matrix:
-        os: [windows-latest, ubuntu-latest]
-        python-version: ["3.9", "3.10", "3.11"]
-        qt-version: ['6.5.0']
+      matrix:  ${{ fromJson(needs.provide_testcase_matrix.outputs.matrix) }}
 
     steps:
 
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python ${{ matrix.python_version }}
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: ${{ matrix.python_version }}
 
       #----------------------------------------------
       #        load pip cache if cache exists
@@ -61,7 +94,7 @@ jobs:
           sudo apt install libxcb-cursor-dev build-essential libgl1-mesa-dev libgstreamer-gl1.0-0 libpulse-dev libxcb-glx0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-render0 libxcb-shape0 libxcb-shm0 libxcb-sync1 libxcb-util1 libxcb-xfixes0 libxcb-xinerama0 libxcb1 libxkbcommon-dev libxkbcommon-x11-0 libxcb-xkb-dev
 
       - name: Generate test files and coverage python
-        run: poetry run coverage run tests/test_codegen/generate.py -a
+        run: poetry run coverage run tests/test_codegen/generate.py  '${{ toJSON(matrix.testcases) }}'
 
       - name: Conan profile detect
         run: |
