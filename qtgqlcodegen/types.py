@@ -190,7 +190,7 @@ class QtGqlList(QtGqlTypeABC):
 
     def type_name(self) -> str:
         if bs := self.of_type.is_builtin_scalar:
-            return f"{QtGqlTypes.ListModelABC.name}<{bs.member_type}>"
+            return f"{QtGqlTypes.ListModelABC.name}<{bs.type_name()}>"
         raise NotImplementedError(
             "complex models have no valid type for schema concretes, call member_type",
         )
@@ -207,8 +207,8 @@ class QtGqlList(QtGqlTypeABC):
             return f"{QtGqlTypes.ListModelABC.name}<{self.of_type.property_type}> *"
         if self.of_type.is_queried_union:
             return f"{QtGqlTypes.ListModelABC.name}<{self.of_type.property_type}> *"
-        if bs := self.of_type.is_builtin_scalar:
-            return f"{QtGqlTypes.ListModelABC.name}<{bs.member_type}> *"
+        if self.of_type.is_builtin_scalar:
+            return f"{self.type_name()} *"
         raise NotImplementedError
 
 

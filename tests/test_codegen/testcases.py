@@ -1084,13 +1084,11 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 if __name__ == "__main__":
     generate_testcases(
-        # FragmentsOnInterfaceTestCase,
-        FragmentWithOperationVariable,
         # NodeUnionTestCase,
         # QmlUsageTestCase,
         # ListOfScalarTestCase,
         # ListOfScalarArgumentTestCase,
-        # ListOfScalarInInputObjectTestCase,
+        ListOfScalarInInputObjectTestCase,
         # ListOfInputObjectTestCase,
         # OptionalInputTestCase,
     )
