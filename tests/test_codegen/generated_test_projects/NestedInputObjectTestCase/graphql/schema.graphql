@@ -1,8 +1,0 @@
-input NestedInput {
-  inp: NestedInput = null
-  level: Int! = 0
-}
-
-type Query {
-  foobar(inp: NestedInput!): Int!
-}

@@ -105,7 +105,7 @@ signals:
     void dataChanged();
 
 public:
-👉 context.operation.generated_variables_type 👈 vars_inst;
+std::unique_ptr<👉 context.operation.generated_variables_type 👈> vars_inst;
 
 👉 context.operation.name 👈(): qtgql::bases::OperationHandlerABC(qtgql::bases::GraphQLMessage(
         {%- for line in context.operation.query.splitlines() %}"👉 line 👈"{% endfor -%}
@@ -137,9 +137,9 @@ inline const 👉 context.operation.root_type.name 👈 * data() const{
 }
 
 {% if context.operation.variables %}
-void set_variables(const 👉 context.operation.generated_variables_type 👈 & vars){
-vars_inst = vars;
-qtgql::bases::OperationHandlerABC::set_vars(vars_inst.to_json());
+void set_variables(std::unique_ptr<👉 context.operation.generated_variables_type 👈> & vars){
+    vars_inst.swap(vars);
+    qtgql::bases::OperationHandlerABC::set_vars(vars_inst->to_json());
 }
 {% endif %}
 

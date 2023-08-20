@@ -865,14 +865,17 @@ OptionalInputTestCase = QtGqlTestCase(
     test_name="OptionalInputTestCase",
 )
 
-NestedInputObjectTestCase = QtGqlTestCase(
-    schema=schemas.nested_input_object.schema,
+RecursiveInputObjectTestCase = QtGqlTestCase(
+    schema=schemas.recursive_input_object.schema,
     operations="""
-    query MainQuery($inp: NestedInput!){
+    query MainQuery($inp: RecursiveInput!){
         foobar(inp: $inp)
     }
     """,
-    test_name="NestedInputObjectTestCase",
+    test_name="RecursiveInputObjectTestCase",
+    metadata=TestCaseMetadata(
+        should_test_updates=BoolWithReason.false("input types are not cached ATM"),
+    ),
 )
 
 CustomScalarInputTestCase = QtGqlTestCase(
@@ -1041,6 +1044,7 @@ all_test_cases = [
     ListOfScalarInInputObjectTestCase,
     ListOfInputObjectTestCase,
     OptionalInputTestCase,
+    RecursiveInputObjectTestCase,
     CustomUserScalarTestCase,
     ObjectsThatReferenceEachOtherTestCase,
     RootListOfTestCase,
@@ -1080,7 +1084,7 @@ implemented_testcases = [
     ListOfScalarInInputObjectTestCase,
     ListOfInputObjectTestCase,
     OptionalInputTestCase,
-    NestedInputObjectTestCase,
+    RecursiveInputObjectTestCase,
 ]
 
 
@@ -1094,4 +1098,4 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 
 if __name__ == "__main__":
-    generate_testcases(NestedInputObjectTestCase)
+    generate_testcases(RecursiveInputObjectTestCase)

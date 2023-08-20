@@ -459,10 +459,10 @@ class QtGqlInputObject(BaseQtGqlObjectType):
         return self
 
     def type_name(self) -> str:
-        return self.name
+        return f"std::unique_ptr<{self.name}>"
 
     def json_repr(self, attr_name: str) -> str:
-        return f"{attr_name}.to_json()"
+        return f"{attr_name}->to_json()"
 
 
 @define

@@ -3,13 +3,13 @@
 #include <QSignalSpy>
 #include <catch2/catch_test_macros.hpp>
 
-namespace NestedInputObjectTestCase {
+namespace RecursiveInputObjectTestCase {
 using namespace qtgql;
 
-auto ENV_NAME = QString("NestedInputObjectTestCase");
-auto SCHEMA_ADDR = get_server_address("NestedInputObjectTestCase");
+auto ENV_NAME = QString("RecursiveInputObjectTestCase");
+auto SCHEMA_ADDR = get_server_address("RecursiveInputObjectTestCase");
 
-TEST_CASE("NestedInputObjectTestCase", "[generated-testcase]") {
+TEST_CASE("RecursiveInputObjectTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
 
@@ -17,4 +17,4 @@ TEST_CASE("NestedInputObjectTestCase", "[generated-testcase]") {
   SECTION("test update") { REQUIRE(false); };
 }
 
-}; // namespace NestedInputObjectTestCase
+}; // namespace RecursiveInputObjectTestCase

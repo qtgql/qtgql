@@ -34,5 +34,5 @@ from . import (  # noqa
     subscription_schema,
     wrogn_id_type,
     list_of_input_object,
-    nested_input_object,
+    recursive_input_object,
 )
