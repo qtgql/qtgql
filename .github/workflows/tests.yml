@@ -46,7 +46,7 @@ jobs:
 
       - id: set_matrix
         run: |
-          echo "matrix=$(cd .github && poetry run python -m workflows.scripts.create_testcases_matrix)" >> $GITHUB_OUTPUT
+          echo "matrix='$(cd .github && poetry run python -m workflows.scripts.create_testcases_matrix)'" >> $GITHUB_OUTPUT
           echo $GITHUB_OUTPUT
 
     # here, we save the result of this 1st phase to the "outputs"
