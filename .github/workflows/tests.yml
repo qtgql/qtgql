@@ -51,9 +51,9 @@ jobs:
 
   tests:
     runs-on: ${{ matrix.os }}
+    needs: provide_testcase_matrix
     strategy:
       fail-fast: false
-      needs: provide_testcase_matrix
       matrix:  ${{ fromJson(needs.provide_testcase_matrix.outputs.matrix) }}
 
     steps:
