@@ -86,6 +86,15 @@ std::optional<👉 var.type.type_name() 👈> 👉 var.name 👈 = {};
     {% endfor -%}
     return __ret;
     }
+struct Params{
+    {%- for var in context.operation.variables -%}
+    {% if var.type.is_optional -%}
+    std::optional<👉 var.type.type_name() 👈> 👉 var.name 👈 = {};
+    {% else -%}
+    👉 var.type.type_name() 👈 👉 var.name 👈;
+    {% endif -%}
+    {%- endfor -%}
+};
 
 ~👉 context.operation.generated_variables_type 👈(){
     👉 input_type_destructor(context.operation.variables) 👈
@@ -110,7 +119,7 @@ signals:
     void dataChanged();
 
 public:
-std::unique_ptr<👉 context.operation.generated_variables_type 👈> vars_inst;
+👉 context.operation.generated_variables_type 👈 vars_inst;
 
 👉 context.operation.name 👈(): qtgql::bases::OperationHandlerABC(qtgql::bases::GraphQLMessage(
         {%- for line in context.operation.query.splitlines() %}"👉 line 👈"{% endfor -%}
@@ -142,9 +151,19 @@ inline const 👉 context.operation.root_type.name 👈 * data() const{
 }
 
 {% if context.operation.variables %}
-void set_variables(std::unique_ptr<👉 context.operation.generated_variables_type 👈>  vars){
-    vars_inst.swap(vars);
-    qtgql::bases::OperationHandlerABC::set_vars(vars_inst->to_json());
+void set_variables(👉 context.operation.generated_variables_type 👈::Params vars){
+    {% for var in context.operation.variables -%}
+    {% if var.type.is_object_type -%}
+    {% if var.type.is_optional -%}
+    if (vars_inst.👉 var.name 👈.has_value())
+        delete vars_inst.👉 var.name 👈.value();
+    {% else %}
+    delete vars_inst.👉 var.name 👈;
+    {% endif -%}
+    {% endif -%}
+    vars_inst.👉 var.name 👈 = vars.👉 var.name 👈;
+    {% endfor -%}
+    qtgql::bases::OperationHandlerABC::set_vars(vars_inst.to_json());
 }
 {% endif %}
 

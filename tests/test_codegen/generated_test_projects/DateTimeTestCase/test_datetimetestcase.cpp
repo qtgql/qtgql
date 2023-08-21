@@ -29,9 +29,7 @@ TEST_CASE("DateTimeTestCase", "[generated-testcase]") {
     auto new_birth = qtgql::customscalars::DateTimeScalar(
         QDateTime::currentDateTime().addDays(12));
     auto user_id = old_user->get_id();
-    modified_user_op->set_variables(
-        std::make_unique<changeuserbirth::ChangeUserBirthVariables>(new_birth,
-                                                                    user_id));
+    modified_user_op->set_variables({{new_birth}, user_id});
     auto catcher =
         test_utils::SignalCatcher({.source_obj = old_user, .only = "birth"});
     modified_user_op->fetch();
