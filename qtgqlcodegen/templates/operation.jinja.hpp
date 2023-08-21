@@ -2,6 +2,7 @@
 {%- from "macros/proxy_type_fields.jinja.hpp" import  proxy_type_fields -%}
 {%- from "macros/update_proxy_field.jinja.cpp" import  update_proxy_field -%}
 {%- from "macros/serialize_input_variable.jinja.hpp" import  serialize_input_variable -%}
+{%- from "macros/input_type_destructor.jinja.hpp" import  input_type_destructor -%}
 #pragma once
 #include "./schema.hpp"
 #include <qtgql/bases/bases.hpp>
@@ -85,6 +86,10 @@ std::optional<👉 var.type.type_name() 👈> 👉 var.name 👈 = {};
     {% endfor -%}
     return __ret;
     }
+
+~👉 context.operation.generated_variables_type 👈(){
+    👉 input_type_destructor(context.operation.variables) 👈
+}
 };
 
 class 👉 context.operation.name 👈: public qtgql::bases::OperationHandlerABC{
