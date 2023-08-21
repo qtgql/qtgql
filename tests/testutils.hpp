@@ -115,7 +115,7 @@ struct QmlBot {
   QmlBot() {
     qquick_view = new QQuickView();
     auto qmltester = fs::path(__FILE__).parent_path() / "qmltester.qml";
-    qquick_view->setSource(QUrl{qmltester.c_str()});
+//    qquick_view->setSource(QUrl{qmltester.c_str()});
     auto errors = qquick_view->errors();
     if (!errors.empty()) {
       qDebug() << errors;
@@ -131,7 +131,7 @@ struct QmlBot {
   QQuickItem *loader() { return find<QQuickItem *>("contentloader"); };
 
   QQuickItem *load(const fs::path &path) {
-    loader()->setProperty("source", path.c_str());
+//    loader()->setProperty("source", path.c_str());
     assert_m((loader()->property("status").toInt() == 1),
              "could not load component");
     auto ret = loader()->findChildren<QQuickItem *>()[0];

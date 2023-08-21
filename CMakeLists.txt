@@ -14,6 +14,9 @@ if(MSVC)
   set(CMAKE_CXX_FLAGS
       "${CMAKE_CXX_FLAGS} /std:c++20 /Zc:__cplusplus /permissive-")
 endif()
+if (WIN32)
+  set(CMAKE_OBJECT_PATH_MAX 500)
+endif ()
 find_package(Qt6 REQUIRED COMPONENTS Core Qml Quick WebSockets)
 qt_standard_project_setup()
 
