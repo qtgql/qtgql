@@ -461,7 +461,12 @@ class QtGqlInputObject(BaseQtGqlObjectType):
         return self
 
     def type_name(self) -> str:
-        # TODO: why this isn't in member type, add comment.
+        # NOTE: this is not in `member_type` because input types that are
+        # shared for schema might have a different type.
+        # If you are kind, fix this.
+        # Note: using shared ptr here is just for convenience and input objects
+        # are not really intended to be shared around, I tried using `unique_ptr` but had
+        # issues with constructors of `optional` calling CC on it.
         return f"std::shared_ptr<{self.name}>"
 
     def json_repr(self, attr_name: str, accessor: str = "->") -> str:
