@@ -23,7 +23,6 @@ TEST_CASE("depth", "[generated-testcase]") {
     test_utils::wait_for_completion(mq);
     REQUIRE(mq->data()->get_depth() == 1);
   };
-  //  TODO: implement some garbage collection.
 }
 
 }; // namespace RecursiveInputObjectTestCase
