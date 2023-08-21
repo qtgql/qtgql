@@ -11,15 +11,14 @@ using namespace qtgql;
 auto ENV_NAME = QString("RecursiveInputObjectTestCase");
 auto SCHEMA_ADDR = get_server_address("RecursiveInputObjectTestCase");
 
-TEST_CASE("depth", "[generated-testcase]") {
+TEST_CASE("RecursiveInputObjectTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
 
   SECTION("test deserialize") {
     auto mq = mainquery::MainQuery::shared();
-    auto a = RecursiveInput::create(RecursiveInput::create(nullptr, 234), 234);
     mq->set_variables(
-        {RecursiveInput::create(RecursiveInput::create(nullptr, 2), 2)});
+        {RecursiveInput::create(RecursiveInput::create(std::nullopt, 2), 2)});
     mq->fetch();
     test_utils::wait_for_completion(mq);
     REQUIRE(mq->data()->get_depth() == 2);
