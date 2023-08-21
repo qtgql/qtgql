@@ -1100,9 +1100,5 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 if __name__ == "__main__":
     generate_testcases(
         ListOfScalarTestCase,
-        ListOfScalarArgumentTestCase,
         ListOfScalarInInputObjectTestCase,
-        ListOfInputObjectTestCase,
-        OptionalInputTestCase,
-        RecursiveInputObjectTestCase,
     )

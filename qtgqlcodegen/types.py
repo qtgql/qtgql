@@ -462,7 +462,7 @@ class QtGqlInputObject(BaseQtGqlObjectType):
 
     def type_name(self) -> str:
         # TODO: why this isn't in member type, add comment.
-        return f"std::unique_ptr<{self.name}>"
+        return f"std::shared_ptr<{self.name}>"
 
     def json_repr(self, attr_name: str, accessor: str = "->") -> str:
         return f"{attr_name}{accessor}to_json()"

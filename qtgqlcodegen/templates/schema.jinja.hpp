@@ -51,7 +51,7 @@ struct 👉type.name👈{
 
 public:
 {% for arg in type.fields -%}
-{% if arg.type.is_optional and not arg.type.is_input_object_type -%}
+{% if arg.type.is_optional -%}
 std::optional<👉 arg.type.type_name() 👈> 👉 arg.name 👈 = {};
 {% else -%}
 👉 arg.type.type_name() 👈 👉 arg.name 👈;
@@ -67,7 +67,7 @@ std::optional<👉 arg.type.type_name() 👈> 👉 arg.name 👈 = {};
 
 template<typename... Args>
 static 👉type.type_name()👈 create(Args... args){
-    return new 👉type.name👈 (Args...);
+    return std::make_shared<👉type.name👈>(args...);
 }
 
 

@@ -87,6 +87,7 @@ std::optional<👉 var.type.type_name() 👈> 👉 var.name 👈 = {};
     {% endfor -%}
     return __ret;
     }
+
 };
 
 class 👉 context.operation.name 👈: public qtgql::bases::OperationHandlerABC{
@@ -144,9 +145,9 @@ void set_variables(👉 context.operation.generated_variables_type 👈 vars){
     {% if var.type.is_input_object_type -%}
     {% if var.type.is_optional -%}
     if (vars.👉 var.name 👈.has_value())
-        vars_inst.👉 var.name 👈 = std::move(vars.👉 var.name 👈.value());
+        vars_inst.👉 var.name 👈.swap(vars.👉 var.name 👈.value());
     {% else %}
-    vars_inst.👉 var.name 👈 = std::move(vars.👉 var.name 👈);
+    vars_inst.👉 var.name 👈.swap(vars.👉 var.name 👈);
     {% endif -%}
     {% else %}
     vars_inst.👉 var.name 👈 = vars.👉 var.name 👈;
