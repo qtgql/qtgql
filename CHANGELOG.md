@@ -1,6 +1,18 @@
 CHANGELOG
 =========
 
+0.135.0 - 2023-08-21
+--------------------
+
+This release adds support for recursive input objects.
+
+### BREAKING CHANGES:
+- From now on, input objects are heap allocated.
+This is due to this specific use case that input objects might reference themselves.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #366](https://github.com/qtgql/qtgql/pull/366/)
+
+
 0.134.0 - 2023-08-20
 --------------------
 
