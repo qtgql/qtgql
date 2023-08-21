@@ -72,7 +72,7 @@ class QtGqlTypeABC(ABC):
     def is_queried_union(self) -> QtGqlQueriedUnion | None:
         return None
 
-    def json_repr(self, attr_name: str) -> str:
+    def json_repr(self, attr_name: str, accessor: str = "->") -> str:
         raise NotImplementedError(f"{self} is not supported as an input type ATM")
 
     @abstractmethod
@@ -221,6 +221,8 @@ class QtGqlInputList(QtGqlTypeABC):
         return self
 
     def type_name(self) -> str:
+        if obj := self.of_type.is_input_object_type:
+            return f"std::list<{obj.name}>"
         return f"std::list<{self.of_type.type_name()}>"
 
 
@@ -271,7 +273,7 @@ class BuiltinScalar(QtGqlTypeABC):
     def property_type(self) -> str:
         return f"{self.type_name()} &"
 
-    def json_repr(self, attr_name: str) -> str:
+    def json_repr(self, attr_name: str, accessor: str = "->") -> str:
         return f"{attr_name}"
 
 
@@ -287,7 +289,7 @@ class CustomScalarDefinition(QtGqlTypeABC):
     def is_custom_scalar(self) -> CustomScalarDefinition | None:
         return self
 
-    def json_repr(self, attr_name: str) -> str:
+    def json_repr(self, attr_name: str, accessor: str = "->") -> str:
         return f"{attr_name}.serialize()"
 
     def type_name(self) -> str:
@@ -459,10 +461,11 @@ class QtGqlInputObject(BaseQtGqlObjectType):
         return self
 
     def type_name(self) -> str:
-        return f"{self.name} *"
+        # TODO: why this isn't in member type, add comment.
+        return f"std::unique_ptr<{self.name}>"
 
-    def json_repr(self, attr_name: str) -> str:
-        return f"{attr_name}->to_json()"
+    def json_repr(self, attr_name: str, accessor: str = "->") -> str:
+        return f"{attr_name}{accessor}to_json()"
 
 
 @define
@@ -494,7 +497,7 @@ class QtGqlEnumDefinition(QtGqlTypeABC):
     def type_name(self) -> str:
         return self.namespaced_name
 
-    def json_repr(self, attr_name: str) -> str:
+    def json_repr(self, attr_name: str, accessor: str = "->") -> str:
         return f"Enums::{self.map_name}::name_by_value({attr_name})"
 
 
