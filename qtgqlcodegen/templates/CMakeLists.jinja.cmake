@@ -54,6 +54,7 @@ target_link_libraries(${PROJECT_NAME}👉 operation.name 👈 PUBLIC
         ${PROJECT_NAME}schema
         qtgql::qtgql
         )
+target_compile_definitions(${PROJECT_NAME}👉 operation.name 👈 PRIVATE QTGQL_TEST_LIBRARY)
 {% endfor %}
 
 qt_add_library(${PROJECT_NAME} "")
