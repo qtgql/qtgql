@@ -85,6 +85,7 @@ std::optional<👉 var.type.type_name() 👈> 👉 var.name 👈 = {};
     {% endfor -%}
     return __ret;
     }
+
 };
 
 class 👉 context.operation.name 👈: public qtgql::bases::OperationHandlerABC{
@@ -137,9 +138,20 @@ inline const 👉 context.operation.root_type.name 👈 * data() const{
 }
 
 {% if context.operation.variables %}
-void set_variables(const 👉 context.operation.generated_variables_type 👈 & vars){
-vars_inst = vars;
-qtgql::bases::OperationHandlerABC::set_vars(vars_inst.to_json());
+void set_variables(👉 context.operation.generated_variables_type 👈 vars){
+    {% for var in context.operation.variables -%}
+    {% if var.type.is_input_object_type -%}
+    {% if var.type.is_optional -%}
+    if (vars.👉 var.name 👈.has_value())
+        vars_inst.👉 var.name 👈.swap(vars.👉 var.name 👈.value());
+    {% else %}
+    vars_inst.👉 var.name 👈.swap(vars.👉 var.name 👈);
+    {% endif -%}
+    {% else %}
+    vars_inst.👉 var.name 👈 = vars.👉 var.name 👈;
+    {% endif -%}
+    {% endfor -%}
+    qtgql::bases::OperationHandlerABC::set_vars(vars_inst.to_json());
 }
 {% endif %}
 

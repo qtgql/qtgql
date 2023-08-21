@@ -865,6 +865,19 @@ OptionalInputTestCase = QtGqlTestCase(
     test_name="OptionalInputTestCase",
 )
 
+RecursiveInputObjectTestCase = QtGqlTestCase(
+    schema=schemas.recursive_input_object.schema,
+    operations="""
+    query MainQuery($inp: RecursiveInput!){
+        depth(inp: $inp)
+    }
+    """,
+    test_name="RecursiveInputObjectTestCase",
+    metadata=TestCaseMetadata(
+        should_test_updates=BoolWithReason.false("input types are not cached ATM"),
+    ),
+)
+
 CustomScalarInputTestCase = QtGqlTestCase(
     schema=schemas.custom_scalar_input_schema.schema,
     operations="""
@@ -1031,6 +1044,7 @@ all_test_cases = [
     ListOfScalarInInputObjectTestCase,
     ListOfInputObjectTestCase,
     OptionalInputTestCase,
+    RecursiveInputObjectTestCase,
     CustomUserScalarTestCase,
     ObjectsThatReferenceEachOtherTestCase,
     RootListOfTestCase,
@@ -1070,6 +1084,7 @@ implemented_testcases = [
     ListOfScalarInInputObjectTestCase,
     ListOfInputObjectTestCase,
     OptionalInputTestCase,
+    RecursiveInputObjectTestCase,
 ]
 
 
@@ -1083,4 +1098,6 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 
 if __name__ == "__main__":
-    generate_testcases(ScalarsTestCase)
+    generate_testcases(
+        RecursiveInputObjectTestCase,
+    )

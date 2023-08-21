@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from qtgqlcodegen.config import QtGqlConfig
     from qtgqlcodegen.types import (
         QtGqlEnumDefinition,
-        QtGqlInputObjectTypeDefinition,
+        QtGqlInputObject,
         QtGqlInterface,
         QtGqlObjectType,
     )
@@ -26,7 +26,7 @@ class SchemaTemplateContext:
     enums: list[QtGqlEnumDefinition]
     types: list[QtGqlObjectType]
     interfaces: list[QtGqlInterface]
-    input_objects: list[QtGqlInputObjectTypeDefinition]
+    input_objects: list[QtGqlInputObject]
     config: QtGqlConfig
 
     @property

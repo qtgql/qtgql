@@ -82,7 +82,7 @@ class QtGqlOperationDefinition:
 
     @property
     def generated_variables_type(self) -> str:
-        return self.name + "Variables"
+        return f"{self.name}Variables"
 
     @property
     def name(self) -> str:

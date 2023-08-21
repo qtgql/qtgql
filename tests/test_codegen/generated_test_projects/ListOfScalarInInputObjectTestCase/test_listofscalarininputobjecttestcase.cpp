@@ -16,7 +16,8 @@ TEST_CASE("ListOfScalarInInputObjectTestCase", "[generated-testcase]") {
   SECTION("test deserialize") {
     auto echo_op = echoarg::EchoArg::shared();
     std::list<QString> echo_me = {"A", "B", "C"};
-    echo_op->set_variables({.what{{echo_me}}});
+
+    echo_op->set_variables({What::create(echo_me)});
     echo_op->fetch();
     test_utils::wait_for_completion(echo_op);
     auto model = echo_op->data()->get_echo();

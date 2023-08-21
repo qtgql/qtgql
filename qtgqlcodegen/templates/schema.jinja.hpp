@@ -63,6 +63,13 @@ std::optional<👉 arg.type.type_name() 👈> 👉 arg.name 👈 = {};
     {% endfor -%}
     return __ret;
 }
+
+template<typename... Args>
+static 👉type.type_name()👈 create(Args... args){
+    return std::make_shared<👉type.name👈>(args...);
+}
+
+
 };
 {% endfor %}
 

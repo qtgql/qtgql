@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from functools import cached_property
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Generic, TypeVar, cast
 
 import attrs
 from attr import define
@@ -37,7 +37,7 @@ class QtGqlTypeABC(ABC):
         return None
 
     @property
-    def is_input_object_type(self) -> QtGqlInputObjectTypeDefinition | None:
+    def is_input_object_type(self) -> QtGqlInputObject | None:
         return None
 
     @property
@@ -72,7 +72,7 @@ class QtGqlTypeABC(ABC):
     def is_queried_union(self) -> QtGqlQueriedUnion | None:
         return None
 
-    def json_repr(self, attr_name: str) -> str:
+    def json_repr(self, attr_name: str, accessor: str = "->") -> str:
         raise NotImplementedError(f"{self} is not supported as an input type ATM")
 
     @abstractmethod
@@ -221,12 +221,14 @@ class QtGqlInputList(QtGqlTypeABC):
         return self
 
     def type_name(self) -> str:
+        if obj := self.of_type.is_input_object_type:
+            return f"std::list<{obj.name}>"
         return f"std::list<{self.of_type.type_name()}>"
 
 
 @define
 class QtGqlUnion(QtGqlTypeABC):
-    types: tuple[QtGqlObjectType | QtGqlDeferredType, ...]
+    types: tuple[QtGqlObjectType | QtGqlDeferredType[QtGqlObjectType], ...]
 
     @property
     def is_union(self) -> QtGqlUnion | None:
@@ -271,7 +273,7 @@ class BuiltinScalar(QtGqlTypeABC):
     def property_type(self) -> str:
         return f"{self.type_name()} &"
 
-    def json_repr(self, attr_name: str) -> str:
+    def json_repr(self, attr_name: str, accessor: str = "->") -> str:
         return f"{attr_name}"
 
 
@@ -287,7 +289,7 @@ class CustomScalarDefinition(QtGqlTypeABC):
     def is_custom_scalar(self) -> CustomScalarDefinition | None:
         return self
 
-    def json_repr(self, attr_name: str) -> str:
+    def json_repr(self, attr_name: str, accessor: str = "->") -> str:
         return f"{attr_name}.serialize()"
 
     def type_name(self) -> str:
@@ -401,11 +403,14 @@ class QtGqlObjectType(BaseQtGqlObjectType):
                 base.implementations[self.name] = self
 
 
+T_QtGqlType = TypeVar("T_QtGqlType", bound=QtGqlTypeABC)
+
+
 @define
-class QtGqlDeferredType(QtGqlTypeABC):
+class QtGqlDeferredType(Generic[T_QtGqlType], QtGqlTypeABC):
     name: str
-    object_map__: dict[str, QtGqlObjectType]
-    cached_: QtGqlTypeABC | None = None
+    object_map__: dict[str, T_QtGqlType]
+    cached_: T_QtGqlType | None = None
 
     def __getattr__(self, item):
         if not self.cached_:
@@ -448,18 +453,24 @@ class QtGqlInterface(QtGqlObjectType):
 
 
 @define(slots=False)
-class QtGqlInputObjectTypeDefinition(BaseQtGqlObjectType):
+class QtGqlInputObject(BaseQtGqlObjectType):
     fields_dict: dict[str, QtGqlArgumentDefinition] = attrs.field(factory=dict)  # type: ignore
 
     @property
-    def is_input_object_type(self) -> QtGqlInputObjectTypeDefinition | None:
+    def is_input_object_type(self) -> QtGqlInputObject | None:
         return self
 
     def type_name(self) -> str:
-        return self.name
+        # NOTE: this is not in `member_type` because input types that are
+        # shared for schema might have a different type.
+        # If you are kind, fix this.
+        # Note: using shared ptr here is just for convenience and input objects
+        # are not really intended to be shared around, I tried using `unique_ptr` but had
+        # issues with constructors of `optional` calling CC on it.
+        return f"std::shared_ptr<{self.name}>"
 
-    def json_repr(self, attr_name: str) -> str:
-        return f"{attr_name}.to_json()"
+    def json_repr(self, attr_name: str, accessor: str = "->") -> str:
+        return f"{attr_name}{accessor}to_json()"
 
 
 @define
@@ -491,7 +502,7 @@ class QtGqlEnumDefinition(QtGqlTypeABC):
     def type_name(self) -> str:
         return self.namespaced_name
 
-    def json_repr(self, attr_name: str) -> str:
+    def json_repr(self, attr_name: str, accessor: str = "->") -> str:
         return f"Enums::{self.map_name}::name_by_value({attr_name})"
 
 

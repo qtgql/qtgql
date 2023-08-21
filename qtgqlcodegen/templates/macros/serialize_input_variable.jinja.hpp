@@ -12,7 +12,7 @@ if (👉 attr_name 👈.has_value()){
 {% if variable.type.is_input_list -%}
 QJsonArray qtgql__👉 variable.name 👈_json;
 for (const auto& node: 👉 p_var_value_attr 👈){
-qtgql__👉 variable.name 👈_json.append(👉 variable.type.of_type.json_repr("node") 👈);
+qtgql__👉 variable.name 👈_json.append(👉 variable.type.of_type.json_repr("node", accessor=".") 👈);
 }
 👉 json_obj 👈.insert("👉 json_name 👈",  qtgql__👉 variable.name 👈_json);
 {% else -%}

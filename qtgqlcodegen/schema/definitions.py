@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from qtgqlcodegen.types import (
         CustomScalarDefinition,
         QtGqlEnumDefinition,
-        QtGqlInputObjectTypeDefinition,
+        QtGqlInputObject,
         QtGqlInterface,
         QtGqlObjectType,
         QtGqlTypeABC,
@@ -100,7 +100,7 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
 
 EnumMap: TypeAlias = "dict[str, QtGqlEnumDefinition]"
 ObjectTypeMap: TypeAlias = "dict[str, QtGqlObjectType]"
-InputObjectMap: TypeAlias = "dict[str, QtGqlInputObjectTypeDefinition]"
+InputObjectMap: TypeAlias = "dict[str, QtGqlInputObject]"
 InterfacesMap: TypeAlias = "dict[str, QtGqlInterface]"
 CustomScalarMap: TypeAlias = "dict[str, CustomScalarDefinition]"
 
@@ -130,7 +130,7 @@ class SchemaTypeInfo:
     def get_enum(self, name: str) -> QtGqlEnumDefinition | None:
         return self.enums.get(name, None)
 
-    def get_input_type(self, name: str) -> QtGqlInputObjectTypeDefinition | None:
+    def get_input_type(self, name: str) -> QtGqlInputObject | None:
         return self.input_objects.get(name, None)
 
     def get_custom_scalar(self, name: str) -> CustomScalarDefinition | None:

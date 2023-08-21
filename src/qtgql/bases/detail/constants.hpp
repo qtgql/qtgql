@@ -2,8 +2,7 @@
 #include <QUuid>
 #include <limits>
 
-namespace qtgql {
-namespace bases {
+namespace qtgql::bases {
 namespace scalars {
 typedef std::nullptr_t Void; // represents null value
 typedef QString Id;          // GraphQL ID scalar
@@ -19,5 +18,4 @@ inline static const int INT = std::numeric_limits<int>::lowest();
 inline static const float FLOAT = std::numeric_limits<float>::lowest();
 inline static const bool BOOL = false;
 } // namespace DEFAULTS
-} // namespace bases
-} // namespace qtgql
+} // namespace qtgql::bases
