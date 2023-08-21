@@ -19,7 +19,7 @@ TEST_CASE("ListOfInputObjectTestCase", "[generated-testcase]") {
     std::list<ListOfInputObjectTestCase::Echo> what_list = {
         {"What"}, {"Am"}, {"I"}};
     echo_query->set_variables(
-        {.what = ListOfInputObjectTestCase::What(what_list)});
+        {ListOfInputObjectTestCase::What::create(what_list)});
     echo_query->fetch();
     test_utils::wait_for_completion(echo_query);
     auto model = echo_query->data()->get_echo();
@@ -31,5 +31,4 @@ TEST_CASE("ListOfInputObjectTestCase", "[generated-testcase]") {
     }
   };
 }
-
 }; // namespace ListOfInputObjectTestCase

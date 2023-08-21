@@ -3,6 +3,7 @@
 {%- from "macros/update_proxy_field.jinja.cpp" import  update_proxy_field -%}
 {%- from "macros/serialize_input_variable.jinja.hpp" import  serialize_input_variable -%}
 {%- from "macros/input_type_destructor.jinja.hpp" import  input_type_destructor -%}
+{%- from "macros/input_type_fields.jinja.hpp" import  input_type_fields -%}
 #pragma once
 #include "./schema.hpp"
 #include <qtgql/bases/bases.hpp>
@@ -86,19 +87,6 @@ std::optional<👉 var.type.type_name() 👈> 👉 var.name 👈 = {};
     {% endfor -%}
     return __ret;
     }
-struct Params{
-    {%- for var in context.operation.variables -%}
-    {% if var.type.is_optional -%}
-    std::optional<👉 var.type.type_name() 👈> 👉 var.name 👈 = {};
-    {% else -%}
-    👉 var.type.type_name() 👈 👉 var.name 👈;
-    {% endif -%}
-    {%- endfor -%}
-};
-
-~👉 context.operation.generated_variables_type 👈(){
-    👉 input_type_destructor(context.operation.variables) 👈
-}
 };
 
 class 👉 context.operation.name 👈: public qtgql::bases::OperationHandlerABC{
@@ -151,17 +139,18 @@ inline const 👉 context.operation.root_type.name 👈 * data() const{
 }
 
 {% if context.operation.variables %}
-void set_variables(👉 context.operation.generated_variables_type 👈::Params vars){
+void set_variables(👉 context.operation.generated_variables_type 👈 vars){
     {% for var in context.operation.variables -%}
-    {% if var.type.is_object_type -%}
+    {% if var.type.is_input_object_type -%}
     {% if var.type.is_optional -%}
-    if (vars_inst.👉 var.name 👈.has_value())
-        delete vars_inst.👉 var.name 👈.value();
+    if (vars.👉 var.name 👈.has_value())
+        vars_inst.👉 var.name 👈 = std::move(vars.👉 var.name 👈.value());
     {% else %}
-    delete vars_inst.👉 var.name 👈;
+    vars_inst.👉 var.name 👈 = std::move(vars.👉 var.name 👈);
     {% endif -%}
-    {% endif -%}
+    {% else %}
     vars_inst.👉 var.name 👈 = vars.👉 var.name 👈;
+    {% endif -%}
     {% endfor -%}
     qtgql::bases::OperationHandlerABC::set_vars(vars_inst.to_json());
 }

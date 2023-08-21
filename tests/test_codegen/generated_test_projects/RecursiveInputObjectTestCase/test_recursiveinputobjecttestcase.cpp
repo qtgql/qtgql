@@ -17,12 +17,12 @@ TEST_CASE("depth", "[generated-testcase]") {
 
   SECTION("test deserialize") {
     auto mq = mainquery::MainQuery::shared();
-    mq->set_variables(std::make_unique<mainquery::MainQueryVariables>(
-        new RecursiveInput{.inp = new RecursiveInput{.depth = 1}, .depth = 0}));
+    auto a = RecursiveInput::create(RecursiveInput::create(nullptr, 234), 234);
+    mq->set_variables(
+        {RecursiveInput::create(RecursiveInput::create(nullptr, 2), 2)});
     mq->fetch();
     test_utils::wait_for_completion(mq);
-    REQUIRE(mq->data()->get_depth() == 1);
+    REQUIRE(mq->data()->get_depth() == 2);
   };
 }
-
 }; // namespace RecursiveInputObjectTestCase
