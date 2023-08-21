@@ -2,8 +2,6 @@
 {%- from "macros/proxy_type_fields.jinja.hpp" import  proxy_type_fields -%}
 {%- from "macros/update_proxy_field.jinja.cpp" import  update_proxy_field -%}
 {%- from "macros/serialize_input_variable.jinja.hpp" import  serialize_input_variable -%}
-{%- from "macros/input_type_destructor.jinja.hpp" import  input_type_destructor -%}
-{%- from "macros/input_type_fields.jinja.hpp" import  input_type_fields -%}
 #pragma once
 #include "./schema.hpp"
 #include <qtgql/bases/bases.hpp>

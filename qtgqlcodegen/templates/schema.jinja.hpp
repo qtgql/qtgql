@@ -1,6 +1,5 @@
 {%- from "macros/concrete_type_fields.jinja.hpp" import concrete_type_fields -%}
 {%- from "macros/serialize_input_variable.jinja.hpp" import  serialize_input_variable -%}
-{%- from "macros/input_type_destructor.jinja.hpp" import  input_type_destructor -%}
 #pragma once
 #include <QObject>
 #include <QJsonObject>
