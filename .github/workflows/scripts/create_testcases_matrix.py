@@ -20,7 +20,7 @@ TESTCASES_PER_RUNNER = 10
 @define
 class Matrix:
     testcases: list[str]
-    os: list[str] = Factory(lambda: ["ubuntu-latest"])
+    os: list[str] = Factory(lambda: ["ubuntu-latest", "windows-latest"])
     qt_version: list[str] = Factory(lambda: ["6.5.0"])
     python_version: list[str] = Factory(lambda: ["3.9", "3.10", "3.11"])
 
