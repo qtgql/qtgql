@@ -1,7 +1,8 @@
 name: 🫸 Pull request checks
 
 on:
-  pull_request:
+  pull_request_target:
+    types: [synchronize, reopened, opened, ready_for_review]
     branches:
     - main
     paths:
@@ -29,7 +30,7 @@ jobs:
           cd .github && poetry run python -m workflows.scripts.bot_status_comment
         env:
           PR_NUMBER: ${{ github.event.number }}
-          BOT_TOKEN: ${{ env.BOT_PUBLIC_TOKEN }}
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
 
   check_no_todos:
     name: Check that PR has no TODO comments
