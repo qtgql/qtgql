@@ -1,7 +1,8 @@
 name: 🫸 Pull request checks
 
 on:
-  pull_request:
+  pull_request_target:
+    types: [synchronize, reopened, opened, ready_for_review]
     branches:
     - main
     paths:
