@@ -1,0 +1,17 @@
+
+    query AnimalQuery($kind: AnimalKind!) {
+      animal(kind: $kind) {
+        metadata{
+          kind
+        	gender
+        	age
+        }
+				id
+        ... on Person {
+          language
+        }
+        ... on Dog {
+          furColor
+        }
+      }
+    }
