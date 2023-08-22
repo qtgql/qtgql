@@ -1,4 +1,4 @@
-#include "graphql/__generated__/MainQuery.hpp"
+#include "graphql/__generated__/AnimalQuery.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>
 #include <catch2/catch_test_macros.hpp>
