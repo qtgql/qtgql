@@ -73,6 +73,11 @@ static 👉type.type_name()👈 create(Args... args){
 };
 {% endfor %}
 
+// Forward references
+{% for type in context.types -%}
+class 👉 type.name 👈;
+{% endfor %}
+
 // ---------- Interfaces ----------
 {% for interface in context.interfaces -%}
 class 👉 interface.name 👈 {% for base in interface.bases %} {%if loop.first %}: {% endif %} public 👉 base.name 👈 {% if not loop.last %}, {% endif %}{% endfor %}{
@@ -90,10 +95,6 @@ static auto & ENV_CACHE() {
 {% endfor %}
 
 // ---------- Object Types ----------
-{# forward references -#}
-{% for type in context.types -%}
-class 👉 type.name 👈;
-{% endfor %}
 
 {% for type in context.types %}
 {%- set base_class -%}{% if type. implements_node %}NodeInterfaceABC{% else %}ObjectTypeABC{% endif %}{%- endset -%}

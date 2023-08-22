@@ -3,10 +3,10 @@
       animal(kind: $kind) {
         metadata{
           kind
-        	gender
-        	age
+            gender
+            age
         }
-				id
+        id
         ... on Person {
           language
         }
