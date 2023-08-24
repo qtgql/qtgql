@@ -27,7 +27,7 @@ jobs:
           poetry install
       - name: upload comment
         run:
-          cd .github && poetry run python -m workflows.main_branch_only.pr_comment
+          cd .github && poetry run python -m workflows.main_branch_only.bot_comment.main
         env:
           PR_NUMBER: ${{ github.event.number }}
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
