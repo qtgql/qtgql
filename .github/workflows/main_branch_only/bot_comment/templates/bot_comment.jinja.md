@@ -17,16 +17,3 @@ Release type: <patch/minor/major>
 [//]: # (describe your changes here...)
 ```
 {% endif %}
-
-### Status of codegen testcases implementation
-<details>
-
-| TestCase         | Has implementation? | Deserialization? | Update? |
-| -----------------|---------------------|------------------|---------|
-{%for tc in context.testcases_context.testcases-%}
-|  {{ tc.test.test_name }} | {{ tc.implemented }} | {{ tc.deserialization }} | {{ tc.update }} |
-{% endfor -%}
-</details>
-
-### Summary 
-{{ context.testcases_context.summery }}
