@@ -558,7 +558,6 @@ NodeInterfaceFieldTestCase = QtGqlTestCase(
     test_name="NodeInterfaceFieldTestCase",
 )
 
-
 NonNodeUnionTestCase = QtGqlTestCase(
     schema=schemas.non_node_union.schema,
     operations="""
@@ -680,7 +679,6 @@ ListOfNonNodeType = QtGqlTestCase(
     test_name="ListOfNonNodeType",
 )
 
-
 ListOfUnionTestCase = QtGqlTestCase(
     schema=schemas.list_of_union.schema,
     operations="""
@@ -759,7 +757,6 @@ FragmentTestCase = QtGqlTestCase(
     """,
     test_name="FragmentTestCase",
 )
-
 
 FragmentsOnInterfaceTestCase = QtGqlTestCase(
     schema=schemas.non_node_interface_field.schema,
@@ -1009,6 +1006,32 @@ ListOfInputObjectTestCase = QtGqlTestCase(
     ),
 )
 
+InterfaceWithObjectField = QtGqlTestCase(
+    schema=schemas.interface_with_object_field.schema,
+    operations="""
+    query AnimalQuery($kind: AnimalKind!) {
+      animal(kind: $kind) {
+        metadata{
+          kind
+            gender
+            age
+        }
+        id
+        ... on Person {
+          language
+        }
+        ... on Dog {
+          furColor
+        }
+      }
+    }    """,
+    test_name="InterfaceWithObjectField",
+    metadata=TestCaseMetadata(
+        should_test_updates=BoolWithReason.false(
+            "There is no reason it would fail, this only failed due to object types being generated after interfaces.",
+        ),
+    ),
+)
 
 all_test_cases = [
     ScalarsTestCase,
@@ -1045,6 +1068,7 @@ all_test_cases = [
     ListOfInputObjectTestCase,
     OptionalInputTestCase,
     RecursiveInputObjectTestCase,
+    InterfaceWithObjectField,
     CustomUserScalarTestCase,
     ObjectsThatReferenceEachOtherTestCase,
     RootListOfTestCase,
@@ -1085,6 +1109,7 @@ implemented_testcases = [
     ListOfInputObjectTestCase,
     OptionalInputTestCase,
     RecursiveInputObjectTestCase,
+    InterfaceWithObjectField,
 ]
 
 
@@ -1099,5 +1124,5 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 if __name__ == "__main__":
     generate_testcases(
-        RecursiveInputObjectTestCase,
+        InterfaceWithObjectField,
     )

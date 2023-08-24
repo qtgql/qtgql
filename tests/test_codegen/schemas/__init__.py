@@ -35,4 +35,5 @@ from . import (  # noqa
     wrogn_id_type,
     list_of_input_object,
     recursive_input_object,
+    interface_with_object_field,
 )
