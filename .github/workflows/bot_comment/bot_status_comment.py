@@ -97,28 +97,10 @@ def render(context: BotCommentContext) -> str:
     return BOT_COMMENT_TEMPLATE.render(context=context)
 
 
-def create_or_update_bot_comment(content: str) -> None:
-    from .ghub import get_current_pr
-
-    pr = get_current_pr()
-    for cm in pr.get_issue_comments():
-        if "878ae1db-766f-49c7-a1a8-59f7be1fee8f" in cm.body:
-            cm.edit(content)
-            return
-
-    pr.create_issue_comment(content)
-
-
-def comment() -> None:
+def get_comment() -> str:
     context = BotCommentContext(
         release_preview=get_release_preview(),
         testcases_context=get_testcases_context(),
     )
-    create_or_update_bot_comment(render(context))
-    # fail workflow release file is not valid.
-    if context.release_preview.error:
-        raise FileNotFoundError(context.release_preview.error)
 
-
-if __name__ == "__main__":
-    comment()
+    return render(context)
