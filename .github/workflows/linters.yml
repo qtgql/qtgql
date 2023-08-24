@@ -1,0 +1,31 @@
+name: 🫸 Linters
+
+on:
+  pull_request:
+    types: [synchronize, reopened, opened, ready_for_review]
+    branches:
+      - main
+    paths:
+      - "qtgql/**"
+      - "qtgqlcodegen/**"
+      - ".github/workflows/release_check.yml"
+      - "RELEASE.md"
+
+jobs:
+
+  check_no_todos:
+    name: Check that PR has no TODO comments
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+      - name: setup poetry
+        run: |
+          pip install poetry
+          poetry install
+      - name: preform check
+        run: |
+          cd .github && poetry run python -m workflows.scripts.no_todos
