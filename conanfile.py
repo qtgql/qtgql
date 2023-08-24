@@ -22,7 +22,7 @@ ConanBool = [True, False]
 
 
 logger = logging.getLogger(__name__)
-__version__: str = "0.134.0"
+__version__: str = "0.135.0"
 
 
 class QtGqlRecipe(ConanFile):
