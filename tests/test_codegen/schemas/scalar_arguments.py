@@ -1,13 +1,10 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from uuid import UUID  # noqa
 
 import strawberry
 
 from tests.test_codegen.schemas.node_interface import NODE_DB, Node
-
-if TYPE_CHECKING:
-    from uuid import UUID
 
 
 @strawberry.type()
