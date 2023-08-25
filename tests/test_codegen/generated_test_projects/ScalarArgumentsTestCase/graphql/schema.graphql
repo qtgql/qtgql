@@ -1,0 +1,18 @@
+interface Node {
+  id: ID!
+}
+
+type Query {
+  getContainer(string: String!, i: Int!, f: Float!, b: Boolean!, uuid: UUID!): ScalarContainer!
+}
+
+type ScalarContainer implements Node {
+  id: ID!
+  string: String!
+  i: Int!
+  f: Float!
+  b: Boolean!
+  uuid: UUID!
+}
+
+scalar UUID

@@ -362,7 +362,25 @@ TimeScalarTestCase = QtGqlTestCase(
     test_name="TimeScalarTestCase",
 )
 
-OperationVariablesTestcase = QtGqlTestCase(
+ScalarArgumentsTestCase = QtGqlTestCase(
+    schema=schemas.scalar_arguments.schema,
+    operations="""
+    query MainQuery($i: Int!, $f: Float!, $string: String!, $b: Boolean!, $uuid: UUID!){
+        getContainer(i: $i, f: $f, string: $string, b: $b, uuid: $uuid){
+            string
+            i
+            f
+            b
+            uuid
+        }
+    }
+
+    """,
+    test_name="ScalarArgumentsTestCase",
+)
+
+
+OperationVariablesTestcase = QtGqlTestCase(  # TODO: rename this
     schema=schemas.operation_variables.schema,
     operations="""
   query MainQuery($connectedVar: Boolean!) {
@@ -1023,6 +1041,7 @@ all_test_cases = [
     NestedObjectTestCase,
     OptionalNestedObjectTestCase,
     ObjectWithListOfObjectTestCase,
+    ScalarArgumentsTestCase,
     OperationVariablesTestcase,
     EnumTestCase,
     RootScalarTestCase,
@@ -1065,6 +1084,7 @@ implemented_testcases = [
     ObjectWithListOfObjectTestCase,
     EnumTestCase,
     NonNodeInterfaceTestCase,
+    ScalarArgumentsTestCase,
     OperationVariablesTestcase,
     RootScalarTestCase,
     NonNodeTypeTestCase,
@@ -1099,5 +1119,5 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 if __name__ == "__main__":
     generate_testcases(
-        RecursiveInputObjectTestCase,
+        ScalarArgumentsTestCase,
     )
