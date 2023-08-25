@@ -26,6 +26,11 @@ void update_👉 t.name 👈(👉 t.concrete.member_type_arg 👈 inst, const QJ
 {% endfor -%}
 };
 
+// ------------ Forward declarations ------------
+{% for t in context.operation.narrowed_types if not t.concrete.is_root -%}
+class 👉 t.name 👈;
+{% endfor %}
+
 // ------------ Narrowed Interfaces ------------
 {% for t in context.operation.interfaces -%}
 class 👉 t.name 👈: public 👉 context.qtgql_types.ObjectTypeABC.name 👈{

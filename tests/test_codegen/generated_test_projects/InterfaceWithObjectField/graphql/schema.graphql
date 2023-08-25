@@ -1,0 +1,36 @@
+interface AnimalInterface {
+  id: ID!
+  metadata: AnimalMetadata!
+}
+
+enum AnimalKind {
+  PERSON
+  DOG
+}
+
+type AnimalMetadata {
+  kind: AnimalKind!
+  gender: Gender!
+  age: Int!
+}
+
+type Dog implements AnimalInterface {
+  id: ID!
+  metadata: AnimalMetadata!
+  furColor: String!
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+type Person implements AnimalInterface {
+  id: ID!
+  metadata: AnimalMetadata!
+  language: String!
+}
+
+type Query {
+  animal(kind: AnimalKind!): AnimalInterface!
+}

@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+0.135.1 - 2023-08-24
+--------------------
+
+Fix a case that interfaces couldn't store an object inside them
+due to object types being defined after them.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #370](https://github.com/qtgql/qtgql/pull/370/)
+
+
 0.135.0 - 2023-08-21
 --------------------
 
