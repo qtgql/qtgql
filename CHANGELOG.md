@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+0.135.2 - 2023-08-27
+--------------------
+
+Fix a case that UUID input type wouldn't serialize.
+Also adds better test for basic scalar inputs.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #378](https://github.com/qtgql/qtgql/pull/378/)
+
+
 0.135.1 - 2023-08-24
 --------------------
 
