@@ -25,8 +25,8 @@ class ReleaseType(Enum):
 
 @dataclass
 class ReleasePreview:
-    type: ReleaseType | None
-    changelog: str | None = None
+    type: ReleaseType
+    changelog: str
 
 
 def get_release_preview(pr: PullRequest) -> ReleasePreview:

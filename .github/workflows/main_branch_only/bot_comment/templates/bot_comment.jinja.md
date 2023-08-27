@@ -1,6 +1,6 @@
 <!-- ID: 878ae1db-766f-49c7-a1a8-59f7be1fee8f -->
 ### Release Notes
-{% if context.release_preview.changelog -%}
+{% if context.release_preview -%}
 <details>
 <summary>Just wanted to say</summary>
 
