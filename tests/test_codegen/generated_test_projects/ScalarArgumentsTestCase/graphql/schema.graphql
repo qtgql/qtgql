@@ -12,6 +12,8 @@ type ScalarContainer implements Node {
   i: Int!
   f: Float!
   b: Boolean!
+
+  """This would be the id of the object"""
   uuid: UUID!
 }
 
