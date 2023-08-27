@@ -26,7 +26,7 @@ from . import (  # noqa
     object_with_time_scalar,
     object_with_user_defined_scalar,
     operation_error,
-    operation_variables,
+    scalar_arguments,
     optional_input_schema,
     root_enum_schema,
     root_list_of_object,

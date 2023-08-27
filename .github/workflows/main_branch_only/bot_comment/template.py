@@ -20,7 +20,7 @@ BOT_COMMENT_TEMPLATE = template_env.get_template("bot_comment.jinja.md")
 
 @dataclass
 class BotCommentContext:
-    release_preview: ReleasePreview
+    release_preview: ReleasePreview | None = None
 
 
 def render(context: BotCommentContext) -> str:

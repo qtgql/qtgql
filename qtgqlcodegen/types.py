@@ -253,6 +253,7 @@ class BuiltinScalar(QtGqlTypeABC):
     default_value_: CppAttribute
     graphql_name: str
     from_json_convertor: str
+    to_json_convertor: str = ""
 
     @property
     def is_builtin_scalar(self) -> BuiltinScalar | None:
@@ -274,7 +275,7 @@ class BuiltinScalar(QtGqlTypeABC):
         return f"{self.type_name()} &"
 
     def json_repr(self, attr_name: str, accessor: str = "->") -> str:
-        return f"{attr_name}"
+        return f"{attr_name}{self.to_json_convertor}"
 
 
 @define
@@ -659,6 +660,7 @@ class _BuiltinScalars:
         DefaultsNs().ns_add("UUID"),
         graphql_name="UUID",
         from_json_convertor="toVariant().toUuid()",
+        to_json_convertor=".toString()",
     )
 
     @classmethod

@@ -362,30 +362,23 @@ TimeScalarTestCase = QtGqlTestCase(
     test_name="TimeScalarTestCase",
 )
 
-OperationVariablesTestcase = QtGqlTestCase(
-    schema=schemas.operation_variables.schema,
+ScalarArgumentsTestCase = QtGqlTestCase(
+    schema=schemas.scalar_arguments.schema,
     operations="""
-  query MainQuery($connectedVar: Boolean!) {
-    user {
-      id
-      name
-      friend(connectedArg: $connectedVar) {
-        id
-        name
-      }
+    query MainQuery($i: Int!, $f: Float!, $string: String!, $b: Boolean!, $uuid: UUID!){
+        getContainer(i: $i, f: $f, string: $string, b: $b, uuid: $uuid){
+            string
+            i
+            f
+            b
+            uuid
+        }
     }
-  }
 
-  mutation ChangeFriendName($connected: Boolean!, $new_name: String!, $user_id: ID! ) {
-  changeFriendName(connected: $connected, newName: $new_name, userId: $user_id) {
-    friend(connectedArg: $connected) {
-      name
-    }
-  }
-}
-        """,
-    test_name="OperationVariablesTestcase",
+    """,
+    test_name="ScalarArgumentsTestCase",
 )
+
 
 OperationErrorTestCase = QtGqlTestCase(
     schema=schemas.operation_error.schema,
@@ -1046,7 +1039,7 @@ all_test_cases = [
     NestedObjectTestCase,
     OptionalNestedObjectTestCase,
     ObjectWithListOfObjectTestCase,
-    OperationVariablesTestcase,
+    ScalarArgumentsTestCase,
     EnumTestCase,
     RootScalarTestCase,
     NonNodeTypeTestCase,
@@ -1089,7 +1082,7 @@ implemented_testcases = [
     ObjectWithListOfObjectTestCase,
     EnumTestCase,
     NonNodeInterfaceTestCase,
-    OperationVariablesTestcase,
+    ScalarArgumentsTestCase,
     RootScalarTestCase,
     NonNodeTypeTestCase,
     InputTypeOperationVariableTestCase,
@@ -1124,5 +1117,5 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 if __name__ == "__main__":
     generate_testcases(
-        InterfaceWithObjectField,
+        ScalarArgumentsTestCase,
     )
