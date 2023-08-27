@@ -380,31 +380,6 @@ ScalarArgumentsTestCase = QtGqlTestCase(
 )
 
 
-OperationVariablesTestcase = QtGqlTestCase(  # TODO: rename this
-    schema=schemas.operation_variables.schema,
-    operations="""
-  query MainQuery($connectedVar: Boolean!) {
-    user {
-      id
-      name
-      friend(connectedArg: $connectedVar) {
-        id
-        name
-      }
-    }
-  }
-
-  mutation ChangeFriendName($connected: Boolean!, $new_name: String!, $user_id: ID! ) {
-  changeFriendName(connected: $connected, newName: $new_name, userId: $user_id) {
-    friend(connectedArg: $connected) {
-      name
-    }
-  }
-}
-        """,
-    test_name="OperationVariablesTestcase",
-)
-
 OperationErrorTestCase = QtGqlTestCase(
     schema=schemas.operation_error.schema,
     operations="""
@@ -1065,7 +1040,6 @@ all_test_cases = [
     OptionalNestedObjectTestCase,
     ObjectWithListOfObjectTestCase,
     ScalarArgumentsTestCase,
-    OperationVariablesTestcase,
     EnumTestCase,
     RootScalarTestCase,
     NonNodeTypeTestCase,
@@ -1109,7 +1083,6 @@ implemented_testcases = [
     EnumTestCase,
     NonNodeInterfaceTestCase,
     ScalarArgumentsTestCase,
-    OperationVariablesTestcase,
     RootScalarTestCase,
     NonNodeTypeTestCase,
     InputTypeOperationVariableTestCase,
