@@ -32,7 +32,7 @@ struct BaseGqlTrnsWsMsg : public bases::HashAbleABC {
   QString type;
   QJsonObject payload;
 
-  BaseGqlTrnsWsMsg(const QString &type) {
+  explicit BaseGqlTrnsWsMsg(const QString &type) {
     assert(!type.isEmpty());
     this->type = type;
   }
@@ -42,7 +42,7 @@ struct BaseGqlTrnsWsMsg : public bases::HashAbleABC {
     this->payload = payload;
   }
 
-  BaseGqlTrnsWsMsg(const QJsonObject &data) {
+  explicit BaseGqlTrnsWsMsg(const QJsonObject &data) {
     if (data.contains("payload") && data["payload"].isObject()) {
       this->payload = data["payload"].toObject();
     }
@@ -51,7 +51,7 @@ struct BaseGqlTrnsWsMsg : public bases::HashAbleABC {
     }
   }
 
-  bool has_payload() const { return !payload.isEmpty(); };
+  [[nodiscard]] bool has_payload() const { return !payload.isEmpty(); };
 
   [[nodiscard]] QJsonObject serialize() const override {
     QJsonObject data;
@@ -80,7 +80,7 @@ struct GqlTrnsWsMsgWithID : public BaseGqlTrnsWsMsg {
       : BaseGqlTrnsWsMsg(PROTOCOL::SUBSCRIBE, payload.serialize()),
         op_id{id} {};
 
-  bool has_errors() const { return !this->errors.isEmpty(); }
+  [[nodiscard]] bool has_errors() const { return !this->errors.isEmpty(); }
 
   [[nodiscard]] QJsonObject serialize() const override {
     QJsonObject ret = BaseGqlTrnsWsMsg::serialize();
@@ -97,12 +97,11 @@ const auto PONG = BaseGqlTrnsWsMsg(PROTOCOL::PONG);
 
 struct GqlTransportWsClientSettings {
   const QUrl url;
-  QObject *parent = nullptr;
   int ping_interval = 50000;
   int ping_timeout = 5000;
   bool auto_reconnect = false;
   int reconnect_timeout = 3000;
-  const QList<std::pair<QString, QString>> headers = {};
+  std::map<QString, QString> headers = {};
 };
 
 class GqlTransportWs : public QObject, public bases::NetworkLayerABC {
@@ -120,7 +119,6 @@ private Q_SLOTS:
   void onPingTesterTimeout();
 
 protected:
-  QUrl m_url;
   bool m_auto_reconnect = true;
   bool m_connection_ack = false;
   QTimer *m_reconnect_timer;
@@ -128,6 +126,7 @@ protected:
   QTimer *m_ping_tester_timer;
   QWebSocket *m_ws;
   QWebSocketHandshakeOptions m_ws_options;
+  GqlTransportWsClientSettings m_settings;
 
   std::map<QUuid, std::shared_ptr<bases::HandlerABC>> m_connected_handlers;
   // handlers that theirs execution was deferred due to connection issues.
@@ -146,7 +145,7 @@ protected:
 
   virtual void on_gql_complete(const GqlTrnsWsMsgWithID &message);
 
-  void init_connection(const QNetworkRequest &request);
+  void init_connection();
 
 protected Q_SLOTS:
 
@@ -169,13 +168,14 @@ public:
                  QWebSocketProtocol::CloseCodeNormal,
              const QString &reason = QString());
 
-  bool is_valid() const;
+  [[nodiscard]] bool is_valid() const;
 
   // whether received connection_ack message and ws is valid.
-  bool gql_is_valid() const;
+  [[nodiscard]] bool gql_is_valid() const;
 
   // execute / pend a handler for execution.
   void execute(const std::shared_ptr<bases::HandlerABC> &handler) override;
+  void set_headers(const std::map<QString, QString> &headers);
 
   // reconnect with previous settings.
   void reconnect();
