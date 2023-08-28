@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-import argparse
-import json
-import sys
+import os
 
 from tests.test_codegen.testcases import (
     generate_testcases,
@@ -20,9 +18,7 @@ def generate_testcases_by_name(testcases_names: list[str]) -> None:
 
 
 if __name__ == "__main__":
-    print(sys.argv)  # noqa
-    parser = argparse.ArgumentParser(prog="find testcases")
-    parser.add_argument("testcases_names_json", default="[]")
+    # fetch test cases names from environment
+    testcases_array = os.getenv("MATRIX_TESTCASES")
 
-    args = parser.parse_args()
-    generate_testcases_by_name(json.loads(args.testcases_names_json))
+    generate_testcases_by_name(testcases_array)

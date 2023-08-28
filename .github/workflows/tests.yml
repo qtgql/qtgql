@@ -94,19 +94,33 @@ jobs:
           sudo apt install libxcb-cursor-dev build-essential libgl1-mesa-dev libgstreamer-gl1.0-0 libpulse-dev libxcb-glx0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-render0 libxcb-shape0 libxcb-shm0 libxcb-sync1 libxcb-util1 libxcb-xfixes0 libxcb-xinerama0 libxcb1 libxkbcommon-dev libxkbcommon-x11-0 libxcb-xkb-dev
 
       - name: Generate test files and coverage python
-        run: poetry run coverage run tests/test_codegen/generate.py  '${{ toJSON(matrix.testcases) }}'
+        shell: bash
+        env:
+            MATRIX_TESTCASES: ${{ toJson(matrix.testcases) }}
+        run: |
+          poetry run coverage run tests/test_codegen/generate.py
 
       - name: Conan profile detect
         run: |
           poetry run conan profile detect
 
       - name: Conan install
+        shell: bash
         run: |
-          poetry run xvfb-run -a conan install . -pr=profiles/${{ runner.os }} -s build_type=Debug --build=missing -c tools.system.package_manager:mode=install
+          if [ "$RUNNER_OS" == "Windows" ]; then
+            poetry run conan install . -pr=profiles/${{ runner.os }} -s build_type=Debug --build=missing -c tools.system.package_manager:mode=install
+          elif [ "$RUNNER_OS" == "Linux" ]; then
+            poetry run xvfb-run -a conan install . -pr=profiles/${{ runner.os }} -s build_type=Debug --build=missing -c tools.system.package_manager:mode=install
+          fi
 
       - name: Conan build
+        shell: bash
         run: |
-          poetry run xvfb-run -a conan build . -o test=True -s build_type=Debug -pr=profiles/${{ runner.os }}
+          if [ "$RUNNER_OS" == "Windows" ]; then
+            poetry run conan build . -o test=True -s build_type=Debug -pr=profiles/${{ runner.os }}
+          elif [ "$RUNNER_OS" == "Linux" ]; then
+            poetry run xvfb-run -a conan build . -o test=True -s build_type=Debug -pr=profiles/${{ runner.os }}
+          fi
 
       - name: Run tests
         shell: bash
