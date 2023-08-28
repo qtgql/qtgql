@@ -34,6 +34,7 @@ target_link_libraries(${PROJECT_NAME}schema
         Qt::Core
         qtgql::qtgql
         )
+target_compile_definitions(${PROJECT_NAME}schema PRIVATE QTGQL_TEST_LIBRARY)
 {% for operation in context.generation_output.operations -%}
 
 qt_add_qml_module(${PROJECT_NAME}👉 operation.name 👈
