@@ -47,4 +47,8 @@ TEST_CASE("Test custom scalar by hand implementation") {
     auto s = CustomStringScalar("initial");
     preform_test(s);
   }
+  SECTION("get_value") {
+    auto s = CustomStringScalar("just value");
+    REQUIRE(s.get_value().toStdString() == "just value");
+  }
 }
