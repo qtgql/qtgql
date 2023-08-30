@@ -19,7 +19,7 @@ public:
    * Getter - return m_value
    * @return m_value
    */
-  const T get_value() const { return m_value; };
+  const T &get_value() const { return m_value; };
   /**
    * The *real* GraphQL name of the scalar (used by the codegen inspection
    * pipeline)

@@ -1,3 +1,3 @@
 Release type: <patch/minor/major>
 
-<description>
+Add `CustomScalarABC.get_value` for c++ usage.
