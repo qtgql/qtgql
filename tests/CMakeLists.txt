@@ -13,7 +13,8 @@ add_executable(${TESTS_TARGET} main.cpp ${TEST_SRCS} testutils.cpp testutils.hpp
         test_networklayers/test_subscription_router.cpp
 )
 include_directories(../tests)
-add_subdirectory(test_codegen/generated_test_projects)
+
+add_subdirectory(gen)
 
 message(STATUS "codegen collected tests:" ${CODEGEN_TEST_SOURCES})
 target_sources(${TESTS_TARGET}

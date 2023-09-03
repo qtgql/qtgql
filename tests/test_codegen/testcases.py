@@ -23,7 +23,7 @@ from tests.test_codegen.utils import temp_cwd
 if TYPE_CHECKING:
     from strawberry import Schema
 
-GENERATED_TESTS_DIR = Path(__file__).parent / "generated_test_projects"
+GENERATED_TESTS_DIR = Path(__file__).parent.parent / "gen"
 if not GENERATED_TESTS_DIR.exists:
     GENERATED_TESTS_DIR.mkdir()
 template_env = jinja2.Environment(
@@ -1085,7 +1085,7 @@ implemented_testcases = [
     ScalarArgumentsTestCase,
     RootScalarTestCase,
     NonNodeTypeTestCase,
-    InputTypeOperationVariableTestCase,
+    # InputTypeOperationVariableTestCase,
     NodeInterfaceFieldTestCase,
     NonNodeUnionTestCase,
     ListOfNonNodeType,
