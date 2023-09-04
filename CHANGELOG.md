@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+0.135.3 - 2023-09-04
+--------------------
+
+Fix a case that updates on Node implementors might try to compare to a field that
+is null ATM of updating it. See #381.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #382](https://github.com/qtgql/qtgql/pull/382/)
+
+
 0.135.2 - 2023-08-27
 --------------------
 
