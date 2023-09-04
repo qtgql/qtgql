@@ -8,7 +8,7 @@
 namespace RecursiveInputObjectTestCase {
 using namespace qtgql;
 
-auto ENV_NAME = QString("RecursiveInputObjectTestCase");
+auto ENV_NAME = std::string("RecursiveInputObjectTestCase");
 auto SCHEMA_ADDR = get_server_address("RecursiveInputObjectTestCase");
 
 TEST_CASE("RecursiveInputObjectTestCase", "[generated-testcase]") {

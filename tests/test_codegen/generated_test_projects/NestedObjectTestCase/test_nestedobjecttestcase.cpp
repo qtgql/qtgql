@@ -8,7 +8,7 @@
 
 namespace NestedObjectTestCase {
 using namespace qtgql;
-auto ENV_NAME = QString("NestedObjectTestCase");
+auto ENV_NAME = std::string("NestedObjectTestCase");
 auto SCHEMA_ADDR = get_server_address("NestedObjectTestCase");
 
 TEST_CASE("NestedObjectTestCase", "[generated-testcase]") {

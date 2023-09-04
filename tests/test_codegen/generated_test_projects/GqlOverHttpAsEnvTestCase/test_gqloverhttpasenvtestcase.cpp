@@ -7,7 +7,7 @@
 namespace GqlOverHttpAsEnvTestCase {
 using namespace qtgql;
 
-auto ENV_NAME = QString("GqlOverHttpAsEnvTestCase");
+auto ENV_NAME = std::string("GqlOverHttpAsEnvTestCase");
 auto SCHEMA_ADDR = test_utils::get_http_server_addr("GqlOverHttpAsEnvTestCase");
 
 TEST_CASE("GqlOverHttpAsEnvTestCase", "[generated-testcase]") {

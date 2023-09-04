@@ -7,7 +7,7 @@
 
 namespace ObjectWithListOfObjectTestCase {
 using namespace qtgql;
-auto ENV_NAME = QString("ObjectWithListOfObjectTestCase");
+auto ENV_NAME = std::string("ObjectWithListOfObjectTestCase");
 auto SCHEMA_ADDR = get_server_address("ObjectWithListOfObjectTestCase");
 
 TEST_CASE("ObjectWithListOfObjectTestCase", "[generated-testcase]") {

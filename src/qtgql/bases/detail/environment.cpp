@@ -29,22 +29,28 @@ void NodeInstanceStore::collect_garbage() {
 }
 
 void Environment::set_gql_env(const SharedQtGqlEnv &env) {
-  ENV_MAP.insert(env->m_name, env);
+  ENV_MAP()->emplace(env->m_name, env);
+}
+
+std::map<std::string, std::shared_ptr<Environment>> *Environment::ENV_MAP() {
+  static std::map<std::string, std::shared_ptr<Environment>> map;
+  return &map;
 }
 
 std::optional<Environment::SharedQtGqlEnv>
-Environment::get_env(const QString &name) {
-  if (!ENV_MAP.contains(name)) {
+Environment::get_env(const std::string &name) {
+  if (!ENV_MAP()->contains(name)) {
     return {};
   }
-  return ENV_MAP.value(name);
+  return ENV_MAP()->at(name);
 }
 
-Environment::SharedQtGqlEnv Environment::get_env_strict(const QString &name) {
-  if (ENV_MAP.contains(name)) {
-    return ENV_MAP.value(name);
+Environment::SharedQtGqlEnv
+Environment::get_env_strict(const std::string &name) {
+  if (ENV_MAP()->contains(name)) {
+    return ENV_MAP()->at(name);
   }
-  throw exceptions::EnvironmentNotFoundError(name.toStdString());
+  throw exceptions::EnvironmentNotFoundError(name);
 }
 
 EnvCache::EnvCache(const qtgql::bases::EnvCacheOptions &options)

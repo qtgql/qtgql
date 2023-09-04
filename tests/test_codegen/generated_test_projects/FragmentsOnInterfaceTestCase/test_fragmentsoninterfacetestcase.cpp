@@ -7,7 +7,7 @@
 namespace FragmentsOnInterfaceTestCase {
 using namespace qtgql;
 
-auto ENV_NAME = QString("FragmentsOnInterfaceTestCase");
+auto ENV_NAME = std::string("FragmentsOnInterfaceTestCase");
 auto SCHEMA_ADDR = get_server_address("FragmentsOnInterfaceTestCase");
 
 TEST_CASE("FragmentsOnInterfaceTestCase", "[generated-testcase]") {

@@ -8,7 +8,7 @@
 namespace ListOfNonNodeType {
 using namespace qtgql;
 
-auto ENV_NAME = QString("ListOfNonNodeType");
+auto ENV_NAME = std::string("ListOfNonNodeType");
 auto SCHEMA_ADDR = get_server_address("ListOfNonNodeType");
 
 TEST_CASE("ListOfNonNodeType", "[generated-testcase]") {

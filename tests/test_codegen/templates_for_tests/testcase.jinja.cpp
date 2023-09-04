@@ -6,7 +6,7 @@
 namespace 👉 context.config.env_name 👈{
 using namespace qtgql;
 
-auto ENV_NAME = QString("👉 context.config.env_name 👈");
+auto ENV_NAME = std::string("👉 context.config.env_name 👈");
 auto SCHEMA_ADDR = get_server_address("👉 context.url_suffix 👈");
 
 TEST_CASE("👉 context.test_name 👈", "[generated-testcase]") {

@@ -69,13 +69,13 @@ void wait_for_completion(
     const std::shared_ptr<qtgql::bases::OperationHandlerABC> &operation) {
   if (!QTest::qWaitFor([&]() -> bool { return operation->completed(); },
                        1500)) {
-    auto error_message =
-        operation->ENV_NAME().toStdString() + " Failed to complete!";
+    auto error_message = operation->ENV_NAME() + " Failed to complete!";
     throw std::runtime_error(error_message);
   }
 }
 std::shared_ptr<qtgql::bases::Environment>
-get_or_create_env(const QString &env_name, const DebugClientSettings &settings,
+get_or_create_env(const std::string &env_name,
+                  const DebugClientSettings &settings,
                   std::chrono::milliseconds cache_dur) {
   auto env = bases::Environment::get_env(env_name);
   if (!env.has_value()) {

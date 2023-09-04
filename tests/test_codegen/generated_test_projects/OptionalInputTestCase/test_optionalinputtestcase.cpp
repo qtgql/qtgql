@@ -6,7 +6,7 @@
 namespace OptionalInputTestCase {
 using namespace qtgql;
 
-auto ENV_NAME = QString("OptionalInputTestCase");
+auto ENV_NAME = std::string("OptionalInputTestCase");
 auto SCHEMA_ADDR = get_server_address("OptionalInputTestCase");
 
 TEST_CASE("OptionalInputTestCase", "[generated-testcase]") {

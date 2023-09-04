@@ -9,7 +9,7 @@
 
 namespace OptionalScalarsTestCase {
 using namespace qtgql;
-auto ENV_NAME = QString("OptionalScalarsTestCase");
+auto ENV_NAME = std::string("OptionalScalarsTestCase");
 auto SCHEMA_ADDR = get_server_address("OptionalScalarsTestCase");
 
 template <typename User> void check_user_is_nulled(const User &user) {

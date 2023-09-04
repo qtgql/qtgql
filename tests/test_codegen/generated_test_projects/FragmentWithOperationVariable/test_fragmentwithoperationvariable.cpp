@@ -8,7 +8,7 @@
 namespace FragmentWithOperationVariable {
 using namespace qtgql;
 
-auto ENV_NAME = QString("FragmentWithOperationVariable");
+auto ENV_NAME = std::string("FragmentWithOperationVariable");
 auto SCHEMA_ADDR = get_server_address("FragmentWithOperationVariable");
 
 template <typename User> void check_user_is_nulled(const User &user) {

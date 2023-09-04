@@ -7,7 +7,7 @@
 namespace FragmentTestCase {
 using namespace qtgql;
 
-auto ENV_NAME = QString("FragmentTestCase");
+auto ENV_NAME = std::string("FragmentTestCase");
 auto SCHEMA_ADDR = get_server_address("FragmentTestCase");
 
 TEST_CASE("FragmentTestCase", "[generated-testcase]") {

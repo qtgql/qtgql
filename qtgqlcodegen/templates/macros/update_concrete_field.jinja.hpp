@@ -35,14 +35,16 @@ if (!data.value("👉f_concrete.name👈").isNull()){
     /* deliberately empty */
     {% else -%}
     auto new_👉f_concrete.name👈 = std::make_shared<👉f_concrete.type.type_name()👈>(data.value("👉f_concrete.name👈").👉 proxy_field.type.is_builtin_scalar.from_json_convertor 👈);
-    if ({% if proxy_field.type.is_optional -%}!👉current👈 || {% endif %}*👉current👈 != *new_👉f_concrete.name👈){
-    👉 setter_name 👈(new_👉f_concrete.name👈 👉 setter_end 👈);
+    auto old_👉f_concrete.name👈 = 👉current👈;
+    if ({% if proxy_field.type.is_optional or parent_proxy_type.implements_node -%}!old_👉f_concrete.name👈 || {% endif -%} *old_👉f_concrete.name👈 != *new_👉f_concrete.name👈){
+        👉 setter_name 👈(new_👉f_concrete.name👈 👉 setter_end 👈);
     }
-    {% endif %}
+    {% endif -%}
 {% elif proxy_field.type.is_custom_scalar %}
 auto new_👉proxy_field.name👈 = std::make_shared<👉 proxy_field.type.type_name() 👈>();
 new_👉proxy_field.name👈->deserialize(data.value("👉f_concrete.name👈"));
-if ({% if proxy_field.type.is_optional -%}!👉current👈 || {% endif %}*👉current👈 != *new_👉proxy_field.name👈){
+auto old_👉f_concrete.name👈 = 👉current👈;
+if ({% if proxy_field.type.is_optional or parent_proxy_type.implements_node -%}!👉current👈 || {% endif %}*👉current👈 != *new_👉proxy_field.name👈){
 👉 setter_name 👈(new_👉f_concrete.name👈 👉 setter_end 👈);
 }
 {% elif proxy_field.type.is_queried_object_type %}

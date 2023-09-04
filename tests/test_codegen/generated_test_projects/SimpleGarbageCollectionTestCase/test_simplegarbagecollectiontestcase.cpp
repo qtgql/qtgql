@@ -6,7 +6,7 @@
 namespace SimpleGarbageCollectionTestCase {
 using namespace qtgql;
 
-auto ENV_NAME = QString("SimpleGarbageCollectionTestCase");
+auto ENV_NAME = std::string("SimpleGarbageCollectionTestCase");
 auto SCHEMA_ADDR = get_server_address("SimpleGarbageCollectionTestCase");
 using namespace std::chrono_literals;
 std::shared_ptr<SimpleGarbageCollectionTestCase::User> get_shared_user() {

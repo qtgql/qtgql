@@ -103,8 +103,8 @@ std::optional<👉 context.operation.root_type.name 👈 *> m_data = std::nullop
 
 
 
-inline const QString &ENV_NAME() final{
-    static const auto ret = QString("👉 context.config.env_name 👈");
+inline const std::string &ENV_NAME() final{
+    static const std::string ret = "👉 context.config.env_name 👈";
     return ret;
     }
 signals:
