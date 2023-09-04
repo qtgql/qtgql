@@ -1,9 +1,0 @@
-
-    query MainQuery {
-          user {
-            name
-            age
-            agePoint
-            male
-          }
-        }
