@@ -38,7 +38,7 @@ target_compile_definitions(${PROJECT_NAME}schema PRIVATE QTGQL_TEST_LIBRARY)
 {% for operation in context.generation_output.operations -%}
 
 qt_add_qml_module(${PROJECT_NAME}👉 operation.name 👈
-        URI ${PROJECT_NAME}
+        URI ${PROJECT_NAME}.👉 operation.name 👈
         # Using PLUGIN_TARGET in static library compilation will cause link failure
         OUTPUT_DIRECTORY ${QTGQL_QML_PLUGIN_DIRECTORY}/👉 operation.name 👈
         # TYPEINFO "plugins.qmltypes"
