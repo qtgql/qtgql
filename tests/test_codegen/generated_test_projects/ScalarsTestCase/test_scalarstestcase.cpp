@@ -10,7 +10,7 @@
 
 namespace ScalarsTestCase {
 using namespace qtgql;
-auto ENV_NAME = QString("ScalarsTestCase");
+auto ENV_NAME = std::string("ScalarsTestCase");
 auto SCHEMA_ADDR = get_server_address("ScalarsTestCase");
 
 TEST_CASE("ScalarsTestCase", "[generated-testcase]") {

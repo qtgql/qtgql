@@ -9,7 +9,7 @@ namespace fs = std::filesystem;
 namespace QmlUsageTestCase {
 using namespace qtgql;
 
-auto ENV_NAME = QString("QmlUsageTestCase");
+auto ENV_NAME = std::string("QmlUsageTestCase");
 
 auto SCHEMA_ADDR = get_server_address("QmlUsageTestCase");
 

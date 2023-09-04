@@ -6,7 +6,7 @@
 namespace InterfaceWithObjectField {
 using namespace qtgql;
 
-auto ENV_NAME = QString("InterfaceWithObjectField");
+auto ENV_NAME = std::string("InterfaceWithObjectField");
 auto SCHEMA_ADDR = get_server_address("InterfaceWithObjectField");
 
 TEST_CASE("InterfaceWithObjectField", "[generated-testcase]") {

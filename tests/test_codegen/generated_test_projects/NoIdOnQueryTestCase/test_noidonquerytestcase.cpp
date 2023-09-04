@@ -6,7 +6,7 @@
 #include "testutils.hpp"
 namespace NoIdOnQueryTestCase {
 using namespace qtgql;
-auto ENV_NAME = QString("NoIdOnQueryTestCase");
+auto ENV_NAME = std::string("NoIdOnQueryTestCase");
 auto SCHEMA_ADDR = get_server_address("NoIdOnQueryTestCase");
 
 TEST_CASE("NoIdOnQueryTestCase", "[generated-testcase]") {

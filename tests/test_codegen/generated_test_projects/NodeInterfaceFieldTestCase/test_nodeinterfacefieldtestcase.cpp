@@ -7,7 +7,7 @@
 namespace NodeInterfaceFieldTestCase {
 using namespace qtgql;
 
-auto ENV_NAME = QString("NodeInterfaceFieldTestCase");
+auto ENV_NAME = std::string("NodeInterfaceFieldTestCase");
 auto SCHEMA_ADDR = get_server_address("NodeInterfaceFieldTestCase");
 
 TEST_CASE("NodeInterfaceFieldTestCase", "[generated-testcase]") {

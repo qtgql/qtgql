@@ -1026,6 +1026,30 @@ InterfaceWithObjectField = QtGqlTestCase(
     ),
 )
 
+PartiallyInitializedNodeUpdate = QtGqlTestCase(
+    schema=schemas.partially_initialized_node.schema,
+    # TODO: create a new schema, create user mutation and return partial object then fetch other fields.
+    operations="""
+
+    query CreateUser_Partial{
+      createUser{
+            name
+            age
+        }
+    }
+
+    query GetUserById($user_id: ID!) {
+      getUserById(userId: $user_id) {
+        name
+        age
+        agePoint
+        uuid
+        birth
+      }
+    }
+    """,
+    test_name="PartiallyInitializedNodeUpdate",
+)
 all_test_cases = [
     ScalarsTestCase,
     SimpleGarbageCollectionTestCase,
@@ -1103,6 +1127,7 @@ implemented_testcases = [
     OptionalInputTestCase,
     RecursiveInputObjectTestCase,
     InterfaceWithObjectField,
+    PartiallyInitializedNodeUpdate,
 ]
 
 
@@ -1117,5 +1142,5 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 if __name__ == "__main__":
     generate_testcases(
-        ScalarArgumentsTestCase,
+        PartiallyInitializedNodeUpdate,
     )

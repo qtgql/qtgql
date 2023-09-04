@@ -6,7 +6,7 @@
 namespace UnionWithNodeTestCase {
 using namespace qtgql;
 
-auto ENV_NAME = QString("UnionWithNodeTestCase");
+auto ENV_NAME = std::string("UnionWithNodeTestCase");
 auto SCHEMA_ADDR = get_server_address("8601306");
 
 TEST_CASE("UnionWithNodeTestCase", "[generated-testcase]") {

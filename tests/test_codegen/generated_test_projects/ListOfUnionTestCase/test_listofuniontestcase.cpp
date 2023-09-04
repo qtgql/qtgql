@@ -9,7 +9,7 @@
 namespace ListOfUnionTestCase {
 using namespace qtgql;
 
-auto ENV_NAME = QString("ListOfUnionTestCase");
+auto ENV_NAME = std::string("ListOfUnionTestCase");
 auto SCHEMA_ADDR = get_server_address("ListOfUnionTestCase");
 
 TEST_CASE("ListOfUnionTestCase", "[generated-testcase]") {

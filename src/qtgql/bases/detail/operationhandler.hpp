@@ -59,7 +59,7 @@ public:
     }
   }
   // abstract functions.
-  virtual const QString &ENV_NAME() = 0;
+  virtual const std::string &ENV_NAME() = 0;
   // end abstract functions.
   std::shared_ptr<Environment> environment() {
     return Environment::get_env_strict(ENV_NAME());

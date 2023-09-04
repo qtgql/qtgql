@@ -36,4 +36,5 @@ from . import (  # noqa
     list_of_input_object,
     recursive_input_object,
     interface_with_object_field,
+    partially_initialized_node,
 )

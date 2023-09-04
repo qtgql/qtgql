@@ -8,7 +8,7 @@
 namespace EnumTestCase {
 using namespace qtgql;
 
-auto ENV_NAME = QString("EnumTestCase");
+auto ENV_NAME = std::string("EnumTestCase");
 auto SCHEMA_ADDR = get_server_address("EnumTestCase");
 
 TEST_CASE("EnumTestCase", "[generated-testcase]") {
