@@ -16,7 +16,7 @@ TEST_CASE("PartiallyInitializedNodeUpdate", "[generated-testcase]") {
       ENV_NAME, DebugClientSettings{.print_debug = true,
                                     .prod_settings = {.url = SCHEMA_ADDR}});
 
-  SECTION("test deserialize") {
+  SECTION("test update on node type (cached) on possibly null fields.") {
     auto mq_partial = createuser_partial::CreateUser_Partial::shared();
     mq_partial->fetch();
     test_utils::wait_for_completion(mq_partial);
@@ -25,9 +25,8 @@ TEST_CASE("PartiallyInitializedNodeUpdate", "[generated-testcase]") {
     auto full_user = getuserbyid::GetUserById::shared();
     full_user->set_variables({user_id});
     full_user->fetch();
-    //        test_utils::wait_for_completion(full_user);
+    test_utils::wait_for_completion(full_user);
   };
-  SECTION("test update") { REQUIRE(false); };
 }
 
 }; // namespace PartiallyInitializedNodeUpdate

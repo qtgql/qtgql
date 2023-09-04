@@ -1047,6 +1047,10 @@ PartiallyInitializedNodeUpdate = QtGqlTestCase(
     }
     """,
     test_name="PartiallyInitializedNodeUpdate",
+    metadata=TestCaseMetadata(
+        should_test_updates=BoolWithReason.false("resolves issue #381"),
+        should_test_deserialization=BoolWithReason.false("resolves issue #381"),
+    ),
 )
 all_test_cases = [
     ScalarsTestCase,
