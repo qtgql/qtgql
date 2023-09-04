@@ -13,7 +13,8 @@ auto SCHEMA_ADDR = get_server_address("PartiallyInitializedNodeUpdate");
 TEST_CASE("PartiallyInitializedNodeUpdate", "[generated-testcase]") {
   // resolves https://github.com/qtgql/qtgql/issues/381
   auto env = test_utils::get_or_create_env(
-      ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
+      ENV_NAME, DebugClientSettings{.print_debug = true,
+                                    .prod_settings = {.url = SCHEMA_ADDR}});
 
   SECTION("test deserialize") {
     auto mq_partial = createuser_partial::CreateUser_Partial::shared();

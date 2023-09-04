@@ -1,5 +1,4 @@
 
-
     query CreateUser_Partial{
       createUser{
             name

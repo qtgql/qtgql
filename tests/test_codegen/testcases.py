@@ -1028,9 +1028,7 @@ InterfaceWithObjectField = QtGqlTestCase(
 
 PartiallyInitializedNodeUpdate = QtGqlTestCase(
     schema=schemas.partially_initialized_node.schema,
-    # TODO: create a new schema, create user mutation and return partial object then fetch other fields.
     operations="""
-
     query CreateUser_Partial{
       createUser{
             name
