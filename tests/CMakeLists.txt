@@ -25,10 +25,10 @@ target_sources(${TESTS_TARGET}
 
 set_target_properties(${TESTS_TARGET} PROPERTIES AUTOMOC TRUE)
 target_link_libraries(${TESTS_TARGET} PUBLIC Catch2::Catch2)
-target_link_libraries(${TESTS_TARGET} PUBLIC Qt6::Test)
+target_link_libraries(${TESTS_TARGET} PRIVATE Qt6::Test)
 target_link_libraries(${TESTS_TARGET} PUBLIC Qt6::Qml)
-target_link_libraries(${TESTS_TARGET} PUBLIC qtgql)
+target_link_libraries(${TESTS_TARGET} PRIVATE qtgql)
 
 if (NOT WIN32)
     catch_discover_tests(${TESTS_TARGET})
-endif(NOT WIN32)
+endif (NOT WIN32)
