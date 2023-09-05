@@ -67,7 +67,7 @@ jobs:
       - name: Set up Python ${{ matrix.python_version }}
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python_version }}
+          python-version: 3.11
 
       #----------------------------------------------
       #        load pip cache if cache exists
