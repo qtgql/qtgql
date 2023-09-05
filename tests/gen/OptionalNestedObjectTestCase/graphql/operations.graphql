@@ -1,0 +1,17 @@
+
+    query MainQuery($return_null: Boolean!) {
+      user(returnNull: $return_null) {
+        person {
+          name
+          age
+        }
+      }
+    }
+
+    mutation UpdateUserName($nodeId: ID!, $newName: String!) {
+      changeName(newName: $newName, nodeId: $nodeId) {
+        person {
+          name
+        }
+      }
+    }

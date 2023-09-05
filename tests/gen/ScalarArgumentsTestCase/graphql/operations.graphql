@@ -1,0 +1,10 @@
+
+    query MainQuery($i: Int!, $f: Float!, $string: String!, $b: Boolean!, $uuid: UUID!){
+        getContainer(i: $i, f: $f, string: $string, b: $b, uuid: $uuid){
+            string
+            i
+            f
+            b
+            uuid
+        }
+    }

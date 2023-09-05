@@ -1,0 +1,4 @@
+
+    query MainQuery($what: What!){
+      echo(what: $what)
+    }

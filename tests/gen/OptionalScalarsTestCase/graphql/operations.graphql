@@ -1,0 +1,29 @@
+
+    query MainQuery($returnNone: Boolean! = false) {
+      user(retNone: $returnNone) {
+        name
+        age
+        agePoint
+        uuid
+        birth
+      }
+    }
+
+    mutation FillUser($userId: ID!){
+      fillUser(userId: $userId) {
+        uuid
+        name
+        birth
+        agePoint
+        age
+      }
+    }
+    mutation NullifyUser($userId: ID!){
+      nullifyUser(userId: $userId) {
+        uuid
+        name
+        birth
+        agePoint
+        age
+      }
+    }

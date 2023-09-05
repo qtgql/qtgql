@@ -1,0 +1,25 @@
+type Frog implements Node {
+  id: ID!
+  name: String!
+  color: String!
+}
+
+union FrogPerson = Frog | Person
+
+interface Node {
+  id: ID!
+}
+
+type Person {
+  name: String!
+  age: Int!
+}
+
+type Query {
+  whoAmI(choice: UnionChoice! = PERSON): FrogPerson!
+}
+
+enum UnionChoice {
+  PERSON
+  FROG
+}

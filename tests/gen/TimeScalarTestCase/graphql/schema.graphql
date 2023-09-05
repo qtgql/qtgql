@@ -1,0 +1,21 @@
+type Mutation {
+  changeLunchTime(nodeId: ID!, newTime: Time!): User!
+}
+
+interface Node {
+  id: ID!
+}
+
+type Query {
+  user: User!
+}
+
+"""Time (isoformat)"""
+scalar Time
+
+type User implements Node {
+  id: ID!
+  name: String!
+  age: Int!
+  lunchTime: Time!
+}

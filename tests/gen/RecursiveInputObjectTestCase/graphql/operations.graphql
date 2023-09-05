@@ -1,0 +1,4 @@
+
+    query MainQuery($inp: RecursiveInput!){
+        depth(inp: $inp)
+    }

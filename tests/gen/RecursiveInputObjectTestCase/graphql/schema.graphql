@@ -1,0 +1,8 @@
+type Query {
+  depth(inp: RecursiveInput!): Int!
+}
+
+input RecursiveInput {
+  inp: RecursiveInput = null
+  depth: Int! = 0
+}

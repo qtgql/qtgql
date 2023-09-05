@@ -1,0 +1,38 @@
+type Cat implements Pet {
+  name: String!
+  color: String!
+}
+
+type Dog implements Pet {
+  name: String!
+  age: Int!
+}
+
+type Mutation {
+  insertToList(nodeId: ID!, at: Int!, name: String!, type: UnionTypes!): Person!
+  modifyName(nodeId: ID!, at: Int!, name: String!): Person!
+  removeAt(nodeId: ID!, at: Int!): Person!
+}
+
+interface Node {
+  id: ID!
+}
+
+type Person implements Node {
+  id: ID!
+  pets: [Pet!]!
+  name: String!
+}
+
+interface Pet {
+  name: String!
+}
+
+type Query {
+  randPerson: Person!
+}
+
+enum UnionTypes {
+  PERSON
+  DOG
+}

@@ -1,0 +1,13 @@
+
+      query MainQuery {
+          user {
+            name
+            age
+            lunchTime
+          }
+        }
+        mutation UpdateLunchTime ($newTime: Time!, $id: ID!) {
+          changeLunchTime(newTime: $newTime, nodeId: $id) {
+            lunchTime
+          }
+        }

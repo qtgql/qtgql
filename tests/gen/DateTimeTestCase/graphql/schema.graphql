@@ -1,0 +1,21 @@
+"""Date with time (isoformat)"""
+scalar DateTime
+
+type Mutation {
+  changeBirth(nodeId: ID!, newBirth: DateTime!): User!
+}
+
+interface Node {
+  id: ID!
+}
+
+type Query {
+  user: User!
+}
+
+type User implements Node {
+  id: ID!
+  name: String!
+  age: Int!
+  birth: DateTime!
+}

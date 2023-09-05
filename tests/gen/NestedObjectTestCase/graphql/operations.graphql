@@ -1,0 +1,25 @@
+
+    query MainQuery {
+        user{
+            person{
+                name
+                age
+            }
+        }
+    }
+
+    mutation UpdateUserName($nodeId: ID!, $newName: String!) {
+      changeName(newName: $newName, nodeId: $nodeId) {
+        person {
+          name
+        }
+      }
+    }
+
+    mutation ReplacePerson($nodeId: ID!){
+    replacePerson(nodeId: $nodeId){
+        person {
+          name
+        }
+      }
+    }

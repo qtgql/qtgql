@@ -1,0 +1,38 @@
+type Dog implements HasNameAgeInterface & Node {
+  id: ID!
+  name: String!
+  age: Int!
+  barks: Boolean!
+}
+
+interface HasNameAgeInterface implements Node {
+  id: ID!
+  name: String!
+  age: Int!
+}
+
+type Mutation {
+  modifyName(nodeId: ID!, newName: String!): Node!
+}
+
+interface Node {
+  id: ID!
+}
+
+type Query {
+  node(ret: TypesEnum! = Dog): Node!
+  dog: Dog!
+  user: User!
+}
+
+enum TypesEnum {
+  Dog
+  User
+}
+
+type User implements HasNameAgeInterface & Node {
+  id: ID!
+  name: String!
+  age: Int!
+  password: String!
+}
