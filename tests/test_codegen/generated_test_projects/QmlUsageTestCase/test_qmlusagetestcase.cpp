@@ -58,6 +58,8 @@ TEST_CASE("QmlUsageTestCase", "[generated-testcase]") {
     remove_friend_mut->set_variables({store_id, last_friend_id});
     remove_friend_mut->fetch();
     test_utils::wait_for_completion(remove_friend_mut);
+    friends_query->refetch();
+    test_utils::wait_for_completion(friends_query);
     REQUIRE(check_list_view_count(list_view, friends_count - 1));
   }
 }
