@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+0.135.4 - 2023-09-06
+--------------------
+
+Fix a bug that when a list of objects is reduced (on update)
+the ui won't get notified properly.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #389](https://github.com/qtgql/qtgql/pull/389/)
+
+
 0.135.3 - 2023-09-04
 --------------------
 
