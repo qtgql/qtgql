@@ -18,7 +18,7 @@ auto operation = m_operation;
     auto new_len = new_data.size();
     auto prev_len = 👉field.private_name👈->rowCount();
     if (new_len < prev_len){
-        👉field.private_name👈->removeRows(prev_len - 1, prev_len - new_len);
+        👉field.private_name👈->removeRows(new_len, prev_len - new_len);
     }
     for (int i = 0; i < new_len; i++){
         const auto& concrete = new_data.at(i);

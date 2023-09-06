@@ -35,13 +35,22 @@ class Query:
         return ret
 
 
+def remove_friend_impl(store_id: str, friend_id: strawberry.ID) -> None:
+    friends = store.get(store_id)
+    friends.pop(friend_id)
+
+
 @strawberry.type()
 class Mutation:
     @strawberry.mutation
     def remove_friend(self, store_id: str, friend_id: strawberry.ID) -> bool:
-        friends = store.get(store_id)
-        friends.pop(friend_id)
+        remove_friend_impl(store_id, friend_id)
         return True
+
+    @strawberry.field()
+    def remove_friends(self, store_id: str, friends: list[strawberry.ID]) -> None:
+        for friend in friends:
+            remove_friend_impl(store_id, friend)
 
 
 schema = strawberry.Schema(query=Query, mutation=Mutation)
