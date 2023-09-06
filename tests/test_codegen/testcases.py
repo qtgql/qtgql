@@ -469,18 +469,6 @@ ObjectWithListOfObjectTestCase = QtGqlTestCase(
     needs_debug=True,
 )
 
-RootListOfTestCase = QtGqlTestCase(
-    schema=schemas.root_list_of_object.schema,
-    operations="""
-    query MainQuery {
-        users{
-            name
-            age
-        }
-    }
-    """,
-    test_name="RootListOfTestCase",
-)
 
 NonNodeInterfaceTestCase = QtGqlTestCase(
     schema=schemas.non_node_interface_field.schema,
@@ -918,8 +906,22 @@ SubscriptionTestCase = QtGqlTestCase(
 )
 
 QmlUsageTestCase = QtGqlTestCase(
-    schema=ObjectWithListOfObjectTestCase.schema,
-    operations=ObjectWithListOfObjectTestCase.operations,
+    schema=schemas.qml_usage_test.schema,
+    operations="""
+    query SimpleQuery {
+        simpleField
+    }
+
+    query FriendsListQuery($storeID: String!) {
+        friends(storeId: $storeID){
+            name
+            age
+        }
+    }
+    mutation RemoveFriend($storeID: String!, $friend_id: ID!) {
+      removeFriend(storeId: $storeID, friendId: $friend_id)
+    }
+    """,
     test_name="QmlUsageTestCase",
     metadata=TestCaseMetadata(
         should_test_updates=BoolWithReason.false("qml testcase"),
@@ -1090,7 +1092,6 @@ all_test_cases = [
     InterfaceWithObjectField,
     CustomUserScalarTestCase,
     ObjectsThatReferenceEachOtherTestCase,
-    RootListOfTestCase,
 ]
 
 implemented_testcases = [
@@ -1144,5 +1145,5 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 if __name__ == "__main__":
     generate_testcases(
-        PartiallyInitializedNodeUpdate,
+        QmlUsageTestCase,
     )

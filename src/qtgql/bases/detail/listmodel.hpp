@@ -175,7 +175,7 @@ public:
   bool removeRows(int row, int count,
                   const QModelIndex &parent = QModelIndex()) override {
     if ((row + count) <= m_count) {
-      remove_common(row, count);
+      remove_common(row, row + count);
       m_data.erase(std::next(m_data.begin(), row),
                    std::next(m_data.begin(), row + count));
       end_remove_common();

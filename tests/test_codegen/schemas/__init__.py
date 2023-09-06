@@ -29,7 +29,7 @@ from . import (  # noqa
     scalar_arguments,
     optional_input_schema,
     root_enum_schema,
-    root_list_of_object,
+    qml_usage_test,
     root_scalar,
     subscription_schema,
     wrogn_id_type,
