@@ -1,17 +1,14 @@
 
-    query MainQuery {
-        user{
-            friends{
-                name
-                age
-            }
-        }
+    query SimpleQuery {
+        simpleField
     }
-    mutation AddFriend ($userId: ID!, $name: String!) {
-    addFriend(userId: $userId, name: $name){
-       friends{
+
+    query FriendsListQuery($storeID: String!) {
+        friends(storeId: $storeID){
             name
             age
-            }
         }
+    }
+    mutation RemoveFriend($storeID: String!, $friend_id: ID!) {
+      removeFriend(storeId: $storeID, friendId: $friend_id)
     }
