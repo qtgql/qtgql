@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+0.135.5 - 2023-09-06
+--------------------
+
+Fix a case that batch deletion won't update the UI.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #390](https://github.com/qtgql/qtgql/pull/390/)
+
+
 0.135.4 - 2023-09-06
 --------------------
 
