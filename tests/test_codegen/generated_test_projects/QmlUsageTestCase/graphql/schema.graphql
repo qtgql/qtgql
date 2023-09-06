@@ -6,6 +6,7 @@ type Friend implements Node {
 
 type Mutation {
   removeFriend(storeId: String!, friendId: ID!): Boolean!
+  removeFriends(storeId: String!, friends: [ID!]!): Void
 }
 
 interface Node {
@@ -16,3 +17,6 @@ type Query {
   simpleField: Boolean!
   friends(storeId: String!): [Friend!]!
 }
+
+"""Represents NULL values"""
+scalar Void

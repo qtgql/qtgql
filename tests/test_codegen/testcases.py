@@ -921,6 +921,9 @@ QmlUsageTestCase = QtGqlTestCase(
     mutation RemoveFriend($storeID: String!, $friend_id: ID!) {
       removeFriend(storeId: $storeID, friendId: $friend_id)
     }
+    mutation RemoveFriendsBatch($storeID: String!, $friends: [ID!]!) {
+      removeFriends(storeId: $storeID, friends: $friends)
+    }
     """,
     test_name="QmlUsageTestCase",
     metadata=TestCaseMetadata(
