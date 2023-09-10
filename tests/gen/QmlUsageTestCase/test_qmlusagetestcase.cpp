@@ -1,6 +1,6 @@
-#include "graphql/__generated__/FriendsListQuery.hpp"
-#include "graphql/__generated__/RemoveFriend.hpp"
-#include "graphql/__generated__/RemoveFriendsBatch.hpp"
+#include "g/FriendsListQuery.hpp"
+#include "g/RemoveFriend.hpp"
+#include "g/RemoveFriendsBatch.hpp"
 
 #include "testutils.hpp"
 #include <QQmlApplicationEngine>

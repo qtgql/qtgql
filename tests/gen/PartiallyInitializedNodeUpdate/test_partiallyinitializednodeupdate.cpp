@@ -1,5 +1,5 @@
-#include "graphql/__generated__/CreateUser_Partial.hpp"
-#include "graphql/__generated__/GetUserById.hpp"
+#include "g/CreateUser_Partial.hpp"
+#include "g/GetUserById.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>
 #include <catch2/catch_test_macros.hpp>
