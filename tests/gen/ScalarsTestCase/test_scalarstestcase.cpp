@@ -2,8 +2,8 @@
 #include <QTest>
 #include <catch2/catch_test_macros.hpp>
 
-#include "g/MainQuery.hpp"
-#include "g/UserWithSameIDAndDifferentFieldsQuery.hpp"
+#include "gen/MainQuery.hpp"
+#include "gen/UserWithSameIDAndDifferentFieldsQuery.hpp"
 #include "testutils.hpp"
 
 #include "qtgql/gqloverhttp/gqloverhttp.hpp"

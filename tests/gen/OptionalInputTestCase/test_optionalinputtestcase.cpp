@@ -1,4 +1,4 @@
-#include "g/HelloOrEchoQuery.hpp"
+#include "gen/HelloOrEchoQuery.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>
 #include <catch2/catch_test_macros.hpp>

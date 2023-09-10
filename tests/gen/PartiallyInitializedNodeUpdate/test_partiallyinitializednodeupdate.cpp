@@ -1,5 +1,5 @@
-#include "g/CreateUser_Partial.hpp"
-#include "g/GetUserById.hpp"
+#include "gen/CreateUser_Partial.hpp"
+#include "gen/GetUserById.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>
 #include <catch2/catch_test_macros.hpp>

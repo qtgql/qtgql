@@ -2,7 +2,7 @@
 #include <QTest>
 #include <catch2/catch_test_macros.hpp>
 
-#include "g/MainQuery.hpp"
+#include "gen/MainQuery.hpp"
 #include "testutils.hpp"
 namespace NoIdOnQueryTestCase {
 using namespace qtgql;

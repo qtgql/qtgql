@@ -1,6 +1,6 @@
-#include "g/ChangeUserName.hpp"
-#include "g/InsertUser.hpp"
-#include "g/MainQuery.hpp"
+#include "gen/ChangeUserName.hpp"
+#include "gen/InsertUser.hpp"
+#include "gen/MainQuery.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>
 #include <catch2/catch_test_macros.hpp>

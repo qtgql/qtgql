@@ -1,8 +1,8 @@
 #include <QSignalSpy>
 #include <catch2/catch_test_macros.hpp>
 
-#include "g/MainQuery.hpp"
-#include "g/UpdateUserName.hpp"
+#include "gen/MainQuery.hpp"
+#include "gen/UpdateUserName.hpp"
 #include "testutils.hpp"
 
 namespace OptionalNestedObjectTestCase {

@@ -2,8 +2,8 @@
 #include <QTest>
 #include <catch2/catch_test_macros.hpp>
 
-#include "g/MainQuery.hpp"
-#include "g/UpdateLunchTime.hpp"
+#include "gen/MainQuery.hpp"
+#include "gen/UpdateLunchTime.hpp"
 #include "testutils.hpp"
 
 namespace TimeScalarTestCase {

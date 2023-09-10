@@ -1,8 +1,8 @@
 #include <QSignalSpy>
 #include <catch2/catch_test_macros.hpp>
 
-#include "g/ChangeUserBirth.hpp"
-#include "g/MainQuery.hpp"
+#include "gen/ChangeUserBirth.hpp"
+#include "gen/MainQuery.hpp"
 #include "testutils.hpp"
 
 namespace DateTimeTestCase {

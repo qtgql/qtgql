@@ -128,7 +128,7 @@ class QtGqlTestCase:
             graphql_dir=self.graphql_dir,
             env_name="default_env",
             custom_scalars=self.custom_scalars,
-            generated_dir_name="gen",
+            generated_dir_name="../gen",
             debug=self.needs_debug,
             qml_plugins_path="${CMAKE_BINARY_DIR}/tests",
         )
@@ -1149,5 +1149,5 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 if __name__ == "__main__":
     generate_testcases(
-        *implemented_testcases,
+        ScalarsTestCase,
     )

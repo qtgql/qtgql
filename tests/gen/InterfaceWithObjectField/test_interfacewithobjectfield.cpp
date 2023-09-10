@@ -1,4 +1,4 @@
-#include "g/AnimalQuery.hpp"
+#include "gen/AnimalQuery.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>
 #include <catch2/catch_test_macros.hpp>

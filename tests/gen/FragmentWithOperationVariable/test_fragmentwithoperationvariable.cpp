@@ -1,6 +1,6 @@
-#include "g/FillUser.hpp"
-#include "g/MainQuery.hpp"
-#include "g/NullifyUser.hpp"
+#include "gen/FillUser.hpp"
+#include "gen/MainQuery.hpp"
+#include "gen/NullifyUser.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>
 #include <catch2/catch_test_macros.hpp>

@@ -1,7 +1,7 @@
-#include "g/InsertToList.hpp"
-#include "g/MainQuery.hpp"
-#include "g/ModifyName.hpp"
-#include "g/RemoveAt.hpp"
+#include "gen/InsertToList.hpp"
+#include "gen/MainQuery.hpp"
+#include "gen/ModifyName.hpp"
+#include "gen/RemoveAt.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>
 #include <catch2/catch_test_macros.hpp>

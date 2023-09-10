@@ -1,4 +1,4 @@
-#include "g/MainQuery.hpp"
+#include "gen/MainQuery.hpp"
 #include "qtgql/gqloverhttp/gqloverhttp.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>

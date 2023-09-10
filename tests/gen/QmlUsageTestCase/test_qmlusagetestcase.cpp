@@ -1,6 +1,6 @@
-#include "g/FriendsListQuery.hpp"
-#include "g/RemoveFriend.hpp"
-#include "g/RemoveFriendsBatch.hpp"
+#include "gen/FriendsListQuery.hpp"
+#include "gen/RemoveFriend.hpp"
+#include "gen/RemoveFriendsBatch.hpp"
 
 #include "testutils.hpp"
 #include <QQmlApplicationEngine>

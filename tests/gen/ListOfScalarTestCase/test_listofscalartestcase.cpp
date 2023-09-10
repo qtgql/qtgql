@@ -1,7 +1,7 @@
-#include "g/AddPostTag.hpp"
-#include "g/GetRndPost.hpp"
-#include "g/RemovePostTag.hpp"
-#include "g/ReplacePostTag.hpp"
+#include "gen/AddPostTag.hpp"
+#include "gen/GetRndPost.hpp"
+#include "gen/RemovePostTag.hpp"
+#include "gen/ReplacePostTag.hpp"
 
 #include "testutils.hpp"
 #include <QSignalSpy>

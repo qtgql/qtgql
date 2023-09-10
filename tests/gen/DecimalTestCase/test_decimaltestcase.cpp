@@ -2,8 +2,8 @@
 #include <QTest>
 #include <catch2/catch_test_macros.hpp>
 
-#include "g/MainQuery.hpp"
-#include "g/UpdateBalance.hpp"
+#include "gen/MainQuery.hpp"
+#include "gen/UpdateBalance.hpp"
 #include "testutils.hpp"
 
 namespace DecimalTestCase {

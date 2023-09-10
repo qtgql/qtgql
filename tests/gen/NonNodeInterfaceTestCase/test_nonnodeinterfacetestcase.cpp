@@ -1,5 +1,5 @@
-#include "g/AnimalQuery.hpp"
-#include "g/ChangeAgeMutation.hpp"
+#include "gen/AnimalQuery.hpp"
+#include "gen/ChangeAgeMutation.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>
 #include <catch2/catch_test_macros.hpp>

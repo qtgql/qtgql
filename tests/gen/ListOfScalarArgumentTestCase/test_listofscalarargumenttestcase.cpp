@@ -1,4 +1,4 @@
-#include "g/EchoArg.hpp"
+#include "gen/EchoArg.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>
 #include <catch2/catch_test_macros.hpp>

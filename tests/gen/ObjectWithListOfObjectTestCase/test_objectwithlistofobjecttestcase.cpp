@@ -1,8 +1,8 @@
 #include <QSignalSpy>
 #include <catch2/catch_test_macros.hpp>
 
-#include "g/AddFriend.hpp"
-#include "g/MainQuery.hpp"
+#include "gen/AddFriend.hpp"
+#include "gen/MainQuery.hpp"
 #include "testutils.hpp"
 
 namespace ObjectWithListOfObjectTestCase {

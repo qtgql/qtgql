@@ -1,4 +1,4 @@
-#include "g/MainQuery.hpp"
+#include "gen/MainQuery.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>
 #include <catch2/catch_test_macros.hpp>
