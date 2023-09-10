@@ -1,7 +1,0 @@
-type Query {
-  echo(what: What!): [String!]!
-}
-
-input What {
-  what: [String!]!
-}

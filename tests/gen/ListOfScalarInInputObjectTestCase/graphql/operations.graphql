@@ -1,4 +1,0 @@
-
-    query EchoArg($what: What!){
-      echo(what: $what)
-    }

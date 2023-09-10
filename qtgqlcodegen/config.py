@@ -35,6 +35,12 @@ class QtGqlConfig:
     debug: bool = False
     """Templates would render some additional helpers for testing."""
 
+    generated_dir_name: str = "__generated__"
+    """
+    The name of the directory that qtgql will create and dump the 
+    generated sources.
+    """
+
     @cached_property
     def schema_path(self) -> Path:
         return self.graphql_dir / "schema.graphql"
@@ -44,8 +50,8 @@ class QtGqlConfig:
         return self.graphql_dir / "operations.graphql"
 
     @cached_property
-    def generated_dir(self):
-        ret = self.graphql_dir.parent / "g"
+    def generated_dir(self) -> Path:
+        ret = self.graphql_dir / self.generated_dir_name
         if not ret.exists():
             ret.mkdir()
         return ret
