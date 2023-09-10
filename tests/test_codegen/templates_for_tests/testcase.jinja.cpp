@@ -1,7 +1,6 @@
 #include <QSignalSpy>
 #include <catch2/catch_test_macros.hpp>
 #include "testutils.hpp"
-#include "graphql/__generated__/MainQuery.hpp"
 
 namespace 👉 context.config.env_name 👈{
 using namespace qtgql;

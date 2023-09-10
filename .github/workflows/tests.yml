@@ -67,7 +67,7 @@ jobs:
       - name: Set up Python ${{ matrix.python_version }}
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python_version }}
+          python-version: 3.11
 
       #----------------------------------------------
       #        load pip cache if cache exists
@@ -127,7 +127,7 @@ jobs:
         run: |
 
           if [ "$RUNNER_OS" == "Windows" ]; then
-            poetry run make test
+            poetry run pytest tests --cov=qtgqlcodegen --cov-report=xml --cov-append
           elif [ "$RUNNER_OS" == "Linux" ]; then
             poetry run make test
           fi

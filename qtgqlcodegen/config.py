@@ -45,7 +45,7 @@ class QtGqlConfig:
 
     @cached_property
     def generated_dir(self):
-        ret = self.graphql_dir / "__generated__"
+        ret = self.graphql_dir.parent / "g"
         if not ret.exists():
             ret.mkdir()
         return ret
