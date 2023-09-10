@@ -142,7 +142,6 @@ dmypy.json
 # cached files
 *~
 #codegen
-
 tests/gen/**/qtgqlconfig.py
 tests/gen/**/graphql/**
 tests/gen/**/gen/**
