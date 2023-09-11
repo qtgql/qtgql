@@ -98,7 +98,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt update
-          sudo apt install libgl1-mesa-dev libx11-dev  libxau-dev libxcb-keysyms1 libxcb-cursor-dev libxcb-xfixes0 libxcb-render0 libxcb1 libxcb-render-util0 libxcb-xinerama0 libxcb-util1 libxaw7-dev  libx11-xcb-dev  libxcb-glx0 libxcb-sync1  libxaw7-dev  libx11-dev build-essential  libfontenc-dev  libxcb-image0  libice-dev  libx11-xcb-dev libxcb-xkb-dev libxcb-icccm4 libxcb-shm0 libxkbcommon-dev libsm-dev  libsm-dev  libfontenc-dev libxcb-shape0  libxau-dev  libxcb-randr0 libpulse-dev libgstreamer-gl1.0-0 libxkbcommon-x11-0 libice-dev
+          sudo apt install libxcb-image0 libxcb-cursor-dev libxcb-shm0 libpulse-dev libxcb-icccm4 libxkbcommon-x11-0  libsm-dev  libxau-dev libgl1-mesa-dev libx11-dev libxcb-util1 libxcb-render-util0  libice-dev   libxau-dev  libxcb-randr0 libxkbcommon-dev libfontenc-dev libxcb-sync1  libx11-xcb-dev  libxcb1 build-essential libxaw7-dev libxcb-xfixes0 libxcb-render0 libx11-dev  libx11-xcb-dev  libxaw7-dev  libxcb-glx0 libgstreamer-gl1.0-0 libxcb-keysyms1 libxcb-xinerama0 libice-dev libxcb-xkb-dev libxcb-shape0  libfontenc-dev  libsm-dev
 
       - name: Generate test files and coverage python
         shell: bash
