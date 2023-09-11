@@ -24,7 +24,7 @@ TEST_CASE("ListOfNonNodeType", "[generated-testcase]") {
   SECTION("test update - modify attributes at index") {
     auto user = mq->data()->get_users()->first();
     auto prev_name = user->get_name();
-    QString new_name("Yeshayahu Leibowitz");
+    QString new_name(QUuid::createUuid().toString());
     REQUIRE(prev_name != new_name);
     auto change_username_mut = changeusername::ChangeUserName::shared();
     change_username_mut->set_variables({0, new_name});
