@@ -53,7 +53,7 @@ jobs:
       matrix: ${{ steps.set_matrix.outputs.matrix }}
 
   tests:
-    name: Tests [{{matrix.os}}] - {{matrix.testcases}}
+    name: ${{matrix.os}} - ${{matrix.testcases}}
     runs-on: ${{ matrix.os }}
     needs: provide_testcase_matrix
     strategy:
