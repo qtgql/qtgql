@@ -111,22 +111,13 @@ jobs:
         run: |
           poetry run conan profile detect
 
-      - name: Conan install
-        shell: bash
-        run: |
-          if [ "$RUNNER_OS" == "Windows" ]; then
-            poetry run conan install . -pr=profiles/Windows_mingw -s build_type=Debug --build=missing -c tools.system.package_manager:mode=install
-          elif [ "$RUNNER_OS" == "Linux" ]; then
-            poetry run xvfb-run -a conan install . -pr=profiles/${{ runner.os }} -s build_type=Debug --build=missing -c tools.system.package_manager:mode=install
-          fi
-
       - name: Conan build
         shell: bash
         run: |
           if [ "$RUNNER_OS" == "Windows" ]; then
-            poetry run conan build . -o test=True -s build_type=Debug -pr=profiles/Windows_mingw
+            poetry run conan build . -o test=True -s build_type=Debug -pr=profiles/Windows_msvc --build=missing
           elif [ "$RUNNER_OS" == "Linux" ]; then
-            poetry run xvfb-run -a conan build . -o test=True -s build_type=Debug -pr=profiles/${{ runner.os }}
+            poetry run xvfb-run -a conan build . -o test=True -s build_type=Debug -pr=profiles/${{ runner.os }} --build=missing
           fi
 
       - name: Run tests
