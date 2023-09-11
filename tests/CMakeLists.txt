@@ -4,7 +4,6 @@ include(Catch)
 find_package(Qt6 REQUIRED COMPONENTS Test Core Network)
 set(TESTS_TARGET "test_qtgql")
 
-
 add_executable(${TESTS_TARGET} main.cpp ${TEST_SRCS} testutils.cpp testutils.hpp
         test_customscalar.cpp
         test_networklayers/test_gqlwstransport.cpp

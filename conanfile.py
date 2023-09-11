@@ -66,11 +66,6 @@ class QtGqlRecipe(ConanFile):
     @cached_property
     def qt_version(self) -> str:
         qt_version = self.options.qt_version.value
-        if self.is_windows() and "6.5" in qt_version:
-            logger.warning(
-                "Can't compile with aqt installer on Windows just yet fall back to 6.5.0",
-            )
-            return "6.5.0"
         return qt_version
 
     @property
