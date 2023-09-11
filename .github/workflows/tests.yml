@@ -108,7 +108,7 @@ jobs:
         shell: bash
         run: |
           if [ "$RUNNER_OS" == "Windows" ]; then
-            poetry run conan install . -pr=profiles/${{ runner.os }} -s build_type=Debug --build=missing -c tools.system.package_manager:mode=install
+            poetry run conan install . -pr=profiles/Windows_mingw -s build_type=Debug --build=missing -c tools.system.package_manager:mode=install
           elif [ "$RUNNER_OS" == "Linux" ]; then
             poetry run xvfb-run -a conan install . -pr=profiles/${{ runner.os }} -s build_type=Debug --build=missing -c tools.system.package_manager:mode=install
           fi
