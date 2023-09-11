@@ -1,15 +1,6 @@
-# TODO delete this
-import re
-from pathlib import Path
-import os
-import shutil
 
-tests = list((Path(__file__).parent / "tests" / "gen").glob("**/test_*.cpp"))
 
-for p in tests:
-    updated = re.sub(
-        'get_server_address\\("([A-Za-z])*"\\)',
-        f'get_server_address(QString::fromStdString(ENV_NAME))',
-        p.read_text("utf-8"),
-    )
-    p.write_text(updated, "UTF-8")
+s = '"libx11-dev", "libx11-xcb-dev", "libfontenc-dev", "libice-dev", "libsm-dev", "libxau-dev", "libxaw7-dev'
+
+l = [r.replace('"', " ") for r in s.split(", ")]
+print(" ".join(l))
