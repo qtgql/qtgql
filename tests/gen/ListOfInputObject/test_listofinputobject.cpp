@@ -16,10 +16,10 @@ TEST_CASE("ListOfInputObjectTestCase", "[generated-testcase]") {
 
   SECTION("test deserialize") {
     auto echo_query = mainquery::MainQuery::shared();
-    std::list<ListOfInputObjectTestCase::Echo> what_list = {
+    std::list<ListOfInputObject::Echo> what_list = {
         {"What"}, {"Am"}, {"I"}};
     echo_query->set_variables(
-        {ListOfInputObjectTestCase::What::create(what_list)});
+        {ListOfInputObject::What::create(what_list)});
     echo_query->fetch();
     test_utils::wait_for_completion(echo_query);
     auto model = echo_query->data()->get_echo();

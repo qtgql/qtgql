@@ -7,7 +7,7 @@
 namespace NoIdOnQuery {
 using namespace qtgql;
 auto ENV_NAME = std::string("NoIdOnQueryTestCase");
-auto SCHEMA_ADDR = get_server_address("NoIdOnQueryTestCase");
+auto SCHEMA_ADDR = get_server_address("NoIdOnQuery");
 
 TEST_CASE("NoIdOnQueryTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(

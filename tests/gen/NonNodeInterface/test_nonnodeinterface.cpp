@@ -15,26 +15,26 @@ TEST_CASE("NonNodeInterfaceTestCase", "[generated-testcase]") {
       ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto animal_query = animalquery::AnimalQuery::shared();
   animal_query->set_variables(
-      {NonNodeInterfaceTestCase::Enums::AnimalKind::DOG});
+      {NonNodeInterface::Enums::AnimalKind::DOG});
   animal_query->fetch();
   test_utils::wait_for_completion(animal_query);
   SECTION("test deserialize") {
     auto animal = animal_query->data()->get_animal();
     REQUIRE(animal->get_kind() ==
-            NonNodeInterfaceTestCase::Enums::AnimalKind::DOG);
+            NonNodeInterface::Enums::AnimalKind::DOG);
     auto dog = qobject_cast<const animalquery::Dog__animal *>(animal);
     REQUIRE(!dog->get_furColor().isEmpty());
   };
   SECTION("test updates new type") {
     auto root = animal_query->data();
     animal_query->set_variables(
-        {NonNodeInterfaceTestCase::Enums::AnimalKind::PERSON});
+        {NonNodeInterface::Enums::AnimalKind::PERSON});
     test_utils::SignalCatcher catcher({.source_obj = root, .only = "animal"});
     animal_query->refetch();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(animal_query);
     REQUIRE(animal_query->data()->get_animal()->get_kind() ==
-            NonNodeInterfaceTestCase::Enums::PERSON);
+            NonNodeInterface::Enums::PERSON);
     auto person = qobject_cast<const animalquery::Person__animal *>(
         animal_query->data()->get_animal());
     REQUIRE(!person->get_language().isEmpty());

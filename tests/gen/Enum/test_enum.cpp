@@ -20,12 +20,12 @@ TEST_CASE("EnumTestCase", "[generated-testcase]") {
   test_utils::wait_for_completion(mq);
   SECTION("test deserialize") {
     REQUIRE(mq->data()->get_user()->get_status() ==
-            EnumTestCase::Enums::Connected);
+            Enum::Enums::Connected);
   }
   SECTION("test updates and as operation variable") {
     auto update_status = updateuserstatus::UpdateUserStatus::shared();
     auto user = mq->data()->get_user();
-    auto new_status = EnumTestCase::Enums::Disconnected;
+    auto new_status = Enum::Enums::Disconnected;
     REQUIRE(new_status != user->get_status());
     update_status->set_variables({user->get_id(), new_status});
     auto catcher =

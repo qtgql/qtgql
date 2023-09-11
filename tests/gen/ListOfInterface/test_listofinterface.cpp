@@ -70,7 +70,7 @@ TEST_CASE("ListOfInterfaceTestcase", "[generated-testcase]") {
     auto prev_length = model->rowCount();
     insert_mut->set_variables(
         {person->get_id(), prev_length + 1, name_to_set,
-         ListOfInterfaceTestcase::Enums::UnionTypes::DOG});
+         ListOfInterface::Enums::UnionTypes::DOG});
     insert_mut->fetch();
     test_utils::wait_for_completion(insert_mut);
     REQUIRE(prev_length < model->rowCount());

@@ -9,7 +9,7 @@
 namespace Decimal {
 using namespace qtgql;
 auto ENV_NAME = std::string("DecimalTestCase");
-auto SCHEMA_ADDR = get_server_address("DecimalTestCase");
+auto SCHEMA_ADDR = get_server_address("Decimal");
 
 TEST_CASE("DecimalTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(

@@ -13,7 +13,7 @@ TEST_CASE("NonNodeUnionTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = mainquery::MainQuery::shared();
-  mq->set_variables({NonNodeUnionTestCase::Enums::UnionChoice::PERSON});
+  mq->set_variables({NonNodeUnion::Enums::UnionChoice::PERSON});
   mq->fetch();
   test_utils::wait_for_completion(mq);
   SECTION("test deserialize") {
@@ -29,7 +29,7 @@ TEST_CASE("NonNodeUnionTestCase", "[generated-testcase]") {
     auto prev_name = mq->data()->get_whoAmI()->property("name").toString();
     auto mq2 = mainquery::MainQuery::shared();
     test_utils::SignalCatcher catcher({.source_obj = person, .only = "name"});
-    mq2->set_variables({NonNodeUnionTestCase::Enums::UnionChoice::PERSON});
+    mq2->set_variables({NonNodeUnion::Enums::UnionChoice::PERSON});
     mq2->fetch();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(mq2);
@@ -43,7 +43,7 @@ TEST_CASE("NonNodeUnionTestCase", "[generated-testcase]") {
   SECTION("test update different type") {
     auto root = mq->data();
     test_utils::SignalCatcher catcher({.source_obj = root, .only = "whoAmI"});
-    mq->set_variables({NonNodeUnionTestCase::Enums::UnionChoice::FROG});
+    mq->set_variables({NonNodeUnion::Enums::UnionChoice::FROG});
     mq->refetch();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(mq);

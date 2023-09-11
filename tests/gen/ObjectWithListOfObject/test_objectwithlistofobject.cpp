@@ -124,7 +124,7 @@ TEST_CASE("default ListModelABC modifications and operations",
 
   SECTION("test append") {
     auto new_obj = new mainquery::Person__userfriends(
-        mq.get(), std::make_shared<ObjectWithListOfObjectTestCase::Person>());
+        mq.get(), std::make_shared<ObjectWithListOfObject::Person>());
     auto before_count = model_with_data->rowCount();
     model_with_data->append(new_obj);
     insert_spy.validate();
@@ -134,7 +134,7 @@ TEST_CASE("default ListModelABC modifications and operations",
   }
   SECTION("test replace") {
     auto new_obj = new mainquery::Person__userfriends(
-        mq.get(), std::make_shared<ObjectWithListOfObjectTestCase::Person>());
+        mq.get(), std::make_shared<ObjectWithListOfObject::Person>());
     auto before_count = model_with_data->rowCount();
     model_with_data->replace(model_with_data->rowCount() - 1, new_obj);
     insert_spy.validate();

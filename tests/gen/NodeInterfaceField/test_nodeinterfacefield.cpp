@@ -14,7 +14,7 @@ TEST_CASE("NodeInterfaceFieldTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = mainquery::MainQuery::shared();
-  mq->set_variables({NodeInterfaceFieldTestCase::Enums::TypesEnum::User});
+  mq->set_variables({NodeInterfaceField::Enums::TypesEnum::User});
   mq->fetch();
   test_utils::wait_for_completion(mq);
   SECTION("test deserialize") {
@@ -41,7 +41,7 @@ TEST_CASE("NodeInterfaceFieldTestCase", "[generated-testcase]") {
     auto mq2 = mainquery::MainQuery::shared();
     test_utils::SignalCatcher catcher(
         {.source_obj = mq->data(), .only = "node"});
-    mq2->set_variables({NodeInterfaceFieldTestCase::Enums::TypesEnum::User});
+    mq2->set_variables({NodeInterfaceField::Enums::TypesEnum::User});
     mq2->fetch();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(mq2);
