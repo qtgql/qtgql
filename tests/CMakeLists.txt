@@ -4,6 +4,8 @@ include(Catch)
 find_package(Qt6 REQUIRED COMPONENTS Test Core Network)
 set(TESTS_TARGET "test_qtgql")
 set(CMAKE_OBJECT_PATH_MAX 9999)
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+
 
 add_executable(${TESTS_TARGET} main.cpp ${TEST_SRCS} testutils.cpp testutils.hpp
         test_customscalar.cpp
@@ -29,6 +31,6 @@ target_link_libraries(${TESTS_TARGET} PRIVATE Qt6::Test)
 target_link_libraries(${TESTS_TARGET} PUBLIC Qt6::Qml)
 target_link_libraries(${TESTS_TARGET} PRIVATE qtgql)
 
-if (NOT WIN32)
+#if (NOT WIN32)
     catch_discover_tests(${TESTS_TARGET})
-endif (NOT WIN32)
+#endif (NOT WIN32)
