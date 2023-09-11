@@ -3,5 +3,5 @@ os=Windows
 arch=x86_64
 compiler=clang
 compiler.version=15
-compiler.cppstd=20
+compiler.cppstd=17
 build_type=Debug
