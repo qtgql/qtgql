@@ -6,7 +6,7 @@
 #include "gen/UpdateUserName.hpp"
 #include "testutils.hpp"
 
-namespace NestedObjectTestCase {
+namespace NestedObject {
 using namespace qtgql;
 auto ENV_NAME = std::string("NestedObjectTestCase");
 auto SCHEMA_ADDR = get_server_address("NestedObjectTestCase");

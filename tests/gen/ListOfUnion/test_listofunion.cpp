@@ -6,7 +6,7 @@
 #include <QSignalSpy>
 #include <catch2/catch_test_macros.hpp>
 
-namespace ListOfUnionTestCase {
+namespace ListOfUnion {
 using namespace qtgql;
 
 auto ENV_NAME = std::string("ListOfUnionTestCase");

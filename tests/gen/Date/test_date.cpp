@@ -6,7 +6,7 @@
 #include "gen/MainQuery.hpp"
 #include "testutils.hpp"
 
-namespace DateTestCase {
+namespace Date {
 using namespace qtgql;
 auto ENV_NAME = std::string("DateTestCase");
 auto SCHEMA_ADDR = get_server_address("DateTestCase");

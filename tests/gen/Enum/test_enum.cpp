@@ -5,7 +5,7 @@
 #include "gen/UpdateUserStatus.hpp"
 #include "testutils.hpp"
 
-namespace EnumTestCase {
+namespace Enum {
 using namespace qtgql;
 
 auto ENV_NAME = std::string("EnumTestCase");

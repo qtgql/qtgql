@@ -4,7 +4,7 @@
 #include <QSignalSpy>
 #include <catch2/catch_test_macros.hpp>
 
-namespace NonNodeInterfaceTestCase {
+namespace NonNodeInterface {
 using namespace qtgql;
 
 auto ENV_NAME = std::string("NonNodeInterfaceTestCase");

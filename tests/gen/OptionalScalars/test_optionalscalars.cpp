@@ -7,7 +7,7 @@
 #include "gen/NullifyUser.hpp"
 #include "testutils.hpp"
 
-namespace OptionalScalarsTestCase {
+namespace OptionalScalars {
 using namespace qtgql;
 auto ENV_NAME = std::string("OptionalScalarsTestCase");
 auto SCHEMA_ADDR = get_server_address("OptionalScalarsTestCase");

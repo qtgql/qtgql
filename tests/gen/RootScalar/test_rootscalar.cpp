@@ -3,7 +3,7 @@
 #include <QSignalSpy>
 #include <catch2/catch_test_macros.hpp>
 
-namespace RootScalarTestCase {
+namespace RootScalar {
 using namespace qtgql;
 
 auto ENV_NAME = std::string("RootScalarTestCase");

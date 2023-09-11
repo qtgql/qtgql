@@ -5,7 +5,7 @@
 #include "gen/MainQuery.hpp"
 #include "testutils.hpp"
 
-namespace ObjectWithListOfObjectTestCase {
+namespace ObjectWithListOfObject {
 using namespace qtgql;
 auto ENV_NAME = std::string("ObjectWithListOfObjectTestCase");
 auto SCHEMA_ADDR = get_server_address("ObjectWithListOfObjectTestCase");

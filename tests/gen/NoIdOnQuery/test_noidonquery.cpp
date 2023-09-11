@@ -4,7 +4,7 @@
 
 #include "gen/MainQuery.hpp"
 #include "testutils.hpp"
-namespace NoIdOnQueryTestCase {
+namespace NoIdOnQuery {
 using namespace qtgql;
 auto ENV_NAME = std::string("NoIdOnQueryTestCase");
 auto SCHEMA_ADDR = get_server_address("NoIdOnQueryTestCase");

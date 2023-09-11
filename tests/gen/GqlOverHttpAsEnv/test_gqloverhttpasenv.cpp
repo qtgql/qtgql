@@ -4,7 +4,7 @@
 #include <QSignalSpy>
 #include <catch2/catch_test_macros.hpp>
 
-namespace GqlOverHttpAsEnvTestCase {
+namespace GqlOverHttpAsEnv {
 using namespace qtgql;
 
 auto ENV_NAME = std::string("GqlOverHttpAsEnvTestCase");

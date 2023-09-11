@@ -4,7 +4,7 @@
 #include <QSignalSpy>
 #include <catch2/catch_test_macros.hpp>
 
-namespace NodeInterfaceFieldTestCase {
+namespace NodeInterfaceField {
 using namespace qtgql;
 
 auto ENV_NAME = std::string("NodeInterfaceFieldTestCase");

@@ -6,7 +6,7 @@
 #include "gen/UpdateBalance.hpp"
 #include "testutils.hpp"
 
-namespace DecimalTestCase {
+namespace Decimal {
 using namespace qtgql;
 auto ENV_NAME = std::string("DecimalTestCase");
 auto SCHEMA_ADDR = get_server_address("DecimalTestCase");

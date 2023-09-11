@@ -7,7 +7,7 @@
 #include <QSignalSpy>
 #include <catch2/catch_test_macros.hpp>
 
-namespace ListOfScalarTestCase {
+namespace ListOfScalar {
 using namespace qtgql;
 
 auto ENV_NAME = std::string("ListOfScalarTestCase");

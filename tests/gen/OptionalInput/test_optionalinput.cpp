@@ -3,7 +3,7 @@
 #include <QSignalSpy>
 #include <catch2/catch_test_macros.hpp>
 
-namespace OptionalInputTestCase {
+namespace OptionalInput {
 using namespace qtgql;
 
 auto ENV_NAME = std::string("OptionalInputTestCase");

@@ -4,7 +4,7 @@
 #include <QSignalSpy>
 #include <catch2/catch_test_macros.hpp>
 
-namespace FragmentTestCase {
+namespace Fragment {
 using namespace qtgql;
 
 auto ENV_NAME = std::string("FragmentTestCase");

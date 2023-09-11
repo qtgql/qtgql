@@ -3,7 +3,7 @@
 #include <QSignalSpy>
 #include <catch2/catch_test_macros.hpp>
 
-namespace NodeUnionTestCase {
+namespace NodeUnion {
 using namespace qtgql;
 
 auto ENV_NAME = std::string("NodeUnionTestCase");

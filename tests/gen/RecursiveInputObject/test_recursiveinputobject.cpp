@@ -5,7 +5,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <memory>
 
-namespace RecursiveInputObjectTestCase {
+namespace RecursiveInputObject {
 using namespace qtgql;
 
 auto ENV_NAME = std::string("RecursiveInputObjectTestCase");

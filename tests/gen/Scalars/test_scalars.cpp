@@ -8,10 +8,10 @@
 
 #include "qtgql/gqloverhttp/gqloverhttp.hpp"
 
-namespace ScalarsTestCase {
+namespace Scalars {
 using namespace qtgql;
 auto ENV_NAME = std::string("ScalarsTestCase");
-auto SCHEMA_ADDR = get_server_address("ScalarsTestCase");
+auto SCHEMA_ADDR = get_server_address("Scalars");
 
 TEST_CASE("ScalarsTestCase", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
