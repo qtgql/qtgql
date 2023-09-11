@@ -133,6 +133,12 @@ class QtGqlRecipe(ConanFile):
         # tc.cache_variables["Qt6_DIR"] = str(self.qt6_install_dir)
         tc.generate()
 
+    def configure(self) -> None:
+        self.options["qt/*"].qtquickcontrols2 = True
+        self.options["qt/*"].qtdeclarative = True
+        self.options["qt/*"].qtwebsockets = True
+        self.options["qt/*"].widgets = False
+        self.options["qt/*"].qtshadertools = True
     def build(self):
         cmake = CMake(self)
         cmake.configure()
