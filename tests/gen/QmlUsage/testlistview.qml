@@ -1,6 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
-import GraphQL.QmlUsageTestCase.FriendsListQuery
+import GraphQL.QmlUsage.FriendsListQuery
 
 Item {
     id: root

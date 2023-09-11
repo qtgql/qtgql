@@ -1,6 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
-import GraphQL.QmlUsageTestCase.MainQuery
+import GraphQL.QmlUsage.MainQuery
 
 Item {
     id: root

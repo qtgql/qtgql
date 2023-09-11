@@ -1,6 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
-import GraphQL.QmlUsageTestCase.SimpleQuery
+import GraphQL.QmlUsage.SimpleQuery
 
 Item {
     id: root
