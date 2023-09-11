@@ -1,8 +1,8 @@
 
 
-deps = 'libgl1-mesa-dev libx11-dev  libxau-dev libxcb-keysyms1 libxcb-cursor-dev libxcb-xfixes0 libxcb-render0 libxcb1 libxcb-render-util0 libxcb-xinerama0 libxcb-util1 libxaw7-dev  libx11-xcb-dev  libxcb-glx0 libxcb-sync1  libxaw7-dev  libx11-dev build-essential  libfontenc-dev  libxcb-image0  libice-dev  libx11-xcb-dev libxcb-xkb-dev libxcb-icccm4 libxcb-shm0 libxkbcommon-dev libsm-dev  libsm-dev  libfontenc-dev libxcb-shape0  libxau-dev  libxcb-randr0 libpulse-dev libgstreamer-gl1.0-0 libxkbcommon-x11-0 libice-dev'
+deps = 'libxcb-xfixes0-dev libxcb-icccm4-dev libxcb-randr0-dev libxcb-keysyms1-dev libxcb-image0 libxcb-cursor-dev libxcb-shm0 libpulse-dev libxcb-icccm4 libxkbcommon-x11-0  libsm-dev  libxau-dev libgl1-mesa-dev libx11-dev libxcb-util1 libxcb-render-util0  libice-dev   libxau-dev  libxcb-randr0 libxkbcommon-dev libfontenc-dev libxcb-sync1  libx11-xcb-dev  libxcb1 build-essential libxaw7-dev libxcb-xfixes0 libxcb-render0 libx11-dev  libx11-xcb-dev  libxaw7-dev  libxcb-glx0 libgstreamer-gl1.0-0 libxcb-keysyms1 libxcb-xinerama0 libice-dev libxcb-xkb-dev libxcb-shape0  libfontenc-dev  libsm-dev'
 
-add = 'libx11-dev", "libx11-xcb-dev", "libfontenc-dev", "libice-dev", "libsm-dev", "libxau-dev", "libxaw7-dev"'
+add = 'libxcomposite-dev, libxcursor-dev, libxdamage-dev, libxfixes-dev, libxi-dev, libxinerama-dev, libxmuu-dev, libxrandr-dev, libxres-dev, libxss-dev, libxtst-dev, libxv-dev, libxvmc-dev, libxxf86vm-dev, libxcb-icccm4-dev, libxcb-keysyms1-dev, libxcb-randr0-dev, libxcb-shape0-dev, libxcb-sync-dev, libxcb-xfixes0-dev, libxcb-xinerama0-dev, libxcb-dri3-dev'
 l = [r.replace('"', " ") for r in add.split(", ")]
 res = set(l).union(set(deps.split(" ")))
 print(" ".join(res))
