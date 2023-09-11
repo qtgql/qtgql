@@ -118,7 +118,7 @@ jobs:
         shell: bash
         run: |
           if [ "$RUNNER_OS" == "Windows" ]; then
-            poetry run conan build . -o test=True -s build_type=Debug -pr=profiles/${{ runner.os }}
+            poetry run conan build . -o test=True -s build_type=Debug -pr=profiles/Windows_mingw
           elif [ "$RUNNER_OS" == "Linux" ]; then
             poetry run xvfb-run -a conan build . -o test=True -s build_type=Debug -pr=profiles/${{ runner.os }}
           fi
