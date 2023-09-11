@@ -10,10 +10,10 @@
 
 namespace Scalars {
 using namespace qtgql;
-auto ENV_NAME = std::string("ScalarsTestCase");
-auto SCHEMA_ADDR = get_server_address("Scalars");
+auto ENV_NAME = std::string("Scalars");
+auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
 
-TEST_CASE("ScalarsTestCase", "[generated-testcase]") {
+TEST_CASE("Scalars", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = std::make_shared<mainquery::MainQuery>();

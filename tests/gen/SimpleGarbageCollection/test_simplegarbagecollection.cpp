@@ -6,8 +6,8 @@
 namespace SimpleGarbageCollection {
 using namespace qtgql;
 
-auto ENV_NAME = std::string("SimpleGarbageCollectionTestCase");
-auto SCHEMA_ADDR = get_server_address("SimpleGarbageCollection");
+auto ENV_NAME = std::string("SimpleGarbageCollection");
+auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
 using namespace std::chrono_literals;
 std::shared_ptr<SimpleGarbageCollection::User> get_shared_user() {
   auto mq = std::make_shared<mainquery::MainQuery>();
@@ -17,7 +17,7 @@ std::shared_ptr<SimpleGarbageCollection::User> get_shared_user() {
   REQUIRE(mq.use_count() == 1);
   return SimpleGarbageCollection::User::get_node(node_id).value();
 }
-TEST_CASE("SimpleGarbageCollectionTestCase", "[generated-testcase]") {
+TEST_CASE("SimpleGarbageCollection", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME,
       DebugClientSettings{.prod_settings =

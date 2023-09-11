@@ -8,10 +8,10 @@
 
 namespace TimeScalar {
 using namespace qtgql;
-auto ENV_NAME = std::string("TimeScalarTestCase");
-auto SCHEMA_ADDR = get_server_address("TimeScalarTestCase");
+auto ENV_NAME = std::string("TimeScalar");
+auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
 
-TEST_CASE("TimeScalarTestCase", "[generated-testcase]") {
+TEST_CASE("TimeScalar", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = std::make_shared<mainquery::MainQuery>();

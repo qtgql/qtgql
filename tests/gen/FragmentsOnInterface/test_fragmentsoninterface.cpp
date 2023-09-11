@@ -7,10 +7,10 @@
 namespace FragmentsOnInterface {
 using namespace qtgql;
 
-auto ENV_NAME = std::string("FragmentsOnInterfaceTestCase");
-auto SCHEMA_ADDR = get_server_address("FragmentsOnInterfaceTestCase");
+auto ENV_NAME = std::string("FragmentsOnInterface");
+auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
 
-TEST_CASE("FragmentsOnInterfaceTestCase", "[generated-testcase]") {
+TEST_CASE("FragmentsOnInterface", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
 

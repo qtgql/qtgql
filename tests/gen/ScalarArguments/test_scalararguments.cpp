@@ -6,10 +6,10 @@
 namespace ScalarArguments {
 using namespace qtgql;
 
-auto ENV_NAME = std::string("ScalarArgumentsTestCase");
-auto SCHEMA_ADDR = get_server_address("ScalarArgumentsTestCase");
+auto ENV_NAME = std::string("ScalarArguments");
+auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
 
-TEST_CASE("ScalarArgumentsTestCase", "[generated-testcase]") {
+TEST_CASE("ScalarArguments", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = mainquery::MainQuery::shared();

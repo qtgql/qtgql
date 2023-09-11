@@ -7,10 +7,10 @@
 namespace NonNodeInterface {
 using namespace qtgql;
 
-auto ENV_NAME = std::string("NonNodeInterfaceTestCase");
-auto SCHEMA_ADDR = get_server_address("NonNodeInterfaceTestCase");
+auto ENV_NAME = std::string("NonNodeInterface");
+auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
 
-TEST_CASE("NonNodeInterfaceTestCase", "[generated-testcase]") {
+TEST_CASE("NonNodeInterface", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto animal_query = animalquery::AnimalQuery::shared();

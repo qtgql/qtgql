@@ -7,10 +7,10 @@
 namespace NodeInterfaceField {
 using namespace qtgql;
 
-auto ENV_NAME = std::string("NodeInterfaceFieldTestCase");
-auto SCHEMA_ADDR = get_server_address("NodeInterfaceFieldTestCase");
+auto ENV_NAME = std::string("NodeInterfaceField");
+auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
 
-TEST_CASE("NodeInterfaceFieldTestCase", "[generated-testcase]") {
+TEST_CASE("NodeInterfaceField", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = mainquery::MainQuery::shared();

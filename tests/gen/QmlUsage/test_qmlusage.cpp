@@ -12,9 +12,9 @@ namespace fs = std::filesystem;
 namespace QmlUsage {
 using namespace qtgql;
 
-auto ENV_NAME = std::string("QmlUsageTestCase");
+auto ENV_NAME = std::string("QmlUsage");
 
-auto SCHEMA_ADDR = get_server_address("QmlUsageTestCase");
+auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
 
 bool check_list_view_count(const QQuickItem *list_view, int expected) {
 

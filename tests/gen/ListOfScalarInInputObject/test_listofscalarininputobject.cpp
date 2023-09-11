@@ -6,10 +6,10 @@
 namespace ListOfScalarInInputObject {
 using namespace qtgql;
 
-auto ENV_NAME = std::string("ListOfScalarInInputObjectTestCase");
-auto SCHEMA_ADDR = get_server_address("ListOfScalarInInputObjectTestCase");
+auto ENV_NAME = std::string("ListOfScalarInInputObject");
+auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
 
-TEST_CASE("ListOfScalarInInputObjectTestCase", "[generated-testcase]") {
+TEST_CASE("ListOfScalarInInputObject", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
 

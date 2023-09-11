@@ -6,10 +6,10 @@
 #include "testutils.hpp"
 namespace NoIdOnQuery {
 using namespace qtgql;
-auto ENV_NAME = std::string("NoIdOnQueryTestCase");
-auto SCHEMA_ADDR = get_server_address("NoIdOnQuery");
+auto ENV_NAME = std::string("NoIdOnQuery");
+auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
 
-TEST_CASE("NoIdOnQueryTestCase", "[generated-testcase]") {
+TEST_CASE("NoIdOnQuery", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = std::make_shared<mainquery::MainQuery>();

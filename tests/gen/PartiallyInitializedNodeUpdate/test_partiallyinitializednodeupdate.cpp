@@ -8,7 +8,7 @@ namespace PartiallyInitializedNodeUpdate {
 using namespace qtgql;
 
 auto ENV_NAME = std::string("PartiallyInitializedNodeUpdate");
-auto SCHEMA_ADDR = get_server_address("PartiallyInitializedNodeUpdate");
+auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
 
 TEST_CASE("PartiallyInitializedNodeUpdate", "[generated-testcase]") {
   // resolves https://github.com/qtgql/qtgql/issues/381

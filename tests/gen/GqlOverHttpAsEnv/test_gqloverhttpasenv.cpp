@@ -7,10 +7,10 @@
 namespace GqlOverHttpAsEnv {
 using namespace qtgql;
 
-auto ENV_NAME = std::string("GqlOverHttpAsEnvTestCase");
-auto SCHEMA_ADDR = test_utils::get_http_server_addr("GqlOverHttpAsEnvTestCase");
+auto ENV_NAME = std::string("GqlOverHttpAsEnv");
+auto SCHEMA_ADDR = test_utils::get_http_server_addr("GqlOverHttpAsEnv");
 
-TEST_CASE("GqlOverHttpAsEnvTestCase", "[generated-testcase]") {
+TEST_CASE("GqlOverHttpAsEnv", "[generated-testcase]") {
 
   SECTION("test deserialize") {
     auto gql_over_http = std::unique_ptr<gqloverhttp::GraphQLOverHttp>{

@@ -8,10 +8,10 @@
 namespace Enum {
 using namespace qtgql;
 
-auto ENV_NAME = std::string("EnumTestCase");
-auto SCHEMA_ADDR = get_server_address("EnumTestCase");
+auto ENV_NAME = std::string("Enum");
+auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
 
-TEST_CASE("EnumTestCase", "[generated-testcase]") {
+TEST_CASE("Enum", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
 

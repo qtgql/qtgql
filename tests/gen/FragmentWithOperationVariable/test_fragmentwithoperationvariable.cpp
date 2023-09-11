@@ -9,7 +9,7 @@ namespace FragmentWithOperationVariable {
 using namespace qtgql;
 
 auto ENV_NAME = std::string("FragmentWithOperationVariable");
-auto SCHEMA_ADDR = get_server_address("FragmentWithOperationVariable");
+auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
 
 template <typename User> void check_user_is_nulled(const User &user) {
   REQUIRE(user->get_age() == bases::DEFAULTS::INT);

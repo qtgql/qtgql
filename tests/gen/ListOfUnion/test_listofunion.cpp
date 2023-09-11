@@ -9,10 +9,10 @@
 namespace ListOfUnion {
 using namespace qtgql;
 
-auto ENV_NAME = std::string("ListOfUnionTestCase");
-auto SCHEMA_ADDR = get_server_address("ListOfUnionTestCase");
+auto ENV_NAME = std::string("ListOfUnion");
+auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
 
-TEST_CASE("ListOfUnionTestCase", "[generated-testcase]") {
+TEST_CASE("ListOfUnion", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME, DebugClientSettings{.print_debug = true,
                                     .prod_settings = {.url = SCHEMA_ADDR}});

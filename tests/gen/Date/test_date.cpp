@@ -8,10 +8,10 @@
 
 namespace Date {
 using namespace qtgql;
-auto ENV_NAME = std::string("DateTestCase");
-auto SCHEMA_ADDR = get_server_address("DateTestCase");
+auto ENV_NAME = std::string("Date");
+auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
 
-TEST_CASE("DateTestCase", "[generated-testcase]") {
+TEST_CASE("Date", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME, DebugClientSettings{.print_debug = false,
                                     .prod_settings = {.url = SCHEMA_ADDR}});

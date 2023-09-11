@@ -9,8 +9,8 @@
 
 namespace OptionalScalars {
 using namespace qtgql;
-auto ENV_NAME = std::string("OptionalScalarsTestCase");
-auto SCHEMA_ADDR = get_server_address("OptionalScalarsTestCase");
+auto ENV_NAME = std::string("OptionalScalars");
+auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
 
 template <typename User> void check_user_is_nulled(const User &user) {
   REQUIRE(user->get_age() == bases::DEFAULTS::INT);
@@ -28,7 +28,7 @@ template <typename User> void check_user_filled(const User &user) {
   REQUIRE(user->get_birth() != qtgql::customscalars::DateTimeScalar().to_qt());
 }
 
-TEST_CASE("OptionalScalarsTestCase", "[generated-testcase]") {
+TEST_CASE("OptionalScalars", "[generated-testcase]") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = mainquery::MainQuery::shared();

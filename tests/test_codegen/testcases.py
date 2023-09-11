@@ -164,8 +164,8 @@ class QtGqlTestCase:
             )
         else:
             updated = re.sub(
-                'get_server_address\\("([A-Za-z])*"\\)',
-                f'get_server_address("{self.url_suffix}")',
+                'auto ENV_NAME = std::string\\("([A-Za-z])*"\\)',
+                f'auto ENV_NAME = std::string("{self.url_suffix}")',
                 self.testcase_file.read_text("utf-8"),
             )
             self.testcase_file.write_text(updated, "UTF-8")
