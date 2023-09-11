@@ -98,7 +98,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt update
-          sudo apt install libxcb-cursor-dev libxcb-randr0 libxcb-glx0 libxcb-render-util0 libxkbcommon-dev libxcb-render0 libxcb-xkb-dev libxcb1 libx11-xcb-dev libgl1-mesa-dev libxcb-image0 libpulse-dev libice-dev libxcb-util1 libxcb-shm0 libx11-dev libxaw7-dev libxcb-sync1 libxkbcommon-x11-0 libsm-dev build-essential libxcb-icccm4 libfontenc-dev libxau-dev libgstreamer-gl1.0-0 libxcb-xinerama0 libxcb-shape0 libxcb-xfixes0 libxcb-keysyms1
+          sudo apt install libgl1-mesa-dev libx11-dev  libxau-dev libxcb-keysyms1 libxcb-cursor-dev libxcb-xfixes0 libxcb-render0 libxcb1 libxcb-render-util0 libxcb-xinerama0 libxcb-util1 libxaw7-dev  libx11-xcb-dev  libxcb-glx0 libxcb-sync1  libxaw7-dev  libx11-dev build-essential  libfontenc-dev  libxcb-image0  libice-dev  libx11-xcb-dev libxcb-xkb-dev libxcb-icccm4 libxcb-shm0 libxkbcommon-dev libsm-dev  libsm-dev  libfontenc-dev libxcb-shape0  libxau-dev  libxcb-randr0 libpulse-dev libgstreamer-gl1.0-0 libxkbcommon-x11-0 libice-dev
 
       - name: Generate test files and coverage python
         shell: bash
