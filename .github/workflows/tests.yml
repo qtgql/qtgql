@@ -87,11 +87,6 @@ jobs:
         run: |
           pip install poetry
           poetry install
-      - name: Set up MinGW - Windows
-        if: runner.os == 'Windows'
-        uses: egor-tensin/setup-mingw@v2
-        with:
-          platform: x64
 
       - name: Install Qt dependencies
         shell: bash
