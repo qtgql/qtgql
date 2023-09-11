@@ -32,7 +32,7 @@ jobs:
       - name: Set up Python ${{ matrix.python_version }}
         uses: actions/setup-python@v4
         with:
-          python-version: 3.11
+          python-version: ${{ matrix.python_version }}
       - uses: actions/cache@v3
         with:
           path: ~/.cache/pip
@@ -53,7 +53,7 @@ jobs:
       matrix: ${{ steps.set_matrix.outputs.matrix }}
 
   tests:
-    name: ${{matrix.os}} - ${{toJSON(matrix.testcases)}}
+    name: ${{matrix.os}} py${{ matrix.python_version }} - ${{toJSON(matrix.testcases)}}
     runs-on: ${{ matrix.os }}
     needs: provide_testcase_matrix
     strategy:
