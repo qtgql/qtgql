@@ -26,7 +26,7 @@ bool check_list_view_count(const QQuickItem *list_view, int expected) {
   });
 }
 
-TEST_CASE("QmlUsageTestCase - simple", "[generated-testcase]") {
+TEST_CASE("QmlUsageTestCase - simple") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   QQmlApplicationEngine engine;
@@ -42,7 +42,7 @@ TEST_CASE("QmlUsageTestCase - simple", "[generated-testcase]") {
         [&] { return root_qquickitem->property("success").toBool(); }));
   }
 }
-TEST_CASE("QmlUsageTestCase - ListView", "[generated-testcase]") {
+TEST_CASE("QmlUsageTestCase - ListView") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   QQmlApplicationEngine engine;

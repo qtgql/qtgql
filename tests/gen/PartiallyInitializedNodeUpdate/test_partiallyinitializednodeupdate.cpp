@@ -10,7 +10,7 @@ using namespace qtgql;
 auto ENV_NAME = std::string("PartiallyInitializedNodeUpdate");
 auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
 
-TEST_CASE("PartiallyInitializedNodeUpdate", "[generated-testcase]") {
+TEST_CASE("PartiallyInitializedNodeUpdate") {
   // resolves https://github.com/qtgql/qtgql/issues/381
   auto env = test_utils::get_or_create_env(
       ENV_NAME, DebugClientSettings{.print_debug = true,

@@ -4,7 +4,7 @@
 #include "testframework.hpp"
 using namespace qtgql;
 
-TEST_CASE("test subscription router", "[subscription router]") {
+TEST_CASE("test subscription router") {
   auto http_layer = std::shared_ptr<gqloverhttp::GraphQLOverHttp>{
       new gqloverhttp::GraphQLOverHttp(
           test_utils::get_http_server_addr("graphql"), {})};

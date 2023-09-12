@@ -3,7 +3,7 @@
 #include "testframework.hpp"
 using namespace qtgql;
 
-TEST_CASE("test_fetch", "[graphql-over-http]") {
+TEST_CASE("test_fetch") {
   auto client = std::unique_ptr<gqloverhttp::GraphQLOverHttp>{
       new gqloverhttp::GraphQLOverHttp(
           test_utils::get_http_server_addr("graphql"), {})};

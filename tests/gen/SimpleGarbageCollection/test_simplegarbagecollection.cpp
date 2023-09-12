@@ -17,7 +17,7 @@ std::shared_ptr<SimpleGarbageCollection::User> get_shared_user() {
   REQUIRE(mq.use_count() == 1);
   return SimpleGarbageCollection::User::get_node(node_id).value();
 }
-TEST_CASE("SimpleGarbageCollection", "[generated-testcase]") {
+TEST_CASE("SimpleGarbageCollection") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME,
       DebugClientSettings{.prod_settings =

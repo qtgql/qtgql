@@ -10,7 +10,7 @@ using namespace qtgql;
 auto ENV_NAME = std::string("DateTime");
 auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
 
-TEST_CASE("DateTime", "[generated-testcase]") {
+TEST_CASE("DateTime") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = std::make_shared<mainquery::MainQuery>();

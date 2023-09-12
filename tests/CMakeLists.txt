@@ -23,7 +23,7 @@ target_sources(${TESTS_TARGET}
         ${CODEGEN_TEST_SOURCES}
 )
 target_compile_features(${TESTS_TARGET} PRIVATE cxx_std_17)
-include(doctest.cmake)
+include(doctest)
 
 set_target_properties(${TESTS_TARGET} PROPERTIES AUTOMOC TRUE)
 target_link_libraries(${TESTS_TARGET} PUBLIC doctest::doctest)

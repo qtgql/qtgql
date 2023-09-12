@@ -27,7 +27,7 @@ template <typename User> void check_user_filled(const User &user) {
   REQUIRE(user->get_birth() != qtgql::customscalars::DateTimeScalar().to_qt());
 }
 
-TEST_CASE("FragmentWithOperationVariable", "[generated-testcase]") {
+TEST_CASE("FragmentWithOperationVariable") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = mainquery::MainQuery::shared();
