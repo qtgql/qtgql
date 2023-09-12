@@ -1,5 +1,4 @@
 #pragma once
-#include "testframework.hpp"
 
 #include <QSignalSpy>
 #include <QTest>
@@ -13,6 +12,7 @@
 
 #include "qtgql/bases/bases.hpp"
 #include "qtgql/gqltransportws/gqltransportws.hpp"
+#include "doctest/doctest.h"
 
 using namespace qtgql;
 namespace fs = std::filesystem;
