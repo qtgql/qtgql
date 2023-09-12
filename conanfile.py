@@ -44,10 +44,10 @@ class QtGqlRecipe(ConanFile):
     exports_sources = "CMakeLists.txt", "include/*", "pyproject.toml"
 
     def requirements(self) -> None:
-        self.requires(f"qt/{self.qt_version}")
+        ...
 
     def build_requirements(self) -> None:
-        self.test_requires("catch2/3.4.0")
+        self.test_requires("doctest/2.4.11")
 
     def layout(self) -> None:
         cmake_layout(self)
@@ -103,26 +103,26 @@ class QtGqlRecipe(ConanFile):
         return False
 
     def generate(self) -> None:
-        # if not self.qt6_install_dir:
-        #     subprocess.run(
-        #         f"poetry run aqt install-qt {self.os_name} "
-        #         f"desktop {self.qt_version} {self.qt_arch} "
-        #         f"--outputdir {self.aqt_install_dir} "
-        #         f"-m qtwebsockets".split(" "),
-        #     ).check_returncode()
-        # os.environ.setdefault(
-        #     "QT_PLUGIN_PATH",
-        #     (self.qt6_install_dir.parent.parent.parent / "plugins").resolve(True).as_uri(),
-        # )
-        # os.environ.setdefault(
-        #     "LD_LIBRARY_PATH",
-        #     (self.qt6_install_dir.parent.parent.parent / "lib").resolve(True).as_uri(),
-        # )
-        # paths = os.environ.get("PATH").split(":")
-        # paths.append((self.qt6_install_dir.parent.parent.parent / "bin").resolve(True).as_uri())
-        # os.environ.setdefault("PATH", ":".join(paths))
-        # assert self.qt6_install_dir
-        # assert self.qt6_install_dir.exists()
+        if not self.qt6_install_dir:
+            subprocess.run(
+                f"poetry run aqt install-qt {self.os_name} "
+                f"desktop {self.qt_version} {self.qt_arch} "
+                f"--outputdir {self.aqt_install_dir} "
+                f"-m qtwebsockets".split(" "),
+            ).check_returncode()
+        os.environ.setdefault(
+            "QT_PLUGIN_PATH",
+            (self.qt6_install_dir.parent.parent.parent / "plugins").resolve(True).as_uri(),
+        )
+        os.environ.setdefault(
+            "LD_LIBRARY_PATH",
+            (self.qt6_install_dir.parent.parent.parent / "lib").resolve(True).as_uri(),
+        )
+        paths = os.environ.get("PATH").split(":")
+        paths.append((self.qt6_install_dir.parent.parent.parent / "bin").resolve(True).as_uri())
+        os.environ.setdefault("PATH", ":".join(paths))
+        assert self.qt6_install_dir
+        assert self.qt6_install_dir.exists()
         deps = CMakeDeps(self)
         deps.generate()
         tc = CMakeToolchain(self)
@@ -130,15 +130,9 @@ class QtGqlRecipe(ConanFile):
             "binaryDir"
         ] = PATHS.QTGQL_TEST_TARGET.as_posix()  # cmake works with posix paths only
         tc.cache_variables["QTGQL_TESTING"] = self.should_test
-        # tc.cache_variables["Qt6_DIR"] = str(self.qt6_install_dir)
+        tc.cache_variables["Qt6_DIR"] = str(self.qt6_install_dir)
         tc.generate()
 
-    def configure(self) -> None:
-        self.options["qt/*"].qtquickcontrols2 = True
-        self.options["qt/*"].qtdeclarative = True
-        self.options["qt/*"].qtwebsockets = True
-        self.options["qt/*"].widgets = False
-        self.options["qt/*"].qtshadertools = True
     def build(self):
         cmake = CMake(self)
         cmake.configure()

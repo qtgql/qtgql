@@ -1,5 +1,5 @@
 #include <QSignalSpy>
-#include <catch2/catch_test_macros.hpp>
+#include "testframework.hpp"
 #include "testutils.hpp"
 
 namespace 👉 context.config.env_name 👈{

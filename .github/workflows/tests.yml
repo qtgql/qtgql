@@ -93,7 +93,8 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt update
-          sudo apt install  libxcb1 libxcb-icccm4-dev libxcb-sync-dev libxres-dev libxcomposite-dev libice-dev libxau-dev libxcb-xfixes0 libxcursor-dev libxtst-dev libxss-dev libxcb-dri3-dev libx11-xcb-dev libxmuu-dev libxcb-xinerama0-dev libxcb-shm0 libx11-dev libxcb-keysyms1 libxi-dev libgstreamer-gl1.0-0 libxaw7-dev libxinerama-dev libxcb-icccm4 libpulse-dev libxcb-randr0 libxv-dev libxcb-cursor-dev libxcb-render0 libsm-dev libxcb-shape0-dev libxcb-shape0 libxcb-xfixes0-dev libxvmc-dev libfontenc-dev libxdamage-dev libgl1-mesa-dev libxcb-xinerama0 libxkbcommon-x11-0 build-essential libxcb-util1 libxcb-image0 libxcb-render-util0 libxcb-sync1 libxxf86vm-dev libxcb-glx0 libxcb-randr0-dev libxcb-keysyms1-dev libxrandr-dev libxcb-xkb-dev libxfixes-dev libxkbcommon-dev
+          sudo apt install libxcb-cursor-dev build-essential libgl1-mesa-dev libgstreamer-gl1.0-0 libpulse-dev libxcb-glx0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-render0 libxcb-shape0 libxcb-shm0 libxcb-sync1 libxcb-util1 libxcb-xfixes0 libxcb-xinerama0 libxcb1 libxkbcommon-dev libxkbcommon-x11-0 libxcb-xkb-dev
+
       - name: Generate test files and coverage python
         shell: bash
         env:

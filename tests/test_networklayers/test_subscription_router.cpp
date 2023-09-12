@@ -1,7 +1,7 @@
 #include "qtgql/gqloverhttp/gqloverhttp.hpp"
 #include "qtgql/routers/detail/routers.hpp"
 #include "utils.hpp"
-#include <catch2/catch_test_macros.hpp>
+#include "testframework.hpp"
 using namespace qtgql;
 
 TEST_CASE("test subscription router", "[subscription router]") {

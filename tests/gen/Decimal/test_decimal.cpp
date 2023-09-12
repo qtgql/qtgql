@@ -1,6 +1,6 @@
 #include <QSignalSpy>
 #include <QTest>
-#include <catch2/catch_test_macros.hpp>
+#include "testframework.hpp"
 
 #include "gen/MainQuery.hpp"
 #include "gen/UpdateBalance.hpp"

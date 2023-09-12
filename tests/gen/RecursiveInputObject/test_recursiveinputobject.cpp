@@ -2,7 +2,7 @@
 #include "gen/schema.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>
-#include <catch2/catch_test_macros.hpp>
+#include "testframework.hpp"
 #include <memory>
 
 namespace RecursiveInputObject {

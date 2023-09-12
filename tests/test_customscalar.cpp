@@ -1,6 +1,6 @@
 #include <QString>
 #include <QTest>
-#include <catch2/catch_test_macros.hpp>
+#include "testframework.hpp"
 
 #include "qtgql/customscalars/customscalars.hpp"
 

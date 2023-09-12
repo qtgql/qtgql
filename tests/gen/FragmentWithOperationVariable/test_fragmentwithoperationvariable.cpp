@@ -3,7 +3,7 @@
 #include "gen/NullifyUser.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>
-#include <catch2/catch_test_macros.hpp>
+#include "testframework.hpp"
 
 namespace FragmentWithOperationVariable {
 using namespace qtgql;

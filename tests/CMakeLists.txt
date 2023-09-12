@@ -1,6 +1,5 @@
 find_package(Qt6 REQUIRED COMPONENTS Test Core Network)
-find_package(Catch2 REQUIRED COMPONENTS Catch2)
-include(Catch)
+find_package(doctest REQUIRED)
 find_package(Qt6 REQUIRED COMPONENTS Test Core Network)
 set(TESTS_TARGET "test_qtgql")
 set(CMAKE_OBJECT_PATH_MAX 9999)
@@ -23,14 +22,15 @@ target_sources(${TESTS_TARGET}
         PRIVATE
         ${CODEGEN_TEST_SOURCES}
 )
-
+target_compile_features(${TESTS_TARGET} PRIVATE cxx_std_17)
+include(doctest.cmake)
 
 set_target_properties(${TESTS_TARGET} PROPERTIES AUTOMOC TRUE)
-target_link_libraries(${TESTS_TARGET} PUBLIC Catch2::Catch2)
+target_link_libraries(${TESTS_TARGET} PUBLIC doctest::doctest)
 target_link_libraries(${TESTS_TARGET} PRIVATE Qt6::Test)
 target_link_libraries(${TESTS_TARGET} PUBLIC Qt6::Qml)
 target_link_libraries(${TESTS_TARGET} PRIVATE qtgql)
 
 #if (NOT WIN32)
-    catch_discover_tests(${TESTS_TARGET})
+    doctest_discover_tests(${TESTS_TARGET})
 #endif (NOT WIN32)

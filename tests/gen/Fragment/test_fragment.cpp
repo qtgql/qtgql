@@ -2,7 +2,7 @@
 #include "gen/UserWithSameIDAndDifferentFieldsQuery.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>
-#include <catch2/catch_test_macros.hpp>
+#include "testframework.hpp"
 
 namespace Fragment {
 using namespace qtgql;
