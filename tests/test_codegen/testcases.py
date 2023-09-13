@@ -213,10 +213,10 @@ ScalarsTestCase = QtGqlTestCase(
     test_name="Scalars",
 )
 
-SimpleGarbageCollectionTestCase = QtGqlTestCase(
+SimpleGarbageCollection = QtGqlTestCase(
     schema=schemas.object_with_scalar.schema,
     operations=ScalarsTestCase.operations,
-    test_name="SimpleGarbageCollection",
+    test_name="GarbageCollection",
     metadata=TestCaseMetadata(
         should_test_updates=BoolWithReason.false("tested in scalar testcase"),
         should_test_deserialization=BoolWithReason.false("tested in scalar testcase"),
@@ -1060,7 +1060,7 @@ PartiallyInitializedNode = QtGqlTestCase(
 )
 all_test_cases = [
     ScalarsTestCase,
-    SimpleGarbageCollectionTestCase,
+    SimpleGarbageCollection,
     GqlOverHttpAsEnvTestCase,
     OptionalScalarsTestCase,
     NoIdOnQueryTestCase,
@@ -1100,7 +1100,7 @@ all_test_cases = [
 
 implemented_testcases = [
     ScalarsTestCase,
-    SimpleGarbageCollectionTestCase,
+    SimpleGarbageCollection,
     GqlOverHttpAsEnvTestCase,
     NoIdOnQueryTestCase,
     DateTimeTestCase,
@@ -1149,5 +1149,5 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 if __name__ == "__main__":
     generate_testcases(
-        PartiallyInitializedNode,
+        SimpleGarbageCollection,
     )
