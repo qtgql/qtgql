@@ -31,12 +31,7 @@ target_link_libraries(${TESTS_TARGET}
     qtgql
     Catch2::Catch2
 )
-if(WIN32)
-    add_custom_command(
-            TARGET ${TESTS_TARGET} POST_BUILD
-            COMMAND echo %PATH%
-            VERBATIM)
-endif ()
+
 catch_discover_tests(${TESTS_TARGET}
         DL_PATHS ${QT_DL_LIBRARIES}
 )
