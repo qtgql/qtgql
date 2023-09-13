@@ -1005,10 +1005,10 @@ ListOfInputObjectTestCase = QtGqlTestCase(
     ),
 )
 
-InterfaceWithObjectField = QtGqlTestCase(
+ObjectInInterface = QtGqlTestCase(
     schema=schemas.interface_with_object_field.schema,
     operations="""
-    query AnimalQuery($kind: AnimalKind!) {
+    query Animal($kind: AnimalKind!) {
       animal(kind: $kind) {
         metadata{
           kind
@@ -1024,7 +1024,7 @@ InterfaceWithObjectField = QtGqlTestCase(
         }
       }
     }    """,
-    test_name="InterfaceWithObjectField",
+    test_name="ObjectInInterface",
     metadata=TestCaseMetadata(
         should_test_updates=BoolWithReason.false(
             "There is no reason it would fail, this only failed due to object types being generated after interfaces.",
@@ -1032,10 +1032,10 @@ InterfaceWithObjectField = QtGqlTestCase(
     ),
 )
 
-PartiallyInitializedNodeUpdate = QtGqlTestCase(
+PartiallyInitializedNode = QtGqlTestCase(
     schema=schemas.partially_initialized_node.schema,
     operations="""
-    query CreateUser_Partial{
+    query PartialCreateUser{
       createUser{
             name
             age
@@ -1052,7 +1052,7 @@ PartiallyInitializedNodeUpdate = QtGqlTestCase(
       }
     }
     """,
-    test_name="PartiallyInitializedNodeUpdate",
+    test_name="PartiallyInitializedNode",
     metadata=TestCaseMetadata(
         should_test_updates=BoolWithReason.false("resolves issue #381"),
         should_test_deserialization=BoolWithReason.false("resolves issue #381"),
@@ -1093,7 +1093,7 @@ all_test_cases = [
     ListOfInputObjectTestCase,
     OptionalInputTestCase,
     RecursiveInputObjectTestCase,
-    InterfaceWithObjectField,
+    ObjectInInterface,
     CustomUserScalarTestCase,
     ObjectsThatReferenceEachOtherTestCase,
 ]
@@ -1133,8 +1133,8 @@ implemented_testcases = [
     ListOfInputObjectTestCase,
     OptionalInputTestCase,
     RecursiveInputObjectTestCase,
-    InterfaceWithObjectField,
-    PartiallyInitializedNodeUpdate,
+    ObjectInInterface,
+    PartiallyInitializedNode,
 ]
 
 
@@ -1149,9 +1149,5 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 if __name__ == "__main__":
     generate_testcases(
-        ScalarsTestCase,
-        SimpleGarbageCollectionTestCase,
-        GqlOverHttpAsEnvTestCase,
-        NoIdOnQueryTestCase,
-        # DateTimeTestCase,
+        PartiallyInitializedNode,
     )

@@ -22,7 +22,6 @@ target_sources(${TESTS_TARGET}
         ${CODEGEN_TEST_SOURCES}
 )
 target_compile_features(${TESTS_TARGET} PRIVATE cxx_std_17)
-
 set_target_properties(${TESTS_TARGET} PROPERTIES AUTOMOC TRUE)
 target_link_libraries(${TESTS_TARGET}
  PUBLIC
@@ -38,4 +37,6 @@ if(WIN32)
             COMMAND echo %PATH%
             VERBATIM)
 endif ()
-catch_discover_tests(${TESTS_TARGET})
+catch_discover_tests(${TESTS_TARGET}
+        DL_PATHS ${QT_DL_LIBRARIES}
+)
