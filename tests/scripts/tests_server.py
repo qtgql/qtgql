@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import random
 from typing import TYPE_CHECKING, AsyncGenerator
 
@@ -78,7 +79,8 @@ schema = strawberry.Schema(query=Query, subscription=Subscription, mutation=Muta
 
 class DebugGraphQLTransportWSHandler(GraphQLTransportWSHandler):
     async def handle_message(self, message: dict):
-        print(f"TestCase{self.testcase_name}: WS[{self._ws._req.path}] message -> {message}")  # noqa
+        with contextlib.suppress(BaseException):
+            print(f"TestCase{self.testcase_name}: WS[{self._ws._req.path}] message -> {message}")  # noqa
         await super().handle_message(message)
 
 
