@@ -67,13 +67,13 @@ class Qt6Installer:
 
     @property
     def qt_root_dir(self) -> Path:
-        arch = "mingw_64"
+        arch = "mingw_64" if self.is_windows else "gcc_64"
         return self.aqt_install_dir / self.version / arch
 
     @property
-    def qt6_cmake_config(self) -> Path | None:
-        if self.qt_root_dir.exists():
-            return next(self.qt_root_dir.glob("**/Qt6Config.cmake")).parent
+    def qt6_cmake_config(self) -> Path:
+        assert self.qt_root_dir.exists()
+        return next(self.qt_root_dir.glob("**/Qt6Config.cmake")).parent
 
     @property
     def dll_path(self) -> Path:
