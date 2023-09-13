@@ -1,8 +1,8 @@
 #include "gen/ChangeName.hpp"
 #include "gen/MainQuery.hpp"
+#include "testframework.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>
-#include "testframework.hpp"
 
 namespace NodeInterfaceField {
 using namespace qtgql;
@@ -52,4 +52,4 @@ TEST_CASE("NodeInterfaceField") {
     REQUIRE(user1->get_password() == user2->get_password());
   };
 }
-}; // namespace NodeInterfaceFieldTestCase
+}; // namespace NodeInterfaceField

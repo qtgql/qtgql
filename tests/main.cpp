@@ -1,11 +1,10 @@
 #include "main.hpp"
 
+#include "testframework.hpp"
 #include <QGuiApplication>
 #include <QTest>
 #include <QTimer>
-#include "testframework.hpp"
 #include <catch2/catch_session.hpp>
-
 
 int main(int argc, char **argv) {
   auto app = QGuiApplication::instance();

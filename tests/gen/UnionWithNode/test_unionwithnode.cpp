@@ -1,7 +1,7 @@
 #include "gen/MainQuery.hpp"
+#include "testframework.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>
-#include "testframework.hpp"
 
 namespace UnionWithNode {
 using namespace qtgql;
@@ -17,4 +17,4 @@ TEST_CASE("UnionWithNode") {
   SECTION("test update") { REQUIRE(false); };
 }
 
-}; // namespace UnionWithNodeTestCase
+}; // namespace UnionWithNode

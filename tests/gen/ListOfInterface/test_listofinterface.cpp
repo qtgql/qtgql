@@ -2,9 +2,9 @@
 #include "gen/MainQuery.hpp"
 #include "gen/ModifyName.hpp"
 #include "gen/RemoveAt.hpp"
+#include "testframework.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>
-#include "testframework.hpp"
 
 namespace ListOfInterface {
 using namespace qtgql;
@@ -68,9 +68,8 @@ TEST_CASE("ListOfInterfaceTestcase") {
     auto model = person->get_pets();
     QString name_to_set("Abu Nasr al-Farabi");
     auto prev_length = model->rowCount();
-    insert_mut->set_variables(
-        {person->get_id(), prev_length + 1, name_to_set,
-         ListOfInterface::Enums::UnionTypes::DOG});
+    insert_mut->set_variables({person->get_id(), prev_length + 1, name_to_set,
+                               ListOfInterface::Enums::UnionTypes::DOG});
     insert_mut->fetch();
     test_utils::wait_for_completion(insert_mut);
     REQUIRE(prev_length < model->rowCount());
@@ -82,4 +81,4 @@ TEST_CASE("ListOfInterfaceTestcase") {
   }
 }
 
-}; // namespace ListOfInterfaceTestcase
+}; // namespace ListOfInterface

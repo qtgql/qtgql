@@ -1,7 +1,7 @@
 #include "gen/MainQuery.hpp"
+#include "testframework.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>
-#include "testframework.hpp"
 
 namespace ScalarArguments {
 using namespace qtgql;
@@ -48,4 +48,4 @@ TEST_CASE("ScalarArguments") {
   };
 }
 
-}; // namespace ScalarArgumentsTestCase
+}; // namespace ScalarArguments

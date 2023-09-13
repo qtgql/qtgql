@@ -1,7 +1,7 @@
 #include "gen/MainQuery.hpp"
+#include "testframework.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>
-#include "testframework.hpp"
 
 namespace SimpleGarbageCollection {
 using namespace qtgql;
@@ -27,8 +27,7 @@ TEST_CASE("SimpleGarbageCollection") {
       100ms);
   SECTION("Test Garbage collection") {
 
-    std::weak_ptr<SimpleGarbageCollection::User> weak_user =
-        get_shared_user();
+    std::weak_ptr<SimpleGarbageCollection::User> weak_user = get_shared_user();
     SimpleGarbageCollection::Query::instance()->m_constUser = {};
     // at map
     REQUIRE(weak_user.use_count() == 1);
@@ -36,4 +35,4 @@ TEST_CASE("SimpleGarbageCollection") {
   }
 }
 
-}; // namespace SimpleGarbageCollectionTestCase
+}; // namespace SimpleGarbageCollection

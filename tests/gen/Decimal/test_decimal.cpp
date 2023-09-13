@@ -1,6 +1,6 @@
+#include "testframework.hpp"
 #include <QSignalSpy>
 #include <QTest>
-#include "testframework.hpp"
 
 #include "gen/MainQuery.hpp"
 #include "gen/UpdateBalance.hpp"
@@ -40,4 +40,4 @@ TEST_CASE("Decimal") {
   };
 }
 
-}; // namespace DecimalTestCase
+}; // namespace Decimal

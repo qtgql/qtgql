@@ -1,9 +1,9 @@
 #include "gen/ChangeUserName.hpp"
 #include "gen/InsertUser.hpp"
 #include "gen/MainQuery.hpp"
+#include "testframework.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>
-#include "testframework.hpp"
 
 namespace ListOfNonNodeType {
 using namespace qtgql;

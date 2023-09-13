@@ -1,8 +1,8 @@
 #include "gen/CreatePost.hpp"
 #include "gen/UpdatePostContent.hpp"
+#include "testframework.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>
-#include "testframework.hpp"
 
 namespace InputTypeOperationVariable {
 using namespace qtgql;
@@ -37,4 +37,4 @@ TEST_CASE("InputTypeOperationVariable") {
   };
 }
 
-}; // namespace InputTypeOperationVariableTestCase
+}; // namespace InputTypeOperationVariable

@@ -1,8 +1,8 @@
 #include "gen/MainQuery.hpp"
 #include "gen/schema.hpp"
+#include "testframework.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>
-#include "testframework.hpp"
 #include <memory>
 
 namespace RecursiveInputObject {
@@ -24,4 +24,4 @@ TEST_CASE("RecursiveInputObject") {
     REQUIRE(mq->data()->get_depth() == 2);
   };
 }
-}; // namespace RecursiveInputObjectTestCase
+}; // namespace RecursiveInputObject

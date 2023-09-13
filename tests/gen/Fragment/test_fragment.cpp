@@ -1,8 +1,8 @@
 #include "gen/MainQuery.hpp"
 #include "gen/UserWithSameIDAndDifferentFieldsQuery.hpp"
+#include "testframework.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>
-#include "testframework.hpp"
 
 namespace Fragment {
 using namespace qtgql;
@@ -48,4 +48,4 @@ TEST_CASE("Fragment") {
   };
 }
 
-}; // namespace FragmentTestCase
+}; // namespace Fragment

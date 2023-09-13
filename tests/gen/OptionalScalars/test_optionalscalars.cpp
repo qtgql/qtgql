@@ -1,6 +1,6 @@
+#include "testframework.hpp"
 #include <QSignalSpy>
 #include <QTest>
-#include "testframework.hpp"
 
 #include "gen/FillUser.hpp"
 #include "gen/MainQuery.hpp"
@@ -78,4 +78,4 @@ TEST_CASE("OptionalScalars") {
   }
 }
 
-}; // namespace OptionalScalarsTestCase
+}; // namespace OptionalScalars

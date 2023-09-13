@@ -1,5 +1,5 @@
-#include <QSignalSpy>
 #include "testframework.hpp"
+#include <QSignalSpy>
 
 #include "gen/MainQuery.hpp"
 #include "gen/UpdateUserStatus.hpp"
@@ -19,8 +19,7 @@ TEST_CASE("Enum") {
   mq->fetch();
   test_utils::wait_for_completion(mq);
   SECTION("test deserialize") {
-    REQUIRE(mq->data()->get_user()->get_status() ==
-            Enum::Enums::Connected);
+    REQUIRE(mq->data()->get_user()->get_status() == Enum::Enums::Connected);
   }
   SECTION("test updates and as operation variable") {
     auto update_status = updateuserstatus::UpdateUserStatus::shared();
@@ -37,4 +36,4 @@ TEST_CASE("Enum") {
   }
 }
 
-}; // namespace EnumTestCase
+}; // namespace Enum

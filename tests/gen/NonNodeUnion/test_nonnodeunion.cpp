@@ -1,7 +1,7 @@
 #include "gen/MainQuery.hpp"
+#include "testframework.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>
-#include "testframework.hpp"
 
 namespace NonNodeUnion {
 using namespace qtgql;
@@ -55,4 +55,4 @@ TEST_CASE("NonNodeUnion") {
   }
 }
 
-}; // namespace NonNodeUnionTestCase
+}; // namespace NonNodeUnion

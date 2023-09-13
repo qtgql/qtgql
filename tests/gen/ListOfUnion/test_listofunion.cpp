@@ -2,9 +2,9 @@
 #include "gen/MainQuery.hpp"
 #include "gen/ModifyName.hpp"
 #include "gen/RemoveAt.hpp"
+#include "testframework.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>
-#include "testframework.hpp"
 
 namespace ListOfUnion {
 using namespace qtgql;
@@ -86,4 +86,4 @@ TEST_CASE("ListOfUnion") {
   };
 }
 
-}; // namespace ListOfUnionTestCase
+}; // namespace ListOfUnion

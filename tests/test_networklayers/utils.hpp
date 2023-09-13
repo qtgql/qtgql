@@ -1,6 +1,6 @@
 #pragma once
-#include <QTest>
 #include "testframework.hpp"
+#include <QTest>
 
 #include "qtgql/bases/bases.hpp"
 #include "qtgql/gqltransportws/gqltransportws.hpp"

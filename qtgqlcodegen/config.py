@@ -36,10 +36,8 @@ class QtGqlConfig:
     """Templates would render some additional helpers for testing."""
 
     generated_dir_name: str = "__generated__"
-    """
-    The name of the directory that qtgql will create and dump the 
-    generated sources.
-    """
+    """The name of the directory that qtgql will create and dump the generated
+    sources."""
 
     @cached_property
     def schema_path(self) -> Path:

@@ -1,7 +1,7 @@
 #include "gen/MainQuery.hpp"
+#include "testframework.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>
-#include "testframework.hpp"
 #include <list>
 
 namespace ListOfInputObject {
@@ -16,10 +16,8 @@ TEST_CASE("ListOfInputObject") {
 
   SECTION("test deserialize") {
     auto echo_query = mainquery::MainQuery::shared();
-    std::list<ListOfInputObject::Echo> what_list = {
-        {"What"}, {"Am"}, {"I"}};
-    echo_query->set_variables(
-        {ListOfInputObject::What::create(what_list)});
+    std::list<ListOfInputObject::Echo> what_list = {{"What"}, {"Am"}, {"I"}};
+    echo_query->set_variables({ListOfInputObject::What::create(what_list)});
     echo_query->fetch();
     test_utils::wait_for_completion(echo_query);
     auto model = echo_query->data()->get_echo();
@@ -31,4 +29,4 @@ TEST_CASE("ListOfInputObject") {
     }
   };
 }
-}; // namespace ListOfInputObjectTestCase
+}; // namespace ListOfInputObject

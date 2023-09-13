@@ -1,7 +1,7 @@
 #include "gen/HelloOrEchoQuery.hpp"
+#include "testframework.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>
-#include "testframework.hpp"
 
 namespace OptionalInput {
 using namespace qtgql;
@@ -51,4 +51,4 @@ TEST_CASE("OptionalInput") {
   }
 }
 
-}; // namespace OptionalInputTestCase
+}; // namespace OptionalInput

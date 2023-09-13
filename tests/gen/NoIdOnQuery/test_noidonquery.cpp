@@ -1,6 +1,6 @@
+#include "testframework.hpp"
 #include <QSignalSpy>
 #include <QTest>
-#include "testframework.hpp"
 
 #include "gen/MainQuery.hpp"
 #include "testutils.hpp"
@@ -20,4 +20,4 @@ TEST_CASE("NoIdOnQuery") {
   }
 }
 
-}; // namespace NoIdOnQueryTestCase
+}; // namespace NoIdOnQuery

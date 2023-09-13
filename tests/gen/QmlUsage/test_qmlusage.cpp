@@ -2,9 +2,9 @@
 #include "gen/RemoveFriend.hpp"
 #include "gen/RemoveFriendsBatch.hpp"
 
+#include "testframework.hpp"
 #include "testutils.hpp"
 #include <QQmlApplicationEngine>
-#include "testframework.hpp"
 #include <filesystem>
 
 namespace fs = std::filesystem;
@@ -85,4 +85,4 @@ TEST_CASE("QmlUsageTestCase - ListView") {
     REQUIRE(check_list_view_count(list_view, friends_count - 2));
   }
 }
-}; // namespace QmlUsageTestCase
+}; // namespace QmlUsage

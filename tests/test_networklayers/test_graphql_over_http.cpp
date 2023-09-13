@@ -1,6 +1,6 @@
 #include "qtgql/gqloverhttp/gqloverhttp.hpp"
-#include "utils.hpp"
 #include "testframework.hpp"
+#include "utils.hpp"
 using namespace qtgql;
 
 TEST_CASE("test_fetch") {

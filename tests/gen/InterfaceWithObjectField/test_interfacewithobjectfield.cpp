@@ -1,7 +1,7 @@
 #include "gen/AnimalQuery.hpp"
+#include "testframework.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>
-#include "testframework.hpp"
 
 namespace InterfaceWithObjectField {
 using namespace qtgql;

@@ -1,7 +1,7 @@
 #include "gen/MainQuery.hpp"
+#include "testframework.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>
-#include "testframework.hpp"
 
 namespace NonNodeType {
 using namespace qtgql;
@@ -30,4 +30,4 @@ TEST_CASE("NonNodeType") {
   };
 }
 
-}; // namespace NonNodeTypeTestCase
+}; // namespace NonNodeType

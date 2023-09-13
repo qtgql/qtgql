@@ -1,8 +1,8 @@
 #include "gen/MainQuery.hpp"
 #include "qtgql/gqloverhttp/gqloverhttp.hpp"
+#include "testframework.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>
-#include "testframework.hpp"
 
 namespace GqlOverHttpAsEnv {
 using namespace qtgql;
@@ -33,4 +33,4 @@ TEST_CASE("GqlOverHttpAsEnv") {
   };
 }
 
-}; // namespace GqlOverHttpAsEnvTestCase
+}; // namespace GqlOverHttpAsEnv

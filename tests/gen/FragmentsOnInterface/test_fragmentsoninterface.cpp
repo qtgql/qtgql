@@ -1,8 +1,8 @@
 #include "gen/AnimalQuery.hpp"
 #include "gen/ChangeAgeMutation.hpp"
+#include "testframework.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>
-#include "testframework.hpp"
 
 namespace FragmentsOnInterface {
 using namespace qtgql;
@@ -57,4 +57,4 @@ TEST_CASE("FragmentsOnInterface") {
   }
 }
 
-}; // namespace FragmentsOnInterfaceTestCase
+}; // namespace FragmentsOnInterface

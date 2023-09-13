@@ -3,9 +3,9 @@
 #include "gen/RemovePostTag.hpp"
 #include "gen/ReplacePostTag.hpp"
 
+#include "testframework.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>
-#include "testframework.hpp"
 
 namespace ListOfScalar {
 using namespace qtgql;
@@ -65,4 +65,4 @@ TEST_CASE("ListOfScalar") {
   };
 }
 
-}; // namespace ListOfScalarTestCase
+}; // namespace ListOfScalar

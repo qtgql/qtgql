@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import contextlib
 import glob
-import logging
 import os
 import subprocess
 from functools import cached_property
@@ -23,9 +22,8 @@ ConanBool = [True, False]
 __version__: str = "0.135.4"
 
 
-
 class QtGqlRecipe(ConanFile):
-    settings = "os", "compiler", "arch",  "build_type"
+    settings = "os", "compiler", "arch", "build_type"
     name = "qtgql"
     license = "MIT"
     author = "Nir Benlulu nrbnlulu@gmail.com"
@@ -61,6 +59,7 @@ class QtGqlRecipe(ConanFile):
 
     def is_linux(self) -> bool:
         return self.os_name == "linux"
+
     def add_to_path(self, p: Path) -> None:
         path_name = "PATH"
         path_delimiter = ":" if self.is_linux() else ";"
@@ -150,4 +149,3 @@ class QtGqlRecipe(ConanFile):
 
     def package_info(self):
         self.cpp_info.libs = ["qtgql"]  # checks that can link against this lib name.
-

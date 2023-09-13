@@ -1,5 +1,5 @@
-#include <QSignalSpy>
 #include "testframework.hpp"
+#include <QSignalSpy>
 
 #include "gen/MainQuery.hpp"
 #include "gen/UpdateUserName.hpp"
@@ -53,4 +53,4 @@ TEST_CASE("OptionalNestedObject") {
   }
 }
 
-}; // namespace OptionalNestedObjectTestCase
+}; // namespace OptionalNestedObject

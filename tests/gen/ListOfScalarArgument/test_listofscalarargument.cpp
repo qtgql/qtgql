@@ -1,7 +1,7 @@
 #include "gen/EchoArg.hpp"
+#include "testframework.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>
-#include "testframework.hpp"
 namespace ListOfScalarArgument {
 using namespace qtgql;
 
@@ -28,4 +28,4 @@ TEST_CASE("ListOfScalarArgument") {
   };
 }
 
-}; // namespace ListOfScalarArgumentTestCase
+}; // namespace ListOfScalarArgument

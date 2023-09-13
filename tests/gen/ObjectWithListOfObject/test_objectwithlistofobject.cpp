@@ -1,5 +1,5 @@
-#include <QSignalSpy>
 #include "testframework.hpp"
+#include <QSignalSpy>
 
 #include "gen/AddFriend.hpp"
 #include "gen/MainQuery.hpp"
@@ -157,4 +157,4 @@ TEST_CASE("default ListModelABC modifications and operations") {
     REQUIRE(ok);
   }
 }
-} // namespace ObjectWithListOfObjectTestCase
+} // namespace ObjectWithListOfObject

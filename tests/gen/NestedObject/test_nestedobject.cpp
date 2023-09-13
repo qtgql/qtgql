@@ -1,5 +1,5 @@
-#include <QSignalSpy>
 #include "testframework.hpp"
+#include <QSignalSpy>
 
 #include "gen/MainQuery.hpp"
 #include "gen/ReplacePerson.hpp"
@@ -64,4 +64,4 @@ TEST_CASE("NestedObject") {
   }
 }
 
-}; // namespace NestedObjectTestCase
+}; // namespace NestedObject

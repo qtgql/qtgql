@@ -1,6 +1,6 @@
+#include "testframework.hpp"
 #include <QSignalSpy>
 #include <QTest>
-#include "testframework.hpp"
 
 #include "gen/MainQuery.hpp"
 #include "gen/UserWithSameIDAndDifferentFieldsQuery.hpp"
@@ -52,4 +52,4 @@ TEST_CASE("Scalars") {
   };
 };
 
-}; // namespace ScalarsTestCase
+}; // namespace Scalars

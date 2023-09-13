@@ -1,6 +1,4 @@
-#include "doctest/doctest.h"
 #include "QString"
+#include "doctest/doctest.h"
 
-TEST_CASE("foobar"){
-    REQUIRE(true);
-}
+TEST_CASE("foobar") { REQUIRE(true); }

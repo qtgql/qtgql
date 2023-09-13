@@ -1,9 +1,9 @@
 #include "gen/FillUser.hpp"
 #include "gen/MainQuery.hpp"
 #include "gen/NullifyUser.hpp"
+#include "testframework.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>
-#include "testframework.hpp"
 
 namespace FragmentWithOperationVariable {
 using namespace qtgql;

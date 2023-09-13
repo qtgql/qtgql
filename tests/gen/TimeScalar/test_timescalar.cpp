@@ -1,6 +1,6 @@
+#include "testframework.hpp"
 #include <QSignalSpy>
 #include <QTest>
-#include "testframework.hpp"
 
 #include "gen/MainQuery.hpp"
 #include "gen/UpdateLunchTime.hpp"
@@ -41,4 +41,4 @@ TEST_CASE("TimeScalar") {
   };
 }
 
-}; // namespace TimeScalarTestCase
+}; // namespace TimeScalar

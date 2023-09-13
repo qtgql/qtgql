@@ -1,5 +1,5 @@
-#include <QSignalSpy>
 #include "testframework.hpp"
+#include <QSignalSpy>
 
 #include "gen/ChangeUserBirth.hpp"
 #include "gen/MainQuery.hpp"
@@ -42,4 +42,4 @@ TEST_CASE("DateTime") {
   };
 }
 
-}; // namespace DateTimeTestCase
+}; // namespace DateTime

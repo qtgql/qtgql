@@ -1,8 +1,8 @@
 #include "gen/CreateUser_Partial.hpp"
 #include "gen/GetUserById.hpp"
+#include "testframework.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>
-#include "testframework.hpp"
 
 namespace PartiallyInitializedNodeUpdate {
 using namespace qtgql;

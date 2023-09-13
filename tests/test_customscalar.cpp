@@ -1,6 +1,6 @@
+#include "testframework.hpp"
 #include <QString>
 #include <QTest>
-#include "testframework.hpp"
 
 #include "qtgql/customscalars/customscalars.hpp"
 
