@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-import contextlib
-import glob
 import os
 import subprocess
+import sys
 from functools import cached_property
 from pathlib import Path
-from typing import ClassVar
+from typing import ClassVar, Literal
 
 from conan import ConanFile
 from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
@@ -14,7 +13,6 @@ from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
 
 class PATHS:
     PROJECT_ROOT: ClassVar[Path] = Path(__file__).parent
-    QTGQL_TEST_TARGET: ClassVar[Path] = PROJECT_ROOT / "tests" / "build"
 
 
 ConanBool = [True, False]
@@ -22,14 +20,13 @@ ConanBool = [True, False]
 __version__: str = "0.135.4"
 
 
-class PathManager:
-    def __init__(self, recipe: QtGqlRecipe) -> None:
+class EnvManager:
+    def __init__(self) -> None:
         self._paths: list[Path] = []
-        self.recipe = recipe
 
     def _add_to_environ(self, p: Path) -> None:
         path_name = "PATH"
-        path_delimiter = ":" if self.recipe.is_linux() else ";"
+        path_delimiter = ":" if sys.platform == "linux" else ";"
         gh_action_path = os.getenv("GITHUB_PATH")
         if gh_action_path:
             with open(gh_action_path, "a") as f:  # noqa: PTH123
@@ -44,6 +41,65 @@ class PathManager:
     def commit(self) -> None:
         for p in self._paths:
             self._add_to_environ(p)
+
+
+class Qt6Installer:
+    def __init__(self, os_name: Literal["windows"] | Literal["linux"], version: str):
+        self.os_name = os_name
+        self.is_windows = os_name == "windows"
+        self.is_linux = os_name == "linux"
+        self.version = version
+
+    @property
+    def arch(self) -> str:
+        if self.is_linux:
+            return "gcc_64"
+        elif self.is_windows:
+            return "win64_mingw"
+
+    @cached_property
+    def aqt_install_dir(self) -> Path:
+        ret = Path.home() / "MyConnandeps" / "Qt"
+
+        if not ret.exists():
+            ret.mkdir(parents=True)
+        return ret
+
+    @property
+    def qt_root_dir(self) -> Path:
+        arch = "mingw_64"
+        return self.aqt_install_dir / self.version / arch
+
+    @property
+    def qt6_cmake_config(self) -> Path | None:
+        if self.qt_root_dir.exists():
+            return next(self.qt_root_dir.glob("**/Qt6Config.cmake")).parent
+
+    @property
+    def dll_path(self) -> Path:
+        return self.qt_root_dir / "bin"
+
+    def installed(self) -> bool:
+        return self.qt_root_dir.exists()
+
+    def install(self) -> None:
+        if not self.installed():
+            subprocess.run(
+                f"poetry run aqt install-qt {self.os_name} "
+                f"desktop {self.version} {self.arch} "
+                f"--outputdir {self.aqt_install_dir} "
+                f"-m qtwebsockets".split(" "),
+            ).check_returncode()
+            assert self.qt6_cmake_config.exists()
+            os.environ.setdefault(
+                "QT_PLUGIN_PATH",
+                (self.qt_root_dir / "plugins").resolve(True).as_uri(),
+            )
+            if self.is_linux:
+                os.environ.setdefault(
+                    "LD_LIBRARY_PATH",
+                    (self.qt_root_dir / "lib").resolve(True).as_uri(),
+                )
 
 
 class QtGqlRecipe(ConanFile):
@@ -85,83 +141,44 @@ class QtGqlRecipe(ConanFile):
         return self.os_name == "linux"
 
     @cached_property
-    def pathmanager(self) -> PathManager:
-        return PathManager(self)
+    def test_executable(self) -> Path:
+        return (
+            PATHS.PROJECT_ROOT
+            / "build"
+            / self.settings.build_type.value
+            / f"test_qtgql.{'exe' if self.is_windows() else '.so'}"
+        )
 
     @cached_property
     def qt_version(self) -> str:
         qt_version = self.options.qt_version.value
         return qt_version
 
-    @property
-    def qt_arch(self) -> str:
-        if self.is_linux():
-            return "gcc_64"
-        elif self.is_windows():
-            return "win64_mingw"
-
-    @cached_property
-    def aqt_install_dir(self) -> Path:
-        ret = Path.home() / "MyConnandeps" / "Qt"
-
-        if not ret.exists():
-            ret.mkdir(parents=True)
-        return ret
-
-    @property
-    def qt6_install_dir(self) -> Path | None:
-        relative_to = self.aqt_install_dir / self.qt_version
-        if relative_to.exists():
-            prev = Path.cwd()
-            os.chdir(relative_to)
-            res = glob.glob("**/Qt6Config.cmake", recursive=True)
-            os.chdir(prev)
-            with contextlib.suppress(IndexError):
-                p = (relative_to / res[0]).resolve(True)
-                return p.parent
-
     @cached_property
     def should_test(self) -> bool:
         if self.options.test.value in ("True", "true", True):
-            if not PATHS.QTGQL_TEST_TARGET.exists():
-                PATHS.QTGQL_TEST_TARGET.mkdir()
             return True
         return False
 
     def generate(self) -> None:
-        if not self.qt6_install_dir:
-            subprocess.run(
-                f"poetry run aqt install-qt {self.os_name} "
-                f"desktop {self.qt_version} {self.qt_arch} "
-                f"--outputdir {self.aqt_install_dir} "
-                f"-m qtwebsockets".split(" "),
-            ).check_returncode()
-        assert self.qt6_install_dir.exists()
-        os.environ.setdefault(
-            "QT_PLUGIN_PATH",
-            (self.qt6_install_dir.parent.parent.parent / "plugins").resolve(True).as_uri(),
-        )
-        if self.is_linux():
-            os.environ.setdefault(
-                "LD_LIBRARY_PATH",
-                (self.qt6_install_dir.parent.parent.parent / "lib").resolve(True).as_uri(),
-            )
-
+        qt_installer = Qt6Installer(self.os_name, self.options.qt_version.value)
+        if not qt_installer.installed():
+            qt_installer.install()
+        env_manager = EnvManager()
+        env_manager.add(qt_installer.dll_path)
+        env_manager.commit()
         deps = CMakeDeps(self)
         deps.generate()
         tc = CMakeToolchain(self)
-        qt_dl_path = self.qt6_install_dir.parent.parent.parent / "bin"
-        self.pathmanager.add(qt_dl_path)
-        tc.cache_variables["QT_DL_LIBRARIES"] = str(qt_dl_path)
-        tc.variables[
-            "binaryDir"
-        ] = PATHS.QTGQL_TEST_TARGET.as_posix()  # cmake works with posix paths only
+
+        tc.cache_variables["QT_DL_LIBRARIES"] = str(
+            qt_installer.dll_path,
+        )  # used by catch2 to discover tests/
         tc.cache_variables["QTGQL_TESTING"] = self.should_test
-        tc.cache_variables["Qt6_DIR"] = str(self.qt6_install_dir)
+        tc.cache_variables["Qt6_DIR"] = str(qt_installer.qt6_cmake_config)
         if self.is_windows():
             tc.cache_variables["CMAKE_CXX_COMPILER"] = "c++.exe"
 
-        self.pathmanager.commit()
         tc.generate()
 
     def build(self):
