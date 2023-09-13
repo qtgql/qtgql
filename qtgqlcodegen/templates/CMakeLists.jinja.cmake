@@ -34,6 +34,8 @@ target_link_libraries(${PROJECT_NAME}schema
         Qt::Core
         qtgql::qtgql
         )
+# TODO: this should be only in tests
+target_compile_definitions(${PROJECT_NAME}schema PRIVATE QTGQL_TEST_LIBRARY)
 {% for operation in context.generation_output.operations -%}
 
 qt_add_qml_module(${PROJECT_NAME}👉 operation.name 👈
@@ -54,6 +56,7 @@ target_link_libraries(${PROJECT_NAME}👉 operation.name 👈 PUBLIC
         ${PROJECT_NAME}schema
         qtgql::qtgql
         )
+target_compile_definitions(${PROJECT_NAME}👉 operation.name 👈 PRIVATE QTGQL_TEST_LIBRARY)
 {% endfor %}
 
 qt_add_library(${PROJECT_NAME} "")

@@ -400,7 +400,7 @@ Now we'll set up the environment in C++ and fetch the first query.
 #include <qtgql/bases/bases.hpp>
 #include <qtgql/gqloverhttp/gqloverhttp.hpp>
 
-#include "graphql/__generated__/ContinentQuery.hpp"
+#include "g/ContinentQuery.hpp"
 
 
 namespace fs = std::filesystem;
