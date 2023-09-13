@@ -78,7 +78,7 @@ schema = strawberry.Schema(query=Query, subscription=Subscription, mutation=Muta
 
 class DebugGraphQLTransportWSHandler(GraphQLTransportWSHandler):
     async def handle_message(self, message: dict):
-        print(f"[{self._ws!r}-{self.testcase_name}] message -> {message}")  # noqa
+        print(f"TestCase{self.testcase_name}: WS[{self._ws._req.path}] message -> {message}")  # noqa
         await super().handle_message(message)
 
 
