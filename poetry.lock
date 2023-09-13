@@ -275,18 +275,6 @@ files = [
 pytz = {version = ">=2015.7", markers = "python_version < \"3.9\""}
 
 [[package]]
-name = "backoff"
-version = "2.1.2"
-description = "Function decoration for backoff and retry"
-category = "dev"
-optional = false
-python-versions = ">=3.7,<4.0"
-files = [
-    {file = "backoff-2.1.2-py3-none-any.whl", hash = "sha256:b135e6d7c7513ba2bfd6895bc32bc8c66c6f3b0279b4c6cd866053cfd7d3126b"},
-    {file = "backoff-2.1.2.tar.gz", hash = "sha256:407f1bc0f22723648a8880821b935ce5df8475cf04f7b6b5017ae264d30f6069"},
-]
-
-[[package]]
 name = "beautifulsoup4"
 version = "4.12.2"
 description = "Screen-scraping library"
@@ -1133,24 +1121,6 @@ python-dateutil = ">=2.8.1"
 dev = ["flake8", "markdown", "twine", "wheel"]
 
 [[package]]
-name = "githubrelease"
-version = "1.5.9"
-description = "githubrelease is a CLI to easily manage GitHub releases, assets and references"
-category = "dev"
-optional = false
-python-versions = "*"
-files = [
-    {file = "githubrelease-1.5.9-py2.py3-none-any.whl", hash = "sha256:add9ae18dbcc94dcc579f243cd7f3e5776b18926b32b8c94829014fe2db12b68"},
-    {file = "githubrelease-1.5.9.tar.gz", hash = "sha256:e3d927c7df059ff538eafb822ab4c97e9b23840b27366fea891a499e4ef8d1f9"},
-]
-
-[package.dependencies]
-backoff = ">=2.1.2,<2.2.0"
-click = "*"
-linkheader = "*"
-requests = "*"
-
-[[package]]
 name = "graphql-core"
 version = "3.2.3"
 description = "GraphQL implementation for Python, a port of GraphQL.js, the JavaScript reference implementation for GraphQL."
@@ -1252,14 +1222,14 @@ tests = ["freezegun", "pytest", "pytest-cov"]
 
 [[package]]
 name = "identify"
-version = "2.5.27"
+version = "2.5.28"
 description = "File identification library for Python"
 category = "dev"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "identify-2.5.27-py2.py3-none-any.whl", hash = "sha256:fdb527b2dfe24602809b2201e033c2a113d7bdf716db3ca8e3243f735dcecaba"},
-    {file = "identify-2.5.27.tar.gz", hash = "sha256:287b75b04a0e22d727bc9a41f0d4f3c1bcada97490fa6eabb5b28f0e9097e733"},
+    {file = "identify-2.5.28-py2.py3-none-any.whl", hash = "sha256:87816de144bf46d161bd5b3e8f5596b16cade3b80be537087334b26bc5c177f3"},
+    {file = "identify-2.5.28.tar.gz", hash = "sha256:94bb59643083ebd60dc996d043497479ee554381fbc5307763915cda49b0e78f"},
 ]
 
 [package.extras]
@@ -1491,17 +1461,6 @@ docs = ["furo", "jaraco.packaging (>=9)", "jaraco.tidelift (>=1.4)", "rst.linker
 testing = ["pytest (>=6)", "pytest-black (>=0.3.7)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=1.3)", "pytest-mypy (>=0.9.1)", "pytest-ruff"]
 
 [[package]]
-name = "linkheader"
-version = "0.4.3"
-description = "Parse and format link headers according to RFC 5988 \"Web Linking\""
-category = "dev"
-optional = false
-python-versions = "*"
-files = [
-    {file = "LinkHeader-0.4.3.tar.gz", hash = "sha256:7fbbc35c0ba3fbbc530571db7e1c886e7db3d718b29b345848ac9686f21b50c3"},
-]
-
-[[package]]
 name = "markdown"
 version = "3.4.4"
 description = "Python implementation of John Gruber's Markdown."
@@ -1731,14 +1690,14 @@ mkdocs = ">=1.1"
 
 [[package]]
 name = "mkdocs-material"
-version = "9.3.0"
+version = "9.3.1"
 description = "Documentation that simply works"
 category = "dev"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "mkdocs_material-9.3.0-py3-none-any.whl", hash = "sha256:eef70a2a8cd0083f229f011a085e78d8c8312e1c648a2488f6e1012f6310ef17"},
-    {file = "mkdocs_material-9.3.0.tar.gz", hash = "sha256:3c89286ea13fb9e6a6e3a3a4be797589f813c4380a936d56641ced6f3ee77b32"},
+    {file = "mkdocs_material-9.3.1-py3-none-any.whl", hash = "sha256:614cdd1d695465375e0f50bfe9881db1eb68d1f17164b8edfedcda1457e61894"},
+    {file = "mkdocs_material-9.3.1.tar.gz", hash = "sha256:793c4ec0978582380491a68db8ac4f7e0d5467a736c9884c05baf95a143f32f7"},
 ]
 
 [package.dependencies]
@@ -1795,14 +1754,14 @@ python-legacy = ["mkdocstrings-python-legacy (>=0.2.1)"]
 
 [[package]]
 name = "mkdocstrings-python"
-version = "1.6.2"
+version = "1.6.3"
 description = "A Python handler for mkdocstrings."
 category = "dev"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "mkdocstrings_python-1.6.2-py3-none-any.whl", hash = "sha256:cf560df975faf712808e44c1c2e52b8267f17bc89c8b23e7b9bfe679561adf4d"},
-    {file = "mkdocstrings_python-1.6.2.tar.gz", hash = "sha256:edf0f81899bee8024971bf2c18b6fc17f66085992f01c72840a3ee0ee42113fb"},
+    {file = "mkdocstrings_python-1.6.3-py3-none-any.whl", hash = "sha256:e5d6b6f6cb595f16e47e22ea2baee3c1bdb501e178872d4924e38d858f8c5a38"},
+    {file = "mkdocstrings_python-1.6.3.tar.gz", hash = "sha256:c11dc2c7bcb120fad9f582840fa032ff4a19d370d77057737ca44c4d3e404e10"},
 ]
 
 [package.dependencies]
@@ -3126,20 +3085,20 @@ doc = ["Sphinx", "sphinx-rtd-theme"]
 
 [[package]]
 name = "setuptools"
-version = "68.2.0"
+version = "68.2.2"
 description = "Easily download, build, install, upgrade, and uninstall Python packages"
 category = "dev"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "setuptools-68.2.0-py3-none-any.whl", hash = "sha256:af3d5949030c3f493f550876b2fd1dd5ec66689c4ee5d5344f009746f71fd5a8"},
-    {file = "setuptools-68.2.0.tar.gz", hash = "sha256:00478ca80aeebeecb2f288d3206b0de568df5cd2b8fada1209843cc9a8d88a48"},
+    {file = "setuptools-68.2.2-py3-none-any.whl", hash = "sha256:b454a35605876da60632df1a60f736524eb73cc47bbc9f3f1ef1b644de74fd2a"},
+    {file = "setuptools-68.2.2.tar.gz", hash = "sha256:4ac1475276d2f1c48684874089fefcd83bd7162ddaafb81fac866ba0db282a87"},
 ]
 
 [package.extras]
 docs = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "pygments-github-lexers (==0.0.5)", "rst.linker (>=1.9)", "sphinx (>=3.5)", "sphinx-favicon", "sphinx-hoverxref (<2)", "sphinx-inline-tabs", "sphinx-lint", "sphinx-notfound-page (>=1,<2)", "sphinx-reredirects", "sphinxcontrib-towncrier"]
 testing = ["build[virtualenv]", "filelock (>=3.4.0)", "flake8-2020", "ini2toml[lite] (>=0.9)", "jaraco.develop (>=7.21)", "jaraco.envs (>=2.2)", "jaraco.path (>=3.2.0)", "pip (>=19.1)", "pytest (>=6)", "pytest-black (>=0.3.7)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=2.2)", "pytest-mypy (>=0.9.1)", "pytest-perf", "pytest-ruff", "pytest-timeout", "pytest-xdist", "tomli-w (>=1.0.0)", "virtualenv (>=13.0.0)", "wheel"]
-testing-integration = ["build[virtualenv]", "filelock (>=3.4.0)", "jaraco.envs (>=2.2)", "jaraco.path (>=3.2.0)", "packaging", "pytest", "pytest-enabler", "pytest-xdist", "tomli", "virtualenv (>=13.0.0)", "wheel"]
+testing-integration = ["build[virtualenv] (>=1.0.3)", "filelock (>=3.4.0)", "jaraco.envs (>=2.2)", "jaraco.path (>=3.2.0)", "packaging (>=23.1)", "pytest", "pytest-enabler", "pytest-xdist", "tomli", "virtualenv (>=13.0.0)", "wheel"]
 
 [[package]]
 name = "shellingham"
@@ -3620,4 +3579,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.12"
-content-hash = "0af0e31279594ea5fb26c948d39c3d125ee48998cb7b0085a329f1cd9de81640"
+content-hash = "793b3d285de8994dfea576a967f2e6b97fda3390a6824c0a61afbe079f1cddfc"
