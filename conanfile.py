@@ -63,6 +63,10 @@ class QtGqlRecipe(ConanFile):
     def add_to_path(self, p: Path) -> None:
         path_name = "PATH"
         path_delimiter = ":" if self.is_linux() else ";"
+        gh_action_path = os.getenv("GITHUB_PATH")
+        if gh_action_path:
+            with open(gh_action_path, "a") as f:  # noqa: PTH123
+                f.write(f"{p!s}{path_delimiter}")
         paths = os.environ.get(path_name).split(path_delimiter)
         paths.append(p.resolve(True).as_uri())
         os.environ.setdefault(path_name, path_delimiter.join(paths))
