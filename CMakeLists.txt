@@ -56,7 +56,6 @@ option(QTGQL_TESTING "Enable tests" FALSE)
 
 
 # ───── LIBRARY TESTS ─────
-
 if(QTGQL_TESTING)
   if(QTGQL_VERBOSE)
     message(STATUS "building tests")

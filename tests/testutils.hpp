@@ -12,7 +12,7 @@
 
 #include "qtgql/bases/bases.hpp"
 #include "qtgql/gqltransportws/gqltransportws.hpp"
-#include "doctest/doctest.h"
+#include "testframework.hpp"
 
 using namespace qtgql;
 namespace fs = std::filesystem;

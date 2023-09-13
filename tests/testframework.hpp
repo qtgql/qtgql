@@ -1,6 +1,5 @@
 #pragma once
-#include "doctest/doctest.h"
+#include <catch2/catch_test_macros.hpp>
 // TODO: remove if migrating to doctest.
 
-#define SECTION(name) DOCTEST_SUBCASE(name)
 

@@ -23,8 +23,9 @@ ConanBool = [True, False]
 __version__: str = "0.135.4"
 
 
+
 class QtGqlRecipe(ConanFile):
-    settings = "os", "compiler", "build_type", "arch"
+    settings = "os", "compiler", "arch",  "build_type"
     name = "qtgql"
     license = "MIT"
     author = "Nir Benlulu nrbnlulu@gmail.com"
@@ -46,7 +47,7 @@ class QtGqlRecipe(ConanFile):
         ...
 
     def build_requirements(self) -> None:
-        self.test_requires("doctest/2.4.11")
+        self.test_requires("catch2/3.4.0")
 
     def layout(self) -> None:
         cmake_layout(self)
@@ -60,6 +61,12 @@ class QtGqlRecipe(ConanFile):
 
     def is_linux(self) -> bool:
         return self.os_name == "linux"
+    def add_to_path(self, p: Path) -> None:
+        path_name = "PATH"
+        path_delimiter = ":" if self.is_linux() else ";"
+        paths = os.environ.get(path_name).split(path_delimiter)
+        paths.append(p.resolve(True).as_uri())
+        os.environ.setdefault(path_name, path_delimiter.join(paths))
 
     @cached_property
     def qt_version(self) -> str:
@@ -109,27 +116,27 @@ class QtGqlRecipe(ConanFile):
                 f"--outputdir {self.aqt_install_dir} "
                 f"-m qtwebsockets".split(" "),
             ).check_returncode()
-        # os.environ.setdefault(
-        #     "QT_PLUGIN_PATH",
-        #     (self.qt6_install_dir.parent.parent.parent / "plugins").resolve(True).as_uri(),
-        # )
-        # os.environ.setdefault(
-        #     "LD_LIBRARY_PATH",
-        #     (self.qt6_install_dir.parent.parent.parent / "lib").resolve(True).as_uri(),
-        # )
-        # paths = os.environ.get("PATH").split(":")
-        # paths.append((self.qt6_install_dir.parent.parent.parent / "bin").resolve(True).as_uri())
-        # os.environ.setdefault("PATH", ":".join(paths))
+        os.environ.setdefault(
+            "QT_PLUGIN_PATH",
+            (self.qt6_install_dir.parent.parent.parent / "plugins").resolve(True).as_uri(),
+        )
+        if self.is_linux():
+            os.environ.setdefault(
+                "LD_LIBRARY_PATH",
+                (self.qt6_install_dir.parent.parent.parent / "lib").resolve(True).as_uri(),
+            )
+        self.add_to_path(self.qt6_install_dir.parent.parent.parent / "bin")
         assert self.qt6_install_dir
         assert self.qt6_install_dir.exists()
         deps = CMakeDeps(self)
         deps.generate()
         tc = CMakeToolchain(self)
-        # tc.variables[
-        #     "binaryDir"
-        # ] = PATHS.QTGQL_TEST_TARGET.as_posix()  # cmake works with posix paths only
+        tc.variables[
+            "binaryDir"
+        ] = PATHS.QTGQL_TEST_TARGET.as_posix()  # cmake works with posix paths only
         tc.cache_variables["QTGQL_TESTING"] = self.should_test
         tc.cache_variables["Qt6_DIR"] = str(self.qt6_install_dir)
+        tc.cache_variables["CMAKE_CXX_COMPILER"] = "c++.exe"
         tc.generate()
 
     def build(self):
@@ -143,3 +150,4 @@ class QtGqlRecipe(ConanFile):
 
     def package_info(self):
         self.cpp_info.libs = ["qtgql"]  # checks that can link against this lib name.
+
