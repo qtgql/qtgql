@@ -30,7 +30,8 @@ target_link_libraries(${TESTS_TARGET}
     Qt6::Qml
     Qt6::Quick
     qtgql
-        Catch2::Catch2    )
+    Catch2::Catch2
+)
 
 
 catch_discover_tests(${TESTS_TARGET})

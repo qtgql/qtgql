@@ -135,7 +135,8 @@ class QtGqlRecipe(ConanFile):
         ] = PATHS.QTGQL_TEST_TARGET.as_posix()  # cmake works with posix paths only
         tc.cache_variables["QTGQL_TESTING"] = self.should_test
         tc.cache_variables["Qt6_DIR"] = str(self.qt6_install_dir)
-        tc.cache_variables["CMAKE_CXX_COMPILER"] = "c++.exe"
+        if self.is_windows():
+            tc.cache_variables["CMAKE_CXX_COMPILER"] = "c++.exe"
         tc.generate()
 
     def build(self):
