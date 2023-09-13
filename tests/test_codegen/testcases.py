@@ -199,7 +199,7 @@ ScalarsTestCase = QtGqlTestCase(
             voidField
           }
         }
-        query UserWithSameIDAndDifferentFieldsQuery {
+        query UserWithSameIDDiffFields {
           constUserWithModifiedFields {
             age
             agePoint
@@ -215,7 +215,20 @@ ScalarsTestCase = QtGqlTestCase(
 
 SimpleGarbageCollection = QtGqlTestCase(
     schema=schemas.object_with_scalar.schema,
-    operations=ScalarsTestCase.operations,
+    operations="""
+        query MainQuery {
+          constUser {
+            id
+            name
+            age
+            agePoint
+            male
+            id
+            uuid
+            voidField
+          }
+        }
+        """,
     test_name="GarbageCollection",
     metadata=TestCaseMetadata(
         should_test_updates=BoolWithReason.false("tested in scalar testcase"),

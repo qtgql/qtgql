@@ -3,7 +3,7 @@
 #include <QTest>
 
 #include "gen/MainQuery.hpp"
-#include "gen/UserWithSameIDAndDifferentFieldsQuery.hpp"
+#include "gen/UserWithSameIDDiffFields.hpp"
 #include "testutils.hpp"
 
 #include "qtgql/gqloverhttp/gqloverhttp.hpp"
@@ -36,8 +36,8 @@ TEST_CASE("Scalars") {
     auto data = mq->data();
     auto user = data->get_constUser();
     auto previous_name = user->get_name();
-    auto modified_user_op = userwithsameidanddifferentfieldsquery::
-        UserWithSameIDAndDifferentFieldsQuery::shared();
+    auto modified_user_op =
+        userwithsameiddifffields::UserWithSameIDDiffFields::shared();
     auto catcher = test_utils::SignalCatcher(
         {.source_obj = user, .excludes = {{"voidField"}}});
     modified_user_op->fetch();
