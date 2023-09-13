@@ -1,5 +1,6 @@
 #include "main.hpp"
 
+#include "testframework.hpp"
 #include <QGuiApplication>
 #include <QTest>
 #include <QTimer>
