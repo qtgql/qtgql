@@ -2,13 +2,14 @@
 #include "qtgql/bases/bases.hpp"
 #include "qtgql/gqloverhttp/gqloverhttp.hpp"
 #include "qtgql/gqltransportws/gqltransportws.hpp"
+#include "qtgql/qtgql_export.hpp"
 
 namespace qtgql::routers {
 
 /* routes subscriptions to gql-ws-transport and other operations to
  graphql-over-http.
  */
-class SubscriptionRouter : public bases::NetworkLayerABC {
+class QTGQL_EXPORT SubscriptionRouter : public bases::NetworkLayerABC {
   std::shared_ptr<gqltransportws::GqlTransportWs> ws_layer;
   std::shared_ptr<gqloverhttp::GraphQLOverHttp> http_layer;
 
@@ -25,6 +26,7 @@ public:
       http_layer->execute(handler);
     }
   }
+  ~SubscriptionRouter() = default;
 };
 
 } // namespace qtgql::routers

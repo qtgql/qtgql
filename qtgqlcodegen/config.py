@@ -63,6 +63,10 @@ class QtGqlConfig:
             ),
         )
 
+    @property
+    def shared_lib_export_definition(self) -> str:
+        return f"QTGQL_{self.env_name}_EXPORT" f""
+
     def generate(self) -> None:
         self._evaluator.dump()
 

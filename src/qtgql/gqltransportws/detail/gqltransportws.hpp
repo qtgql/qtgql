@@ -1,4 +1,7 @@
 #pragma once
+#include "qtgql/bases/bases.hpp"
+#include "qtgql/qtgql_export.hpp"
+
 #include <QJsonObject>
 #include <QUuid>
 #include <QWebSocket>
@@ -8,8 +11,6 @@
 #include <memory>
 #include <optional>
 #include <unordered_set>
-
-#include "qtgql/bases/bases.hpp"
 
 namespace qtgql::gqltransportws {
 
@@ -104,7 +105,8 @@ struct GqlTransportWsClientSettings {
   std::map<QString, QString> headers = {};
 };
 
-class GqlTransportWs : public QObject, public bases::NetworkLayerABC {
+class QTGQL_EXPORT GqlTransportWs : public QObject,
+                                    public bases::NetworkLayerABC {
   Q_OBJECT
 
 private:

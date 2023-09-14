@@ -11,10 +11,10 @@
 👉 dep 👈
 {% endfor %}
 
-#if defined(QTGQL_TEST_LIBRARY)
-#define QTGQL_EXPORT_FOR_UNIT_TESTS Q_DECL_EXPORT
+#if defined(👉context.config.shared_lib_export_definition 👈)
+#define 👉context.export_macro👈 Q_DECL_EXPORT
 #else
-#define QTGQL_EXPORT_FOR_UNIT_TESTS Q_DECL_IMPORT
+#define 👉context.export_macro👈 Q_DECL_IMPORT
 #endif
 
 namespace 👉 context.config.env_name 👈{
@@ -86,7 +86,7 @@ class 👉 type.name 👈;
 
 // ---------- Interfaces ----------
 {% for interface in context.interfaces -%}
-class QTGQL_EXPORT_FOR_UNIT_TESTS 👉 interface.name 👈 {% for base in interface.bases %} {%if loop.first %}: {% endif %} public 👉 base.name 👈 {% if not loop.last %}, {% endif %}{% endfor %}{
+class 👉context.export_macro👈  👉 interface.name 👈 {% for base in interface.bases %} {%if loop.first %}: {% endif %} public 👉 base.name 👈 {% if not loop.last %}, {% endif %}{% endfor %}{
 Q_OBJECT
 
 👉 concrete_type_fields(interface) 👈
@@ -104,7 +104,7 @@ static auto & ENV_CACHE() {
 
 {% for type in context.types %}
 {%- set base_class -%}{% if type. implements_node %}NodeInterfaceABC{% else %}ObjectTypeABC{% endif %}{%- endset -%}
-class QTGQL_EXPORT_FOR_UNIT_TESTS 👉 type.name 👈 {% for base in type.bases %}{%if loop.first%}: {% endif %} public 👉 base.name 👈 {% if not loop.last %}, {% endif %}{% endfor %}{
+class 👉context.export_macro👈  👉 type.name 👈 {% for base in type.bases %}{%if loop.first%}: {% endif %} public 👉 base.name 👈 {% if not loop.last %}, {% endif %}{% endfor %}{
 Q_OBJECT
 👉 concrete_type_fields(type) 👈
 public:

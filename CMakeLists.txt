@@ -17,6 +17,7 @@ if (WIN32)
 endif ()
 find_package(Qt6 REQUIRED COMPONENTS Core Qml Quick WebSockets)
 qt_standard_project_setup()
+set(WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 
 
@@ -27,6 +28,7 @@ file(GLOB_RECURSE QTGQL_HEADERS "src/*.hpp")
 
 add_library(${PROJECT_NAME} SHARED ${QTGQL_SOURCES})
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+target_compile_definitions(${PROJECT_NAME} PRIVATE QTGQL_CORE_LIB_SHARED_BUILD)
 
 target_link_libraries(
         ${PROJECT_NAME}
@@ -45,7 +47,6 @@ target_sources(${PROJECT_NAME} PUBLIC FILE_SET HEADERS
         FILES
         ${QTGQL_HEADERS}
         )
-
 # install with headers
 install(TARGETS ${PROJECT_NAME} FILE_SET HEADERS)
 

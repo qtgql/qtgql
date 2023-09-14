@@ -1,17 +1,17 @@
 #pragma once
-#include <QTimer>
-#include <utility>
-
 #include "./networklayer.hpp"
 #include "./objecttype.hpp"
 #include "QMap"
 #include "QString"
 #include "objecttype.hpp"
+#include "qtgql/qtgql_export.hpp"
+#include <QTimer>
+#include <utility>
 
 namespace qtgql::bases {
 using namespace std::chrono_literals;
 
-class NodeInstanceStore {
+class QTGQL_EXPORT NodeInstanceStore {
   friend class EnvCache;
 
 protected:
@@ -25,12 +25,12 @@ protected:
   void collect_garbage();
 };
 
-struct EnvCacheOptions {
+struct QTGQL_EXPORT EnvCacheOptions {
   std::chrono::milliseconds garbage_collection_period =
       std::chrono::milliseconds(30s);
 };
 
-class EnvCache : public QObject {
+class QTGQL_EXPORT EnvCache : public QObject {
   Q_OBJECT
 protected:
   NodeInstanceStore m_store = {};
@@ -63,7 +63,7 @@ all the generated handlers for this environment  would use this layer.
 by the generated handlers based on the configurations.
 */
 
-class Environment {
+class QTGQL_EXPORT Environment {
   typedef std::shared_ptr<Environment> SharedQtGqlEnv;
   //  using a ptr here since client is to be extended by implementors.
   typedef std::unique_ptr<NetworkLayerABC> UniqueNetworkLayer;

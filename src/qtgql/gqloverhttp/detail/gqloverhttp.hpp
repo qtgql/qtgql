@@ -1,5 +1,6 @@
 #pragma once
-#include "../../bases/bases.hpp"
+#include "qtgql/bases/bases.hpp"
+#include "qtgql/qtgql_export.hpp"
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -43,7 +44,8 @@ public:
   }
 };
 
-class GraphQLOverHttp : public QObject, public bases::NetworkLayerABC {
+class QTGQL_EXPORT GraphQLOverHttp : public QObject,
+                                     public bases::NetworkLayerABC {
   Q_OBJECT
 protected:
   QUrl m_url;

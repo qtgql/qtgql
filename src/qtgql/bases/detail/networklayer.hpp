@@ -4,10 +4,10 @@
  * at ../gqlwstransport dir.
  */
 #pragma once
-
 #include "QJsonObject"
 #include "QUuid"
 #include "exceptions.hpp"
+#include "qtgql/qtgql_export.hpp"
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QNetworkAccessManager>
@@ -60,7 +60,7 @@ struct GraphQLMessage : public bases::HashAbleABC {
   void set_variables(const QJsonObject &vars) { variables = vars; }
 };
 
-struct HandlerABC {
+struct QTGQL_EXPORT HandlerABC {
 
   // https://github.com/enisdenjo/graphql-ws/blob/master/PROTOCOL.md#next
   virtual void on_next(const QJsonObject &message) = 0;
@@ -79,7 +79,7 @@ class that should support executing handlers
  and expected to call the handler's `on_data` /
 `on_error` / 'on_completed' when the operation is completed.
 */
-struct NetworkLayerABC {
+struct QTGQL_EXPORT NetworkLayerABC {
   virtual void execute(const std::shared_ptr<HandlerABC> &handler) {
     throw exceptions::NotImplementedError({});
   }

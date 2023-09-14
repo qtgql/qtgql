@@ -5,11 +5,12 @@
 #include "QSet"
 #include "exceptions.hpp"
 #include "metadata.hpp"
+#include "qtgql/qtgql_export.hpp"
 
 namespace qtgql {
 namespace bases {
 
-class ObjectTypeABC : public QObject {
+class QTGQL_EXPORT ObjectTypeABC : public QObject {
   Q_OBJECT
 
   Q_PROPERTY(const QString &__typeName READ __typename CONSTANT)
@@ -24,7 +25,7 @@ public:
 
 class NodeInterfaceABC;
 
-class NodeInterfaceABC : public ObjectTypeABC {
+class QTGQL_EXPORT NodeInterfaceABC : public ObjectTypeABC {
 public:
   using ObjectTypeABC::ObjectTypeABC;
 

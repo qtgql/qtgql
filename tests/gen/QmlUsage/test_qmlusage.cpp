@@ -1,6 +1,7 @@
 #include "gen/FriendsListQuery.hpp"
 #include "gen/RemoveFriend.hpp"
 #include "gen/RemoveFriendsBatch.hpp"
+#include "gen/SimpleQuery.hpp"
 
 #include "testframework.hpp"
 #include "testutils.hpp"
@@ -37,7 +38,12 @@ TEST_CASE("QmlUsageTestCase - simple") {
         fs::path(__FILE__).parent_path() / "testoncompletedhook.qml";
 
     auto root_qquickitem = bot.load(main_qml);
-
+    auto node = bot.find<QQuickItem *>("useSimpleQuery");
+    for (int i = node->metaObject()->propertyOffset();
+         i < node->metaObject()->propertyCount(); ++i) {
+      qDebug() << node->metaObject()->property(i).name()
+               << node->metaObject()->property(i).read(node);
+    }
     REQUIRE(QTest::qWaitFor(
         [&] { return root_qquickitem->property("success").toBool(); }));
   }

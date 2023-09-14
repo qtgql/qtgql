@@ -21,19 +21,15 @@ __version__: str = "0.135.4"
 
 
 class EnvManager:
-    def __init__(self) -> None:
+    def __init__(self, env_var: str = "PATH") -> None:
+        self._env_avr = env_var
         self._paths: list[Path] = []
 
     def _add_to_environ(self, p: Path) -> None:
-        path_name = "PATH"
         path_delimiter = ":" if sys.platform == "linux" else ";"
-        gh_action_path = os.getenv("GITHUB_PATH")
-        if gh_action_path:
-            with open(gh_action_path, "a") as f:  # noqa: PTH123
-                f.write(f"{p!s}{path_delimiter}")
-        paths = os.environ.get(path_name).split(path_delimiter)
+        paths = os.environ.get(self._env_avr, "").split(path_delimiter)
         paths.append(p.resolve(True).as_uri())
-        os.environ.setdefault(path_name, path_delimiter.join(paths))
+        os.environ.setdefault(self._env_avr, path_delimiter.join(paths))
 
     def add(self, p: Path) -> None:
         self._paths.append(p)
@@ -134,6 +130,10 @@ class QtGqlRecipe(ConanFile):
     def os_name(self):
         return self.settings.os.value.lower()
 
+    @property
+    def build_type(self) -> str:
+        return self.settings.build_type.value
+
     def is_windows(self) -> bool:
         return self.os_name == "windows"
 
@@ -145,7 +145,7 @@ class QtGqlRecipe(ConanFile):
         return (
             PATHS.PROJECT_ROOT
             / "build"
-            / self.settings.build_type.value
+            / self.build_type
             / f"test_qtgql.{'exe' if self.is_windows() else '.so'}"
         )
 
@@ -170,10 +170,10 @@ class QtGqlRecipe(ConanFile):
         deps = CMakeDeps(self)
         deps.generate()
         tc = CMakeToolchain(self)
-
-        tc.cache_variables["QT_DL_LIBRARIES"] = str(
-            qt_installer.dll_path,
-        )  # used by catch2 to discover tests/
+        a = str(self.build_path / "tests" / "gen")
+        tc.cache_variables[
+            "QT_DL_LIBRARIES"
+        ] = f"{qt_installer.dll_path!s};"  # used by catch2 to discover tests/
         tc.cache_variables["QTGQL_TESTING"] = self.should_test
         tc.cache_variables["Qt6_DIR"] = str(qt_installer.qt6_cmake_config)
         if self.is_windows():

@@ -112,55 +112,39 @@ public:
 };
 
 struct QmlBot {
-  QQuickView *m_qquick_view;
+  std::unique_ptr<QQmlEngine> m_engine;
   QmlBot() {
-    m_qquick_view = new QQuickView();
-    auto qmltester =
-        QFileInfo(fs::path(__FILE__).parent_path() / "qmltester.qml");
-    m_qquick_view->setSource(QUrl::fromLocalFile(qmltester.absoluteFilePath()));
-    auto loaded = QTest::qWaitFor(
-        [this] { return this->m_qquick_view->status() == QQuickView::Ready; });
-    auto errors = m_qquick_view->errors();
-    if (!errors.empty() || !loaded) {
-      qDebug() << errors;
-      throw "errors during qml load";
-    }
-    m_qquick_view->show();
+    m_engine = std::make_unique<QQmlEngine>();
+    // TODO: make this relative and add a note.
+    m_engine->addImportPath(
+        R"(C:\Users\temp\Desktop\omortie_qtgql\build\Debug\tests)");
+    qDebug() << m_engine->importPathList();
   }
 
   template <typename T> T find(const QString &objectName) {
-    return m_qquick_view->findChild<T>(objectName);
+    return m_engine->findChild<T>(objectName);
   };
 
-  QQuickItem *root_rect() { return find<QQuickItem *>("rootRect"); };
-
   QQuickItem *load(const fs::path &path) {
-    auto source = QFileInfo(path);
-    assert_m(source.exists(), "source qml file doesn't exists.")
-        QQmlComponent component(m_qquick_view->engine(),
-                                QUrl::fromLocalFile(source.absoluteFilePath()),
-                                QQmlComponent::PreferSynchronous);
-    if (!QTest::qWaitFor([&] { return component.isReady(); }))
+    assert_m(QFileInfo(path).exists(), "source qml file doesn't exists.");
+    auto pathstring = path.string();
+    auto qml_file = QFile(QFileInfo(path).absoluteFilePath());
+    qml_file.open(QIODevice::ReadOnly | QIODevice::Text);
+    auto qmlcontent = qml_file.readAll();
 
-      assert_m(false, component.errors());
-
-    QObject *object = component.create();
-    object->setParent(m_qquick_view->rootObject());
-    auto errors = m_qquick_view->errors();
-
-    if (!errors.empty()) {
-      qDebug() << errors << m_qquick_view->errors();
-      throw "errors during qml load";
-    }
-    auto ret = root_rect()->findChildren<QQuickItem *>()[0];
+    assert_m(!qmlcontent.isEmpty(), "file is empty");
+    QQmlComponent component(m_engine.get());
+    component.setData(qmlcontent, {});
+    auto loaded = QTest::qWaitFor(
+        [&] { return component.status() == QQmlComponent::Ready; });
+    assert_m(loaded, component.errors());
+    auto obj = component.create();
+    assert_m((obj != nullptr), "couldn't create component");
+    QQuickWindow *win = qobject_cast<QQuickWindow *>(obj);
+    assert_m((win != nullptr),
+             "make user your root component is an window") auto ret =
+        win->findChildren<QQuickItem *>()[0];
     return ret;
-  }
-
-  [[nodiscard]] QQmlEngine *engine() const { return m_qquick_view->engine(); }
-
-  ~QmlBot() {
-    m_qquick_view->close();
-    delete m_qquick_view;
   }
 };
 

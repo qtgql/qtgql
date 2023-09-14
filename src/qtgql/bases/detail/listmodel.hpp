@@ -1,13 +1,13 @@
 #pragma once
 #include "QAbstractListModel"
-#include "Qt"
 #include "metadata.hpp"
 #include "objecttype.hpp"
+#include "qtgql/qtgql_export.hpp"
 
 namespace qtgql {
 namespace bases {
 
-class ListModelMixin : public QAbstractListModel {
+class QTGQL_EXPORT ListModelMixin : public QAbstractListModel {
   Q_OBJECT
 
   Q_PROPERTY(int count MEMBER m_count NOTIFY countChanged)

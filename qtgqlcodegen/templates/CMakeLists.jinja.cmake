@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 3.20)
 set(EnvTarget "👉 context.target_name 👈")
 set(QTGQL_QML_PLUGIN_DIRECTORY 👉 context.config.qml_plugins_path 👈/GraphQL/${EnvTarget})
 
-project(${EnvTarget} LANGUAGES CXX)
-
 # add import path for Qt-Creator usage.
 if (NOT ${CMAKE_BINARY_DIR}/qml IN_LIST QML_DIRS)
     list(APPEND QML_DIRS ${CMAKE_BINARY_DIR}/qml)
@@ -34,15 +32,12 @@ target_link_libraries(${PROJECT_NAME}schema
         Qt::Core
         qtgql::qtgql
         )
-# TODO: this should be only in tests
-target_compile_definitions(${PROJECT_NAME}schema PRIVATE QTGQL_TEST_LIBRARY)
-{% for operation in context.generation_output.operations -%}
 
+target_compile_definitions(${PROJECT_NAME}schema PRIVATE 👉 context.config.shared_lib_export_definition 👈)
+{% for operation in context.generation_output.operations -%}
 qt_add_qml_module(${PROJECT_NAME}👉 operation.name 👈
         URI GraphQL.${PROJECT_NAME}.👉 operation.name 👈
-        # Using PLUGIN_TARGET in static library compilation will cause link failure
         OUTPUT_DIRECTORY ${QTGQL_QML_PLUGIN_DIRECTORY}/👉 operation.name 👈
-        # TYPEINFO "plugins.qmltypes"
         SOURCES
         {% for filespec in operation.sources -%}
         👉 filespec.path.as_posix() 👈
@@ -56,7 +51,7 @@ target_link_libraries(${PROJECT_NAME}👉 operation.name 👈 PUBLIC
         ${PROJECT_NAME}schema
         qtgql::qtgql
         )
-target_compile_definitions(${PROJECT_NAME}👉 operation.name 👈 PRIVATE QTGQL_TEST_LIBRARY)
+target_compile_definitions(${PROJECT_NAME}👉 operation.name 👈 PRIVATE 👉 context.config.shared_lib_export_definition 👈)
 {% endfor %}
 
 qt_add_library(${PROJECT_NAME} "")
