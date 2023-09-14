@@ -110,13 +110,21 @@ public:
 
   [[nodiscard]] bool wait(int timeout = 1000);
 };
-
+#define STRINGIFY(x) #x
+#define TOSTRING(x) STRINGIFY(x)
 struct QmlBot {
   QQuickView *m_qquick_view;
   QmlBot() {
     m_qquick_view = new QQuickView();
-    m_qquick_view->engine()->addImportPath(
-        R"(C:\Users\temp\Desktop\omortie_qtgql\build\Debug\tests)");
+#ifdef _WIN32
+    auto additional_path =
+        QDir(fs::path(TOSTRING(TESTS_QML_DIR))).absolutePath();
+    additional_path.replace('/', '\\');
+    if (!QDir(additional_path).exists())
+      qDebug() << "additional qml path doesn't exist";
+    m_qquick_view->engine()->addImportPath(additional_path);
+
+#endif
     auto qmltester =
         QFileInfo(fs::path(__FILE__).parent_path() / "qmltester.qml");
     m_qquick_view->setSource(QUrl::fromLocalFile(qmltester.absoluteFilePath()));
