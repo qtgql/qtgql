@@ -26,7 +26,8 @@ file(GLOB_RECURSE QTGQL_SOURCES "src/*.cpp" "src/*.hpp")
 
 file(GLOB_RECURSE QTGQL_HEADERS "src/*.hpp")
 
-add_library(${PROJECT_NAME} SHARED ${QTGQL_SOURCES})
+add_library(${PROJECT_NAME} SHARED ${QTGQL_SOURCES}
+        src/qtgql/routers/detail/routers.cpp)
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 target_compile_definitions(${PROJECT_NAME} PRIVATE QTGQL_CORE_LIB_SHARED_BUILD)
 
