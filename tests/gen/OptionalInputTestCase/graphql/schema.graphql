@@ -1,3 +1,0 @@
-type Query {
-  echoOrHello(echo: String = null): String!
-}

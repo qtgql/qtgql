@@ -1,17 +1,17 @@
-#include "g/ChangeUserName.hpp"
-#include "g/InsertUser.hpp"
-#include "g/MainQuery.hpp"
+#include "gen/ChangeUserName.hpp"
+#include "gen/InsertUser.hpp"
+#include "gen/MainQuery.hpp"
+#include "testframework.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>
-#include <catch2/catch_test_macros.hpp>
 
 namespace ListOfNonNodeType {
 using namespace qtgql;
 
 auto ENV_NAME = std::string("ListOfNonNodeType");
-auto SCHEMA_ADDR = get_server_address("ListOfNonNodeType");
+auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
 
-TEST_CASE("ListOfNonNodeType", "[generated-testcase]") {
+TEST_CASE("ListOfNonNodeType") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = mainquery::MainQuery::shared();
@@ -24,7 +24,7 @@ TEST_CASE("ListOfNonNodeType", "[generated-testcase]") {
   SECTION("test update - modify attributes at index") {
     auto user = mq->data()->get_users()->first();
     auto prev_name = user->get_name();
-    QString new_name("Yeshayahu Leibowitz");
+    QString new_name(QUuid::createUuid().toString());
     REQUIRE(prev_name != new_name);
     auto change_username_mut = changeusername::ChangeUserName::shared();
     change_username_mut->set_variables({0, new_name});

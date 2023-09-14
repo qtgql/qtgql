@@ -1,15 +1,15 @@
-#include "g/FillUser.hpp"
-#include "g/MainQuery.hpp"
-#include "g/NullifyUser.hpp"
+#include "gen/FillUser.hpp"
+#include "gen/MainQuery.hpp"
+#include "gen/NullifyUser.hpp"
+#include "testframework.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>
-#include <catch2/catch_test_macros.hpp>
 
 namespace FragmentWithOperationVariable {
 using namespace qtgql;
 
 auto ENV_NAME = std::string("FragmentWithOperationVariable");
-auto SCHEMA_ADDR = get_server_address("FragmentWithOperationVariable");
+auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
 
 template <typename User> void check_user_is_nulled(const User &user) {
   REQUIRE(user->get_age() == bases::DEFAULTS::INT);
@@ -27,7 +27,7 @@ template <typename User> void check_user_filled(const User &user) {
   REQUIRE(user->get_birth() != qtgql::customscalars::DateTimeScalar().to_qt());
 }
 
-TEST_CASE("FragmentWithOperationVariable", "[generated-testcase]") {
+TEST_CASE("FragmentWithOperationVariable") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = mainquery::MainQuery::shared();
