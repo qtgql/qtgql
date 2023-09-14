@@ -112,38 +112,55 @@ public:
 };
 
 struct QmlBot {
-  QQuickView *qquick_view;
+  QQuickView *m_qquick_view;
   QmlBot() {
-    qquick_view = new QQuickView();
-    auto qmltester = fs::path(__FILE__).parent_path() / "qmltester.qml";
-    qquick_view->setSource(QUrl(QString::fromStdString(qmltester.string())));
-    auto errors = qquick_view->errors();
-    if (!errors.empty()) {
+    m_qquick_view = new QQuickView();
+    auto qmltester =
+        QFileInfo(fs::path(__FILE__).parent_path() / "qmltester.qml");
+    m_qquick_view->setSource(QUrl::fromLocalFile(qmltester.absoluteFilePath()));
+    auto loaded = QTest::qWaitFor(
+        [this] { return this->m_qquick_view->status() == QQuickView::Ready; });
+    auto errors = m_qquick_view->errors();
+    if (!errors.empty() || !loaded) {
       qDebug() << errors;
       throw "errors during qml load";
     }
-    qquick_view->show();
+    m_qquick_view->show();
   }
 
   template <typename T> T find(const QString &objectName) {
-    return qquick_view->findChild<T>(objectName);
+    return m_qquick_view->findChild<T>(objectName);
   };
 
-  QQuickItem *loader() { return find<QQuickItem *>("contentloader"); };
+  QQuickItem *root_rect() { return find<QQuickItem *>("rootRect"); };
 
   QQuickItem *load(const fs::path &path) {
-    loader()->setProperty("source", QString::fromStdString(path.string()));
-    assert_m((loader()->property("status").toInt() == 1),
-             "could not load component");
-    auto ret = loader()->findChildren<QQuickItem *>()[0];
+    auto source = QFileInfo(path);
+    assert_m(source.exists(), "source qml file doesn't exists.")
+        QQmlComponent component(m_qquick_view->engine(),
+                                QUrl::fromLocalFile(source.absoluteFilePath()),
+                                QQmlComponent::PreferSynchronous);
+    if (!QTest::qWaitFor([&] { return component.isReady(); }))
+
+      assert_m(false, component.errors());
+
+    QObject *object = component.create();
+    object->setParent(m_qquick_view->rootObject());
+    auto errors = m_qquick_view->errors();
+
+    if (!errors.empty()) {
+      qDebug() << errors << m_qquick_view->errors();
+      throw "errors during qml load";
+    }
+    auto ret = root_rect()->findChildren<QQuickItem *>()[0];
     return ret;
   }
 
-  [[nodiscard]] QQmlEngine *engine() const { return qquick_view->engine(); }
+  [[nodiscard]] QQmlEngine *engine() const { return m_qquick_view->engine(); }
 
   ~QmlBot() {
-    qquick_view->close();
-    delete qquick_view;
+    m_qquick_view->close();
+    delete m_qquick_view;
   }
 };
 
