@@ -24,19 +24,19 @@ endif()
 # see https://doc.qt.io/qt-6/qt-cmake-policy-qtp0001.html
 qt_policy(SET QTP0001 NEW)
 
-add_library(${PROJECT_NAME}schema
+add_library(${EnvTarget}schema
         schema.hpp
         )
-target_link_libraries(${PROJECT_NAME}schema
+target_link_libraries(${EnvTarget}schema
         PUBLIC
         Qt::Core
         qtgql::qtgql
         )
 
-target_compile_definitions(${PROJECT_NAME}schema PRIVATE 👉 context.config.shared_lib_export_definition 👈)
+target_compile_definitions(${EnvTarget}schema PRIVATE 👉 context.config.shared_lib_export_definition 👈)
 {% for operation in context.generation_output.operations -%}
-qt_add_qml_module(${PROJECT_NAME}👉 operation.name 👈
-        URI GraphQL.${PROJECT_NAME}.👉 operation.name 👈
+qt_add_qml_module(${EnvTarget}👉 operation.name 👈
+        URI GraphQL.${EnvTarget}.👉 operation.name 👈
         OUTPUT_DIRECTORY ${QTGQL_QML_PLUGIN_DIRECTORY}/👉 operation.name 👈
         SOURCES
         {% for filespec in operation.sources -%}
@@ -44,25 +44,25 @@ qt_add_qml_module(${PROJECT_NAME}👉 operation.name 👈
         {% endfor -%}
         )
 
-target_link_libraries(${PROJECT_NAME}👉 operation.name 👈 PUBLIC
+target_link_libraries(${EnvTarget}👉 operation.name 👈 PUBLIC
         Qt::CorePrivate
         Qt::QuickPrivate
         Qt::QmlPrivate
-        ${PROJECT_NAME}schema
+        ${EnvTarget}schema
         qtgql::qtgql
         )
-target_compile_definitions(${PROJECT_NAME}👉 operation.name 👈 PRIVATE 👉 context.config.shared_lib_export_definition 👈)
+target_compile_definitions(${EnvTarget}👉 operation.name 👈 PRIVATE 👉 context.config.shared_lib_export_definition 👈)
 {% endfor %}
 
-qt_add_library(${PROJECT_NAME} "")
+qt_add_library(${EnvTarget} "")
 
 target_link_libraries(
-    ${PROJECT_NAME}
+    ${EnvTarget}
     PUBLIC
     Qt6::Core
     qtgql::qtgql
-    ${PROJECT_NAME}schema
+    ${EnvTarget}schema
     {% for operation in context.generation_output.operations -%}
-    ${PROJECT_NAME}👉 operation.name 👈
+    ${EnvTarget}👉 operation.name 👈
     {% endfor %}
 )

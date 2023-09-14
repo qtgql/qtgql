@@ -26,7 +26,7 @@ def check_todos() -> list:
         )
     errors: list[str] = []
     for file in files_grabbed:
-        for line_num, line in enumerate(file.read_text().splitlines(), start=1):
+        for line_num, line in enumerate(file.read_text(encoding="utf-8").splitlines(), start=1):
             if match := pattern.search(line):
                 if not ALLOWED_TODO.search(line):
                     errors.append(
