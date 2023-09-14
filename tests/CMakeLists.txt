@@ -11,6 +11,7 @@ add_executable(${TESTS_TARGET} main.cpp ${TEST_SRCS} testutils.cpp testutils.hpp
         test_networklayers/test_gqlwstransport.cpp
         test_networklayers/test_graphql_over_http.cpp
         test_networklayers/utils.hpp
+        test_networklayers/utils.cpp
         test_networklayers/test_subscription_router.cpp
 )
 add_compile_definitions(TESTS_QML_DIR=${TESTS_QML_DIR} ${TESTS_TARGET})
