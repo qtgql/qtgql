@@ -18,8 +18,7 @@ on:
 
 env:
   IS_GITHUB_ACTION: 1
-  QT_DEBUG_PLUGINS: 1
-  QT_QPA_PLATFORM: "xcb"
+
 
 jobs:
   provide_testcase_matrix:
@@ -94,6 +93,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt install libxcb-cursor-dev build-essential libgl1-mesa-dev libgstreamer-gl1.0-0 libpulse-dev libxcb-glx0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-render0 libxcb-shape0 libxcb-shm0 libxcb-sync1 libxcb-util1 libxcb-xfixes0 libxcb-xinerama0 libxcb1 libxkbcommon-dev libxkbcommon-x11-0 libxcb-xkb-dev
+          echo "QT_QPA_PLATFORM=xcb" >> $GITHUB_ENV
 
       - name: Generate test files and coverage python
         shell: bash
@@ -105,12 +105,10 @@ jobs:
       - name: Conan profile detect
         run: |
           poetry run conan profile detect
-# TODO: delete this echo of path
       - name: Conan build
         shell: bash
         run: |
           if [ "$RUNNER_OS" == "Windows" ]; then
-            $Env:Path;
             poetry run conan build . -o test=True -s build_type=Debug -pr=profiles/Windows_mingw --build=missing;
           elif [ "$RUNNER_OS" == "Linux" ]; then
             poetry run xvfb-run -a conan build . -o test=True -s build_type=Debug -pr=profiles/${{ runner.os }} --build=missing -c tools.system.package_manager:sudo=True -c tools.system.package_manager:mode=install

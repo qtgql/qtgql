@@ -78,7 +78,10 @@ schema = strawberry.Schema(query=Query, subscription=Subscription, mutation=Muta
 
 class DebugGraphQLTransportWSHandler(GraphQLTransportWSHandler):
     async def handle_message(self, message: dict):
-        print(f"[{self._ws!r}-{self.testcase_name}] message -> {message}")  # noqa
+        try:
+            print(f"[{self._ws!r}-{self.testcase_name}] message -> {message}")  # noqa T201
+        except BaseException as e:  # on windows, it failed on the ci somewhere.
+            print(f"{e} \n failed to debug ws message.")  # noqa T201
         await super().handle_message(message)
 
 
