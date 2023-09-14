@@ -1,8 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import GraphQL.QmlUsage.FriendsListQuery
-Window {
-    visible:true;
+
     Item {
         id: root
         objectName: "root"
@@ -29,5 +28,5 @@ Window {
                 }
             }
         }
-    }
+
 }
