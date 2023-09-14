@@ -1,7 +1,6 @@
 import QtQuick
 import GraphQL.QmlUsage.SimpleQuery
-Window{
-    visible: true;
+
 Item {
     id: root
     objectName: "root"
@@ -16,6 +15,4 @@ Item {
     Text {
         text: `completed ${main_query.completed}`
     }
-}
-
 }
