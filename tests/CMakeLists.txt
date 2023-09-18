@@ -7,7 +7,8 @@ set(CMAKE_OBJECT_PATH_MAX 9999)
 
 
 add_executable(${TESTS_TARGET} main.cpp ${TEST_SRCS} testutils.cpp testutils.hpp
-        test_customscalar.cpp
+        test_listmodel.cpp
+            test_customscalar.cpp
         test_networklayers/test_gqlwstransport.cpp
         test_networklayers/test_graphql_over_http.cpp
         test_networklayers/utils.hpp
@@ -29,7 +30,6 @@ target_link_libraries(${TESTS_TARGET}
  PUBLIC
     Qt6::Test
     Qt6::Qml
-    Qt6::Quick
     qtgql
     Catch2::Catch2
 )

@@ -32,8 +32,6 @@ class QtGqlConfig:
 
     This should suffice for most basic setups.
     """
-    debug: bool = False
-    """Templates would render some additional helpers for testing."""
 
     generated_dir_name: str = "__generated__"
     """The name of the directory that qtgql will create and dump the generated

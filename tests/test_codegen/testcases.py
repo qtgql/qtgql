@@ -75,7 +75,6 @@ class QtGqlTestCase:
     test_name: str
     custom_scalars: dict = Factory(dict)
     qml_file: str = ""
-    needs_debug: bool = False
     metadata: TestCaseMetadata = attrs.Factory(TestCaseMetadata)
     is_virtual_test: bool = False
 
@@ -129,7 +128,6 @@ class QtGqlTestCase:
             env_name="default_env",
             custom_scalars=self.custom_scalars,
             generated_dir_name="../gen",
-            debug=self.needs_debug,
             qml_plugins_path="${CMAKE_BINARY_DIR}/tests",
         )
 
@@ -480,7 +478,6 @@ ObjectWithListOfObjectTestCase = QtGqlTestCase(
     }
     """,
     test_name="ObjectWithListOfObject",
-    needs_debug=True,
 )
 
 
