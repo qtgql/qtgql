@@ -4,11 +4,9 @@
 #include "QObject"
 #include "QSet"
 #include "exceptions.hpp"
-#include "metadata.hpp"
 #include "qtgql/qtgql_export.hpp"
 
-namespace qtgql {
-namespace bases {
+namespace qtgql::bases {
 
 class QTGQL_EXPORT ObjectTypeABC : public QObject {
   Q_OBJECT
@@ -17,10 +15,7 @@ class QTGQL_EXPORT ObjectTypeABC : public QObject {
 public:
   using QObject::QObject;
 
-  [[nodiscard]] inline virtual const QString &__typename() const {
-    throw exceptions::NotImplementedError(
-        {"Derived classes must override this method."});
-  }
+  [[nodiscard]] virtual const QString &__typename() const;
 };
 
 class NodeInterfaceABC;
@@ -32,5 +27,4 @@ public:
   [[nodiscard]] virtual const std::shared_ptr<scalars::Id> &get_id() const = 0;
 };
 
-} // namespace bases
-} // namespace qtgql
+} // namespace qtgql::bases

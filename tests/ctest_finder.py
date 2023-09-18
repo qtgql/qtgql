@@ -50,7 +50,11 @@ class CtestTestCommand:
             [*self._data, self.test_name],
             cwd=build_dir.resolve(True),
             capture_output=True,
+            timeout=10,
         )
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}[{self.test_name}]"
 
 
 def collect_tests() -> list[CtestTestCommand]:

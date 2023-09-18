@@ -5,7 +5,6 @@ find_package(Qt6 REQUIRED COMPONENTS Test Core Network)
 set(TESTS_TARGET "test_qtgql")
 set(CMAKE_OBJECT_PATH_MAX 9999)
 
-
 add_executable(${TESTS_TARGET} main.cpp ${TEST_SRCS} testutils.cpp testutils.hpp
         test_listmodel.cpp
             test_customscalar.cpp
