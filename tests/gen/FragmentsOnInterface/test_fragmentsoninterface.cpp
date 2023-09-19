@@ -20,7 +20,7 @@ TEST_CASE("FragmentsOnInterface") {
   test_utils::wait_for_completion(animal_query);
   SECTION("test deserialize") {
     auto animal = animal_query->data()->get_animal();
-    REQUIRE(animal->get_kind() == Enums::AnimalKind::DOG);
+    REQUIRE_EQ(animal->get_kind() , Enums::AnimalKind::DOG);
     auto dog = qobject_cast<const animalquery::Dog__animal *>(animal);
     REQUIRE(!dog->get_furColor().isEmpty());
   };
@@ -31,7 +31,7 @@ TEST_CASE("FragmentsOnInterface") {
     animal_query->refetch();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(animal_query);
-    REQUIRE(animal_query->data()->get_animal()->get_kind() == Enums::PERSON);
+    REQUIRE_EQ(animal_query->data()->get_animal()->get_kind() , Enums::PERSON);
     auto person = qobject_cast<const animalquery::Person__animal *>(
         animal_query->data()->get_animal());
     REQUIRE(!person->get_language().isEmpty());
@@ -53,7 +53,7 @@ TEST_CASE("FragmentsOnInterface") {
     change_age_mut->refetch();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(change_age_mut);
-    REQUIRE(change_age_mut->data()->get_changeAge()->get_age() == new_age);
+    REQUIRE_EQ(change_age_mut->data()->get_changeAge()->get_age() , new_age);
   }
 }
 

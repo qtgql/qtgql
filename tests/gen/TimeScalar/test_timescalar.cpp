@@ -20,7 +20,7 @@ TEST_CASE("TimeScalar") {
   SECTION("test deserialize") {
     auto user = mq->data()->get_user();
     auto now = QDateTime::currentDateTime(QTimeZone::utc()).time().toString();
-    REQUIRE(user->get_lunchTime().toStdString() == now.toStdString());
+    REQUIRE_EQ(user->get_lunchTime().toStdString() , now.toStdString());
   }
   SECTION("test update and as operation variables") {
     auto old_user = mq->data()->get_user();
@@ -35,9 +35,9 @@ TEST_CASE("TimeScalar") {
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(modified_user_op);
     auto new_user = modified_user_op->data()->get_changeLunchTime();
-    REQUIRE(old_user->get_id() == new_user->get_id());
-    REQUIRE(new_user->get_lunchTime() == new_lunch_time.to_qt());
-    REQUIRE(old_user->get_lunchTime() == new_lunch_time.to_qt());
+    REQUIRE_EQ(old_user->get_id() , new_user->get_id());
+    REQUIRE_EQ(new_user->get_lunchTime() , new_lunch_time.to_qt());
+    REQUIRE_EQ(old_user->get_lunchTime() , new_lunch_time.to_qt());
   };
 }
 

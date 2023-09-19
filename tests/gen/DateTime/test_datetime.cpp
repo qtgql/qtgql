@@ -20,7 +20,7 @@ TEST_CASE("DateTime") {
     auto user = mq->data()->get_user();
     auto now = QDateTime::currentDateTime(QTimeZone::utc())
                    .toString("hh:mm (dd.mm.yyyy)");
-    REQUIRE(user->get_birth() == now);
+    REQUIRE_EQ(user->get_birth() , now);
   }
   SECTION("test update and as operation variables") {
     auto old_user =
@@ -36,9 +36,9 @@ TEST_CASE("DateTime") {
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(modified_user_op);
     auto updated_user = modified_user_op->data()->get_changeBirth();
-    REQUIRE(old_user->get_id() == updated_user->get_id());
-    REQUIRE(updated_user->get_birth() == new_birth.to_qt());
-    REQUIRE(old_user->get_birth() == new_birth.to_qt());
+    REQUIRE_EQ(old_user->get_id() , updated_user->get_id());
+    REQUIRE_EQ(updated_user->get_birth() , new_birth.to_qt());
+    REQUIRE_EQ(old_user->get_birth() , new_birth.to_qt());
   };
 }
 

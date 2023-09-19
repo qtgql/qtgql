@@ -30,18 +30,18 @@ public:
 };
 
 void preform_test(CustomStringScalar &s) {
-  REQUIRE(s.to_qt() == "Decoration-initial");
-  REQUIRE(s.GRAPHQL_NAME() == "CustomStringScalar");
+  REQUIRE_EQ(s.to_qt() , "Decoration-initial");
+  REQUIRE_EQ(s.GRAPHQL_NAME() , "CustomStringScalar");
   auto b = CustomStringScalar();
   b.deserialize("second");
-  REQUIRE(s != b);
+  REQUIRE_NE(s , b);
 }
 
 TEST_CASE("Test custom scalar by hand implementation") {
   SECTION("from json") {
-    auto a = CustomStringScalar();
-    a.deserialize({"initial"});
-    preform_test(a);
+    auto cs = CustomStringScalar();
+    cs.deserialize({"initial"});
+    preform_test(cs);
   }
   SECTION("to_json") {
     auto s = CustomStringScalar("initial");

@@ -21,7 +21,7 @@ TEST_CASE("Date") {
   SECTION("test deserialize") {
     auto user = mq->data()->get_user();
     auto now = QDate::currentDate().toString("dd.MM.yyyy");
-    REQUIRE(user->get_birth() == now);
+    REQUIRE_EQ(user->get_birth() , now);
   }
   SECTION("test update and as operation variables") {
     auto old_user = mq->data()->get_user();
@@ -36,9 +36,9 @@ TEST_CASE("Date") {
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(modified_user_op);
     auto new_user = modified_user_op->data()->get_changeBirth();
-    REQUIRE(old_user->get_id() == new_user->get_id());
-    REQUIRE(new_user->get_birth() == new_birth.to_qt());
-    REQUIRE(old_user->get_birth() == new_birth.to_qt());
+    REQUIRE_EQ(old_user->get_id() , new_user->get_id());
+    REQUIRE_EQ(new_user->get_birth() , new_birth.to_qt());
+    REQUIRE_EQ(old_user->get_birth() , new_birth.to_qt());
   };
 }
 

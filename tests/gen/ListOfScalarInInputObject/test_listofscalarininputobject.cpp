@@ -24,7 +24,7 @@ TEST_CASE("ListOfScalarInInputObject") {
     REQUIRE(model->rowCount() > 0);
     int i = 0;
     for (const auto &expected : echo_me) {
-      REQUIRE(model->get(i) == expected);
+      REQUIRE_EQ(model->get(i) , expected);
       i++;
     }
   };

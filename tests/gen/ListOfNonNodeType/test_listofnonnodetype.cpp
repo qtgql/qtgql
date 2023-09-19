@@ -25,7 +25,7 @@ TEST_CASE("ListOfNonNodeType") {
     auto user = mq->data()->get_users()->first();
     auto prev_name = user->get_name();
     QString new_name(QUuid::createUuid().toString());
-    REQUIRE(prev_name != new_name);
+    REQUIRE_NE(prev_name , new_name);
     auto change_username_mut = changeusername::ChangeUserName::shared();
     change_username_mut->set_variables({0, new_name});
     change_username_mut->fetch();
@@ -34,7 +34,7 @@ TEST_CASE("ListOfNonNodeType") {
     mq->refetch();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(mq);
-    REQUIRE(user->get_name().toStdString() == new_name.toStdString());
+    REQUIRE_EQ(user->get_name().toStdString() , new_name.toStdString());
   };
   SECTION("test update - insert new object at index") {
     auto model = mq->data()->get_users();
@@ -46,8 +46,8 @@ TEST_CASE("ListOfNonNodeType") {
     test_utils::wait_for_completion(insert_user);
     mq->refetch();
     test_utils::wait_for_completion(mq);
-    REQUIRE(model->rowCount() == prev_len + 1);
-    REQUIRE(model->get(3)->get_name().toStdString() == user_name.toStdString());
+    REQUIRE_EQ(model->rowCount() , prev_len + 1);
+    REQUIRE_EQ(model->get(3)->get_name().toStdString() , user_name.toStdString());
   }
 }
 

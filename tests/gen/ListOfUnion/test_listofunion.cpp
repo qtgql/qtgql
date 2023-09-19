@@ -42,7 +42,7 @@ TEST_CASE("ListOfUnion") {
     modify_mut->set_variables({person->get_id(), 3, new_name});
     modify_mut->fetch();
     test_utils::wait_for_completion(modify_mut);
-    REQUIRE(model->get(3)->property("name").toString().toStdString() ==
+    REQUIRE_EQ(model->get(3)->property("name").toString().toStdString() ,
             new_name.toStdString());
   }
   SECTION("test update add") {
@@ -59,8 +59,8 @@ TEST_CASE("ListOfUnion") {
     qDebug() << model->last();
     auto dog =
         qobject_cast<const mainquery::Dog__randPersonpets *>(model->last());
-    REQUIRE(dog->__typename().toStdString() == "Dog");
-    REQUIRE(dog->get_name().toStdString() == name_to_set.toStdString());
+    REQUIRE_EQ(dog->__typename().toStdString() , "Dog");
+    REQUIRE_EQ(dog->get_name().toStdString() , name_to_set.toStdString());
   }
   SECTION("test update remove") {
     auto person = mq->data()->get_randPerson();
@@ -81,7 +81,7 @@ TEST_CASE("ListOfUnion") {
 
     test_utils::wait_for_completion(remove_mut);
 
-    REQUIRE(model->get(3)->property("name").toString().toStdString() !=
+    REQUIRE_NE(model->get(3)->property("name").toString().toStdString() ,
             name_for_third_item.toStdString());
   };
 }

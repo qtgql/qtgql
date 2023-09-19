@@ -15,7 +15,7 @@ TEST_CASE("test subscription router") {
     auto handler = std::make_shared<DebugHandler>("query HelloWorld{hello}");
     client->execute(handler);
     handler->wait_for_completed();
-    REQUIRE(handler->m_data.value("hello").toString().toStdString() == "world");
+    REQUIRE_EQ(handler->m_data.value("hello").toString().toStdString() , "world");
   }
 
   SECTION("test error") {

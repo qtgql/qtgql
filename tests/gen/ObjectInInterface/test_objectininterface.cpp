@@ -19,7 +19,7 @@ TEST_CASE("ObjectInInterface") {
     animal_query->fetch();
     test_utils::wait_for_completion(animal_query);
     auto animal = animal_query->data()->get_animal();
-    REQUIRE(animal->get_metadata()->get_kind() == Enums::AnimalKind::DOG);
+    REQUIRE_EQ(animal->get_metadata()->get_kind() , Enums::AnimalKind::DOG);
     auto dog = qobject_cast<const animal::Dog__animal *>(animal);
     REQUIRE(!dog->get_furColor().isEmpty());
   };

@@ -14,7 +14,7 @@ std::shared_ptr<GarbageCollection::User> get_shared_user() {
   mq->fetch();
   test_utils::wait_for_completion(mq);
   auto node_id = mq->data()->get_constUser()->get_id();
-  REQUIRE(mq.use_count() == 1);
+  REQUIRE_EQ(mq.use_count() , 1);
   return GarbageCollection::User::get_node(node_id).value();
 }
 TEST_CASE("GarbageCollection") {
@@ -30,8 +30,8 @@ TEST_CASE("GarbageCollection") {
     std::weak_ptr<GarbageCollection::User> weak_user = get_shared_user();
     GarbageCollection::Query::instance()->m_constUser = {};
     // at map
-    REQUIRE(weak_user.use_count() == 1);
-    REQUIRE(QTest::qWaitFor([&]() { return weak_user.use_count() == 0; }));
+    REQUIRE_EQ(weak_user.use_count() , 1);
+    REQUIRE_EQ(QTest::qWaitFor([&]() { return weak_user.use_count() , 0; }));
   }
 }
 

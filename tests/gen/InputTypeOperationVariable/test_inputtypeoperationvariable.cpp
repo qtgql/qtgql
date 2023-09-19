@@ -21,8 +21,8 @@ TEST_CASE("InputTypeOperationVariable") {
   test_utils::wait_for_completion(create_post);
   auto post = create_post->data()->get_createPost();
   SECTION("test deserialize") {
-    REQUIRE(post->get_header() == "Post header");
-    REQUIRE(post->get_content() == old_post_content);
+    REQUIRE_EQ(post->get_header() , "Post header");
+    REQUIRE_EQ(post->get_content() , old_post_content);
   };
   SECTION("test update") {
     auto update_post = updatepostcontent::UpdatePostContent::shared();
@@ -33,7 +33,7 @@ TEST_CASE("InputTypeOperationVariable") {
     update_post->fetch();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(update_post);
-    REQUIRE(post->get_content() == new_content);
+    REQUIRE_EQ(post->get_content() , new_content);
   };
 }
 

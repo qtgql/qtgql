@@ -34,9 +34,9 @@ TEST_CASE("Decimal") {
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(modified_user_op);
     auto new_user = modified_user_op->data()->get_changeBalance();
-    REQUIRE(old_user->get_id() == new_user->get_id());
-    REQUIRE(new_user->get_balance() == new_balance.to_qt());
-    REQUIRE(old_user->get_balance() == new_balance.to_qt());
+    REQUIRE_EQ(old_user->get_id() , new_user->get_id());
+    REQUIRE_EQ(new_user->get_balance() , new_balance.to_qt());
+    REQUIRE_EQ(old_user->get_balance() , new_balance.to_qt());
   };
 }
 

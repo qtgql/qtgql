@@ -19,7 +19,7 @@ TEST_CASE("ObjectWithListOfObject") {
   SECTION("test deserialize") {
     auto friends = mq->data()->get_user()->get_friends();
     auto p = friends->first();
-    REQUIRE(p->get_name() != bases::DEFAULTS::STRING);
+    REQUIRE_NE(p->get_name() , bases::DEFAULTS::STRING);
   }
   SECTION("test update") {
     auto add_friend_mut = addfriend::AddFriend::shared();
@@ -33,7 +33,7 @@ TEST_CASE("ObjectWithListOfObject") {
     // when the updated user data returns from the mutation, the list on the
     // main query should update as well with a new friend.
     REQUIRE(before_count < mq_model->rowCount());
-    REQUIRE(mq_model->rowCount() ==
+    REQUIRE_EQ(mq_model->rowCount() ,
             add_friend_mut->data()->get_addFriend()->get_friends()->rowCount());
   }
 }

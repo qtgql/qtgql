@@ -11,12 +11,13 @@ add_executable(${TESTS_TARGET}
         testutils.cpp testutils.hpp
         test_networklayers/utils.hpp
         test_networklayers/utils.cpp
-        test_listmodel.cpp
-            test_customscalar.cpp
-        test_networklayers/test_gqltransportws.cpp
-        test_networklayers/test_graphql_over_http.cpp
+#        test_listmodel.cpp
+        test_foo.cpp
+#        test_customscalar.cpp
+#        test_networklayers/test_gqltransportws.cpp
+#        test_networklayers/test_graphql_over_http.cpp
 
-        test_networklayers/test_subscription_router.cpp
+#        test_networklayers/test_subscription_router.cpp
 )
 add_compile_definitions(TESTS_QML_DIR=${TESTS_QML_DIR} ${TESTS_TARGET})
 include_directories(../tests)

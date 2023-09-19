@@ -24,7 +24,7 @@ TEST_CASE("ListOfInputObject") {
     REQUIRE(model->rowCount() > 0);
     int i = 0;
     for (const auto &expected : what_list) {
-      REQUIRE(model->get(i) == expected.value);
+      REQUIRE_EQ(model->get(i) , expected.value);
       i++;
     }
   };

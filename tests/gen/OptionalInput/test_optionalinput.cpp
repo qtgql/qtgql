@@ -31,7 +31,7 @@ TEST_CASE("OptionalInput") {
     auto prev = q->data()->get_echoOrHello();
     q->refetch();
     REQUIRE(catcher.wait());
-    REQUIRE(prev.toStdString() != q->data()->get_echoOrHello().toStdString());
+    REQUIRE_NE(prev.toStdString() , q->data()->get_echoOrHello().toStdString());
   }
   SECTION("test deserialize no variable set.") {
     q->fetch();
@@ -47,7 +47,7 @@ TEST_CASE("OptionalInput") {
     auto prev = q->data()->get_echoOrHello();
     q->refetch();
     REQUIRE(catcher.wait());
-    REQUIRE(prev.toStdString() != q->data()->get_echoOrHello().toStdString());
+    REQUIRE_NE(prev.toStdString() , q->data()->get_echoOrHello().toStdString());
   }
 }
 

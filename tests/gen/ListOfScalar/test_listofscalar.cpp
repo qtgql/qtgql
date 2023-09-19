@@ -36,7 +36,7 @@ TEST_CASE("ListOfScalar") {
     test_utils::wait_for_completion(add_tag_mut);
     auto model = rnd_post->data()->get_post()->get_tags();
     auto last = model->last();
-    REQUIRE(last.toStdString() == new_tag.toStdString());
+    REQUIRE_EQ(last.toStdString() , new_tag.toStdString());
   };
 
   SECTION("test update remove") {
@@ -60,7 +60,7 @@ TEST_CASE("ListOfScalar") {
     replace_tag_mut->fetch();
     test_utils::wait_for_completion(replace_tag_mut);
     auto model = rnd_post->data()->get_post()->get_tags();
-    REQUIRE(model->data(model->index(2), 257).toString().toStdString() ==
+    REQUIRE_EQ(model->data(model->index(2), 257).toString().toStdString() ,
             new_tag.toStdString());
   };
 }

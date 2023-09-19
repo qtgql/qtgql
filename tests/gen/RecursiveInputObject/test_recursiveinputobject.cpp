@@ -21,7 +21,7 @@ TEST_CASE("RecursiveInputObject") {
         {RecursiveInput::create(RecursiveInput::create(std::nullopt, 2), 2)});
     mq->fetch();
     test_utils::wait_for_completion(mq);
-    REQUIRE(mq->data()->get_depth() == 2);
+    REQUIRE_EQ(mq->data()->get_depth() , 2);
   };
 }
 }; // namespace RecursiveInputObject

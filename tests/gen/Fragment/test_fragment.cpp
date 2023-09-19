@@ -19,14 +19,14 @@ TEST_CASE("Fragment") {
 
   SECTION("test deserialize") {
     auto d = mq->data()->get_constUser();
-    REQUIRE(d->get_age() == 24);
-    REQUIRE(d->get_agePoint() == 24.0f);
-    REQUIRE(d->get_id() == "FakeID");
-    REQUIRE(d->get_male() == true);
-    REQUIRE(d->get_name() == "nir");
-    REQUIRE(d->get_uuid() ==
+    REQUIRE_EQ(d->get_age() , 24);
+    REQUIRE_EQ(d->get_agePoint() , 24.0f);
+    REQUIRE_EQ(d->get_id() , "FakeID");
+    REQUIRE_EQ(d->get_male() , true);
+    REQUIRE_EQ(d->get_name() , "nir");
+    REQUIRE_EQ(d->get_uuid() ,
             QUuid::fromString("06335e84-2872-4914-8c5d-3ed07d2a2f16"));
-    REQUIRE(d->get_voidField() == qtgql::bases::DEFAULTS::VOID);
+    REQUIRE_EQ(d->get_voidField() , qtgql::bases::DEFAULTS::VOID);
   };
   SECTION("test update") {
     auto data = mq->data();
@@ -41,10 +41,10 @@ TEST_CASE("Fragment") {
     test_utils::wait_for_completion(modified_user_op);
     auto modified_user =
         modified_user_op->data()->get_constUserWithModifiedFields();
-    REQUIRE(user->get_id() == modified_user->get_id());
+    REQUIRE_EQ(user->get_id() , modified_user->get_id());
     auto new_name = modified_user->get_name();
-    REQUIRE(user->get_name() == new_name);
-    REQUIRE(new_name != previous_name);
+    REQUIRE_EQ(user->get_name() , new_name);
+    REQUIRE_NE(new_name , previous_name);
   };
 }
 

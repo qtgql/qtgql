@@ -9,7 +9,7 @@ TEST_CASE("GraphQLTransportWS") {
     auto res_op_name =
         bases::get_operation_name("query SampleOperation {field1 field2}");
     REQUIRE(res_op_name);
-    REQUIRE(res_op_name.value() == operation_name);
+    REQUIRE_EQ(res_op_name.value() , operation_name);
   };
   auto valid_client = get_valid_ws_client();
 
@@ -118,7 +118,7 @@ TEST_CASE("GraphQLTransportWS") {
         std::make_shared<DebugHandler>("query MyQuery {isAuthenticated}");
     authorized_client.execute(handler);
     handler->wait_for_completed();
-    REQUIRE(handler->m_data["isAuthenticated"].toString().toStdString() ==
+    REQUIRE_EQ(handler->m_data["isAuthenticated"].toString().toStdString() ,
             expected_ret.toStdString());
   }
   SECTION("Mutation and Query operations compatibility") {
@@ -137,7 +137,7 @@ TEST_CASE("GraphQLTransportWS") {
           std::make_shared<DebugHandler>("query TestQuery{hello}");
       valid_client->execute(query_handler);
       query_handler->wait_for_completed();
-      REQUIRE(query_handler->m_data["hello"].toString() == "world");
+      REQUIRE_EQ(query_handler->m_data["hello"].toString() , "world");
     }
   }
 
@@ -152,7 +152,7 @@ TEST_CASE("GraphQLTransportWS") {
     client->wait_for_valid();
     client->execute(sub1);
     sub1->wait_for_completed();
-    REQUIRE(sub1->m_data.value("count").toInt() == 1);
+    REQUIRE_EQ(sub1->m_data.value("count").toInt() , 1);
   }
 }
 

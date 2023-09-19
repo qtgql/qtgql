@@ -6,5 +6,5 @@ Release type: minor
 * `qtgql::bases::Environment`
 now accepts a network layer as a shared_ptr (previously was unique_ptr).
 
-### Internal
+#### Internal Changes
 * catch2 was replaced with doctest.
