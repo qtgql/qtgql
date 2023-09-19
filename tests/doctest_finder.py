@@ -6,10 +6,16 @@ from pathlib import Path
 
 import pytest
 
-exe_suffix = "exe" if sys.platform == "win32" else ".so"
+IS_WINDOWS = sys.platform == "win32"
+IS_LINUX = not IS_WINDOWS
+
+exe_suffix = "exe" if IS_WINDOWS == "win32" else "so"
 PROJECT_ROOT = Path(__file__).parent.parent
 build_dir = PROJECT_ROOT / "build" / "Debug"
-test_executable = build_dir / f"test_qtgql.{exe_suffix}"
+if IS_WINDOWS:
+    test_executable = build_dir / f"test_qtgql.{exe_suffix}"
+else:
+    test_executable = build_dir / 'tests' / f"test_qtgql"
 
 
 class DoctestTestcase:

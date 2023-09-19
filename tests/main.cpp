@@ -14,11 +14,14 @@ int main(int argc, char **argv) {
   if (!app) {
     app = new QGuiApplication(argc, argv);
   }
-  int res = context.run(); // run
+  QTimer::singleShot(0,
+          [&]{
+              QGuiApplication::exit(context.run()); // run
 
-  if (context.shouldExit()) // important - query flags (and --exit) rely on the
-                            // user doing this
-    return res;             // propagate the result of the tests
+
+  }
+          );
+
 
   auto ret = QGuiApplication::exec();
   delete app;
