@@ -19,7 +19,6 @@
 #include <utility>
 
 namespace qtgql::bases {
-
 QTGQL_EXPORT std::optional<QString> get_operation_name(const QString &query);
 
 struct HashAbleABC {

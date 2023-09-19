@@ -1,17 +1,26 @@
+#define DOCTEST_CONFIG_IMPLEMENT
 #include "testframework.hpp"
 #include <QGuiApplication>
 #include <QTest>
 #include <QTimer>
-#include <catch2/catch_session.hpp>
 
 int main(int argc, char **argv) {
+  doctest::Context context;
+  context.applyCommandLine(argc, argv);
+  context.setOption("no-breaks",
+                    true); // don't break in the debugger when assertions fail
+
   auto app = QGuiApplication::instance();
   if (!app) {
-    auto app = new QGuiApplication(argc, argv);
+    app = new QGuiApplication(argc, argv);
   }
-  QTimer::singleShot(
-      0, [app, argc, argv]() { app->exit(Catch::Session().run(argc, argv)); });
-  auto ret = app->exec();
+  int res = context.run(); // run
+
+  if (context.shouldExit()) // important - query flags (and --exit) rely on the
+                            // user doing this
+    return res;             // propagate the result of the tests
+
+  auto ret = QGuiApplication::exec();
   delete app;
   return ret;
 }

@@ -1,5 +1,7 @@
 #include "environment.hpp"
 
+#include <utility>
+
 using namespace qtgql::bases;
 
 void NodeInstanceStore::add_node(
@@ -51,6 +53,23 @@ Environment::get_env_strict(const std::string &name) {
     return ENV_MAP()->at(name);
   }
   throw exceptions::EnvironmentNotFoundError(name);
+}
+
+Environment::Environment(const std::string &name,
+                         const Environment::SharedNetworkLayer &network_layer) {
+  m_name = name;
+  m_network_layer = network_layer;
+  m_cache = std::make_unique<EnvCache>();
+}
+
+Environment::Environment(std::string name,
+                         Environment::SharedNetworkLayer network_layer,
+                         Environment::UniqueCache cache_)
+    : m_name(std::move(name)), m_network_layer(std::move(network_layer)),
+      m_cache(std::move(cache_)) {}
+
+void Environment::execute(const std::shared_ptr<HandlerABC> &handler) {
+  m_network_layer->execute(handler);
 }
 
 EnvCache::EnvCache(const qtgql::bases::EnvCacheOptions &options)

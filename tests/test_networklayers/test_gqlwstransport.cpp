@@ -3,8 +3,8 @@
 
 using namespace qtgql;
 
-TEST_CASE("get operation name") {
-  const QString operation_name = "SampleOperation";
+TEST_CASE("get_operation_name") {
+  QString operation_name = "SampleOperation";
   auto res_op_name =
       bases::get_operation_name("query SampleOperation {field1 field2}");
   REQUIRE(res_op_name);

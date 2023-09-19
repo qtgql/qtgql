@@ -63,6 +63,21 @@ void DebugAbleWsNetworkLayer::onTextMessageReceived(
   GqlTransportWs::onTextMessageReceived(raw_message);
 }
 
+DebugAbleWsNetworkLayer::DebugAbleWsNetworkLayer(
+    const DebugClientSettings &settings)
+    : gqltransportws::GqlTransportWs(settings.prod_settings),
+      m_settings{settings} {}
+
+void DebugAbleWsNetworkLayer::wait_for_valid() {
+  if (!QTest::qWaitFor([this]() { return this->gql_is_valid(); }, 1000)) {
+    throw "Client could not connect to the GraphQL server";
+  }
+}
+
+DebugAbleWsNetworkLayer *DebugAbleWsNetworkLayer::from_environment(
+    const std::shared_ptr<bases::Environment> &env) {
+  return dynamic_cast<DebugAbleWsNetworkLayer *>(env->get_network_layer());
+};
 namespace test_utils {
 
 void wait_for_completion(

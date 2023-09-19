@@ -2655,6 +2655,18 @@ files = [
 ]
 
 [[package]]
+name = "pyvoip"
+version = "1.6.5"
+description = "PyVoIP is a pure python VoIP/SIP/RTP library."
+category = "main"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "pyVoIP-1.6.5-py3-none-any.whl", hash = "sha256:34f8ff66b7fbbda796ff71dbdc0355ff8c87cf82268cb14aba2ad575999776d4"},
+    {file = "pyVoIP-1.6.5.tar.gz", hash = "sha256:cc9106cf52c9437d06592cd1dc529b0495631685eb88e48777bf850af01db711"},
+]
+
+[[package]]
 name = "pywin32-ctypes"
 version = "0.2.2"
 description = "A (partial) reimplementation of pywin32 using ctypes/cffi"
@@ -3579,4 +3591,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.12"
-content-hash = "793b3d285de8994dfea576a967f2e6b97fda3390a6824c0a61afbe079f1cddfc"
+content-hash = "4f90ce32da016d441cd608128ca8b520c159ed70a2c4504032f80f3cdcda8c8b"

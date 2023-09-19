@@ -37,29 +37,21 @@ struct DebugClientSettings {
 };
 
 class DebugAbleWsNetworkLayer : public gqltransportws::GqlTransportWs {
-  void onTextMessageReceived(const QString &raw_message);
+  void onTextMessageReceived(const QString &raw_message) override;
 
 public:
   bool m_pong_received = false;
   DebugClientSettings m_settings;
   QJsonObject m_current_message;
 
-  DebugAbleWsNetworkLayer(
-      const DebugClientSettings &settings = DebugClientSettings())
-      : gqltransportws::GqlTransportWs(settings.prod_settings),
-        m_settings{settings} {};
-  void wait_for_valid() {
-    if (!QTest::qWaitFor([&]() { return gql_is_valid(); }, 1000)) {
-      throw "Client could not connect to the GraphQL server";
-    }
-  }
+  explicit DebugAbleWsNetworkLayer(
+      const DebugClientSettings &settings = DebugClientSettings());
+  void wait_for_valid();
   bool is_reconnect_timer_active() { return m_reconnect_timer->isActive(); }
   bool has_handler(const std::shared_ptr<bases::HandlerABC> &handler);
 
   static DebugAbleWsNetworkLayer *
-  from_environment(std::shared_ptr<bases::Environment> env) {
-    return dynamic_cast<DebugAbleWsNetworkLayer *>(env->get_network_layer());
-  };
+  from_environment(const std::shared_ptr<bases::Environment> &env);
 };
 
 std::shared_ptr<DebugAbleWsNetworkLayer> get_valid_ws_client();
@@ -89,7 +81,7 @@ struct ModelSignalSpy {
 };
 
 struct SignalCatcherParams {
-  const QObject *source_obj;
+  const QObject *source_obj = nullptr;
   const QSet<QString> &excludes = {};
   bool exclude_id = true;
   const std::optional<QString> &only = {};
@@ -106,7 +98,7 @@ class SignalCatcher {
   QSet<QString> m_excludes = {};
 
 public:
-  SignalCatcher(const SignalCatcherParams &params);
+  explicit SignalCatcher(const SignalCatcherParams &params);
 
   [[nodiscard]] bool wait(int timeout = 1000);
 };

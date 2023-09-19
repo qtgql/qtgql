@@ -108,10 +108,10 @@ class QtGqlRecipe(ConanFile):
     topics = ("GraphQL", "Qt", "codegen")
     version = __version__
     build_policy = "missing"
-    options = {"qt_version": ["6.5.0"], "verbose": ConanBool, "test": ConanBool}  # noqa
+    options = {"qt_version": ["6.5.2"], "verbose": ConanBool, "test": ConanBool}  # noqa
     default_options = {  # noqa
         "verbose": False,
-        "qt_version": "6.5.0",
+        "qt_version": "6.5.2",
         "test": False,
     }
 
@@ -121,7 +121,7 @@ class QtGqlRecipe(ConanFile):
         ...
 
     def build_requirements(self) -> None:
-        self.test_requires("catch2/3.4.0")
+        self.test_requires("doctest/2.4.11")
 
     def layout(self) -> None:
         cmake_layout(self)
