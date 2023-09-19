@@ -13,7 +13,7 @@ add_executable(${TESTS_TARGET}
         test_networklayers/utils.cpp
         test_listmodel.cpp
             test_customscalar.cpp
-        test_networklayers/test_gqlwstransport.cpp
+        test_networklayers/test_gqltransportws.cpp
         test_networklayers/test_graphql_over_http.cpp
 
         test_networklayers/test_subscription_router.cpp
