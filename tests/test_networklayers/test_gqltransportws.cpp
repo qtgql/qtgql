@@ -42,7 +42,7 @@ TEST_CASE("GraphQLTransportWS") {
 
   SECTION("Send ping receive pong") {
     auto success =
-        QTest::qWaitFor([&]() { return valid_client.m_pong_received; }, 1000);
+        QTest::qWaitFor([&]() { return valid_client->m_pong_received; }, 1000);
     REQUIRE(success);
   }
 
