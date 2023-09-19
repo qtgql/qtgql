@@ -9,13 +9,13 @@ import pytest
 IS_WINDOWS = sys.platform == "win32"
 IS_LINUX = not IS_WINDOWS
 
-exe_suffix = "exe" if IS_WINDOWS == "win32" else "so"
+exe_suffix = "exe" if IS_WINDOWS else "so"
 PROJECT_ROOT = Path(__file__).parent.parent
 build_dir = PROJECT_ROOT / "build" / "Debug"
 if IS_WINDOWS:
     test_executable = build_dir / f"test_qtgql.{exe_suffix}"
 else:
-    test_executable = build_dir / 'tests' / f"test_qtgql"
+    test_executable = build_dir / "tests" / "test_qtgql"
 
 
 class DoctestTestcase:
