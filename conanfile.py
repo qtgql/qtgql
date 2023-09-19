@@ -45,6 +45,7 @@ class Qt6Installer:
         self.is_windows = os_name == "windows"
         self.is_linux = os_name == "linux"
         self.version = version
+        self.env_manager = EnvManager()
 
     @property
     def arch(self) -> str:
@@ -78,6 +79,19 @@ class Qt6Installer:
     def installed(self) -> bool:
         return self.qt_root_dir.exists()
 
+    def set_env_vars(self) -> None:
+        self.env_manager.add(self.dll_path.resolve(True))
+        self.env_manager.commit()
+        os.environ.setdefault(
+            "QT_PLUGIN_PATH",
+            (self.qt_root_dir / "plugins").resolve(True).as_uri(),
+        )
+        if self.is_linux:
+            os.environ.setdefault(
+                "LD_LIBRARY_PATH",
+                (self.qt_root_dir / "lib").resolve(True).as_uri(),
+            )
+
     def install(self) -> None:
         if not self.installed():
             subprocess.run(
@@ -87,15 +101,7 @@ class Qt6Installer:
                 f"-m qtwebsockets".split(" "),
             ).check_returncode()
             assert self.qt6_cmake_config.exists()
-            os.environ.setdefault(
-                "QT_PLUGIN_PATH",
-                (self.qt_root_dir / "plugins").resolve(True).as_uri(),
-            )
-            if self.is_linux:
-                os.environ.setdefault(
-                    "LD_LIBRARY_PATH",
-                    (self.qt_root_dir / "lib").resolve(True).as_uri(),
-                )
+        self.set_env_vars()
 
 
 class QtGqlRecipe(ConanFile):
@@ -164,9 +170,7 @@ class QtGqlRecipe(ConanFile):
         qt_installer = Qt6Installer(self.os_name, self.options.qt_version.value)
         if not qt_installer.installed():
             qt_installer.install()
-        env_manager = EnvManager()
-        env_manager.add(qt_installer.dll_path)
-        env_manager.commit()
+
         deps = CMakeDeps(self)
         deps.generate()
         tc = CMakeToolchain(self)

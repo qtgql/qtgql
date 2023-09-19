@@ -1,13 +1,11 @@
 from __future__ import annotations
 
 import subprocess
-import sys
 from pathlib import Path
 
 import pytest
 
-IS_WINDOWS = sys.platform == "win32"
-IS_LINUX = not IS_WINDOWS
+from tests.conftest import IS_WINDOWS
 
 exe_suffix = "exe" if IS_WINDOWS else "so"
 PROJECT_ROOT = Path(__file__).parent.parent
