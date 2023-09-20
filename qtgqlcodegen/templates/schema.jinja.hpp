@@ -21,7 +21,7 @@ namespace 👉 context.config.env_name 👈{
 {% if context.enums %}
 // ---------- Enums ----------
 
-class Enums{
+class 👉context.export_macro👈 Enums{
     Q_GADGET
 
 public:
