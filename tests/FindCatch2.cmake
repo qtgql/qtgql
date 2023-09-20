@@ -1,4 +1,5 @@
 Include(FetchContent)
+set(BUILD_SHARED_LIBS ON)
 
 FetchContent_Declare(
         Catch2

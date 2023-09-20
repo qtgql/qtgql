@@ -1,5 +1,5 @@
 #include "gen/MainQuery.hpp"
-#include "gen/UserWithSameIDAndDifferentFieldsQuery.hpp"
+#include "gen/SameIDAndDifferentFields.hpp"
 #include "testframework.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>
@@ -32,8 +32,8 @@ TEST_CASE("Fragment") {
     auto data = mq->data();
     auto user = data->get_constUser();
     auto previous_name = user->get_name();
-    auto modified_user_op = userwithsameidanddifferentfieldsquery::
-        UserWithSameIDAndDifferentFieldsQuery::shared();
+    auto modified_user_op = sameidanddifferentfields::
+        SameIDAndDifferentFields::shared();
     auto catcher = test_utils::SignalCatcher(
         {.source_obj = user, .excludes = {"voidField"}});
     modified_user_op->fetch();

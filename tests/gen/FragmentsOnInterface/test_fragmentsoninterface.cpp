@@ -1,5 +1,5 @@
-#include "gen/AnimalQuery.hpp"
-#include "gen/ChangeAgeMutation.hpp"
+#include "gen/Animal.hpp"
+#include "gen/ChangeAge.hpp"
 #include "testframework.hpp"
 #include "testutils.hpp"
 #include <QSignalSpy>
@@ -14,14 +14,14 @@ TEST_CASE("FragmentsOnInterface") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME, test_utils::DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
 
-  auto animal_query = animalquery::AnimalQuery::shared();
+  auto animal_query = animal::Animal::shared();
   animal_query->set_variables({Enums::AnimalKind::DOG});
   animal_query->fetch();
   test_utils::wait_for_completion(animal_query);
   SECTION("test deserialize") {
     auto animal = animal_query->data()->get_animal();
     REQUIRE(animal->get_kind() == Enums::AnimalKind::DOG);
-    auto dog = qobject_cast<const animalquery::Dog__animal *>(animal);
+    auto dog = qobject_cast<const animal::Dog__animal *>(animal);
     REQUIRE(!dog->get_furColor().isEmpty());
   };
   SECTION("test updates new type") {
@@ -32,13 +32,13 @@ TEST_CASE("FragmentsOnInterface") {
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(animal_query);
     REQUIRE(animal_query->data()->get_animal()->get_kind() == Enums::PERSON);
-    auto person = qobject_cast<const animalquery::Person__animal *>(
+    auto person = qobject_cast<const animal::Person__animal *>(
         animal_query->data()->get_animal());
     REQUIRE(!person->get_language().isEmpty());
   }
 
   SECTION("test updates same type") {
-    auto change_age_mut = changeagemutation::ChangeAgeMutation::shared();
+    auto change_age_mut = changeage::ChangeAge::shared();
     // since this is not implementing node, first get the data filled on that
     // field
     auto animal_id = animal_query->data()->get_animal()->get_id();

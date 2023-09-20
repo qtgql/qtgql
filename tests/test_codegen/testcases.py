@@ -741,7 +741,7 @@ FragmentTestCase = QtGqlTestCase(
       }
     }
 
-    query UserWithSameIDAndDifferentFieldsQuery {
+    query SameIDAndDifferentFields {
       constUserWithModifiedFields {
         ...UserSelectionsFrag
       }
@@ -753,13 +753,13 @@ FragmentTestCase = QtGqlTestCase(
 FragmentsOnInterfaceTestCase = QtGqlTestCase(
     schema=schemas.non_node_interface_field.schema,
     operations="""
-    query AnimalQuery($kind: AnimalKind!) {
+    query Animal($kind: AnimalKind!) {
       animal(kind: $kind) {
         ...AnimalFragment
       }
     }
 
-    mutation ChangeAgeMutation($id: ID!, $newAge: Int!) {
+    mutation ChangeAge($id: ID!, $newAge: Int!) {
       changeAge(animalId: $id, newAge: $newAge) {
         ...AnimalFragment
       }
@@ -1159,5 +1159,8 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 if __name__ == "__main__":
     generate_testcases(
-        OptionalInputTestCase,
-    )
+        ListOfNonNodeType,
+        ListOfUnionTestCase,
+        ListOfInterfaceTestcase,
+        FragmentTestCase,
+        FragmentsOnInterfaceTestCase,    )
