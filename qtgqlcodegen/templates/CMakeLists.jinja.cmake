@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 3.20)
 set(EnvTarget "👉 context.target_name 👈")
 set(QTGQL_QML_PLUGIN_DIRECTORY 👉 context.config.qml_plugins_path 👈/GraphQL/${EnvTarget})
 
-project(${EnvTarget} LANGUAGES CXX)
-
 # add import path for Qt-Creator usage.
 if (NOT ${CMAKE_BINARY_DIR}/qml IN_LIST QML_DIRS)
     list(APPEND QML_DIRS ${CMAKE_BINARY_DIR}/qml)
@@ -26,48 +24,45 @@ endif()
 # see https://doc.qt.io/qt-6/qt-cmake-policy-qtp0001.html
 qt_policy(SET QTP0001 NEW)
 
-add_library(${PROJECT_NAME}schema
+add_library(${EnvTarget}schema
         schema.hpp
         )
-target_link_libraries(${PROJECT_NAME}schema
+target_link_libraries(${EnvTarget}schema
         PUBLIC
         Qt::Core
         qtgql::qtgql
         )
-# TODO: this should be only in tests
-target_compile_definitions(${PROJECT_NAME}schema PRIVATE QTGQL_TEST_LIBRARY)
-{% for operation in context.generation_output.operations -%}
 
-qt_add_qml_module(${PROJECT_NAME}👉 operation.name 👈
-        URI GraphQL.${PROJECT_NAME}.👉 operation.name 👈
-        # Using PLUGIN_TARGET in static library compilation will cause link failure
+target_compile_definitions(${EnvTarget}schema PRIVATE 👉 context.config.shared_lib_export_definition 👈)
+{% for operation in context.generation_output.operations -%}
+qt_add_qml_module(${EnvTarget}👉 operation.name 👈
+        URI GraphQL.${EnvTarget}.👉 operation.name 👈
         OUTPUT_DIRECTORY ${QTGQL_QML_PLUGIN_DIRECTORY}/👉 operation.name 👈
-        # TYPEINFO "plugins.qmltypes"
         SOURCES
         {% for filespec in operation.sources -%}
         👉 filespec.path.as_posix() 👈
         {% endfor -%}
         )
 
-target_link_libraries(${PROJECT_NAME}👉 operation.name 👈 PUBLIC
+target_link_libraries(${EnvTarget}👉 operation.name 👈 PUBLIC
         Qt::CorePrivate
         Qt::QuickPrivate
         Qt::QmlPrivate
-        ${PROJECT_NAME}schema
+        ${EnvTarget}schema
         qtgql::qtgql
         )
-target_compile_definitions(${PROJECT_NAME}👉 operation.name 👈 PRIVATE QTGQL_TEST_LIBRARY)
+target_compile_definitions(${EnvTarget}👉 operation.name 👈 PRIVATE 👉 context.config.shared_lib_export_definition 👈)
 {% endfor %}
 
-qt_add_library(${PROJECT_NAME} "")
+qt_add_library(${EnvTarget} "")
 
 target_link_libraries(
-    ${PROJECT_NAME}
+    ${EnvTarget}
     PUBLIC
     Qt6::Core
     qtgql::qtgql
-    ${PROJECT_NAME}schema
+    ${EnvTarget}schema
     {% for operation in context.generation_output.operations -%}
-    ${PROJECT_NAME}👉 operation.name 👈
+    ${EnvTarget}👉 operation.name 👈
     {% endfor %}
 )

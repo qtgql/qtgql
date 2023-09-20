@@ -7,7 +7,7 @@ namespace GarbageCollection {
 using namespace qtgql;
 
 auto ENV_NAME = std::string("GarbageCollection");
-auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
+auto SCHEMA_ADDR = test_utils::get_server_address(QString::fromStdString(ENV_NAME));
 using namespace std::chrono_literals;
 std::shared_ptr<GarbageCollection::User> get_shared_user() {
   auto mq = std::make_shared<mainquery::MainQuery>();
@@ -20,7 +20,7 @@ std::shared_ptr<GarbageCollection::User> get_shared_user() {
 TEST_CASE("GarbageCollection") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME,
-      DebugClientSettings{.prod_settings =
+      test_utils::DebugClientSettings{.prod_settings =
                               {
                                   .url = SCHEMA_ADDR,
                               }},

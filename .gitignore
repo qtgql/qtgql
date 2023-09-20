@@ -152,3 +152,5 @@ tests/gen/CMakeLists.txt
 3rdParty/Qt/
 **/CMakeUserPresets.json
 /coverage.json
+CMakeFiles
+generated-includes

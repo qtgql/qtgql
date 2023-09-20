@@ -7,11 +7,11 @@ namespace ScalarArguments {
 using namespace qtgql;
 
 auto ENV_NAME = std::string("ScalarArguments");
-auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
+auto SCHEMA_ADDR = test_utils::get_server_address(QString::fromStdString(ENV_NAME));
 
 TEST_CASE("ScalarArguments") {
   auto env = test_utils::get_or_create_env(
-      ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
+      ENV_NAME, test_utils::DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = mainquery::MainQuery::shared();
   int int_exp = 123;
   float float_exp = 123.123;
@@ -25,9 +25,9 @@ TEST_CASE("ScalarArguments") {
   SECTION("test deserialize") {
     REQUIRE(container->get_i() == int_exp);
     REQUIRE(container->get_f() == float_exp);
-    REQUIRE(container->get_string().toStdString() == string_exp.toStdString());
-    REQUIRE(container->get_uuid().toString().toStdString() ==
-            uuid_exp.toString().toStdString());
+    REQUIRE(container->get_string() == string_exp);
+    REQUIRE(container->get_uuid().toString() ==
+            uuid_exp.toString());
   };
   SECTION("test update") {
     auto nl = dynamic_cast<gqltransportws::GqlTransportWs *>(
@@ -42,9 +42,9 @@ TEST_CASE("ScalarArguments") {
     test_utils::wait_for_completion(mq);
     REQUIRE(container->get_i() != int_exp);
     REQUIRE(container->get_f() != float_exp);
-    REQUIRE(container->get_string().toStdString() != string_exp.toStdString());
-    REQUIRE(container->get_uuid().toString().toStdString() !=
-            uuid_exp.toString().toStdString());
+    REQUIRE(container->get_string() != string_exp);
+    REQUIRE(container->get_uuid().toString() !=
+            uuid_exp.toString());
   };
 }
 

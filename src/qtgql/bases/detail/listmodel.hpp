@@ -1,13 +1,11 @@
 #pragma once
 #include "QAbstractListModel"
-#include "Qt"
-#include "metadata.hpp"
 #include "objecttype.hpp"
+#include "qtgql/qtgql_export.hpp"
 
-namespace qtgql {
-namespace bases {
+namespace qtgql::bases {
 
-class ListModelMixin : public QAbstractListModel {
+class QTGQL_EXPORT ListModelMixin : public QAbstractListModel {
   Q_OBJECT
 
   Q_PROPERTY(int count MEMBER m_count NOTIFY countChanged)
@@ -15,41 +13,26 @@ class ListModelMixin : public QAbstractListModel {
                  NOTIFY currentIndexChanged)
 
 private:
-  static QHash<int, QByteArray> default_roles() {
-    QHash<int, QByteArray> roles;
-    roles.insert(Qt::UserRole + 1, "data");
-    return roles;
-  }
+  static QHash<int, QByteArray> default_roles();
 
 protected:
   const QHash<int, QByteArray> c_role_names = default_roles();
 
-  static const QModelIndex &invalid_index() {
-    static const QModelIndex ret = QModelIndex();
-    return ret;
-  }
+  static const QModelIndex &invalid_index();
 
   int m_count = 0;
   int m_current_index = 0;
 
 public:
-  explicit ListModelMixin(QObject *parent = nullptr)
-      : QAbstractListModel(parent) {}
+  explicit ListModelMixin(QObject *parent = nullptr);
 
-  virtual ~ListModelMixin() = default;
-
-  int rowCount(const QModelIndex &parent = QModelIndex()) const override {
-    return (!parent.isValid() ? m_count : 0);
-  }
+  int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
   static const int DATA_ROLE = Qt::UserRole + 1;
 
-  QHash<int, QByteArray> roleNames() const override { return c_role_names; }
+  QHash<int, QByteArray> roleNames() const override;
 
-  void set_current_index(int index) {
-    m_current_index = index;
-    emit currentIndexChanged();
-  }
+  void set_current_index(int index);
 
 signals:
 
@@ -62,7 +45,7 @@ template <typename T> struct is_shared_ptr : std::false_type {};
 template <typename T>
 struct is_shared_ptr<std::shared_ptr<T>> : std::true_type {};
 
-template <typename T> class ListModelABC : public ListModelMixin {
+template <typename T> class  ListModelABC : public ListModelMixin {
   typedef std::vector<T> T_VEC;
 
 private:
@@ -106,6 +89,7 @@ public:
       : ListModelMixin(parent), m_data{std::move(data)} {
     m_count = m_data.size();
   };
+
 
   [[nodiscard]] QVariant data(const QModelIndex &index,
                               int role) const override {
@@ -185,5 +169,4 @@ public:
   }
 };
 
-} // namespace bases
-} // namespace qtgql
+} // namespace qtgql::bases

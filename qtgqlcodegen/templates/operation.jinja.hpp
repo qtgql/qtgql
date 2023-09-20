@@ -8,10 +8,10 @@
 #include <QObject>
 #include <QtQml/qqmlregistration.h>
 
-#if defined(QTGQL_TEST_LIBRARY)
-#define QTGQL_EXPORT_FOR_UNIT_TESTS Q_DECL_EXPORT
+#if defined(👉context.config.shared_lib_export_definition 👈)
+#define 👉context.export_macro👈 Q_DECL_EXPORT
 #else
-#define QTGQL_EXPORT_FOR_UNIT_TESTS Q_DECL_IMPORT
+#define 👉context.export_macro👈 Q_DECL_IMPORT
 #endif
 
 namespace 👉 context.config.env_name 👈::👉context.ns👈{
@@ -39,7 +39,7 @@ class 👉 t.name 👈;
 
 // ------------ Narrowed Interfaces ------------
 {% for t in context.operation.interfaces -%}
-class QTGQL_EXPORT_FOR_UNIT_TESTS 👉 t.name 👈: public 👉 context.qtgql_types.ObjectTypeABC.name 👈{
+class 👉context.export_macro👈  👉 t.name 👈: public 👉 context.qtgql_types.ObjectTypeABC.name 👈{
 
 👉 proxy_type_fields(t, context) 👈
 public:
@@ -53,7 +53,7 @@ throw qtgql::exceptions::InterfaceDirectAccessError("👉t.concrete.name👈");
 {% endfor %}
 // ------------ Narrowed Object types ------------
 {% for t in context.operation.narrowed_types %}
-class QTGQL_EXPORT_FOR_UNIT_TESTS 👉 t.name 👈: public 👉 context.qtgql_types.ObjectTypeABC.name if not t.base_interface else t.base_interface.name 👈{
+class 👉context.export_macro👈  👉 t.name 👈: public 👉 context.qtgql_types.ObjectTypeABC.name if not t.base_interface else t.base_interface.name 👈{
 
 👉context.operation.name👈* m_operation;
 
@@ -99,7 +99,7 @@ std::optional<👉 var.type.type_name() 👈> 👉 var.name 👈 = {};
 
 };
 
-class QTGQL_EXPORT_FOR_UNIT_TESTS 👉 context.operation.name 👈: public qtgql::bases::OperationHandlerABC{
+class 👉context.export_macro👈  👉 context.operation.name 👈: public qtgql::bases::OperationHandlerABC{
     Q_OBJECT
     Q_PROPERTY(const 👉 context.operation.root_type.name 👈 * data READ data NOTIFY dataChanged);
     QML_ELEMENT
@@ -170,7 +170,7 @@ void set_variables(👉 context.operation.generated_variables_type 👈 vars){
 
 {# // This class exists as an alias class to an operation for qml, since operations
 // must be created with shared pointers. -#}
-class Use👉 context.operation.name 👈: public QObject{
+class 👉context.export_macro👈 Use👉 context.operation.name 👈: public QObject{
     Q_OBJECT
     QML_ELEMENT
     Q_PROPERTY(const 👉 context.operation.root_type.name 👈 * data READ data NOTIFY dataChanged);
@@ -207,8 +207,8 @@ void refetch(){
 };
 
 signals:
-void dataChanged();
-void completedChanged();
-void operationOnFlightChanged();
+    void dataChanged();
+    void completedChanged();
+    void operationOnFlightChanged();
 };
 };

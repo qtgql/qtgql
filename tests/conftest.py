@@ -18,7 +18,6 @@ fake = Faker()
 
 class PATHS:
     PROJECT_ROOT = Path(__file__).parent.parent
-    QTGQL_TEST_TARGET = PROJECT_ROOT / "tests" / "build"
     ROOT_CMAKE = PROJECT_ROOT / "CMakeLists.txt"
     QTGQLCODEGEN_ROOT = PROJECT_ROOT / "qtgqlcodegen"
 
@@ -37,7 +36,7 @@ class factory:
 
 
 IS_WINDOWS = platform.system() == "Windows"
-IS_GITHUB_ACTION = os.environ.get("CI", False)
+IS_GITHUB_ACTION = os.environ.get("IS_GITHUB_ACTION", False)
 
 
 @define
@@ -45,7 +44,7 @@ class MiniServer:
     process: subprocess.Popen
     address: str
     port: str
-
+all
 
 @pytest.fixture(scope="session")
 def schemas_server() -> MiniServer:

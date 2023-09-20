@@ -1,12 +1,12 @@
 import QtQuick
-import QtQuick.Controls.Material
 
 Rectangle {
-    color: "grey"
-    objectName: "MainPane"
+    color: "red"
+    objectName: "rootRect"
     anchors.fill: parent
-    Loader {
-        objectName: "contentloader"
-        anchors.fill: parent
+    Loader{objectName: "rootLoader"
+        anchors.fill: parent;
+
+
     }
 }

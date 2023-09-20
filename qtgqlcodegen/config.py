@@ -32,8 +32,6 @@ class QtGqlConfig:
 
     This should suffice for most basic setups.
     """
-    debug: bool = False
-    """Templates would render some additional helpers for testing."""
 
     generated_dir_name: str = "__generated__"
     """The name of the directory that qtgql will create and dump the generated
@@ -62,6 +60,10 @@ class QtGqlConfig:
                 (self.graphql_dir / "schema.graphql").resolve(True).read_text("utf-8"),
             ),
         )
+
+    @property
+    def shared_lib_export_definition(self) -> str:
+        return f"QTGQL_{self.env_name}_EXPORT" f""
 
     def generate(self) -> None:
         self._evaluator.dump()

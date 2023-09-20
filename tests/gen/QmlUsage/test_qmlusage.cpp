@@ -1,9 +1,10 @@
+#include "testframework.hpp"
+#include "testutils.hpp"
+
 #include "gen/FriendsListQuery.hpp"
 #include "gen/RemoveFriend.hpp"
 #include "gen/RemoveFriendsBatch.hpp"
 
-#include "testframework.hpp"
-#include "testutils.hpp"
 #include <QQmlApplicationEngine>
 #include <filesystem>
 
@@ -14,7 +15,7 @@ using namespace qtgql;
 
 auto ENV_NAME = std::string("QmlUsage");
 
-auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
+auto SCHEMA_ADDR = test_utils::get_server_address(QString::fromStdString(ENV_NAME));
 
 bool check_list_view_count(const QQuickItem *list_view, int expected) {
 
@@ -28,7 +29,7 @@ bool check_list_view_count(const QQuickItem *list_view, int expected) {
 
 TEST_CASE("QmlUsageTestCase - simple") {
   auto env = test_utils::get_or_create_env(
-      ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
+      ENV_NAME, test_utils::DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   QQmlApplicationEngine engine;
   auto bot = test_utils::QmlBot();
 
@@ -44,7 +45,7 @@ TEST_CASE("QmlUsageTestCase - simple") {
 }
 TEST_CASE("QmlUsageTestCase - ListView") {
   auto env = test_utils::get_or_create_env(
-      ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
+      ENV_NAME, test_utils::DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   QQmlApplicationEngine engine;
   auto bot = test_utils::QmlBot();
   auto store_id = QUuid::createUuid().toString();

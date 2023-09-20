@@ -1,12 +1,11 @@
 import QtQuick
-import QtQuick.Layouts
 import GraphQL.QmlUsage.SimpleQuery
 
 Item {
     id: root
     objectName: "root"
     property bool success: false
-    UseSimpleQuery {
+    UseSimpleQuery {objectName: "useSimpleQuery";
         id: main_query
         onCompletedChanged: root.success = true
     }
