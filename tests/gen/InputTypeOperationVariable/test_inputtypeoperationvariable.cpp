@@ -8,7 +8,7 @@ namespace InputTypeOperationVariable {
 using namespace qtgql;
 
 auto ENV_NAME = std::string("InputTypeOperationVariable");
-auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
+auto SCHEMA_ADDR = test_utils::get_server_address(QString::fromStdString(ENV_NAME));
 
 TEST_CASE("InputTypeOperationVariable") {
   auto env = test_utils::get_or_create_env(
@@ -21,8 +21,8 @@ TEST_CASE("InputTypeOperationVariable") {
   test_utils::wait_for_completion(create_post);
   auto post = create_post->data()->get_createPost();
   SECTION("test deserialize") {
-    REQUIRE_EQ(post->get_header() , "Post header");
-    REQUIRE_EQ(post->get_content() , old_post_content);
+    REQUIRE(post->get_header() == "Post header");
+    REQUIRE(post->get_content() == old_post_content);
   };
   SECTION("test update") {
     auto update_post = updatepostcontent::UpdatePostContent::shared();
@@ -33,7 +33,7 @@ TEST_CASE("InputTypeOperationVariable") {
     update_post->fetch();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(update_post);
-    REQUIRE_EQ(post->get_content() , new_content);
+    REQUIRE(post->get_content() == new_content);
   };
 }
 

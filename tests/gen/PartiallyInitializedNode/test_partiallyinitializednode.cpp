@@ -8,7 +8,7 @@ namespace PartiallyInitializedNode {
 using namespace qtgql;
 
 auto ENV_NAME = std::string("PartiallyInitializedNode");
-auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
+auto SCHEMA_ADDR = test_utils::get_server_address(QString::fromStdString(ENV_NAME));
 
 TEST_CASE("PartiallyInitializedNode") {
   // resolves https://github.com/qtgql/qtgql/issues/381

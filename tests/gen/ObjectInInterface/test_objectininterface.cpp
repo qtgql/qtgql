@@ -7,7 +7,7 @@ namespace ObjectInInterface {
 using namespace qtgql;
 
 auto ENV_NAME = std::string("ObjectInInterface");
-auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
+auto SCHEMA_ADDR = test_utils::get_server_address(QString::fromStdString(ENV_NAME));
 
 TEST_CASE("ObjectInInterface") {
   auto env = test_utils::get_or_create_env(
@@ -19,7 +19,7 @@ TEST_CASE("ObjectInInterface") {
     animal_query->fetch();
     test_utils::wait_for_completion(animal_query);
     auto animal = animal_query->data()->get_animal();
-    REQUIRE_EQ(animal->get_metadata()->get_kind() , Enums::AnimalKind::DOG);
+    REQUIRE(animal->get_metadata()->get_kind() == Enums::AnimalKind::DOG);
     auto dog = qobject_cast<const animal::Dog__animal *>(animal);
     REQUIRE(!dog->get_furColor().isEmpty());
   };

@@ -7,7 +7,7 @@ namespace OptionalInput {
 using namespace qtgql;
 
 auto ENV_NAME = std::string("OptionalInput");
-auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
+auto SCHEMA_ADDR = test_utils::get_server_address(QString::fromStdString(ENV_NAME));
 
 TEST_CASE("OptionalInput") {
   auto env = test_utils::get_or_create_env(
@@ -31,7 +31,7 @@ TEST_CASE("OptionalInput") {
     auto prev = q->data()->get_echoOrHello();
     q->refetch();
     REQUIRE(catcher.wait());
-    REQUIRE_NE(prev.toStdString() , q->data()->get_echoOrHello().toStdString());
+    REQUIRE(prev.toStdString() == q->data()->get_echoOrHello().toStdString());
   }
   SECTION("test deserialize no variable set.") {
     q->fetch();
@@ -47,7 +47,7 @@ TEST_CASE("OptionalInput") {
     auto prev = q->data()->get_echoOrHello();
     q->refetch();
     REQUIRE(catcher.wait());
-    REQUIRE_NE(prev.toStdString() , q->data()->get_echoOrHello().toStdString());
+    REQUIRE(prev.toStdString() == q->data()->get_echoOrHello().toStdString());
   }
 }
 

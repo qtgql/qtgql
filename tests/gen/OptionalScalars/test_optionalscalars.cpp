@@ -10,22 +10,22 @@
 namespace OptionalScalars {
 using namespace qtgql;
 auto ENV_NAME = std::string("OptionalScalars");
-auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
+auto SCHEMA_ADDR = test_utils::get_server_address(QString::fromStdString(ENV_NAME));
 
 template <typename User> void check_user_is_nulled(const User &user) {
-  REQUIRE_EQ(user->get_age() , bases::DEFAULTS::INT);
-  REQUIRE_EQ(user->get_name() , bases::DEFAULTS::STRING);
-  REQUIRE_EQ(user->get_agePoint() , bases::DEFAULTS::FLOAT);
-  REQUIRE_EQ(user->get_uuid() , bases::DEFAULTS::UUID);
-  REQUIRE_EQ(user->get_birth() , qtgql::customscalars::DateTimeScalar().to_qt());
+  REQUIRE(user->get_age() == bases::DEFAULTS::INT);
+  REQUIRE(user->get_name() == bases::DEFAULTS::STRING);
+  REQUIRE(user->get_agePoint() == bases::DEFAULTS::FLOAT);
+  REQUIRE(user->get_uuid() == bases::DEFAULTS::UUID);
+  REQUIRE(user->get_birth() == qtgql::customscalars::DateTimeScalar().to_qt());
 }
 
 template <typename User> void check_user_filled(const User &user) {
-  REQUIRE_NE(user->get_age() , bases::DEFAULTS::INT);
-  REQUIRE_NE(user->get_name() , bases::DEFAULTS::STRING);
-  REQUIRE_NE(user->get_agePoint() , bases::DEFAULTS::FLOAT);
-  REQUIRE_NE(user->get_uuid() , bases::DEFAULTS::UUID);
-  REQUIRE_NE(user->get_birth() , qtgql::customscalars::DateTimeScalar().to_qt());
+  REQUIRE(user->get_age() == bases::DEFAULTS::INT);
+  REQUIRE(user->get_name() == bases::DEFAULTS::STRING);
+  REQUIRE(user->get_agePoint() == bases::DEFAULTS::FLOAT);
+  REQUIRE(user->get_uuid() == bases::DEFAULTS::UUID);
+  REQUIRE(user->get_birth() == qtgql::customscalars::DateTimeScalar().to_qt());
 }
 
 TEST_CASE("OptionalScalars") {

@@ -20,7 +20,7 @@ TEST_CASE("ListModelABC modifications and operations") {
 
     SECTION("do test") {
         REQUIRE(false);
-        REQUIRE_EQ(obj->parent(), nullptr);
+        REQUIRE(obj->parent()== nullptr);
 
     }
 }

@@ -8,14 +8,14 @@ TEST_CASE("test subscription router") {
   auto http_layer = std::shared_ptr<gqloverhttp::GraphQLOverHttp>{
       new gqloverhttp::GraphQLOverHttp(
           test_utils::get_http_server_addr("graphql"), {})};
-  auto ws_layer = get_valid_ws_client();
+  auto ws_layer = test_utils::get_valid_ws_client();
   auto client =
       std::make_shared<routers::SubscriptionRouter>(ws_layer, http_layer);
   SECTION("test simple query") {
     auto handler = std::make_shared<DebugHandler>("query HelloWorld{hello}");
     client->execute(handler);
     handler->wait_for_completed();
-    REQUIRE_EQ(handler->m_data.value("hello").toString().toStdString() , "world");
+    REQUIRE(handler->m_data.value("hello").toString().toStdString() == "world");
   }
 
   SECTION("test error") {

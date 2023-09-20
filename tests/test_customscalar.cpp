@@ -30,11 +30,11 @@ public:
 };
 
 void preform_test(CustomStringScalar &s) {
-  REQUIRE_EQ(s.to_qt() , "Decoration-initial");
-  REQUIRE_EQ(s.GRAPHQL_NAME() , "CustomStringScalar");
+  REQUIRE(s.to_qt() == "Decoration-initial");
+  REQUIRE(s.GRAPHQL_NAME() == "CustomStringScalar");
   auto b = CustomStringScalar();
   b.deserialize("second");
-  REQUIRE_NE(s , b);
+  REQUIRE(s != b);
 }
 
 TEST_CASE("Test custom scalar by hand implementation") {

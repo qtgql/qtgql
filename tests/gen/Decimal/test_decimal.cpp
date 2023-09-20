@@ -9,7 +9,7 @@
 namespace Decimal {
 using namespace qtgql;
 auto ENV_NAME = std::string("Decimal");
-auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
+auto SCHEMA_ADDR = test_utils::get_server_address(QString::fromStdString(ENV_NAME));
 
 TEST_CASE("Decimal") {
   auto env = test_utils::get_or_create_env(
@@ -34,9 +34,9 @@ TEST_CASE("Decimal") {
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(modified_user_op);
     auto new_user = modified_user_op->data()->get_changeBalance();
-    REQUIRE_EQ(old_user->get_id() , new_user->get_id());
-    REQUIRE_EQ(new_user->get_balance() , new_balance.to_qt());
-    REQUIRE_EQ(old_user->get_balance() , new_balance.to_qt());
+    REQUIRE(old_user->get_id() == new_user->get_id());
+    REQUIRE(new_user->get_balance() == new_balance.to_qt());
+    REQUIRE(old_user->get_balance() == new_balance.to_qt());
   };
 }
 

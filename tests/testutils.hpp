@@ -24,7 +24,7 @@ namespace fs = std::filesystem;
 
 
 namespace test_utils {
-
+using namespace qtgql;
 
     QString get_server_address(const QString &suffix = "graphql",
                                const QString &prefix = "ws");
@@ -51,10 +51,10 @@ namespace test_utils {
                 const DebugClientSettings &settings = DebugClientSettings());
         void wait_for_valid();
         bool is_reconnect_timer_active() { return m_reconnect_timer->isActive(); }
-        bool has_handler(const std::shared_ptr<qtgql::bases::HandlerABC> &handler);
+        bool has_handler(const std::shared_ptr<bases::HandlerABC> &handler);
 
         static DebugAbleWsNetworkLayer *
-        from_environment(const std::shared_ptr<qtgql::bases::Environment> &env);
+        from_environment(const std::shared_ptr<bases::Environment> &env);
     };
 
     std::shared_ptr<DebugAbleWsNetworkLayer> get_valid_ws_client();
@@ -64,7 +64,7 @@ inline QString get_http_server_addr(const QString &suffix) {
   return get_server_address(suffix, "http");
 }
 void wait_for_completion(
-    const std::shared_ptr<qtgql::bases::OperationHandlerABC> &handler);
+    const std::shared_ptr<bases::OperationHandlerABC> &handler);
 class QCleanerObject : public QObject {
 public:
     using QObject::QObject;
@@ -152,7 +152,7 @@ struct QmlBot {
     delete m_qquick_view;
   }
 };
-    std::shared_ptr<qtgql::bases::Environment>
+    std::shared_ptr<bases::Environment>
     get_or_create_env(const std::string &env_name,
                       const DebugClientSettings &settings,
                       std::chrono::milliseconds cache_dur = 5s);

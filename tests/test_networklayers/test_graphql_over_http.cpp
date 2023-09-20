@@ -11,7 +11,7 @@ TEST_CASE("test_fetch") {
     auto handler = std::make_shared<DebugHandler>("query HelloWorld{hello}");
     client->execute(handler);
     handler->wait_for_completed();
-    REQUIRE_EQ(handler->m_data.value("hello").toString().toStdString() , "world");
+    REQUIRE(handler->m_data.value("hello").toString().toStdString() == "world");
   }
 
   SECTION("test error") {
@@ -34,7 +34,7 @@ TEST_CASE("test_fetch") {
         std::make_shared<DebugHandler>("query MyQuery {isAuthenticated}");
     client->execute(handler);
     handler->wait_for_completed();
-    REQUIRE_EQ(handler->m_data["isAuthenticated"].toString().toStdString() ,
+    REQUIRE(handler->m_data["isAuthenticated"].toString().toStdString() ==
             expected_ret);
   }
 }

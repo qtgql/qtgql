@@ -8,7 +8,7 @@
 namespace OptionalNestedObject {
 using namespace qtgql;
 auto ENV_NAME = std::string("OptionalNestedObject");
-auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
+auto SCHEMA_ADDR = test_utils::get_server_address(QString::fromStdString(ENV_NAME));
 
 TEST_CASE("OptionalNestedObject") {
   auto env = test_utils::get_or_create_env(
@@ -21,14 +21,14 @@ TEST_CASE("OptionalNestedObject") {
       mq->fetch();
       test_utils::wait_for_completion(mq);
       auto p = mq->data()->get_user()->get_person();
-      REQUIRE_EQ(p , nullptr);
+      REQUIRE(p == nullptr);
     };
     mq->set_variables({false});
     SECTION("returned value") {
       mq->fetch();
       test_utils::wait_for_completion(mq);
       auto p = mq->data()->get_user()->get_person();
-      REQUIRE_EQ(p->get_name() , "nir");
+      REQUIRE(p->get_name() == "nir");
     };
   }
   mq->set_variables({false});
@@ -48,8 +48,8 @@ TEST_CASE("OptionalNestedObject") {
     test_utils::wait_for_completion(change_user_name_op);
     auto new_person =
         change_user_name_op->data()->get_changeName()->get_person();
-    REQUIRE_EQ(old_user->get_person()->get_id() , new_person->get_id());
-    REQUIRE_EQ(old_user->get_person()->get_name() , new_name);
+    REQUIRE(old_user->get_person()->get_id() == new_person->get_id());
+    REQUIRE(old_user->get_person()->get_name() == new_name);
   }
 }
 

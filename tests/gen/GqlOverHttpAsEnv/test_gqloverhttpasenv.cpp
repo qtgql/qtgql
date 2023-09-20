@@ -22,14 +22,14 @@ TEST_CASE("GqlOverHttpAsEnv") {
     mq->fetch();
     test_utils::wait_for_completion(mq);
     auto d = mq->data()->get_constUser();
-    REQUIRE_EQ(d->get_age() , 24);
-    REQUIRE_EQ(d->get_agePoint() , 24.0f);
-    REQUIRE_EQ(d->get_id() , "FakeID");
-    REQUIRE_EQ(d->get_male() , true);
-    REQUIRE_EQ(d->get_name() , "nir");
-    REQUIRE_EQ(d->get_uuid() ,
+    REQUIRE(d->get_age() == 24);
+    REQUIRE(d->get_agePoint() == 24.0f);
+    REQUIRE(d->get_id() == "FakeID");
+    REQUIRE(d->get_male() == true);
+    REQUIRE(d->get_name() == "nir");
+    REQUIRE(d->get_uuid() ==
             QUuid::fromString("06335e84-2872-4914-8c5d-3ed07d2a2f16"));
-    REQUIRE_EQ(d->get_voidField() , qtgql::bases::DEFAULTS::VOID);
+    REQUIRE(d->get_voidField() == qtgql::bases::DEFAULTS::VOID);
   };
 }
 

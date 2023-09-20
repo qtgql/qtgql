@@ -7,7 +7,7 @@ namespace ListOfScalarInInputObject {
 using namespace qtgql;
 
 auto ENV_NAME = std::string("ListOfScalarInInputObject");
-auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
+auto SCHEMA_ADDR = test_utils::get_server_address(QString::fromStdString(ENV_NAME));
 
 TEST_CASE("ListOfScalarInInputObject") {
   auto env = test_utils::get_or_create_env(
@@ -24,7 +24,7 @@ TEST_CASE("ListOfScalarInInputObject") {
     REQUIRE(model->rowCount() > 0);
     int i = 0;
     for (const auto &expected : echo_me) {
-      REQUIRE_EQ(model->get(i) , expected);
+      REQUIRE(model->get(i) == expected);
       i++;
     }
   };

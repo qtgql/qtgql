@@ -15,7 +15,7 @@ using namespace qtgql;
 
 auto ENV_NAME = std::string("QmlUsage");
 
-auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
+auto SCHEMA_ADDR = test_utils::get_server_address(QString::fromStdString(ENV_NAME));
 
 bool check_list_view_count(const QQuickItem *list_view, int expected) {
 

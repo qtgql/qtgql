@@ -9,7 +9,7 @@
 namespace NestedObject {
 using namespace qtgql;
 auto ENV_NAME = std::string("NestedObject");
-auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
+auto SCHEMA_ADDR = test_utils::get_server_address(QString::fromStdString(ENV_NAME));
 
 TEST_CASE("NestedObject") {
   auto env = test_utils::get_or_create_env(
@@ -19,7 +19,7 @@ TEST_CASE("NestedObject") {
   test_utils::wait_for_completion(mq);
   SECTION("test deserialize") {
     auto name = mq->data()->get_user()->get_person()->get_name();
-    REQUIRE_NE((!name.isEmpty() && name , bases::DEFAULTS::STRING));
+    REQUIRE((!name.isEmpty() && name == bases::DEFAULTS::STRING));
   }
   SECTION("test updates") {
     auto old_user = mq->data()->get_user();
@@ -35,8 +35,8 @@ TEST_CASE("NestedObject") {
     test_utils::wait_for_completion(change_user_name_op);
     auto new_person =
         change_user_name_op->data()->get_changeName()->get_person();
-    REQUIRE_EQ(old_user->get_person()->get_id() , new_person->get_id());
-    REQUIRE_EQ(old_user->get_person()->get_name() , new_name);
+    REQUIRE(old_user->get_person()->get_id() == new_person->get_id());
+    REQUIRE(old_user->get_person()->get_name() == new_name);
   }
   SECTION("test update returned entirely new node") {
     auto user_inst_from_mq = mq->data()->get_user();
@@ -55,11 +55,11 @@ TEST_CASE("NestedObject") {
     auto new_person =
         replace_person_op->data()->get_replacePerson()->get_person();
 
-    REQUIRE_NE(new_person->get_id() , old_person_id);
-    REQUIRE_EQ(new_person->get_id() , user_inst_from_mq->get_person()->get_id());
-    REQUIRE_NE(new_person->get_name().toStdString() ,
+    REQUIRE(new_person->get_id() == old_person_id);
+    REQUIRE(new_person->get_id() == user_inst_from_mq->get_person()->get_id());
+    REQUIRE(new_person->get_name().toStdString() ==
             old_person_name.toStdString());
-    REQUIRE_EQ(new_person->get_name() ,
+    REQUIRE(new_person->get_name() ==
             user_inst_from_mq->get_person()->get_name());
   }
 }

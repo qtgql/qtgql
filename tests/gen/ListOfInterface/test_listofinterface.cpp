@@ -10,7 +10,7 @@ namespace ListOfInterface {
 using namespace qtgql;
 
 auto ENV_NAME = std::string("ListOfInterface");
-auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
+auto SCHEMA_ADDR = test_utils::get_server_address(QString::fromStdString(ENV_NAME));
 
 TEST_CASE("ListOfInterfaceTestcase") {
   auto env = test_utils::get_or_create_env(
@@ -49,7 +49,7 @@ TEST_CASE("ListOfInterfaceTestcase") {
     remove_mut->set_variables({person->get_id(), 3});
     remove_mut->fetch();
     test_utils::wait_for_completion(remove_mut);
-    REQUIRE_NE(model->get(3)->property("name").toString().toStdString() ,
+    REQUIRE(model->get(3)->property("name").toString().toStdString() ==
             name_for_third_item.toStdString());
   };
   SECTION("test update modify") {
@@ -60,7 +60,7 @@ TEST_CASE("ListOfInterfaceTestcase") {
     modify_mut->set_variables({person->get_id(), 3, new_name});
     modify_mut->fetch();
     test_utils::wait_for_completion(modify_mut);
-    REQUIRE_EQ(model->get(3)->get_name().toStdString() , new_name.toStdString());
+    REQUIRE(model->get(3)->get_name().toStdString() == new_name.toStdString());
   }
   SECTION("test update add") {
     auto insert_mut = inserttolist::InsertToList::shared();
@@ -76,8 +76,8 @@ TEST_CASE("ListOfInterfaceTestcase") {
     qDebug() << model->last();
     auto dog =
         qobject_cast<const mainquery::Dog__randPersonpets *>(model->last());
-    REQUIRE_EQ(dog->__typename().toStdString() , "Dog");
-    REQUIRE_EQ(dog->get_name().toStdString() , name_to_set.toStdString());
+    REQUIRE(dog->__typename().toStdString() == "Dog");
+    REQUIRE(dog->get_name().toStdString() == name_to_set.toStdString());
   }
 }
 

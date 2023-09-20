@@ -7,7 +7,7 @@ namespace ScalarArguments {
 using namespace qtgql;
 
 auto ENV_NAME = std::string("ScalarArguments");
-auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
+auto SCHEMA_ADDR = test_utils::get_server_address(QString::fromStdString(ENV_NAME));
 
 TEST_CASE("ScalarArguments") {
   auto env = test_utils::get_or_create_env(
@@ -23,10 +23,10 @@ TEST_CASE("ScalarArguments") {
   auto container = mq->data()->get_getContainer();
 
   SECTION("test deserialize") {
-    REQUIRE_EQ(container->get_i() , int_exp);
-    REQUIRE_EQ(container->get_f() , float_exp);
-    REQUIRE_EQ(container->get_string().toStdString() , string_exp.toStdString());
-    REQUIRE_EQ(container->get_uuid().toString().toStdString() ,
+    REQUIRE(container->get_i() == int_exp);
+    REQUIRE(container->get_f() == float_exp);
+    REQUIRE(container->get_string().toStdString() == string_exp.toStdString());
+    REQUIRE(container->get_uuid().toString().toStdString() ==
             uuid_exp.toString().toStdString());
   };
   SECTION("test update") {
@@ -40,10 +40,10 @@ TEST_CASE("ScalarArguments") {
     mq->refetch();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(mq);
-    REQUIRE_NE(container->get_i() , int_exp);
-    REQUIRE_NE(container->get_f() , float_exp);
-    REQUIRE_NE(container->get_string().toStdString() , string_exp.toStdString());
-    REQUIRE_NE(container->get_uuid().toString().toStdString() ,
+    REQUIRE(container->get_i() == int_exp);
+    REQUIRE(container->get_f() == float_exp);
+    REQUIRE(container->get_string().toStdString() == string_exp.toStdString());
+    REQUIRE(container->get_uuid().toString().toStdString() ==
             uuid_exp.toString().toStdString());
   };
 }

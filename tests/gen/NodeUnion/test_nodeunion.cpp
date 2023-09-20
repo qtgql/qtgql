@@ -7,7 +7,7 @@ namespace NodeUnion {
 using namespace qtgql;
 
 auto ENV_NAME = std::string("NodeUnion");
-auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
+auto SCHEMA_ADDR = test_utils::get_server_address(QString::fromStdString(ENV_NAME));
 
 TEST_CASE("NodeUnion") {
   auto env = test_utils::get_or_create_env(
@@ -19,7 +19,7 @@ TEST_CASE("NodeUnion") {
   test_utils::wait_for_completion(mq);
   SECTION("test deserialize") {
     auto raw_ptr = mq->data()->get_whoAmI();
-    REQUIRE_EQ(raw_ptr->property("__typeName").toString().toStdString() ,
+    REQUIRE(raw_ptr->property("__typeName").toString().toStdString() ==
             "Person");
     auto p = qobject_cast<const mainquery::Person__whoAmI *>(raw_ptr);
     REQUIRE(!p->get_name().isEmpty());
@@ -49,7 +49,7 @@ TEST_CASE("NodeUnion") {
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(mq);
     auto frog_maybe = root->get_whoAmI();
-    REQUIRE_EQ(frog_maybe->__typename().toStdString() , "Frog");
+    REQUIRE(frog_maybe->__typename().toStdString() == "Frog");
     REQUIRE(!qobject_cast<const mainquery::Frog__whoAmI *>(frog_maybe)
                  ->get_color()
                  .isEmpty());

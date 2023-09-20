@@ -8,7 +8,7 @@ namespace NodeInterfaceField {
 using namespace qtgql;
 
 auto ENV_NAME = std::string("NodeInterfaceField");
-auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
+auto SCHEMA_ADDR = test_utils::get_server_address(QString::fromStdString(ENV_NAME));
 
 TEST_CASE("NodeInterfaceField") {
   auto env = test_utils::get_or_create_env(
@@ -18,7 +18,7 @@ TEST_CASE("NodeInterfaceField") {
   mq->fetch();
   test_utils::wait_for_completion(mq);
   SECTION("test deserialize") {
-    REQUIRE_EQ(mq->data()->get_node()->property("__typeName") , "User");
+    REQUIRE(mq->data()->get_node()->property("__typeName") == "User");
     auto user =
         qobject_cast<const mainquery::User__node *>(mq->data()->get_node());
     REQUIRE(!user->get_password().isEmpty());
@@ -34,7 +34,7 @@ TEST_CASE("NodeInterfaceField") {
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(change_name_mut);
 
-    REQUIRE_EQ(user->get_name().toStdString() , new_name.toStdString());
+    REQUIRE(user->get_name().toStdString() == new_name.toStdString());
   };
 
   SECTION("test updates different id same type") {
@@ -49,7 +49,7 @@ TEST_CASE("NodeInterfaceField") {
         qobject_cast<const mainquery::User__node *>(mq->data()->get_node());
     auto user2 =
         qobject_cast<const mainquery::User__node *>(mq2->data()->get_node());
-    REQUIRE_EQ(user1->get_password() , user2->get_password());
+    REQUIRE(user1->get_password() == user2->get_password());
   };
 }
 }; // namespace NodeInterfaceField

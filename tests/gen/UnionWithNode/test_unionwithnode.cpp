@@ -7,7 +7,7 @@ namespace UnionWithNode {
 using namespace qtgql;
 
 auto ENV_NAME = std::string("UnionWithNode");
-auto SCHEMA_ADDR = get_server_address("8601306");
+auto SCHEMA_ADDR = test_utils::get_server_address("8601306");
 
 TEST_CASE("UnionWithNode") {
   auto env = test_utils::get_or_create_env(

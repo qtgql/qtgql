@@ -24,11 +24,11 @@ TEST_CASE("ListModelABC modifications and operations") {
   SECTION("data role is USER_ROLE + 1") {
     int expected = Qt::UserRole + 1;
     auto roles = model_with_data.roleNames();
-    REQUIRE_EQ(roles.value(expected) , QByteArray("data"));
+    REQUIRE(roles.value(expected) == QByteArray("data"));
   }
 
   SECTION("test row count") {
-    REQUIRE_EQ(model_with_data.rowCount() , init_vec.size());
+    REQUIRE(model_with_data.rowCount() == init_vec.size());
   }
 
   SECTION("test returns data") {
@@ -37,7 +37,7 @@ TEST_CASE("ListModelABC modifications and operations") {
     auto res =
         model_with_data.data(model_with_data.index(0), ModelType ::DATA_ROLE);
     REQUIRE(res.canConvert<QObject *>());
-    REQUIRE_EQ(res.value<QObject *>()->property("name").toString().toStdString() ,
+    REQUIRE(res.value<QObject *>()->property("name").toString().toStdString() ==
             "foobar");
   }
 
@@ -49,31 +49,31 @@ TEST_CASE("ListModelABC modifications and operations") {
     qDebug() << "After";
     qDebug() << "First: " << model_with_data.first();
     qDebug() << "Last: " << model_with_data.last();
-    REQUIRE_EQ(model_with_data.rowCount() , init_vec.size() - 1);
+    REQUIRE(model_with_data.rowCount() == init_vec.size() - 1);
     auto val = model_with_data.last();
     auto val2 = init_vec.at(model_with_data.rowCount() - 1);
-    REQUIRE_EQ(val , val2);
+    REQUIRE(val == val2);
     remove_spy.validate();
   }
 
   SECTION("test clear") {
     model_with_data.clear();
     remove_spy.validate();
-    REQUIRE_EQ(model_with_data.rowCount() , 0);
+    REQUIRE(model_with_data.rowCount() == 0);
   }
   SECTION("test remove rows") {
     model_with_data.removeRows(0, model_with_data.rowCount());
-    REQUIRE_EQ(model_with_data.rowCount() , 0);
+    REQUIRE(model_with_data.rowCount() == 0);
     remove_spy.validate();
   }
   SECTION("test remove rows inside") {
-    REQUIRE_EQ(model_with_data.rowCount() , 10);
+    REQUIRE(model_with_data.rowCount() == 10);
     auto first_item = model_with_data.first();
     REQUIRE(model_with_data.removeRows(1, model_with_data.rowCount() - 1));
     remove_spy.validate();
-    REQUIRE_EQ(model_with_data.rowCount() , 1);
+    REQUIRE(model_with_data.rowCount() == 1);
     auto new_last = model_with_data.first();
-    REQUIRE_EQ(new_last , first_item);
+    REQUIRE(new_last == first_item);
   }
 
   auto new_obj = new QObject(&parent_cleaner);
@@ -83,8 +83,8 @@ TEST_CASE("ListModelABC modifications and operations") {
     model_with_data.append(new_obj);
     insert_spy.validate();
     auto after_count = model_with_data.rowCount();
-    REQUIRE_EQ(before_count , after_count - 1);
-    REQUIRE_EQ(model_with_data.last() , new_obj);
+    REQUIRE(before_count == after_count - 1);
+    REQUIRE(model_with_data.last() == new_obj);
   }
   SECTION("test replace") {
 
@@ -92,13 +92,13 @@ TEST_CASE("ListModelABC modifications and operations") {
     model_with_data.replace(model_with_data.rowCount() - 1, new_obj);
     insert_spy.validate();
     auto after_count = model_with_data.rowCount();
-    REQUIRE_EQ(before_count , after_count);
-    REQUIRE_EQ(model_with_data.last() , new_obj);
+    REQUIRE(before_count == after_count);
+    REQUIRE(model_with_data.last() == new_obj);
   }
 
   SECTION("test current index prop") {
     bool ok = false;
-    REQUIRE_EQ(model_with_data.property("currentIndex").toInt(&ok) , 0);
+    REQUIRE(model_with_data.property("currentIndex").toInt(&ok) == 0);
     REQUIRE(ok);
   }
 
@@ -107,7 +107,7 @@ TEST_CASE("ListModelABC modifications and operations") {
     model_with_data.set_current_index(2);
     REQUIRE(!spy.isEmpty());
     bool ok = false;
-    REQUIRE_EQ(model_with_data.property("currentIndex").toInt(&ok) , 2);
+    REQUIRE(model_with_data.property("currentIndex").toInt(&ok) == 2);
     REQUIRE(ok);
   }
 }

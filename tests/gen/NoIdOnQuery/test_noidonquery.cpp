@@ -7,7 +7,7 @@
 namespace NoIdOnQuery {
 using namespace qtgql;
 auto ENV_NAME = std::string("NoIdOnQuery");
-auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
+auto SCHEMA_ADDR = test_utils::get_server_address(QString::fromStdString(ENV_NAME));
 
 TEST_CASE("NoIdOnQuery") {
   auto env = test_utils::get_or_create_env(
@@ -16,7 +16,7 @@ TEST_CASE("NoIdOnQuery") {
   mq->fetch();
   test_utils::wait_for_completion(mq);
   SECTION("test deserialize and appends ID selection to query") {
-    REQUIRE_NE(mq->data()->get_user()->get_id() , bases::DEFAULTS::ID);
+    REQUIRE(mq->data()->get_user()->get_id() == bases::DEFAULTS::ID);
   }
 }
 

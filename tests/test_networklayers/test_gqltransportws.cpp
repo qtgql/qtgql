@@ -9,9 +9,9 @@ TEST_CASE("GraphQLTransportWS") {
     auto res_op_name =
         bases::get_operation_name("query SampleOperation {field1 field2}");
     REQUIRE(res_op_name);
-    REQUIRE_EQ(res_op_name.value() , operation_name);
+    REQUIRE(res_op_name.value() == operation_name);
   };
-  auto valid_client = get_valid_ws_client();
+  auto valid_client = test_utils::get_valid_ws_client();
 
   SECTION("If ws not valid gql_valid=false") {
     REQUIRE(
@@ -25,8 +25,8 @@ TEST_CASE("GraphQLTransportWS") {
   }
 
   SECTION("If ack not received - gql is not valid") {
-    auto invalid_client = DebugAbleWsNetworkLayer(
-        DebugClientSettings{.url = get_server_address(), .handle_ack = false});
+    auto invalid_client = test_utils::DebugAbleWsNetworkLayer(
+        test_utils::DebugClientSettings{.url = test_utils::get_server_address(), .handle_ack = false});
     REQUIRE(QTest::qWaitFor([&]() { return invalid_client.is_valid(); }, 1000));
     std::ignore = QTest::qWaitFor(
         [&]() -> bool { return invalid_client.gql_is_valid(); }, 200);
@@ -34,7 +34,7 @@ TEST_CASE("GraphQLTransportWS") {
   }
 
   SECTION("Connection init is sent and receives ack") {
-    auto client = DebugAbleWsNetworkLayer({.url = get_server_address()});
+    auto client = test_utils::DebugAbleWsNetworkLayer({.url = test_utils::get_server_address()});
     auto success =
         QTest::qWaitFor([&]() { return client.gql_is_valid(); }, 1000);
     REQUIRE(success);
@@ -56,8 +56,8 @@ TEST_CASE("GraphQLTransportWS") {
   SECTION("execute via environment") {
     auto env = new bases::Environment(
         "Sample env",
-        std::shared_ptr<DebugAbleWsNetworkLayer>(
-            new DebugAbleWsNetworkLayer({.url = get_server_address()})));
+        std::shared_ptr<test_utils::DebugAbleWsNetworkLayer>(
+            new test_utils::DebugAbleWsNetworkLayer({.url = test_utils::get_server_address()})));
     auto handler = std::make_shared<DebugHandler>(get_subscription_str());
     env->execute(handler);
     handler->wait_for_completed();
@@ -72,16 +72,16 @@ TEST_CASE("GraphQLTransportWS") {
   }
 
   SECTION("Ping timeout close connection") {
-    auto client = DebugAbleWsNetworkLayer(
+    auto client = test_utils::DebugAbleWsNetworkLayer(
         {.handle_pong = false,
-         .prod_settings = {.url = get_server_address(), .ping_timeout = 500}});
+         .prod_settings = {.url = test_utils::get_server_address(), .ping_timeout = 500}});
     client.wait_for_valid();
     REQUIRE(QTest::qWaitFor([&]() -> bool { return !client.is_valid(); }, 700));
   }
 
   SECTION("wont reconnect if reconnect is false") {
     auto client =
-        DebugAbleWsNetworkLayer({.prod_settings = {.url = get_server_address(),
+        test_utils::DebugAbleWsNetworkLayer({.prod_settings = {.url = test_utils::get_server_address(),
                                                    .auto_reconnect = false}});
     client.wait_for_valid();
     client.close();
@@ -90,7 +90,7 @@ TEST_CASE("GraphQLTransportWS") {
 
   SECTION("Reconnection tests") {
     auto client =
-        DebugAbleWsNetworkLayer({.prod_settings = {.url = get_server_address(),
+        test_utils::DebugAbleWsNetworkLayer({.prod_settings = {.url = test_utils::get_server_address(),
                                                    .auto_reconnect = true}});
     client.wait_for_valid();
     client.close();
@@ -110,15 +110,15 @@ TEST_CASE("GraphQLTransportWS") {
 
   SECTION("valid_client can have headers and and authorize") {
     QString expected_ret = "The resolver will return this";
-    auto authorized_client = DebugAbleWsNetworkLayer(
-        {.prod_settings = {.url = get_server_address(),
+    auto authorized_client = test_utils::DebugAbleWsNetworkLayer(
+        {.prod_settings = {.url = test_utils::get_server_address(),
                            .headers = {{"Authorization", expected_ret}}}});
     authorized_client.wait_for_valid();
     auto handler =
         std::make_shared<DebugHandler>("query MyQuery {isAuthenticated}");
     authorized_client.execute(handler);
     handler->wait_for_completed();
-    REQUIRE_EQ(handler->m_data["isAuthenticated"].toString().toStdString() ,
+    REQUIRE(handler->m_data["isAuthenticated"].toString().toStdString() ==
             expected_ret.toStdString());
   }
   SECTION("Mutation and Query operations compatibility") {
@@ -137,12 +137,12 @@ TEST_CASE("GraphQLTransportWS") {
           std::make_shared<DebugHandler>("query TestQuery{hello}");
       valid_client->execute(query_handler);
       query_handler->wait_for_completed();
-      REQUIRE_EQ(query_handler->m_data["hello"].toString() , "world");
+      REQUIRE(query_handler->m_data["hello"].toString() == "world");
     }
   }
 
   SECTION("Test variables") {
-    auto client = get_valid_ws_client();
+    auto client = test_utils::get_valid_ws_client();
     auto sub1 = std::make_shared<DebugHandler>(QString(
         "subscription Sub1($target: Int!, $raiseOn5: Boolean = false) {\n"
         "  count(target: $target, raiseOn5: $raiseOn5)\n"
@@ -152,13 +152,13 @@ TEST_CASE("GraphQLTransportWS") {
     client->wait_for_valid();
     client->execute(sub1);
     sub1->wait_for_completed();
-    REQUIRE_EQ(sub1->m_data.value("count").toInt() , 1);
+    REQUIRE(sub1->m_data.value("count").toInt() == 1);
   }
 }
 
 // NOTE: these tests could exist in any other network layer.
 TEST_CASE("Operation handlers tests") {
-  auto valid_client = get_valid_ws_client();
+  auto valid_client = test_utils::get_valid_ws_client();
   SECTION("Handlers tests") {
     auto sub1 = std::make_shared<DebugHandler>(get_subscription_str());
     auto sub2 = std::make_shared<DebugHandler>(get_subscription_str());

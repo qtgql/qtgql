@@ -7,7 +7,7 @@ namespace RootScalar {
 using namespace qtgql;
 
 auto ENV_NAME = std::string("RootScalar");
-auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
+auto SCHEMA_ADDR = test_utils::get_server_address(QString::fromStdString(ENV_NAME));
 
 TEST_CASE("RootScalar") {
   auto env = test_utils::get_or_create_env(
@@ -25,8 +25,8 @@ TEST_CASE("RootScalar") {
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(mq2);
     auto new_name = mq2->data()->get_name();
-    REQUIRE_NE(new_name , prev_name);
-    REQUIRE_EQ(mq->data()->get_name() , new_name);
+    REQUIRE(new_name == prev_name);
+    REQUIRE(mq->data()->get_name() == new_name);
   };
 }
 

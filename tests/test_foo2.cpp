@@ -18,7 +18,7 @@ TEST_CASE("Test foo 2") {
     SECTION("do test"){
         auto obj = new QObject(&parent_cleaner);
 
-        REQUIRE_EQ(obj->parent(), nullptr);
+        REQUIRE(obj->parent()== nullptr);
     }
 
 //delete obj;

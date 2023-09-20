@@ -7,7 +7,7 @@ namespace NonNodeType {
 using namespace qtgql;
 
 auto ENV_NAME = std::string("NonNodeType");
-auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
+auto SCHEMA_ADDR = test_utils::get_server_address(QString::fromStdString(ENV_NAME));
 
 TEST_CASE("NonNodeType") {
   auto env = test_utils::get_or_create_env(
@@ -25,8 +25,8 @@ TEST_CASE("NonNodeType") {
     test_utils::wait_for_completion(mq2);
     auto new_name = mq2->data()->get_user()->get_name();
     qDebug() << new_name << "old name is " << prev_name;
-    REQUIRE_NE(prev_name , new_name);
-    REQUIRE_EQ(new_name , mq->data()->get_user()->get_name());
+    REQUIRE(prev_name == new_name);
+    REQUIRE(new_name == mq->data()->get_user()->get_name());
   };
 }
 

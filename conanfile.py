@@ -126,9 +126,6 @@ class QtGqlRecipe(ConanFile):
     def requirements(self) -> None:
         ...
 
-    # def build_requirements(self) -> None:
-    #     self.test_requires("catch2/3.4.0")
-
     def layout(self) -> None:
         cmake_layout(self)
 
@@ -167,13 +164,14 @@ class QtGqlRecipe(ConanFile):
         return False
 
     def generate(self) -> None:
-        # qt_installer = Qt6Installer(self.os_name, self.options.qt_version.value)
-        # if not qt_installer.installed():
-        #     qt_installer.install()
+        if self.is_linux(): # couldn't get this to build on Windows ATM.
+            qt_installer = Qt6Installer(self.os_name, self.options.qt_version.value)
+            if not qt_installer.installed():
+                qt_installer.install()
 
         deps = CMakeDeps(self)
         deps.generate()
-        tc = CMakeToolchain(self, generator="Ninja")
+        tc = CMakeToolchain(self, generator="Ninja" if self.is_windows() else "Unix Makefiles")
         # tc.cache_variables[
         #     "QT_DL_LIBRARIES"
         # ] = f"{qt_installer.dll_path!s};"  # used by catch2 to discover tests/

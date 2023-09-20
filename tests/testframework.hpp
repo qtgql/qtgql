@@ -1,5 +1,11 @@
 #pragma once
 #include <catch2/catch_test_macros.hpp>
-#define REQUIRE_EQ(first, second) REQUIRE(first == second)
-//#include <doctest/doctest.h>
-//#define SECTION(name) DOCTEST_SUBCASE(name)
+#include <QString>
+namespace Catch {
+    template<>
+    struct StringMaker<QString> {
+        static std::string convert( QString const& value ) {
+            return value.toStdString();
+        }
+    };
+}

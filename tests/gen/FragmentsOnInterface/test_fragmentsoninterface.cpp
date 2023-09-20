@@ -8,7 +8,7 @@ namespace FragmentsOnInterface {
 using namespace qtgql;
 
 auto ENV_NAME = std::string("FragmentsOnInterface");
-auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
+auto SCHEMA_ADDR = test_utils::get_server_address(QString::fromStdString(ENV_NAME));
 
 TEST_CASE("FragmentsOnInterface") {
   auto env = test_utils::get_or_create_env(
@@ -20,7 +20,7 @@ TEST_CASE("FragmentsOnInterface") {
   test_utils::wait_for_completion(animal_query);
   SECTION("test deserialize") {
     auto animal = animal_query->data()->get_animal();
-    REQUIRE_EQ(animal->get_kind() , Enums::AnimalKind::DOG);
+    REQUIRE(animal->get_kind() == Enums::AnimalKind::DOG);
     auto dog = qobject_cast<const animalquery::Dog__animal *>(animal);
     REQUIRE(!dog->get_furColor().isEmpty());
   };
@@ -31,7 +31,7 @@ TEST_CASE("FragmentsOnInterface") {
     animal_query->refetch();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(animal_query);
-    REQUIRE_EQ(animal_query->data()->get_animal()->get_kind() , Enums::PERSON);
+    REQUIRE(animal_query->data()->get_animal()->get_kind() == Enums::PERSON);
     auto person = qobject_cast<const animalquery::Person__animal *>(
         animal_query->data()->get_animal());
     REQUIRE(!person->get_language().isEmpty());
@@ -53,7 +53,7 @@ TEST_CASE("FragmentsOnInterface") {
     change_age_mut->refetch();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(change_age_mut);
-    REQUIRE_EQ(change_age_mut->data()->get_changeAge()->get_age() , new_age);
+    REQUIRE(change_age_mut->data()->get_changeAge()->get_age() == new_age);
   }
 }
 
