@@ -17,11 +17,11 @@
 #define 👉context.export_macro👈 Q_DECL_IMPORT
 #endif
 
-namespace  👉 context.config.env_name 👈{
+namespace 👉 context.config.env_name 👈{
 {% if context.enums %}
 // ---------- Enums ----------
 
-class 👉context.export_macro👈 Enums{
+class Enums{
     Q_GADGET
 
 public:
