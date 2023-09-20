@@ -14,7 +14,7 @@ auto SCHEMA_ADDR = test_utils::get_server_address(QString::fromStdString(ENV_NAM
 
 TEST_CASE("ListOfUnion") {
   auto env = test_utils::get_or_create_env(
-      ENV_NAME, DebugClientSettings{.print_debug = true,
+      ENV_NAME, test_utils::DebugClientSettings{.print_debug = true,
                                     .prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = mainquery::MainQuery::shared();
   mq->fetch();

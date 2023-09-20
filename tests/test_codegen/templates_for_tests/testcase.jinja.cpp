@@ -10,7 +10,7 @@ auto SCHEMA_ADDR = get_server_address(ENV_NAME);
 
 TEST_CASE("👉 context.test_name 👈") {
     auto env = test_utils::get_or_create_env(
-            ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
+            ENV_NAME, test_utils::DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
 
     SECTION("test deserialize"){
         REQUIRE(false);

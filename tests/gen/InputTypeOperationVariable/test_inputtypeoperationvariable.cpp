@@ -12,7 +12,7 @@ auto SCHEMA_ADDR = test_utils::get_server_address(QString::fromStdString(ENV_NAM
 
 TEST_CASE("InputTypeOperationVariable") {
   auto env = test_utils::get_or_create_env(
-      ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
+      ENV_NAME, test_utils::DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto create_post = createpost::CreatePost::shared();
   QString old_post_content("this is a great post about elephants");
   create_post->set_variables(

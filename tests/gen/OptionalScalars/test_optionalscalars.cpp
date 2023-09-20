@@ -30,7 +30,7 @@ template <typename User> void check_user_filled(const User &user) {
 
 TEST_CASE("OptionalScalars") {
   auto env = test_utils::get_or_create_env(
-      ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
+      ENV_NAME, test_utils::DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = mainquery::MainQuery::shared();
   SECTION("test deserialize - when null returns default values") {
     mq->set_variables({true});

@@ -7,7 +7,7 @@ set(CMAKE_OBJECT_PATH_MAX 9999)
 
 add_executable(${TESTS_TARGET}
         main.cpp
-#        ${TEST_SRCS}
+        ${TEST_SRCS}
         testutils.cpp testutils.hpp
         test_networklayers/utils.hpp
         test_networklayers/utils.cpp
@@ -22,7 +22,7 @@ add_executable(${TESTS_TARGET}
 add_compile_definitions(TESTS_QML_DIR=${TESTS_QML_DIR} ${TESTS_TARGET})
 include_directories(../tests)
 
-#add_subdirectory(gen)
+add_subdirectory(gen)
 
 target_sources(${TESTS_TARGET}
         PRIVATE

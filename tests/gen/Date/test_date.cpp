@@ -13,7 +13,7 @@ auto SCHEMA_ADDR = test_utils::get_server_address(QString::fromStdString(ENV_NAM
 
 TEST_CASE("Date") {
   auto env = test_utils::get_or_create_env(
-      ENV_NAME, DebugClientSettings{.print_debug = false,
+      ENV_NAME, test_utils::DebugClientSettings{.print_debug = false,
                                     .prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = std::make_shared<mainquery::MainQuery>();
   mq->fetch();
