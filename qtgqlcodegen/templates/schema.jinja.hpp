@@ -35,10 +35,14 @@ Q_ENUM(👉enum.name👈)
 struct 👉enum.map_name👈{
 Q_GADGET
 public:
-inline static const std::vector<std::pair<QString, 👉enum.name👈>> members = {
+static const std::vector<std::pair<QString, 👉enum.name👈>> & members(){
+        static std::vector<std::pair<QString, 👉enum.name👈>> ret =
+        {
         {% for member in enum.members -%}
         {"👉member.name👈", 👉enum.name👈::👉member.name👈},
-        {% endfor %}
+        {% endfor -%}
+        };
+        return ret;
 };
     GraphQLEnum_MACRO(👉enum.name👈)
 };
