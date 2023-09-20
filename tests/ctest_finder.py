@@ -41,12 +41,11 @@ class CtestTestCommand:
             cwd=build_dir.resolve(True),
             capture_output=True,
         )
-        try:
+        if self.ret_res.returncode != 0:
             match = re.findall("(in: )(.*)(\\.log)", self.ret_res.stderr.decode())
             log_file = match[0][1]
-        except IndexError:
-            return
-        pytest.fail(Path(log_file + ".log").resolve(True).read_text("utf-8"))
+            pytest.fail(Path(log_file + ".log").resolve(True).read_text("utf-8"))
+
 
 
 def collect_tests() -> list[CtestTestCommand]:
