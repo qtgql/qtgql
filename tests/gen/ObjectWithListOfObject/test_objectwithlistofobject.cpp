@@ -1,5 +1,4 @@
 #include "testframework.hpp"
-#include <QSignalSpy>
 
 #include "gen/AddFriend.hpp"
 #include "gen/MainQuery.hpp"
@@ -19,7 +18,7 @@ TEST_CASE("ObjectWithListOfObject") {
   SECTION("test deserialize") {
     auto friends = mq->data()->get_user()->get_friends();
     auto p = friends->first();
-    REQUIRE(p->get_name() == bases::DEFAULTS::STRING);
+    REQUIRE(p->get_name() != bases::DEFAULTS::STRING);
   }
   SECTION("test update") {
     auto add_friend_mut = addfriend::AddFriend::shared();

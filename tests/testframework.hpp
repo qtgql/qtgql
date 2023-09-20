@@ -5,6 +5,8 @@ namespace Catch {
     template<>
     struct StringMaker<QString> {
         static std::string convert( QString const& value ) {
+            if(value.isEmpty())
+                return "\"\"";
             return value.toStdString();
         }
     };

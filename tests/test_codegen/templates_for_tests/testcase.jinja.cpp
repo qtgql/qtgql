@@ -1,4 +1,3 @@
-#include <QSignalSpy>
 #include "testframework.hpp"
 #include "testutils.hpp"
 

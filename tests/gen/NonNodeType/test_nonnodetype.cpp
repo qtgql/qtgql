@@ -25,7 +25,7 @@ TEST_CASE("NonNodeType") {
     test_utils::wait_for_completion(mq2);
     auto new_name = mq2->data()->get_user()->get_name();
     qDebug() << new_name << "old name is " << prev_name;
-    REQUIRE(prev_name == new_name);
+    REQUIRE(prev_name != new_name);
     REQUIRE(new_name == mq->data()->get_user()->get_name());
   };
 }

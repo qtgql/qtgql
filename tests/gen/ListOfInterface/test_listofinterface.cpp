@@ -49,8 +49,8 @@ TEST_CASE("ListOfInterfaceTestcase") {
     remove_mut->set_variables({person->get_id(), 3});
     remove_mut->fetch();
     test_utils::wait_for_completion(remove_mut);
-    REQUIRE(model->get(3)->property("name").toString().toStdString() ==
-            name_for_third_item.toStdString());
+    REQUIRE(model->get(3)->property("name").toString() !=
+            name_for_third_item);
   };
   SECTION("test update modify") {
     auto modify_mut = modifyname::ModifyName::shared();

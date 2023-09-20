@@ -19,7 +19,7 @@ TEST_CASE("NestedObject") {
   test_utils::wait_for_completion(mq);
   SECTION("test deserialize") {
     auto name = mq->data()->get_user()->get_person()->get_name();
-    REQUIRE((!name.isEmpty() && name == bases::DEFAULTS::STRING));
+    REQUIRE((!name.isEmpty() && name != bases::DEFAULTS::STRING));
   }
   SECTION("test updates") {
     auto old_user = mq->data()->get_user();
@@ -55,10 +55,10 @@ TEST_CASE("NestedObject") {
     auto new_person =
         replace_person_op->data()->get_replacePerson()->get_person();
 
-    REQUIRE(new_person->get_id() == old_person_id);
+    REQUIRE(new_person->get_id() != old_person_id);
     REQUIRE(new_person->get_id() == user_inst_from_mq->get_person()->get_id());
-    REQUIRE(new_person->get_name().toStdString() ==
-            old_person_name.toStdString());
+    REQUIRE(new_person->get_name() !=
+            old_person_name);
     REQUIRE(new_person->get_name() ==
             user_inst_from_mq->get_person()->get_name());
   }

@@ -25,9 +25,9 @@ TEST_CASE("ScalarArguments") {
   SECTION("test deserialize") {
     REQUIRE(container->get_i() == int_exp);
     REQUIRE(container->get_f() == float_exp);
-    REQUIRE(container->get_string().toStdString() == string_exp.toStdString());
-    REQUIRE(container->get_uuid().toString().toStdString() ==
-            uuid_exp.toString().toStdString());
+    REQUIRE(container->get_string() == string_exp);
+    REQUIRE(container->get_uuid().toString() ==
+            uuid_exp.toString());
   };
   SECTION("test update") {
     auto nl = dynamic_cast<gqltransportws::GqlTransportWs *>(
@@ -40,11 +40,11 @@ TEST_CASE("ScalarArguments") {
     mq->refetch();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(mq);
-    REQUIRE(container->get_i() == int_exp);
-    REQUIRE(container->get_f() == float_exp);
-    REQUIRE(container->get_string().toStdString() == string_exp.toStdString());
-    REQUIRE(container->get_uuid().toString().toStdString() ==
-            uuid_exp.toString().toStdString());
+    REQUIRE(container->get_i() != int_exp);
+    REQUIRE(container->get_f() != float_exp);
+    REQUIRE(container->get_string() != string_exp);
+    REQUIRE(container->get_uuid().toString() !=
+            uuid_exp.toString());
   };
 }
 

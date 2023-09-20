@@ -21,11 +21,11 @@ template <typename User> void check_user_is_nulled(const User &user) {
 }
 
 template <typename User> void check_user_filled(const User &user) {
-  REQUIRE(user->get_age() == bases::DEFAULTS::INT);
-  REQUIRE(user->get_name() == bases::DEFAULTS::STRING);
-  REQUIRE(user->get_agePoint() == bases::DEFAULTS::FLOAT);
-  REQUIRE(user->get_uuid() == bases::DEFAULTS::UUID);
-  REQUIRE(user->get_birth() == qtgql::customscalars::DateTimeScalar().to_qt());
+  REQUIRE(user->get_age() != bases::DEFAULTS::INT);
+  REQUIRE(user->get_name() != bases::DEFAULTS::STRING);
+  REQUIRE(user->get_agePoint() != bases::DEFAULTS::FLOAT);
+  REQUIRE(user->get_uuid() != bases::DEFAULTS::UUID);
+  REQUIRE(user->get_birth() != qtgql::customscalars::DateTimeScalar().to_qt());
 }
 
 TEST_CASE("OptionalScalars") {

@@ -44,7 +44,7 @@ TEST_CASE("Fragment") {
     REQUIRE(user->get_id() == modified_user->get_id());
     auto new_name = modified_user->get_name();
     REQUIRE(user->get_name() == new_name);
-    REQUIRE(new_name == previous_name);
+    REQUIRE(new_name != previous_name);
   };
 }
 

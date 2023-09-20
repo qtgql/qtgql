@@ -25,7 +25,7 @@ TEST_CASE("Enum") {
     auto update_status = updateuserstatus::UpdateUserStatus::shared();
     auto user = mq->data()->get_user();
     auto new_status = Enum::Enums::Disconnected;
-    REQUIRE(new_status == user->get_status());
+    REQUIRE(new_status != user->get_status());
     update_status->set_variables({user->get_id(), new_status});
     auto catcher =
         test_utils::SignalCatcher({.source_obj = user, .only = "status"});

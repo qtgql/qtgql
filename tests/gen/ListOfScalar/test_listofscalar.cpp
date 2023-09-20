@@ -60,8 +60,8 @@ TEST_CASE("ListOfScalar") {
     replace_tag_mut->fetch();
     test_utils::wait_for_completion(replace_tag_mut);
     auto model = rnd_post->data()->get_post()->get_tags();
-    REQUIRE(model->data(model->index(2)== 257).toString().toStdString() ==
-            new_tag.toStdString());
+    REQUIRE(model->data(model->index(2), 257).toString() ==
+            new_tag);
   };
 }
 

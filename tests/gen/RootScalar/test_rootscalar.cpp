@@ -25,7 +25,7 @@ TEST_CASE("RootScalar") {
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(mq2);
     auto new_name = mq2->data()->get_name();
-    REQUIRE(new_name == prev_name);
+    REQUIRE(new_name != prev_name);
     REQUIRE(mq->data()->get_name() == new_name);
   };
 }
