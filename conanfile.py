@@ -21,6 +21,7 @@ __version__: str = "0.135.4"
 
 IS_GITHUB_ACTION = os.environ.get("IS_GITHUB_ACTION", False)
 
+
 class EnvManager:
     def __init__(self, env_var: str = "PATH") -> None:
         self._env_avr = env_var
@@ -165,12 +166,10 @@ class QtGqlRecipe(ConanFile):
         return False
 
     def generate(self) -> None:
-
-
         deps = CMakeDeps(self)
         deps.generate()
-        tc = CMakeToolchain(self, generator="Ninja" if self.is_windows() else "Unix Makefiles")
-        if self.is_linux() or IS_GITHUB_ACTION: # couldn't get this to build on Windows ATM.
+        tc = CMakeToolchain(self)
+        if self.is_linux() or IS_GITHUB_ACTION:  # couldn't get this to build on Windows ATM.
             qt_installer = Qt6Installer(self.os_name, self.options.qt_version.value)
             if not qt_installer.installed():
                 qt_installer.install()
