@@ -10,7 +10,7 @@ auto ENV_NAME = std::string("ObjectWithListOfObject");
 auto SCHEMA_ADDR = test_utils::get_server_address(QString::fromStdString(ENV_NAME));
 
 TEST_CASE("ObjectWithListOfObject") {
-  auto env = test_utils::get_or_create_env(
+    test_utils::get_or_create_env(
       ENV_NAME, test_utils::DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = mainquery::MainQuery::shared();
   mq->fetch();

@@ -19,6 +19,7 @@ ConanBool = [True, False]
 
 __version__: str = "0.135.4"
 
+IS_GITHUB_ACTION = os.environ.get("IS_GITHUB_ACTION", False)
 
 class EnvManager:
     def __init__(self, env_var: str = "PATH") -> None:
@@ -164,19 +165,21 @@ class QtGqlRecipe(ConanFile):
         return False
 
     def generate(self) -> None:
-        if self.is_linux(): # couldn't get this to build on Windows ATM.
-            qt_installer = Qt6Installer(self.os_name, self.options.qt_version.value)
-            if not qt_installer.installed():
-                qt_installer.install()
+
 
         deps = CMakeDeps(self)
         deps.generate()
         tc = CMakeToolchain(self, generator="Ninja" if self.is_windows() else "Unix Makefiles")
-        # tc.cache_variables[
-        #     "QT_DL_LIBRARIES"
-        # ] = f"{qt_installer.dll_path!s};"  # used by catch2 to discover tests/
+        if self.is_linux() or IS_GITHUB_ACTION: # couldn't get this to build on Windows ATM.
+            qt_installer = Qt6Installer(self.os_name, self.options.qt_version.value)
+            if not qt_installer.installed():
+                qt_installer.install()
+            tc.cache_variables[
+                "QT_DL_LIBRARIES"
+            ] = f"{qt_installer.dll_path!s};"  # used by catch2 to discover tests/
+            tc.cache_variables["Qt6_DIR"] = str(qt_installer.qt6_cmake_config)
+
         tc.cache_variables["QTGQL_TESTING"] = self.should_test
-        # tc.cache_variables["Qt6_DIR"] = str(qt_installer.qt6_cmake_config)
         tc.cache_variables["TESTS_QML_DIR"] = (self.build_path / "tests").as_posix()
         if self.is_windows():
             tc.cache_variables["CMAKE_CXX_COMPILER"] = "c++.exe"

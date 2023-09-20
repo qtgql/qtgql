@@ -152,7 +152,7 @@ struct QmlBot {
     delete m_qquick_view;
   }
 };
-    std::shared_ptr<bases::Environment>
+    [[maybe_unused]] std::shared_ptr<bases::Environment>
     get_or_create_env(const std::string &env_name,
                       const DebugClientSettings &settings,
                       std::chrono::milliseconds cache_dur = 5s);
