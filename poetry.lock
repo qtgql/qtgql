@@ -708,36 +708,6 @@ files = [
 colorama = {version = "*", markers = "platform_system == \"Windows\""}
 
 [[package]]
-name = "cmake"
-version = "3.27.4.1"
-description = "CMake is an open-source, cross-platform family of tools designed to build, test and package software"
-category = "dev"
-optional = false
-python-versions = "*"
-files = [
-    {file = "cmake-3.27.4.1-py2.py3-none-macosx_10_10_universal2.macosx_10_10_x86_64.macosx_11_0_arm64.macosx_11_0_universal2.whl", hash = "sha256:65b79f1e8b6fa254697ee0b411aa4dff0d2309c1405af3448adf06cbd7ef0ac5"},
-    {file = "cmake-3.27.4.1-py2.py3-none-manylinux2010_i686.manylinux_2_12_i686.whl", hash = "sha256:4a1d22ee72dcdc32d0f8bbf5691d2e9367585db8bfeafe7cffa2c4274127a801"},
-    {file = "cmake-3.27.4.1-py2.py3-none-manylinux2010_x86_64.manylinux_2_12_x86_64.whl", hash = "sha256:37e9cad75184fbefe837311528d026901278b606707e9d14b58e3767d49d0aa6"},
-    {file = "cmake-3.27.4.1-py2.py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:2f217fb281b068696fdcc4b198de62e9ded8bc0a93877684afc59db3507ccb44"},
-    {file = "cmake-3.27.4.1-py2.py3-none-manylinux2014_i686.manylinux_2_17_i686.whl", hash = "sha256:a3bd8b9d0e294bd2b3ce27a850c9d924aee7e4f4c0bb56d66641cc1544314f58"},
-    {file = "cmake-3.27.4.1-py2.py3-none-manylinux2014_ppc64le.manylinux_2_17_ppc64le.whl", hash = "sha256:871c8b5eaac959f079c2389c7a7f198fa5f86a029e8726fcb1f3e13d030c33e9"},
-    {file = "cmake-3.27.4.1-py2.py3-none-manylinux2014_s390x.manylinux_2_17_s390x.whl", hash = "sha256:ec4a5bc2376dfc57065bfde6806183b331165f33457b7cc0fc0511260dde7c72"},
-    {file = "cmake-3.27.4.1-py2.py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:c36eb106dec60198264b25d4bd23cd9ea30b0af9200a143ec1db887c095306f7"},
-    {file = "cmake-3.27.4.1-py2.py3-none-musllinux_1_1_aarch64.whl", hash = "sha256:2b0b53ec2e45cfe9982d0adf833b3519efc328c1e3cffae4d237841a1ed6edf4"},
-    {file = "cmake-3.27.4.1-py2.py3-none-musllinux_1_1_i686.whl", hash = "sha256:a504815bcba0ece9aafb48a6b7770d6479756fda92f8b62f9ab7ff8a403a12d5"},
-    {file = "cmake-3.27.4.1-py2.py3-none-musllinux_1_1_ppc64le.whl", hash = "sha256:1aca07fccfa042a0379bb027e30f090a8239b18fd3f959391c5d77c22dd0a809"},
-    {file = "cmake-3.27.4.1-py2.py3-none-musllinux_1_1_s390x.whl", hash = "sha256:315eb37233e2d0b8fa01580e33439eaeaef65f1e41ad9ca269cbe68cc0a039a4"},
-    {file = "cmake-3.27.4.1-py2.py3-none-musllinux_1_1_x86_64.whl", hash = "sha256:94fec5a8bae1f3b62d8a8653ebcb7fa4007e2d0e713f94e4b2089f708c13548f"},
-    {file = "cmake-3.27.4.1-py2.py3-none-win32.whl", hash = "sha256:8249a1ba7901b53661b44e59bdf6fd1e977e10843795788efe25d3374de6ed95"},
-    {file = "cmake-3.27.4.1-py2.py3-none-win_amd64.whl", hash = "sha256:b72db11e13eafb46b9c53797d141e89886293db768feabef4b841accf666de54"},
-    {file = "cmake-3.27.4.1-py2.py3-none-win_arm64.whl", hash = "sha256:0fb68660ce3954de99d1f41bedcf87063325c4cc891003f12de36472fa1efa28"},
-    {file = "cmake-3.27.4.1.tar.gz", hash = "sha256:70526bbff5eeb7d4d6b921af1b80d2d29828302882f94a2cba93ad7d469b90f6"},
-]
-
-[package.extras]
-test = ["coverage (>=4.2)", "flake8 (>=3.0.4)", "path.py (>=11.5.0)", "pytest (>=3.0.3)", "pytest-cov (>=2.4.0)", "pytest-runner (>=2.9)", "pytest-virtualenv (>=1.7.0)", "scikit-build (>=0.10.0)", "setuptools (>=28.0.0)", "virtualenv (>=15.0.3)", "wheel"]
-
-[[package]]
 name = "colorama"
 version = "0.4.6"
 description = "Cross-platform colored terminal text."
@@ -2655,18 +2625,6 @@ files = [
 ]
 
 [[package]]
-name = "pyvoip"
-version = "1.6.5"
-description = "PyVoIP is a pure python VoIP/SIP/RTP library."
-category = "main"
-optional = false
-python-versions = ">=3.6"
-files = [
-    {file = "pyVoIP-1.6.5-py3-none-any.whl", hash = "sha256:34f8ff66b7fbbda796ff71dbdc0355ff8c87cf82268cb14aba2ad575999776d4"},
-    {file = "pyVoIP-1.6.5.tar.gz", hash = "sha256:cc9106cf52c9437d06592cd1dc529b0495631685eb88e48777bf850af01db711"},
-]
-
-[[package]]
 name = "pywin32-ctypes"
 version = "0.2.2"
 description = "A (partial) reimplementation of pywin32 using ctypes/cffi"
@@ -3591,4 +3549,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.12"
-content-hash = "4f90ce32da016d441cd608128ca8b520c159ed70a2c4504032f80f3cdcda8c8b"
+content-hash = "950dc01c8ce95c324b8cae519f7c9bfb3565bc2f6924b22863a730fd155fb570"

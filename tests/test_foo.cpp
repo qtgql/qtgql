@@ -2,13 +2,13 @@
 //#include <QString>
 //#include <QTest>
 //
-#include "qtgql/customscalars/customscalars.hpp"
-#include "testutils.hpp"
+//#include "qtgql/customscalars/customscalars.hpp"
+//#include "testutils.hpp"
 
 #include <QObject>
 
 TEST_CASE("ListModelABC modifications and operations") {
-//    test_utils::QCleanerObject parent_cleaner(nullptr);
+//    auto parent_cleaner = new QObject(nullptr);
 //        QObject parent_cleaner;
 //    std::vector<QObject *> init_vec;
 //    for (int i = 0; i < 10; i++) {
@@ -16,8 +16,12 @@ TEST_CASE("ListModelABC modifications and operations") {
 //    }
 //    REQUIRE(parent_cleaner.children().empty());
 //auto obj = new QObject(nullptr);
-SECTION("do test"){
-    REQUIRE_EQ(nullptr, nullptr);
+    auto obj = std::make_unique<QObject>();
+
+    SECTION("do test") {
+        REQUIRE(false);
+        REQUIRE_EQ(obj->parent(), nullptr);
+
+    }
 }
-//delete obj;
-}
+//delete parent_cleaner;

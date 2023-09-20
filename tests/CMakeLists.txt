@@ -1,6 +1,6 @@
 find_package(Qt6 REQUIRED COMPONENTS Test Core Network)
-find_package(doctest REQUIRED)
-include(doctest)
+include(FindCatch2.cmake)
+
 find_package(Qt6 REQUIRED COMPONENTS Test Core Network)
 set(TESTS_TARGET "test_qtgql")
 set(CMAKE_OBJECT_PATH_MAX 9999)
@@ -11,13 +11,13 @@ add_executable(${TESTS_TARGET}
         testutils.cpp testutils.hpp
         test_networklayers/utils.hpp
         test_networklayers/utils.cpp
-#        test_listmodel.cpp
-        test_foo.cpp
-#        test_customscalar.cpp
-#        test_networklayers/test_gqltransportws.cpp
-#        test_networklayers/test_graphql_over_http.cpp
+        test_listmodel.cpp
 
-#        test_networklayers/test_subscription_router.cpp
+        test_customscalar.cpp
+        test_networklayers/test_gqltransportws.cpp
+        test_networklayers/test_graphql_over_http.cpp
+
+        test_networklayers/test_subscription_router.cpp
 )
 add_compile_definitions(TESTS_QML_DIR=${TESTS_QML_DIR} ${TESTS_TARGET})
 include_directories(../tests)
@@ -36,10 +36,10 @@ target_link_libraries(${TESTS_TARGET}
     Qt6::Quick
     Qt6::Gui
     qtgql
-    doctest::doctest
+        Catch2::Catch2
 )
 
 
-doctest_discover_tests(${TESTS_TARGET}
+catch_discover_tests(${TESTS_TARGET}
         WORKING_DIRECTORY  ${QT_DL_LIBRARIES}
 )

@@ -1,7 +1,6 @@
 #include "testutils.hpp"
 
 #include <memory>
-#include "doctest/doctest.h"
 namespace test_utils {
 
 //    QString get_server_address(const QString &suffix, const QString &prefix) {
