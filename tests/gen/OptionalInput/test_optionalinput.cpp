@@ -18,7 +18,7 @@ TEST_CASE("OptionalInput") {
     q->set_variables({{to_compare}});
     q->fetch();
     test_utils::wait_for_completion(q);
-    REQUIRE(q->data()->get_echoOrHello().starts_with(
+    REQUIRE(q->data()->get_echoOrHello().startsWith(
         to_compare));
   };
   SECTION("test update with variable") {
@@ -37,7 +37,7 @@ TEST_CASE("OptionalInput") {
     q->fetch();
     test_utils::wait_for_completion(q);
     REQUIRE(
-        q->data()->get_echoOrHello().starts_with("Hello World!"));
+        q->data()->get_echoOrHello().startsWith("Hello World!"));
   };
   SECTION("test update no variable") {
     q->fetch();

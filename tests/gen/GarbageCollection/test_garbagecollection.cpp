@@ -20,7 +20,7 @@ std::shared_ptr<GarbageCollection::User> get_shared_user() {
 TEST_CASE("GarbageCollection") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME,
-      DebugClientSettings{.prod_settings =
+      test_utils::DebugClientSettings{.prod_settings =
                               {
                                   .url = SCHEMA_ADDR,
                               }},
