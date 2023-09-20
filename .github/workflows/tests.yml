@@ -97,7 +97,7 @@ jobs:
       - name: install Mingw64 - windows
         if: runner.os == 'Windows'
         run: |
-          choco install mingw --version 11.2.0.07112021 -y
+          choco install mingw --version 11.2.0.07112021 -y --force
 
       - name: Generate test files and coverage python
         shell: bash
