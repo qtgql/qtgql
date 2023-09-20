@@ -168,7 +168,7 @@ class QtGqlRecipe(ConanFile):
     def generate(self) -> None:
         deps = CMakeDeps(self)
         deps.generate()
-        tc = CMakeToolchain(self)
+        tc = CMakeToolchain(self, generator="Ninja" if self.is_windows() else "Unix Makefiles")
         if self.is_linux() or IS_GITHUB_ACTION:  # couldn't get this to build on Windows ATM.
             qt_installer = Qt6Installer(self.os_name, self.options.qt_version.value)
             if not qt_installer.installed():
