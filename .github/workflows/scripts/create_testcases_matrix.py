@@ -14,7 +14,7 @@ def chunks(lst: list, n: int):
         yield lst[i : i + n]
 
 
-TESTCASES_PER_RUNNER = 10
+TESTCASES_PER_RUNNER = 5
 
 
 @define
