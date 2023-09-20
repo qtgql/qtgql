@@ -44,7 +44,7 @@ class MiniServer:
     process: subprocess.Popen
     address: str
     port: str
-
+all
 
 @pytest.fixture(scope="session")
 def schemas_server() -> MiniServer:
