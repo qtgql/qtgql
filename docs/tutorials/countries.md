@@ -400,7 +400,7 @@ Now we'll set up the environment in C++ and fetch the first query.
 #include <qtgql/bases/bases.hpp>
 #include <qtgql/gqloverhttp/gqloverhttp.hpp>
 
-#include "g/ContinentQuery.hpp"
+#include "graphql/__generated__/ContinentQuery.hpp"
 
 
 namespace fs = std::filesystem;
@@ -412,7 +412,7 @@ int main(int argc, char *argv[]){
     auto env = std::shared_ptr<qtgql::bases::Environment>(
         new qtgql::bases::Environment("Countries",
 
-        std::unique_ptr<qtgql::bases::NetworkLayerABC>(new qtgql::gqloverhttp::GraphQLOverHttp({"https://countries.trevorblades.com/"})))
+        std::shared_ptr<qtgql::bases::NetworkLayerABC>(new qtgql::gqloverhttp::GraphQLOverHttp({"https://countries.trevorblades.com/"})))
     );
     // Export it
     qtgql::bases::Environment::set_gql_env(env);
