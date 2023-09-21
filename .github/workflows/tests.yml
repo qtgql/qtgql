@@ -53,7 +53,7 @@ jobs:
       matrix: ${{ steps.set_matrix.outputs.matrix }}
 
   tests:
-    name: ${{matrix.profile.runner_os}} ${{matrix.profile.profile}} py${{ matrix.python_version }} - ${{toJSON(matrix.testcases)}}
+    name: ${{matrix.profile.profile}} ${{matrix.profile.runner_os}} py${{ matrix.python_version }} - ${{toJSON(matrix.testcases)}}
     runs-on: ${{ matrix.profile.runner_os }}
     needs: provide_testcase_matrix
     strategy:
@@ -99,7 +99,7 @@ jobs:
         run: |
           choco install mingw --version 11.2.0.07112021 -y --allow-downgrade
       - name: install msvc - windows
-        if: runner.os == 'Windows' && contains(matrix.profile.profile, "msvc")
+        if: runner.os == 'Windows' && contains(matrix.profile.profile, 'msvc')
         uses: TheMrMilchmann/setup-msvc-dev@v2
         with:
           arch: x64
