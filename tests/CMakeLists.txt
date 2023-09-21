@@ -41,5 +41,5 @@ target_link_libraries(${TESTS_TARGET}
 
 
 catch_discover_tests(${TESTS_TARGET}
-        WORKING_DIRECTORY  ${QT_DL_LIBRARIES}
+        DL_PATHS  "${QT_DL_LIBRARIES};"
 )

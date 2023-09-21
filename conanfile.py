@@ -41,19 +41,13 @@ class EnvManager:
 
 
 class Qt6Installer:
-    def __init__(self, os_name: Literal["windows"] | Literal["linux"], version: str):
+    def __init__(self, os_name: Literal["windows"] | Literal["linux"], version: str, arch: str):
         self.os_name = os_name
         self.is_windows = os_name == "windows"
         self.is_linux = os_name == "linux"
         self.version = version
         self.env_manager = EnvManager()
-
-    @property
-    def arch(self) -> str:
-        if self.is_linux:
-            return "gcc_64"
-        elif self.is_windows:
-            return "win64_mingw"
+        self.arch = arch
 
     @cached_property
     def aqt_install_dir(self) -> Path:
@@ -64,9 +58,11 @@ class Qt6Installer:
         return ret
 
     @property
-    def qt_root_dir(self) -> Path:
-        arch = "mingw_64" if self.is_windows else "gcc_64"
-        return self.aqt_install_dir / self.version / arch
+    def qt_root_dir(self) -> Path | None:
+        aqt_versioned_root =( self.aqt_install_dir / self.version).resolve(True)
+        for folder in os.scandir(aqt_versioned_root):
+            if folder.name in self.arch:
+                return Path(folder.path).resolve(True)
 
     @property
     def qt6_cmake_config(self) -> Path:
@@ -137,10 +133,11 @@ class QtGqlRecipe(ConanFile):
     @property
     def build_type(self) -> str:
         return self.settings.build_type.value
-
+    @property
     def is_windows(self) -> bool:
         return self.os_name == "windows"
 
+    @property
     def is_linux(self) -> bool:
         return self.os_name == "linux"
 
@@ -150,7 +147,7 @@ class QtGqlRecipe(ConanFile):
             PATHS.PROJECT_ROOT
             / "build"
             / self.build_type
-            / f"test_qtgql.{'exe' if self.is_windows() else '.so'}"
+            / f"test_qtgql.{'exe' if self.is_windows else '.so'}"
         )
 
     @cached_property
@@ -164,24 +161,31 @@ class QtGqlRecipe(ConanFile):
             return True
         return False
 
+    @property
+    def is_mingw(self) -> bool:
+        return False # TODO: this
     def generate(self) -> None:
-
-
         deps = CMakeDeps(self)
         deps.generate()
-        tc = CMakeToolchain(self, generator="Ninja" if self.is_windows() else "Unix Makefiles")
-        if self.is_linux() or IS_GITHUB_ACTION: # couldn't get this to build on Windows ATM.
-            qt_installer = Qt6Installer(self.os_name, self.options.qt_version.value)
-            if not qt_installer.installed():
-                qt_installer.install()
-            tc.cache_variables[
-                "QT_DL_LIBRARIES"
-            ] = f"{qt_installer.dll_path!s};"  # used by catch2 to discover tests/
-            tc.cache_variables["Qt6_DIR"] = str(qt_installer.qt6_cmake_config)
+        tc = CMakeToolchain(self)
+        # if self.is_linux() or IS_GITHUB_ACTION: # couldn't get this to build on Windows ATM.
+        if self.is_linux:
+            arch = "gcc_64"
+        elif self.is_windows:
+            arch = "win64_msvc2019_64"
+        qt_installer = Qt6Installer(self.os_name, self.options.qt_version.value,
+                                    arch=arch
+                                    )
+        if not qt_installer.installed():
+            qt_installer.install()
+        tc.cache_variables[
+            "QT_DL_LIBRARIES"
+        ] = str(qt_installer.dll_path)  # used by catch2 to discover tests/
+        tc.cache_variables["Qt6_DIR"] = str(qt_installer.qt6_cmake_config)
 
         tc.cache_variables["QTGQL_TESTING"] = self.should_test
         tc.cache_variables["TESTS_QML_DIR"] = (self.build_path / "tests").as_posix()
-        if self.is_windows():
+        if self.is_windows:
             tc.cache_variables["CMAKE_CXX_COMPILER"] = "c++.exe"
 
         tc.generate()

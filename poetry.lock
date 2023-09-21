@@ -684,6 +684,35 @@ files = [
 colorama = {version = "*", markers = "platform_system == \"Windows\""}
 
 [[package]]
+name = "cmake"
+version = "3.27.5"
+description = "CMake is an open-source, cross-platform family of tools designed to build, test and package software"
+optional = false
+python-versions = "*"
+files = [
+    {file = "cmake-3.27.5-py2.py3-none-macosx_10_10_universal2.macosx_10_10_x86_64.macosx_11_0_arm64.macosx_11_0_universal2.whl", hash = "sha256:fc15d514587e6bae7c3b6616d1eb2792548d34e6910490e20065378b3cd1019e"},
+    {file = "cmake-3.27.5-py2.py3-none-manylinux2010_i686.manylinux_2_12_i686.whl", hash = "sha256:bc784f6a0f07f517323e1fa2b005302ed8e90d3044a89a1b4b9b1962df2053ed"},
+    {file = "cmake-3.27.5-py2.py3-none-manylinux2010_x86_64.manylinux_2_12_x86_64.whl", hash = "sha256:49307970589b2202bd528317a7a4a52bb6e6debca4f4c28e192a6b4965f47687"},
+    {file = "cmake-3.27.5-py2.py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:000efab194567cbd5c7f1cb0e839c57b44db01f218f4d318ee5eac0ec72dbd90"},
+    {file = "cmake-3.27.5-py2.py3-none-manylinux2014_i686.manylinux_2_17_i686.whl", hash = "sha256:9229170107c5bfadba32cd25c7c6ee5b936649a36c53247d41a39bcdfdcd55d6"},
+    {file = "cmake-3.27.5-py2.py3-none-manylinux2014_ppc64le.manylinux_2_17_ppc64le.whl", hash = "sha256:a941c9dc0fda65e2b7cf2657f87802702fd28e677991d629b58a00cced3bed08"},
+    {file = "cmake-3.27.5-py2.py3-none-manylinux2014_s390x.manylinux_2_17_s390x.whl", hash = "sha256:f47117376ccea3189628a911666a7e23e09efae26c124aebe8f0aa139000dc73"},
+    {file = "cmake-3.27.5-py2.py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:14acb1954b1ec0b398fb5265bc9e9b8785dffc6c3686d031bd1758ca23293162"},
+    {file = "cmake-3.27.5-py2.py3-none-musllinux_1_1_aarch64.whl", hash = "sha256:49385eda22f5b94ffb00c2251a76f4c1d5b5aedf737767e7c44f75b4a1fdd426"},
+    {file = "cmake-3.27.5-py2.py3-none-musllinux_1_1_i686.whl", hash = "sha256:9ef2b45834e3777ddbb477d21784ffdbe4f09a3d0e0883b55fea0c4cadd6038e"},
+    {file = "cmake-3.27.5-py2.py3-none-musllinux_1_1_ppc64le.whl", hash = "sha256:f510aa3bc6b2c0b8fb51f22209359a6da7544f668629b01544a5b991cdec82ee"},
+    {file = "cmake-3.27.5-py2.py3-none-musllinux_1_1_s390x.whl", hash = "sha256:014badd3ad7b0bd55ed81d8b60bf435ef2a382e9ad0f03340fea2bb41620b9af"},
+    {file = "cmake-3.27.5-py2.py3-none-musllinux_1_1_x86_64.whl", hash = "sha256:256ba48b86bb63bcb61db6de27a5458d66857b10902d8f942e8d3432a58939b4"},
+    {file = "cmake-3.27.5-py2.py3-none-win32.whl", hash = "sha256:ec338a489a80feaf8adfe9bb92eaba93318407ae6088a6dad7896aba0dd698cf"},
+    {file = "cmake-3.27.5-py2.py3-none-win_amd64.whl", hash = "sha256:fa55547922e5dbe0f1edb6d4d23d78feab39366a0507e9eb5f9300f5d6010ab6"},
+    {file = "cmake-3.27.5-py2.py3-none-win_arm64.whl", hash = "sha256:3c93abd817848f81f992cd2c53c9397a353625de2af27b14b23761e5cce99c5d"},
+    {file = "cmake-3.27.5.tar.gz", hash = "sha256:101d4e56154658c974e9425acd31f0fedde3ce68b47263fd14f789b028f8a13a"},
+]
+
+[package.extras]
+test = ["coverage (>=4.2)", "flake8 (>=3.0.4)", "path.py (>=11.5.0)", "pytest (>=3.0.3)", "pytest-cov (>=2.4.0)", "pytest-runner (>=2.9)", "pytest-virtualenv (>=1.7.0)", "scikit-build (>=0.10.0)", "setuptools (>=28.0.0)", "virtualenv (>=15.0.3)", "wheel"]
+
+[[package]]
 name = "colorama"
 version = "0.4.6"
 description = "Cross-platform colored terminal text."
@@ -3414,4 +3443,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.12"
-content-hash = "950dc01c8ce95c324b8cae519f7c9bfb3565bc2f6924b22863a730fd155fb570"
+content-hash = "d3eb7de889347b0b57aae1e23b3a436f6ff88ad93f40e582b253ce2823bec110"
