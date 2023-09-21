@@ -44,11 +44,11 @@ class CtestTestCommand:
         if self.ret_res.returncode != 0:
             match = re.findall("(in: )(.*)(\\.log)", self.ret_res.stderr.decode())
             log_file = match[0][1]
-        content = Path(log_file + ".log").resolve(True).read_text("utf-8")
-        # for some reason, py3.10 will return non-zeo return code on some cases
-        # even though the test case were passing.
-        if not "All tests passed" in content:
-            pytest.fail(content)
+            content = Path(log_file + ".log").resolve(True).read_text("utf-8")
+            # for some reason, py3.10 will return non-zeo return code on some cases
+            # even though the test case were passing.
+            if not "All tests passed" in content:
+                pytest.fail(content)
 
 
 def collect_tests() -> list[CtestTestCommand]:
