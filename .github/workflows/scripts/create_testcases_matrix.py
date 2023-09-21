@@ -35,7 +35,7 @@ class Matrix:
     python_version: list[str] = Factory(lambda: ["3.9", "3.10", "3.11"])
 
 
-TESTCASES_PER_RUNNER = 5
+TESTCASES_PER_RUNNER = 9
 
 
 def tst_names(tests: list[QtGqlTestCase]) -> list[str]:
