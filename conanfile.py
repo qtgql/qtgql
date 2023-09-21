@@ -21,6 +21,7 @@ __version__: str = "0.135.4"
 
 IS_GITHUB_ACTION = os.environ.get("IS_GITHUB_ACTION", False)
 
+
 class EnvManager:
     def __init__(self, env_var: str = "PATH") -> None:
         self._env_avr = env_var
@@ -59,10 +60,11 @@ class Qt6Installer:
 
     @property
     def qt_root_dir(self) -> Path | None:
-        aqt_versioned_root =( self.aqt_install_dir / self.version).resolve(True)
-        for folder in os.scandir(aqt_versioned_root):
-            if folder.name in self.arch:
-                return Path(folder.path).resolve(True)
+        aqt_versioned_root = (self.aqt_install_dir / self.version)
+        if aqt_versioned_root.exists():
+            for folder in os.scandir(aqt_versioned_root):
+                if folder.name in self.arch:
+                    return Path(folder.path).resolve(True)
 
     @property
     def qt6_cmake_config(self) -> Path:
@@ -71,10 +73,11 @@ class Qt6Installer:
 
     @property
     def dll_path(self) -> Path:
+        assert self.qt_root_dir.exists()
         return self.qt_root_dir / "bin"
 
     def installed(self) -> bool:
-        return self.qt_root_dir.exists()
+        return bool(self.qt_root_dir)
 
     def set_env_vars(self) -> None:
         self.env_manager.add(self.dll_path.resolve(True))
@@ -133,6 +136,7 @@ class QtGqlRecipe(ConanFile):
     @property
     def build_type(self) -> str:
         return self.settings.build_type.value
+
     @property
     def is_windows(self) -> bool:
         return self.os_name == "windows"
@@ -144,10 +148,10 @@ class QtGqlRecipe(ConanFile):
     @cached_property
     def test_executable(self) -> Path:
         return (
-            PATHS.PROJECT_ROOT
-            / "build"
-            / self.build_type
-            / f"test_qtgql.{'exe' if self.is_windows else '.so'}"
+                PATHS.PROJECT_ROOT
+                / "build"
+                / self.build_type
+                / f"test_qtgql.{'exe' if self.is_windows else '.so'}"
         )
 
     @cached_property
@@ -163,7 +167,8 @@ class QtGqlRecipe(ConanFile):
 
     @property
     def is_mingw(self) -> bool:
-        return False # TODO: this
+        return False  # TODO: this
+
     def generate(self) -> None:
         deps = CMakeDeps(self)
         deps.generate()
