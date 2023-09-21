@@ -177,7 +177,10 @@ class QtGqlRecipe(ConanFile):
         if self.is_linux:
             arch = "gcc_64"
         elif self.is_windows:
-            arch = "win64_msvc2019_64"
+            if "msvc" in self.settings.arch.value:
+                arch = "win64_msvc2019_64"
+            else:
+                arch = "win64_mingw"
         qt_installer = Qt6Installer(self.os_name, self.options.qt_version.value,
                                     arch=arch
                                     )
