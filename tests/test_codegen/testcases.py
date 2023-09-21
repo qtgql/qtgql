@@ -1042,10 +1042,10 @@ ObjectInInterface = QtGqlTestCase(
     ),
 )
 
-PartiallyInitializedNode = QtGqlTestCase(
+SemiInitializedNode = QtGqlTestCase(
     schema=schemas.partially_initialized_node.schema,
     operations="""
-    query PartialCreateUser{
+    query PTLCreateUser{
       createUser{
             name
             age
@@ -1062,7 +1062,7 @@ PartiallyInitializedNode = QtGqlTestCase(
       }
     }
     """,
-    test_name="PartiallyInitializedNode",
+    test_name="SemiInitializedNode",
     metadata=TestCaseMetadata(
         should_test_updates=BoolWithReason.false("resolves issue #381"),
         should_test_deserialization=BoolWithReason.false("resolves issue #381"),
@@ -1144,7 +1144,7 @@ implemented_testcases = [
     OptionalInputTestCase,
     RecursiveInputObjectTestCase,
     ObjectInInterface,
-    PartiallyInitializedNode,
+    SemiInitializedNode,
 ]
 
 
@@ -1159,6 +1159,6 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 if __name__ == "__main__":
     generate_testcases(
-    ScalarsTestCase
+        SemiInitializedNode
 
     )
