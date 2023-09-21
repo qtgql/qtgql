@@ -2,7 +2,7 @@
 os=Windows
 arch=x86_64
 compiler=gcc
-compiler.version=13.1
+compiler.version=11.2
 compiler.libcxx=libstdc++11
 compiler.cppstd=gnu17
 build_type=Debug

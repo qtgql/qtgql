@@ -97,7 +97,7 @@ jobs:
       - name: install mingw - windows
         if: runner.os == 'Windows' && contains(matrix.profile.profile, 'mingw')
         run: |
-          choco install mingw --version 11.2.0.07112021 -y --allow-downgrade
+          choco install mingw --version 11.2.0 -y --allow-downgrade
       - name: install msvc - windows
         if: runner.os == 'Windows' && contains(matrix.profile.profile, 'msvc')
         uses: TheMrMilchmann/setup-msvc-dev@v2
