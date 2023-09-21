@@ -53,7 +53,7 @@ jobs:
       matrix: ${{ steps.set_matrix.outputs.matrix }}
 
   tests:
-    name: ${{matrix.profile.os}} ${{matrix.profile.profile}} py${{ matrix.python_version }} - ${{toJSON(matrix.testcases)}}
+    name: ${{matrix.profile.runner_os}} ${{matrix.profile.profile}} py${{ matrix.python_version }} - ${{toJSON(matrix.testcases)}}
     runs-on: ${{ matrix.profile.runner_os }}
     needs: provide_testcase_matrix
     strategy:
