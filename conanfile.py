@@ -181,7 +181,7 @@ class QtGqlRecipe(ConanFile):
         elif self.is_windows:
             if "msvc" in self.settings.compiler.value:
                 arch = "win64_msvc2019_64"
-                arch_folder = "?"
+                arch_folder = "msvc2019_64"
             else:
                 arch = "win64_mingw"
                 arch_folder = "mingw_64"
