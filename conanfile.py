@@ -42,13 +42,14 @@ class EnvManager:
 
 
 class Qt6Installer:
-    def __init__(self, os_name: Literal["windows"] | Literal["linux"], version: str, arch: str):
+    def __init__(self, os_name: Literal["windows"] | Literal["linux"], version: str, arch: str, arch_folder: str):
         self.os_name = os_name
         self.is_windows = os_name == "windows"
         self.is_linux = os_name == "linux"
         self.version = version
         self.env_manager = EnvManager()
         self.arch = arch
+        self.arch_folder = arch_folder  # aqt installs in different dir name than the cli.
 
     @cached_property
     def aqt_install_dir(self) -> Path:
@@ -63,7 +64,7 @@ class Qt6Installer:
         aqt_versioned_root = (self.aqt_install_dir / self.version)
         if aqt_versioned_root.exists():
             for folder in os.scandir(aqt_versioned_root):
-                if folder.name in self.arch:
+                if folder.name == self.arch_folder:
                     return Path(folder.path).resolve(True)
 
     @property
@@ -176,16 +177,18 @@ class QtGqlRecipe(ConanFile):
         # if self.is_linux() or IS_GITHUB_ACTION: # couldn't get this to build on Windows ATM.
         if self.is_linux:
             arch = "gcc_64"
+            arch_folder = "gcc_64"
         elif self.is_windows:
-            if "msvc" in self.settings.arch.value:
+            if "msvc" in self.settings.compiler.value:
                 arch = "win64_msvc2019_64"
+                arch_folder = "?"
             else:
                 arch = "win64_mingw"
+                arch_folder = "mingw_64"
         qt_installer = Qt6Installer(self.os_name, self.options.qt_version.value,
-                                    arch=arch
+                                    arch=arch, arch_folder=arch_folder
                                     )
-        if not qt_installer.installed():
-            qt_installer.install()
+        qt_installer.install()
         tc.cache_variables[
             "QT_DL_LIBRARIES"
         ] = str(qt_installer.dll_path)  # used by catch2 to discover tests/
