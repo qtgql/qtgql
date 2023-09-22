@@ -185,6 +185,7 @@ class QtGqlRecipe(ConanFile):
             "QT_DL_LIBRARIES"
         ] = f"{qt_installer.dll_path!s};"  # used by catch2 to discover tests/
         tc.cache_variables["QTGQL_TESTING"] = self.should_test
+        tc.cache_variables["Qt6_DIR"] = str(qt_installer.qt6_cmake_config)
         tc.cache_variables["TESTS_QML_DIR"] = (self.build_path / "tests").as_posix()
         if self.is_windows:
             tc.cache_variables["CMAKE_CXX_COMPILER"] = "c++.exe"
