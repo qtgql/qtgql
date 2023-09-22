@@ -1,7 +1,6 @@
 find_package(Qt6 REQUIRED COMPONENTS Test Core Network)
-include(FindCatch2.cmake)
-
-find_package(Qt6 REQUIRED COMPONENTS Test Core Network)
+find_package(Catch2 REQUIRED COMPONENTS Catch2)
+include(Catch)
 set(TESTS_TARGET "test_qtgql")
 set(CMAKE_OBJECT_PATH_MAX 9999)
 
@@ -33,13 +32,12 @@ set_target_properties(${TESTS_TARGET} PROPERTIES AUTOMOC TRUE)
 target_link_libraries(${TESTS_TARGET}
  PUBLIC
     Qt6::Test
-    Qt6::Quick
-    Qt6::Gui
+    Qt6::Qml
     qtgql
-        Catch2::Catch2
+    Catch2::Catch2
 )
 
 
 catch_discover_tests(${TESTS_TARGET}
-        DL_PATHS  "${QT_DL_LIBRARIES};"
+        DL_PATHS ${QT_DL_LIBRARIES}
 )
