@@ -17,12 +17,12 @@ def chunks(lst: list, n: int):
 
 @define
 class ConanProfile:
-    runner_os: Literal["ubuntu-22.04"] | Literal["windows-2022"]
+    runner_os: Literal["ubuntu-latest"] | Literal["windows-latest"]
     profile: str
 
 CONAN_PROFILES = (
-    ConanProfile(runner_os="ubuntu-22.04", profile="profiles/Linux"),
-    ConanProfile(runner_os="windows-2022", profile="profiles/Windows_mingw"),
+    ConanProfile(runner_os="ubuntu-latest", profile="profiles/Linux"),
+    ConanProfile(runner_os="windows-latest", profile="profiles/Windows_mingw"),
 )
 
 @define
