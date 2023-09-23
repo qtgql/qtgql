@@ -18,7 +18,6 @@ fake = Faker()
 
 class PATHS:
     PROJECT_ROOT = Path(__file__).parent.parent
-    QTGQL_TEST_EXE_DIR = PROJECT_ROOT / "build" / "Debug"
     ROOT_CMAKE = PROJECT_ROOT / "CMakeLists.txt"
     QTGQLCODEGEN_ROOT = PROJECT_ROOT / "qtgqlcodegen"
 

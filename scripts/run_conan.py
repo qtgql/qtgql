@@ -16,8 +16,11 @@ if __name__ == "__main__":
     WINDOWS_MINGW = (
         "conan build . -o test=True -s build_type=Debug --build=missing -pr=profiles/Windows_mingw"
     )
+    WINDOWS_MSVC = (
+        "conan build . -o test=True -s build_type=Debug --build=missing -pr=profiles/Windows_msvc"
+    )
     CONFIG_SHOW = "conan config show '*' -pr=profiles/Windows_mingw"
     os.chdir(Path(__file__).parent.parent)  # change working dir to root
-    sys.argv = WINDOWS_MINGW.split(" ")
+    sys.argv = WINDOWS_MSVC.split(" ")
     with contextlib.suppress(BaseException):
         run()
