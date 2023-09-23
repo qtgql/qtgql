@@ -23,8 +23,6 @@ class ConanProfile:
 CONAN_PROFILES = (
     ConanProfile(runner_os="ubuntu-22.04", profile="profiles/Linux"),
     ConanProfile(runner_os="windows-2022", profile="profiles/Windows_mingw"),
-    ConanProfile(runner_os="windows-2022", profile="profiles/Windows_msvc"),
-
 )
 
 @define

@@ -53,8 +53,8 @@ jobs:
       matrix: ${{ steps.set_matrix.outputs.matrix }}
 
   tests:
-    name: ${{matrix.os}} py${{ matrix.python_version }} - ${{toJSON(matrix.testcases)}}
-    runs-on: ${{ matrix.os }}
+    name: ${{matrix.profile.profile}} ${{matrix.profile.runner_os}} py${{ matrix.python_version }} - ${{toJSON(matrix.testcases)}}
+    runs-on: ${{ matrix.profile.runner_os }}
     needs: provide_testcase_matrix
     strategy:
       fail-fast: false
@@ -95,9 +95,15 @@ jobs:
           sudo apt install libxcb-cursor-dev build-essential libgl1-mesa-dev libgstreamer-gl1.0-0 libpulse-dev libxcb-glx0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-render0 libxcb-shape0 libxcb-shm0 libxcb-sync1 libxcb-util1 libxcb-xfixes0 libxcb-xinerama0 libxcb1 libxkbcommon-dev libxkbcommon-x11-0 libxcb-xkb-dev
           echo "QT_QPA_PLATFORM=xcb" >> $GITHUB_ENV
       - name: install mingw - windows
-        if: runner.os == 'Windows'
+        if: runner.os == 'Windows' && contains(matrix.profile.profile, 'mingw')
         run: |
           choco install mingw --version 11.2.0 -y --allow-downgrade
+      - name: install msvc - windows
+        if: runner.os == 'Windows' && contains(matrix.profile.profile, 'msvc')
+        uses: TheMrMilchmann/setup-msvc-dev@v2
+        with:
+          arch: x64
+          toolset: 14.3
 
       - name: Generate test files and coverage python
         shell: bash
@@ -109,13 +115,14 @@ jobs:
       - name: Conan profile detect
         run: |
           poetry run conan profile detect
+      # TODO: cache Qt installation.
       - name: Conan build
         shell: bash
         run: |
           if [ "$RUNNER_OS" == "Windows" ]; then
             poetry run conan build . -o test=True -s build_type=Debug -pr=profiles/Windows_mingw --build=missing;
           elif [ "$RUNNER_OS" == "Linux" ]; then
-            poetry run xvfb-run -a conan build . -o test=True -s build_type=Debug -pr=profiles/${{ runner.os }} --build=missing -c tools.system.package_manager:sudo=True -c tools.system.package_manager:mode=install
+            poetry run xvfb-run -a conan build . -o test=True -s build_type=Debug -pr=profiles/Linux --build=missing -c tools.system.package_manager:sudo=True -c tools.system.package_manager:mode=install
           fi
 
       - name: Run tests
