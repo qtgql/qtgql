@@ -149,14 +149,6 @@ class QtGqlRecipe(ConanFile):
     def is_linux(self) -> bool:
         return self.os_name == "linux"
 
-    @cached_property
-    def test_executable(self) -> Path:
-        return (
-                PATHS.PROJECT_ROOT
-                / "build"
-                / self.build_type
-                / f"test_qtgql.{'exe' if self.is_windows else '.so'}"
-        )
 
     @cached_property
     def qt_version(self) -> str:
@@ -169,9 +161,6 @@ class QtGqlRecipe(ConanFile):
             return True
         return False
 
-    @property
-    def is_mingw(self) -> bool:
-        return False  # TODO: this
 
     def generate(self) -> None:
         deps = CMakeDeps(self)
@@ -196,7 +185,6 @@ class QtGqlRecipe(ConanFile):
             "QT_DL_LIBRARIES"
         ] = str(qt_installer.dll_path)  # used by catch2 to discover tests/
         tc.cache_variables["Qt6_DIR"] = str(qt_installer.qt6_cmake_config)
-
         tc.cache_variables["QTGQL_TESTING"] = self.should_test
         tc.cache_variables["TESTS_QML_DIR"] = (self.build_path / "tests").as_posix()
         if self.is_windows:
