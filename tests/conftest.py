@@ -36,7 +36,7 @@ class factory:
 
 
 IS_WINDOWS = platform.system() == "Windows"
-IS_GITHUB_ACTION = os.environ.get("CI", False)
+IS_GITHUB_ACTION = os.environ.get("IS_GITHUB_ACTION", False)
 
 
 @define

@@ -4,13 +4,18 @@ include(Catch)
 set(TESTS_TARGET "test_qtgql")
 set(CMAKE_OBJECT_PATH_MAX 9999)
 
-add_executable(${TESTS_TARGET} main.cpp ${TEST_SRCS} testutils.cpp testutils.hpp
-        test_listmodel.cpp
-            test_customscalar.cpp
-        test_networklayers/test_gqlwstransport.cpp
-        test_networklayers/test_graphql_over_http.cpp
+add_executable(${TESTS_TARGET}
+        main.cpp
+        ${TEST_SRCS}
+        testutils.cpp testutils.hpp
         test_networklayers/utils.hpp
         test_networklayers/utils.cpp
+        test_listmodel.cpp
+
+        test_customscalar.cpp
+        test_networklayers/test_gqltransportws.cpp
+        test_networklayers/test_graphql_over_http.cpp
+
         test_networklayers/test_subscription_router.cpp
 )
 add_compile_definitions(TESTS_QML_DIR=${TESTS_QML_DIR} ${TESTS_TARGET})
@@ -31,6 +36,7 @@ target_link_libraries(${TESTS_TARGET}
     qtgql
     Catch2::Catch2
 )
+
 
 catch_discover_tests(${TESTS_TARGET}
         DL_PATHS ${QT_DL_LIBRARIES}

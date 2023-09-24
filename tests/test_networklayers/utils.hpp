@@ -6,8 +6,8 @@
 #include "qtgql/gqltransportws/gqltransportws.hpp"
 #include "testutils.hpp"
 
-struct DebugHandler : public bases::HandlerABC {
-  bases::GraphQLMessage m_message;
+struct DebugHandler : public qtgql::bases::HandlerABC {
+  qtgql::bases::GraphQLMessage m_message;
   explicit DebugHandler(const QString &query);
 
   QJsonArray m_errors;
@@ -18,7 +18,7 @@ struct DebugHandler : public bases::HandlerABC {
   void on_error(const QJsonArray &errors) override;
   void on_completed() override;
 
-  const bases::GraphQLMessage &message() override { return m_message; }
+  const qtgql::bases::GraphQLMessage &message() override { return m_message; }
 
   void wait_for_completed() const;
 };

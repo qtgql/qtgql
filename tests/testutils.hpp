@@ -14,64 +14,62 @@
 #include "qtgql/gqltransportws/gqltransportws.hpp"
 #include "testframework.hpp"
 
-using namespace qtgql;
 namespace fs = std::filesystem;
 
-#define assert_m(cond, msg)                                                    \
+#define qtgql_assert_m(cond, msg)                                                    \
   if (!cond) {                                                                 \
     qDebug() << msg;                                                           \
   }                                                                            \
-  assert(cond);
+  REQUIRE(cond);
 
-QString get_server_address(const QString &suffix = "graphql",
-                           const QString &prefix = "ws");
-
-struct DebugClientSettings {
-  QString url;
-  bool handle_ack = true;
-  bool handle_pong = true;
-  bool print_debug = false;
-
-  gqltransportws::GqlTransportWsClientSettings prod_settings = {
-      .url = url, .auto_reconnect = true, .reconnect_timeout = 500};
-};
-
-class DebugAbleWsNetworkLayer : public gqltransportws::GqlTransportWs {
-  void onTextMessageReceived(const QString &raw_message);
-
-public:
-  bool m_pong_received = false;
-  DebugClientSettings m_settings;
-  QJsonObject m_current_message;
-
-  DebugAbleWsNetworkLayer(
-      const DebugClientSettings &settings = DebugClientSettings())
-      : gqltransportws::GqlTransportWs(settings.prod_settings),
-        m_settings{settings} {};
-  void wait_for_valid() {
-    if (!QTest::qWaitFor([&]() { return gql_is_valid(); }, 1000)) {
-      throw "Client could not connect to the GraphQL server";
-    }
-  }
-  bool is_reconnect_timer_active() { return m_reconnect_timer->isActive(); }
-  bool has_handler(const std::shared_ptr<bases::HandlerABC> &handler);
-
-  static DebugAbleWsNetworkLayer *
-  from_environment(std::shared_ptr<bases::Environment> env) {
-    return dynamic_cast<DebugAbleWsNetworkLayer *>(env->get_network_layer());
-  };
-};
-
-std::shared_ptr<DebugAbleWsNetworkLayer> get_valid_ws_client();
 
 namespace test_utils {
-using namespace std::chrono_literals;
+using namespace qtgql;
+
+    QString get_server_address(const QString &suffix = "graphql",
+                               const QString &prefix = "ws");
+
+    struct DebugClientSettings {
+        QString url;
+        bool handle_ack = true;
+        bool handle_pong = true;
+        bool print_debug = false;
+
+        gqltransportws::GqlTransportWsClientSettings prod_settings = {
+                .url = url, .auto_reconnect = true, .reconnect_timeout = 500};
+    };
+
+    class DebugAbleWsNetworkLayer : public gqltransportws::GqlTransportWs {
+        void onTextMessageReceived(const QString &raw_message) override;
+
+    public:
+        bool m_pong_received = false;
+        DebugClientSettings m_settings;
+        QJsonObject m_current_message;
+
+        explicit DebugAbleWsNetworkLayer(
+                const DebugClientSettings &settings = DebugClientSettings());
+        void wait_for_valid();
+        bool is_reconnect_timer_active() { return m_reconnect_timer->isActive(); }
+        bool has_handler(const std::shared_ptr<bases::HandlerABC> &handler);
+
+        static DebugAbleWsNetworkLayer *
+        from_environment(const std::shared_ptr<bases::Environment> &env);
+    };
+
+    std::shared_ptr<DebugAbleWsNetworkLayer> get_valid_ws_client();
+
+    using namespace std::chrono_literals;
 inline QString get_http_server_addr(const QString &suffix) {
   return get_server_address(suffix, "http");
 }
 void wait_for_completion(
     const std::shared_ptr<bases::OperationHandlerABC> &handler);
-class QCleanerObject : public QObject {};
+class QCleanerObject : public QObject {
+public:
+    using QObject::QObject;
+    QCleanerObject() = delete;
+};
 
 struct ModelSignalSpy {
   QSignalSpy *about_to;
@@ -88,37 +86,16 @@ struct ModelSignalSpy {
   }
 };
 
-struct SignalCatcherParams {
-  const QObject *source_obj;
-  const QSet<QString> &excludes = {};
-  bool exclude_id = true;
-  const std::optional<QString> &only = {};
-};
 
-std::shared_ptr<qtgql::bases::Environment>
-get_or_create_env(const std::string &env_name,
-                  const DebugClientSettings &settings,
-                  std::chrono::milliseconds cache_dur = 5s);
-void remove_env(const QString &env_name);
-
-class SignalCatcher {
-  std::list<std::pair<QSignalSpy *, QString>> m_spys = {};
-  QSet<QString> m_excludes = {};
-
-public:
-  SignalCatcher(const SignalCatcherParams &params);
-
-  [[nodiscard]] bool wait(int timeout = 1000);
-};
-#define STRINGIFY(x) #x
-#define TOSTRING(x) STRINGIFY(x)
+#define QTGQL_STRINGIFY(x) #x
+#define QTGQL_TOSTRING(x) QTGQL_STRINGIFY(x)
 struct QmlBot {
   QQuickView *m_qquick_view;
   QmlBot() {
     m_qquick_view = new QQuickView();
 #ifdef _WIN32
     auto additional_path =
-        QDir(fs::path(TOSTRING(TESTS_QML_DIR))).absolutePath();
+        QDir(fs::path(QTGQL_TOSTRING(TESTS_QML_DIR))).absolutePath();
     additional_path.replace('/', '\\');
     if (!QDir(additional_path).exists())
       qDebug() << "additional qml path doesn't exist";
@@ -146,7 +123,7 @@ struct QmlBot {
 
   QQuickItem *load(const fs::path &path) {
     auto source = QFileInfo(path);
-    assert_m(source.exists(),
+    qtgql_assert_m(source.exists(),
              "source qml file doesn't exists.") auto component =
         new QQmlComponent(m_qquick_view->engine(),
                           QUrl::fromLocalFile(source.absoluteFilePath()),
@@ -175,5 +152,28 @@ struct QmlBot {
     delete m_qquick_view;
   }
 };
+    [[maybe_unused]] std::shared_ptr<bases::Environment>
+    get_or_create_env(const std::string &env_name,
+                      const DebugClientSettings &settings,
+                      std::chrono::milliseconds cache_dur = 5s);
+    void remove_env(const QString &env_name);
 
+    struct SignalCatcherParams {
+        const QObject *source_obj = nullptr;
+        const QSet<QString> &excludes = {};
+        bool exclude_id = true;
+        const std::optional<QString> &only = {};
+    };
+
+
+
+    class SignalCatcher {
+        std::list<std::pair<QSignalSpy *, QString>> m_spys = {};
+        QSet<QString> m_excludes = {};
+
+    public:
+        explicit SignalCatcher(const SignalCatcherParams &params);
+
+        [[nodiscard]] bool wait(int timeout = 1000);
+    };
 }; // namespace test_utils

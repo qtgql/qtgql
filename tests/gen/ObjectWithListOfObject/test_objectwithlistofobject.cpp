@@ -1,5 +1,4 @@
 #include "testframework.hpp"
-#include <QSignalSpy>
 
 #include "gen/AddFriend.hpp"
 #include "gen/MainQuery.hpp"
@@ -8,11 +7,11 @@
 namespace ObjectWithListOfObject {
 using namespace qtgql;
 auto ENV_NAME = std::string("ObjectWithListOfObject");
-auto SCHEMA_ADDR = get_server_address(QString::fromStdString(ENV_NAME));
+auto SCHEMA_ADDR = test_utils::get_server_address(QString::fromStdString(ENV_NAME));
 
 TEST_CASE("ObjectWithListOfObject") {
-  auto env = test_utils::get_or_create_env(
-      ENV_NAME, DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
+    test_utils::get_or_create_env(
+      ENV_NAME, test_utils::DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = mainquery::MainQuery::shared();
   mq->fetch();
   test_utils::wait_for_completion(mq);

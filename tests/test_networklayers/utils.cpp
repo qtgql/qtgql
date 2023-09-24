@@ -1,7 +1,7 @@
 #include "utils.hpp"
 
 DebugHandler::DebugHandler(const QString &query)
-    : m_message{bases::GraphQLMessage(query)} {};
+    : m_message{qtgql::bases::GraphQLMessage(query)} {};
 
 void DebugHandler::on_next(const QJsonObject &data) {
   // here we copy the message though generally user wouldn't do this as it
@@ -14,7 +14,7 @@ void DebugHandler::on_error(const QJsonArray &errors) { m_errors = errors; }
 void DebugHandler::on_completed() { m_completed = true; }
 
 void DebugHandler::wait_for_completed() const {
-    assert_m(QTest::qWaitFor([&]() -> bool { return m_completed; }, 1500),
+    qtgql_assert_m(QTest::qWaitFor([&]() -> bool { return m_completed; }, 1500),
              "handler couldn't complete successfully.")} QString
     get_subscription_str(bool raiseOn5, const QString &op_name, int target) {
   QString ro5 = raiseOn5 ? "true" : "false";

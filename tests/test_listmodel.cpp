@@ -4,7 +4,7 @@
 using namespace qtgql;
 
 TEST_CASE("ListModelABC modifications and operations") {
-  test_utils::QCleanerObject parent_cleaner;
+  test_utils::QCleanerObject parent_cleaner(nullptr);
 
   std::vector<QObject *> init_vec;
   for (int i = 0; i < 10; i++) {
