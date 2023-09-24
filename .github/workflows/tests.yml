@@ -115,7 +115,20 @@ jobs:
       - name: Conan profile detect
         run: |
           poetry run conan profile detect
-      # TODO: cache Qt installation.
+
+      - uses: actions/cache@v3
+        if: startsWith(runner.os, 'Linux')
+        with:
+          path: ~/MyConnandeps
+          key: Qt6 # there is no need for something dynamic conan will pick the right one any-ways
+
+      - uses: actions/cache@v3
+        if: startsWith(runner.os, 'Windows')
+        with:
+          path: ~\MyConnandeps
+          key: Qt6 # there is no need for something dynamic conan will pick the right one any-ways
+
+
       - name: Conan build
         shell: bash
         run: |
