@@ -66,13 +66,13 @@ by the generated handlers based on the configurations.
 class QTGQL_EXPORT Environment {
   typedef std::shared_ptr<Environment> SharedQtGqlEnv;
   //  using a ptr here since client is to be extended by implementors.
-  typedef std::unique_ptr<NetworkLayerABC> UniqueNetworkLayer;
+  typedef std::shared_ptr<NetworkLayerABC> SharedNetworkLayer;
   typedef std::unique_ptr<EnvCache> UniqueCache;
 
-  UniqueNetworkLayer m_network_layer;
-  UniqueCache m_cache =
-      std::make_unique<EnvCache>(); // using unique pointers for extendability
+  SharedNetworkLayer m_network_layer;
+  UniqueCache m_cache;
   static std::map<std::string, std::shared_ptr<Environment>> *ENV_MAP();
+  std::string m_name;
 
 public:
   // static members
@@ -82,24 +82,21 @@ public:
   static Environment::SharedQtGqlEnv get_env_strict(const std::string &name);
   // end static members
 
-  const std::string m_name;
+  Environment(const std::string &name, const SharedNetworkLayer &network_layer);
 
-  Environment(std::string name, UniqueNetworkLayer network_layer)
-      : m_name(std::move(name)), m_network_layer(std::move(network_layer)){};
+  Environment(std::string name, SharedNetworkLayer network_layer,
+              UniqueCache cache_);
 
-  Environment(std::string name, UniqueNetworkLayer network_layer,
-              UniqueCache cache_)
-      : m_name(std::move(name)), m_network_layer(std::move(network_layer)),
-        m_cache(std::move(cache_)){};
-
-  void execute(const std::shared_ptr<HandlerABC> &handler) {
-    m_network_layer->execute(handler);
-  }
+  void execute(const std::shared_ptr<HandlerABC> &handler);
   /*
    * You would generally not be needed for this method.
    * Though it might be of use for testing purposes.
    */
   [[nodiscard]] NetworkLayerABC *get_network_layer() const {
+    if (!m_network_layer) {
+      throw qtgql::exceptions::EnvironmentNotFoundError(
+          "environment is not set up yet.");
+    }
     return m_network_layer.get();
   };
 

@@ -81,7 +81,7 @@ get_or_create_env(const std::string &env_name,
   if (!env.has_value()) {
     auto env_ = std::make_shared<bases::Environment>(
         env_name,
-        std::unique_ptr<qtgql::gqltransportws::GqlTransportWs>(
+        std::shared_ptr<qtgql::gqltransportws::GqlTransportWs>(
             new DebugAbleWsNetworkLayer(settings)),
         std::unique_ptr<qtgql::bases::EnvCache>(
             new qtgql::bases::EnvCache{{cache_dur}}));
