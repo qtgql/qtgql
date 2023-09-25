@@ -1,10 +1,11 @@
 #pragma once
 #include "environment.hpp"
+#include "qtgql/qtgql_export.hpp"
 #include <QObject>
 
 namespace qtgql::bases {
 
-class _OperationHandlerABCSignals : public QObject {
+class QTGQL_EXPORT _OperationHandlerABCSignals : public QObject {
   Q_OBJECT
 
   Q_PROPERTY(bool completed READ completed NOTIFY completedChanged)

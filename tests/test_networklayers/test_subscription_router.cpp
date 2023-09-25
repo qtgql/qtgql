@@ -1,14 +1,14 @@
 #include "qtgql/gqloverhttp/gqloverhttp.hpp"
 #include "qtgql/routers/detail/routers.hpp"
+#include "testframework.hpp"
 #include "utils.hpp"
-#include <catch2/catch_test_macros.hpp>
 using namespace qtgql;
 
-TEST_CASE("test subscription router", "[subscription router]") {
+TEST_CASE("test subscription router") {
   auto http_layer = std::shared_ptr<gqloverhttp::GraphQLOverHttp>{
       new gqloverhttp::GraphQLOverHttp(
           test_utils::get_http_server_addr("graphql"), {})};
-  auto ws_layer = get_valid_ws_client();
+  auto ws_layer = test_utils::get_valid_ws_client();
   auto client =
       std::make_shared<routers::SubscriptionRouter>(ws_layer, http_layer);
   SECTION("test simple query") {
@@ -17,7 +17,6 @@ TEST_CASE("test subscription router", "[subscription router]") {
     handler->wait_for_completed();
     REQUIRE(handler->m_data.value("hello").toString().toStdString() == "world");
   }
-
   SECTION("test error") {
     auto handler =
         std::make_shared<DebugHandler>("query HelloWorld{raiseError}");

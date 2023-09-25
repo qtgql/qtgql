@@ -3,30 +3,29 @@ from __future__ import annotations
 import glob
 import pprint
 import re
+import subprocess
 from typing import TYPE_CHECKING
 
 from tests.conftest import PATHS
+from pathlib import Path
 
-if TYPE_CHECKING:
-    from pathlib import Path
 
 pattern = re.compile(r"\b(TODO|FIXME)\b")
 ALLOWED_TODO = re.compile("TODO\\((.+?)\\):\\s+(.*)")
 
-
 def check_todos() -> list:
-    types = ("py", "cpp", "hpp")
-    files_grabbed: list[Path] = []
-    for f_type in types:
-        files_grabbed.extend(
-            [
-                PATHS.PROJECT_ROOT / f
-                for f in glob.glob(f"**/*.{f_type}", root_dir=PATHS.PROJECT_ROOT, recursive=True)
-            ],
-        )
+    tracked_files: list[Path] = []
+    types = ("py", "cpp", "hpp", "jinja", "md", "yml")
+    excludes = (Path(__file__), PATHS.PROJECT_ROOT / ".github/workflows/linters.yml")
+    types = tuple(f".{t}" for t in types)
+    for path_name in subprocess.run("git ls-tree -r HEAD --name-only".split(" "), capture_output=True, cwd=PATHS.PROJECT_ROOT).stdout.decode("utf-8").splitlines():
+        file = (PATHS.PROJECT_ROOT / path_name.strip("")).resolve(True)
+        if file.suffix in types and file not in excludes:
+            tracked_files.append(file)
+
     errors: list[str] = []
-    for file in files_grabbed:
-        for line_num, line in enumerate(file.read_text().splitlines(), start=1):
+    for file in tracked_files:
+        for line_num, line in enumerate(file.read_text(encoding="utf-8").splitlines(), start=1):
             if match := pattern.search(line):
                 if not ALLOWED_TODO.search(line):
                     errors.append(

@@ -82,7 +82,6 @@ class SchemaGenerator:
             context = OperationTemplateContext(
                 operation=op,
                 config=self.config,
-                debug=self.config.debug,
             )
 
             ret.append(

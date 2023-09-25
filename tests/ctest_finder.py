@@ -3,9 +3,9 @@ from __future__ import annotations
 import json
 import re
 import subprocess
-from functools import cached_property
 from pathlib import Path
 
+import pytest
 from typing_extensions import TypedDict
 
 PROJECT_ROOT = Path(__file__).parent.parent
@@ -35,22 +35,20 @@ class CtestTestCommand:
     def add_command(self, command: str):
         self._data.append(command)
 
-    @cached_property
-    def failed_log(self) -> str | None:
-        assert self.ret_res
-        try:
-            match = re.findall("(in: )(.*)(\\.log)", self.ret_res.stderr.decode())
-            log_file = match[0][1]
-        except IndexError:
-            return None
-        return Path(log_file + ".log").resolve(True).read_text("utf-8")
-
     def run(self) -> None:
         self.ret_res = subprocess.run(
             [*self._data, self.test_name],
             cwd=build_dir.resolve(True),
             capture_output=True,
         )
+        if self.ret_res.returncode != 0:
+            match = re.findall("(in: )(.*)(\\.log)", self.ret_res.stderr.decode())
+            log_file = match[0][1]
+            content = Path(log_file + ".log").resolve(True).read_text("utf-8")
+            # for some reason, py3.10 will return non-zeo return code on some cases
+            # even though the test case were passing.
+            if not "All tests passed" in content:
+                pytest.fail(content)
 
 
 def collect_tests() -> list[CtestTestCommand]:

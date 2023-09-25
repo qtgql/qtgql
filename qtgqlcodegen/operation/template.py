@@ -27,6 +27,11 @@ class OperationTemplateContext:
     def schema_ns(self) -> str:
         return self.config.env_name
 
+    @property
+    def export_macro(self) -> str:
+        # see https://doc.qt.io/qt-6/sharedlibrary.html
+        return f"QTGQL_{self.schema_ns}_{self.ns}".upper()
+
 
 OPERATION_HPP_TEMPLATE = template_env.get_template("operation.jinja.hpp")
 OPERATION_CPP_TEMPLATE = template_env.get_template("operation.jinja.cpp")

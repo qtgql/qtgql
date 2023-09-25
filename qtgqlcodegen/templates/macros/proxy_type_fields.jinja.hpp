@@ -12,11 +12,7 @@ signals:
 void 👉 f.concrete.signal_name 👈();
 {% endfor %}
 {# members -#}
-{% if context.debug -%}
-public: // WARNING: members are public because you have debug=True in your config file.
-{% else -%}
 protected:
-{% endif -%}
 std::shared_ptr<👉context.schema_ns👈::👉 t.concrete.name 👈> m_inst;
 {% for ref_field in t.references -%}
 👉ref_field.type.property_type👈 👉ref_field.private_name👈 = {};

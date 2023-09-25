@@ -1,4 +1,5 @@
 #pragma once
+#include "qtgql/qtgql_export.hpp"
 #include <QJsonValue>
 #include <QString>
 

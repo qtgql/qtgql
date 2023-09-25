@@ -1,6 +1,6 @@
+#include "testframework.hpp"
 #include <QString>
 #include <QTest>
-#include <catch2/catch_test_macros.hpp>
 
 #include "qtgql/customscalars/customscalars.hpp"
 
@@ -39,9 +39,9 @@ void preform_test(CustomStringScalar &s) {
 
 TEST_CASE("Test custom scalar by hand implementation") {
   SECTION("from json") {
-    auto a = CustomStringScalar();
-    a.deserialize({"initial"});
-    preform_test(a);
+    auto cs = CustomStringScalar();
+    cs.deserialize({"initial"});
+    preform_test(cs);
   }
   SECTION("to_json") {
     auto s = CustomStringScalar("initial");

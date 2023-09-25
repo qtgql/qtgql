@@ -41,6 +41,10 @@ class SchemaTemplateContext:
     def custom_scalars(self) -> list[str]:
         return [scalar.graphql_name for scalar in self.config.custom_scalars.values()]
 
+    @property
+    def export_macro(self) -> str:
+        return f"QTGQL_{self.config.env_name}_SCHEMA_EXPORT"
+
 
 def schema_types_template_hpp(context: SchemaTemplateContext) -> str:
     return SCHEMA_HPP_TEMPLATE.render(context=context)

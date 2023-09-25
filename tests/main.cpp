@@ -1,5 +1,4 @@
-#include "main.hpp"
-
+#include "testframework.hpp"
 #include <QGuiApplication>
 #include <QTest>
 #include <QTimer>
@@ -10,8 +9,6 @@ int main(int argc, char **argv) {
   if (!app) {
     auto app = new QGuiApplication(argc, argv);
   }
-  const Main &main = Main::getInstance();
-
   QTimer::singleShot(
       0, [app, argc, argv]() { app->exit(Catch::Session().run(argc, argv)); });
   auto ret = app->exec();

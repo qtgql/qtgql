@@ -18,8 +18,7 @@ on:
 
 env:
   IS_GITHUB_ACTION: 1
-  QT_DEBUG_PLUGINS: 1
-  QT_QPA_PLATFORM: "xcb"
+
 
 jobs:
   provide_testcase_matrix:
@@ -29,20 +28,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Set up Python ${{ matrix.python_version }}
-        uses: actions/setup-python@v4
+      - name: Install poetry
+        run: pipx install poetry
+      - uses: actions/setup-python@v4
         with:
-          python-version: 3.11
-      - uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip
-          restore-keys: ${{ runner.os }}-pip
-
-      - name: Install Poetry
-        run: |
-          pip install poetry
-          poetry install
+          python-version: '3.11'
+          cache: 'poetry'
+      - run: poetry install
 
       - id: set_matrix
         run: |
@@ -53,7 +45,8 @@ jobs:
       matrix: ${{ steps.set_matrix.outputs.matrix }}
 
   tests:
-    runs-on: ${{ matrix.os }}
+    name: ${{matrix.profile.profile}} ${{matrix.profile.runner_os}} py${{ matrix.python_version }} - ${{toJSON(matrix.testcases)}}
+    runs-on: ${{ matrix.profile.runner_os }}
     needs: provide_testcase_matrix
     strategy:
       fail-fast: false
@@ -64,27 +57,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Set up Python ${{ matrix.python_version }}
-        uses: actions/setup-python@v4
+      - name: Install poetry
+        run: pipx install poetry
+      - uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python_version }}
-
-      #----------------------------------------------
-      #        load pip cache if cache exists
-      #----------------------------------------------
-      - uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip
-          restore-keys: ${{ runner.os }}-pip
-
-      #----------------------------------------------
-      #  -----  install & configure poetry  -----
-      #----------------------------------------------
-      - name: Install Poetry
-        run: |
-          pip install poetry
-          poetry install
+          python-version: ${{matrix.python_version}}
+          cache: 'poetry'
+      - run: poetry install
 
       - name: Install Qt dependencies
         shell: bash
@@ -92,28 +71,57 @@ jobs:
         run: |
           sudo apt update
           sudo apt install libxcb-cursor-dev build-essential libgl1-mesa-dev libgstreamer-gl1.0-0 libpulse-dev libxcb-glx0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-render0 libxcb-shape0 libxcb-shm0 libxcb-sync1 libxcb-util1 libxcb-xfixes0 libxcb-xinerama0 libxcb1 libxkbcommon-dev libxkbcommon-x11-0 libxcb-xkb-dev
+          echo "QT_QPA_PLATFORM=xcb" >> $GITHUB_ENV
+      - name: install mingw - windows
+        if: runner.os == 'Windows' && contains(matrix.profile.profile, 'mingw')
+        run: |
+          choco install mingw --version 11.2.0 -y --allow-downgrade
+      - name: install msvc - windows
+        if: runner.os == 'Windows' && contains(matrix.profile.profile, 'msvc')
+        uses: TheMrMilchmann/setup-msvc-dev@v2
+        with:
+          arch: x64
+          toolset: 14.3
 
       - name: Generate test files and coverage python
-        run: poetry run coverage run tests/test_codegen/generate.py  '${{ toJSON(matrix.testcases) }}'
+        shell: bash
+        env:
+            MATRIX_TESTCASES: ${{ toJson(matrix.testcases) }}
+        run: |
+          poetry run coverage run tests/test_codegen/generate.py
 
       - name: Conan profile detect
         run: |
           poetry run conan profile detect
 
-      - name: Conan install
-        run: |
-          poetry run xvfb-run -a conan install . -pr=profiles/${{ runner.os }} -s build_type=Debug --build=missing -c tools.system.package_manager:mode=install
+      - uses: actions/cache@v3
+        if: startsWith(runner.os, 'Linux')
+        with:
+          path: ~/MyConnandeps
+          key: Qt6 # there is no need for something dynamic conan will pick the right one any-ways
+
+      - uses: actions/cache@v3
+        if: startsWith(runner.os, 'Windows')
+        with:
+          path: ~\MyConnandeps
+          key: Qt6 # there is no need for something dynamic conan will pick the right one any-ways
+
 
       - name: Conan build
+        shell: bash
         run: |
-          poetry run xvfb-run -a conan build . -o test=True -s build_type=Debug -pr=profiles/${{ runner.os }}
+          if [ "$RUNNER_OS" == "Windows" ]; then
+            poetry run conan build . -o test=True -s build_type=Debug -pr=profiles/Windows_mingw --build=missing;
+          elif [ "$RUNNER_OS" == "Linux" ]; then
+            poetry run xvfb-run -a conan build . -o test=True -s build_type=Debug -pr=profiles/Linux --build=missing -c tools.system.package_manager:sudo=True -c tools.system.package_manager:mode=install
+          fi
 
       - name: Run tests
         shell: bash
         run: |
 
           if [ "$RUNNER_OS" == "Windows" ]; then
-            poetry run make test
+            poetry run pytest tests --cov=qtgqlcodegen --cov-report=xml --cov-append
           elif [ "$RUNNER_OS" == "Linux" ]; then
             poetry run make test
           fi

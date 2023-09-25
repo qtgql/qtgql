@@ -23,7 +23,7 @@ from tests.test_codegen.utils import temp_cwd
 if TYPE_CHECKING:
     from strawberry import Schema
 
-GENERATED_TESTS_DIR = Path(__file__).parent / "generated_test_projects"
+GENERATED_TESTS_DIR = Path(__file__).parent.parent / "gen"
 if not GENERATED_TESTS_DIR.exists:
     GENERATED_TESTS_DIR.mkdir()
 template_env = jinja2.Environment(
@@ -75,7 +75,6 @@ class QtGqlTestCase:
     test_name: str
     custom_scalars: dict = Factory(dict)
     qml_file: str = ""
-    needs_debug: bool = False
     metadata: TestCaseMetadata = attrs.Factory(TestCaseMetadata)
     is_virtual_test: bool = False
 
@@ -128,7 +127,7 @@ class QtGqlTestCase:
             graphql_dir=self.graphql_dir,
             env_name="default_env",
             custom_scalars=self.custom_scalars,
-            debug=self.needs_debug,
+            generated_dir_name="../gen",
             qml_plugins_path="${CMAKE_BINARY_DIR}/tests",
         )
 
@@ -163,8 +162,8 @@ class QtGqlTestCase:
             )
         else:
             updated = re.sub(
-                'get_server_address\\("([A-Za-z])*"\\)',
-                f'get_server_address("{self.url_suffix}")',
+                'auto ENV_NAME = std::string\\("([A-Za-z])*"\\)',
+                f'auto ENV_NAME = std::string("{self.url_suffix}")',
                 self.testcase_file.read_text("utf-8"),
             )
             self.testcase_file.write_text(updated, "UTF-8")
@@ -180,7 +179,7 @@ RootScalarTestCase = QtGqlTestCase(
             name
         }
     """,
-    test_name="RootScalarTestCase",
+    test_name="RootScalar",
 )
 
 ScalarsTestCase = QtGqlTestCase(
@@ -198,7 +197,7 @@ ScalarsTestCase = QtGqlTestCase(
             voidField
           }
         }
-        query UserWithSameIDAndDifferentFieldsQuery {
+        query UserWithSameIDDiffFields {
           constUserWithModifiedFields {
             age
             agePoint
@@ -209,13 +208,26 @@ ScalarsTestCase = QtGqlTestCase(
           }
         }
         """,
-    test_name="ScalarsTestCase",
+    test_name="Scalars",
 )
 
-SimpleGarbageCollectionTestCase = QtGqlTestCase(
+SimpleGarbageCollection = QtGqlTestCase(
     schema=schemas.object_with_scalar.schema,
-    operations=ScalarsTestCase.operations,
-    test_name="SimpleGarbageCollectionTestCase",
+    operations="""
+        query MainQuery {
+          constUser {
+            id
+            name
+            age
+            agePoint
+            male
+            id
+            uuid
+            voidField
+          }
+        }
+        """,
+    test_name="GarbageCollection",
     metadata=TestCaseMetadata(
         should_test_updates=BoolWithReason.false("tested in scalar testcase"),
         should_test_deserialization=BoolWithReason.false("tested in scalar testcase"),
@@ -225,7 +237,7 @@ SimpleGarbageCollectionTestCase = QtGqlTestCase(
 GqlOverHttpAsEnvTestCase = QtGqlTestCase(
     schema=schemas.object_with_scalar.schema,
     operations=ScalarsTestCase.operations,
-    test_name="GqlOverHttpAsEnvTestCase",
+    test_name="GqlOverHttpAsEnv",
     metadata=TestCaseMetadata(
         should_test_updates=BoolWithReason.false("tested in scalar testcase"),
         should_test_deserialization=BoolWithReason.false("tested in scalar testcase"),
@@ -265,7 +277,7 @@ OptionalScalarsTestCase = QtGqlTestCase(
     }
 
     """,
-    test_name="OptionalScalarsTestCase",
+    test_name="OptionalScalars",
 )
 NoIdOnQueryTestCase = QtGqlTestCase(
     # should append id to types that implements Node automatically.
@@ -279,7 +291,7 @@ NoIdOnQueryTestCase = QtGqlTestCase(
             male
           }
         }""",
-    test_name="NoIdOnQueryTestCase",
+    test_name="NoIdOnQuery",
     metadata=TestCaseMetadata(
         should_test_updates=BoolWithReason.false("nothing special here in that context"),
     ),
@@ -304,7 +316,7 @@ DateTimeTestCase = QtGqlTestCase(
           }
         }
         """,
-    test_name="DateTimeTestCase",
+    test_name="DateTime",
 )
 
 DecimalTestCase = QtGqlTestCase(
@@ -323,7 +335,7 @@ DecimalTestCase = QtGqlTestCase(
           }
         }
     """,
-    test_name="DecimalTestCase",
+    test_name="Decimal",
 )
 DateTestCase = QtGqlTestCase(
     schema=schemas.object_with_date.schema,
@@ -341,7 +353,7 @@ DateTestCase = QtGqlTestCase(
           }
         }
         """,
-    test_name="DateTestCase",
+    test_name="Date",
 )
 TimeScalarTestCase = QtGqlTestCase(
     schema=schemas.object_with_time_scalar.schema,
@@ -359,7 +371,7 @@ TimeScalarTestCase = QtGqlTestCase(
           }
         }
         """,
-    test_name="TimeScalarTestCase",
+    test_name="TimeScalar",
 )
 
 ScalarArgumentsTestCase = QtGqlTestCase(
@@ -376,7 +388,7 @@ ScalarArgumentsTestCase = QtGqlTestCase(
     }
 
     """,
-    test_name="ScalarArgumentsTestCase",
+    test_name="ScalarArguments",
 )
 
 
@@ -390,7 +402,7 @@ OperationErrorTestCase = QtGqlTestCase(
         }
     }
     """,
-    test_name="OperationErrorTestCase",
+    test_name="OperationError",
 )
 
 NestedObjectTestCase = QtGqlTestCase(
@@ -421,7 +433,7 @@ NestedObjectTestCase = QtGqlTestCase(
       }
     }
     """,
-    test_name="NestedObjectTestCase",
+    test_name="NestedObject",
 )
 OptionalNestedObjectTestCase = QtGqlTestCase(
     schema=schemas.object_with_optional_object.schema,
@@ -443,7 +455,7 @@ OptionalNestedObjectTestCase = QtGqlTestCase(
       }
     }
     """,
-    test_name="OptionalNestedObjectTestCase",
+    test_name="OptionalNestedObject",
 )
 ObjectWithListOfObjectTestCase = QtGqlTestCase(
     schema=schemas.object_with_list_of_object.schema,
@@ -465,8 +477,7 @@ ObjectWithListOfObjectTestCase = QtGqlTestCase(
         }
     }
     """,
-    test_name="ObjectWithListOfObjectTestCase",
-    needs_debug=True,
+    test_name="ObjectWithListOfObject",
 )
 
 
@@ -503,7 +514,7 @@ NonNodeInterfaceTestCase = QtGqlTestCase(
       }
     }
     """,
-    test_name="NonNodeInterfaceTestCase",
+    test_name="NonNodeInterface",
 )
 
 
@@ -536,7 +547,7 @@ NodeInterfaceFieldTestCase = QtGqlTestCase(
         }
     }
     """,
-    test_name="NodeInterfaceFieldTestCase",
+    test_name="NodeInterfaceField",
 )
 
 NonNodeUnionTestCase = QtGqlTestCase(
@@ -555,12 +566,12 @@ NonNodeUnionTestCase = QtGqlTestCase(
         }
       }
     """,
-    test_name="NonNodeUnionTestCase",
+    test_name="NonNodeUnion",
 )
 NodeUnionTestCase = QtGqlTestCase(
     schema=schemas.node_union.schema,
     operations=NonNodeUnionTestCase.operations,
-    test_name="NodeUnionTestCase",
+    test_name="NodeUnion",
 )
 EnumTestCase = QtGqlTestCase(
     schema=schemas.object_with_enum.schema,
@@ -581,7 +592,7 @@ EnumTestCase = QtGqlTestCase(
             }
         }
         """,
-    test_name="EnumTestCase",
+    test_name="Enum",
 )
 RootEnumTestCase = QtGqlTestCase(
     schema=schemas.root_enum_schema.schema,
@@ -590,12 +601,12 @@ RootEnumTestCase = QtGqlTestCase(
           status
         }
         """,
-    test_name="RootEnumTestCase",
+    test_name="RootEnum",
 )
 
 ObjectsThatReferenceEachOtherTestCase = QtGqlTestCase(
     schema=schemas.object_reference_each_other.schema,
-    test_name="ObjectsThatReferenceEachOtherTestCase",
+    test_name="ObjectsThatReferenceEachOther",
     operations="""
   query MainQuery {
       user {
@@ -620,7 +631,7 @@ CountryScalar = CustomScalarDefinition(
 CustomUserScalarTestCase = QtGqlTestCase(
     schema=schemas.object_with_user_defined_scalar.schema,
     custom_scalars={CountryScalar.graphql_name: CountryScalar},
-    test_name="CustomUserScalarTestCase",
+    test_name="CustomUserScalar",
     operations="""
      query MainQuery {
           user {
@@ -641,7 +652,7 @@ NonNodeTypeTestCase = QtGqlTestCase(
             age
         }
     }""",
-    test_name="NonNodeTypeTestCase",
+    test_name="NonNodeType",
 )
 
 ListOfNonNodeType = QtGqlTestCase(
@@ -702,13 +713,13 @@ ListOfUnionTestCase = QtGqlTestCase(
         }
         """,
     ),
-    test_name="ListOfUnionTestCase",
+    test_name="ListOfUnion",
 )
 
 ListOfInterfaceTestcase = QtGqlTestCase(
     schema=schemas.list_of_interface.schema,
     operations=ListOfUnionTestCase.operations.replace("pets {", "pets { name"),
-    test_name="ListOfInterfaceTestcase",
+    test_name="ListOfInterface",
 )
 
 FragmentTestCase = QtGqlTestCase(
@@ -736,7 +747,7 @@ FragmentTestCase = QtGqlTestCase(
       }
     }
     """,
-    test_name="FragmentTestCase",
+    test_name="Fragment",
 )
 
 FragmentsOnInterfaceTestCase = QtGqlTestCase(
@@ -767,7 +778,7 @@ FragmentsOnInterfaceTestCase = QtGqlTestCase(
       }
     }
     """,
-    test_name="FragmentsOnInterfaceTestCase",
+    test_name="FragmentsOnInterface",
 )
 
 FragmentWithOperationVariable = QtGqlTestCase(
@@ -830,7 +841,7 @@ InputTypeOperationVariableTestCase = QtGqlTestCase(
       }
     }
     """,
-    test_name="InputTypeOperationVariableTestCase",
+    test_name="InputTypeOperationVariable",
 )
 
 OptionalInputTestCase = QtGqlTestCase(
@@ -840,7 +851,7 @@ OptionalInputTestCase = QtGqlTestCase(
       echoOrHello(echo: $echo)
     }
     """,
-    test_name="OptionalInputTestCase",
+    test_name="OptionalInput",
 )
 
 RecursiveInputObjectTestCase = QtGqlTestCase(
@@ -850,7 +861,7 @@ RecursiveInputObjectTestCase = QtGqlTestCase(
         depth(inp: $inp)
     }
     """,
-    test_name="RecursiveInputObjectTestCase",
+    test_name="RecursiveInputObject",
     metadata=TestCaseMetadata(
         should_test_updates=BoolWithReason.false("input types are not cached ATM"),
     ),
@@ -877,7 +888,7 @@ CustomScalarInputTestCase = QtGqlTestCase(
           }
         }
     """,
-    test_name="CustomScalarInputTestCase",
+    test_name="CustomScalarInput",
 )
 
 MutationOperationTestCase = QtGqlTestCase(
@@ -892,7 +903,7 @@ MutationOperationTestCase = QtGqlTestCase(
             uuid
           }
         }""",
-    test_name="MutationOperationTestCase",
+    test_name="MutationOperation",
 )
 
 SubscriptionTestCase = QtGqlTestCase(
@@ -902,7 +913,7 @@ SubscriptionTestCase = QtGqlTestCase(
         count(target: $target)
 }
     """,
-    test_name="SubscriptionTestCase",
+    test_name="Subscription",
 )
 
 QmlUsageTestCase = QtGqlTestCase(
@@ -925,7 +936,7 @@ QmlUsageTestCase = QtGqlTestCase(
       removeFriends(storeId: $storeID, friends: $friends)
     }
     """,
-    test_name="QmlUsageTestCase",
+    test_name="QmlUsage",
     metadata=TestCaseMetadata(
         should_test_updates=BoolWithReason.false("qml testcase"),
         should_test_deserialization=BoolWithReason.false("qml testcase"),
@@ -963,7 +974,7 @@ ListOfScalarTestCase = QtGqlTestCase(
       }
     }
     """,
-    test_name="ListOfScalarTestCase",
+    test_name="ListOfScalar",
 )
 ListOfScalarArgumentTestCase = QtGqlTestCase(
     schema=schemas.list_of_scalar_argument.schema,
@@ -972,7 +983,7 @@ ListOfScalarArgumentTestCase = QtGqlTestCase(
       echo(what: $what)
     }
     """,
-    test_name="ListOfScalarArgumentTestCase",
+    test_name="ListOfScalarArgument",
     metadata=TestCaseMetadata(
         should_test_updates=BoolWithReason.false("input types are not cached ATM"),
     ),
@@ -985,7 +996,7 @@ ListOfScalarInInputObjectTestCase = QtGqlTestCase(
       echo(what: $what)
     }
     """,
-    test_name="ListOfScalarInInputObjectTestCase",
+    test_name="ListOfScalarInInputObject",
     metadata=TestCaseMetadata(
         should_test_updates=BoolWithReason.false("input types are not cached ATM"),
     ),
@@ -998,16 +1009,16 @@ ListOfInputObjectTestCase = QtGqlTestCase(
       echo(what: $what)
     }
     """,
-    test_name="ListOfInputObjectTestCase",
+    test_name="ListOfInputObject",
     metadata=TestCaseMetadata(
         should_test_updates=BoolWithReason.false("input types are not cached ATM"),
     ),
 )
 
-InterfaceWithObjectField = QtGqlTestCase(
+ObjectInInterface = QtGqlTestCase(
     schema=schemas.interface_with_object_field.schema,
     operations="""
-    query AnimalQuery($kind: AnimalKind!) {
+    query Animal($kind: AnimalKind!) {
       animal(kind: $kind) {
         metadata{
           kind
@@ -1023,7 +1034,7 @@ InterfaceWithObjectField = QtGqlTestCase(
         }
       }
     }    """,
-    test_name="InterfaceWithObjectField",
+    test_name="ObjectInInterface",
     metadata=TestCaseMetadata(
         should_test_updates=BoolWithReason.false(
             "There is no reason it would fail, this only failed due to object types being generated after interfaces.",
@@ -1031,10 +1042,10 @@ InterfaceWithObjectField = QtGqlTestCase(
     ),
 )
 
-PartiallyInitializedNodeUpdate = QtGqlTestCase(
+PartiallyInitializedNode = QtGqlTestCase(
     schema=schemas.partially_initialized_node.schema,
     operations="""
-    query CreateUser_Partial{
+    query PartialCreateUser{
       createUser{
             name
             age
@@ -1051,7 +1062,7 @@ PartiallyInitializedNodeUpdate = QtGqlTestCase(
       }
     }
     """,
-    test_name="PartiallyInitializedNodeUpdate",
+    test_name="PartiallyInitializedNode",
     metadata=TestCaseMetadata(
         should_test_updates=BoolWithReason.false("resolves issue #381"),
         should_test_deserialization=BoolWithReason.false("resolves issue #381"),
@@ -1059,7 +1070,7 @@ PartiallyInitializedNodeUpdate = QtGqlTestCase(
 )
 all_test_cases = [
     ScalarsTestCase,
-    SimpleGarbageCollectionTestCase,
+    SimpleGarbageCollection,
     GqlOverHttpAsEnvTestCase,
     OptionalScalarsTestCase,
     NoIdOnQueryTestCase,
@@ -1092,14 +1103,14 @@ all_test_cases = [
     ListOfInputObjectTestCase,
     OptionalInputTestCase,
     RecursiveInputObjectTestCase,
-    InterfaceWithObjectField,
+    ObjectInInterface,
     CustomUserScalarTestCase,
     ObjectsThatReferenceEachOtherTestCase,
 ]
 
 implemented_testcases = [
     ScalarsTestCase,
-    SimpleGarbageCollectionTestCase,
+    SimpleGarbageCollection,
     GqlOverHttpAsEnvTestCase,
     NoIdOnQueryTestCase,
     DateTimeTestCase,
@@ -1132,8 +1143,8 @@ implemented_testcases = [
     ListOfInputObjectTestCase,
     OptionalInputTestCase,
     RecursiveInputObjectTestCase,
-    InterfaceWithObjectField,
-    PartiallyInitializedNodeUpdate,
+    ObjectInInterface,
+    PartiallyInitializedNode,
 ]
 
 
@@ -1148,5 +1159,5 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 if __name__ == "__main__":
     generate_testcases(
-        QmlUsageTestCase,
+        PartiallyInitializedNode,
     )

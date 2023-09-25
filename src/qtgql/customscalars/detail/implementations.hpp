@@ -1,10 +1,11 @@
 #pragma once
+#include "basecustomscalar.hpp"
+#include "qtgql/qtgql_export.hpp"
 #include <QDateTime>
 
-#include "basecustomscalar.hpp"
 namespace qtgql {
 namespace customscalars {
-class BaseTimeScalar {
+class QTGQL_EXPORT BaseTimeScalar {
 protected:
   QString m_cached_to_qt;
   bool m_should_update = true;
@@ -13,8 +14,8 @@ public:
   inline static Qt::DateFormat FORMAT = Qt::DateFormat(Qt::ISODate);
 };
 
-class DateTimeScalar : public CustomScalarABC<QDateTime, QString>,
-                       BaseTimeScalar {
+class QTGQL_EXPORT DateTimeScalar : public CustomScalarABC<QDateTime, QString>,
+                                    BaseTimeScalar {
 public:
   using CustomScalarABC<QDateTime, QString>::CustomScalarABC;
 
@@ -27,7 +28,8 @@ public:
   [[nodiscard]] QJsonValue serialize() const override;
 };
 
-class DateScalar : public CustomScalarABC<QDate, QString>, BaseTimeScalar {
+class QTGQL_EXPORT DateScalar : public CustomScalarABC<QDate, QString>,
+                                BaseTimeScalar {
 
 public:
   using CustomScalarABC<QDate, QString>::CustomScalarABC;
@@ -40,7 +42,8 @@ public:
   [[nodiscard]] QJsonValue serialize() const override;
 };
 
-class TimeScalar : public CustomScalarABC<QTime, QString>, BaseTimeScalar {
+class QTGQL_EXPORT TimeScalar : public CustomScalarABC<QTime, QString>,
+                                BaseTimeScalar {
 public:
   using CustomScalarABC<QTime, QString>::CustomScalarABC;
 
@@ -52,7 +55,7 @@ public:
   [[nodiscard]] QJsonValue serialize() const override;
 };
 
-class DecimalScalar : public CustomScalarABC<QString, QString> {
+class QTGQL_EXPORT DecimalScalar : public CustomScalarABC<QString, QString> {
 public:
   using CustomScalarABC<QString, QString>::CustomScalarABC;
 

@@ -142,12 +142,11 @@ dmypy.json
 # cached files
 *~
 #codegen
-__temp.py
-/tests/test_sample_ui/graphql/handlers.py
-/tests/test_sample_ui/graphql/objecttypes.py
-**/__generated__/
-tests/test_codegen/generated_test_projects/**/qtgqlconfig.py
-/tests/test_codegen/generated_test_projects/CMakeLists.txt
+tests/gen/**/qtgqlconfig.py
+tests/gen/**/graphql/**
+tests/gen/**/gen/**
+tests/gen/CMakeLists.txt
+
 
 # C++ packages
 3rdParty/Qt/
