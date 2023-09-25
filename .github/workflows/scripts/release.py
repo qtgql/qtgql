@@ -1,5 +1,6 @@
 import os
 import re
+import subprocess
 from pathlib import Path
 
 from autopub import autopub
@@ -39,15 +40,16 @@ def update_python_versions() -> None:
     replace__version__(CONANFILE)
 
 
-update_python_versions()
-
 if __name__ == "__main__":
     os.chdir(PATHS.PROJECT_ROOT)
     args = None
     autopub.prepare(args)
     update_cmake_version()
     update_python_versions()
-    git(["add", str(PATHS.ROOT_CMAKE)])
+    subprocess.run(
+        ["git", "add", str(PATHS.ROOT_CMAKE), str(INIT_FILE), str(CONANFILE)],
+        cwd=PATHS.PROJECT_ROOT,
+    ).check_returncode()
     autopub.build(args)
     autopub.commit(args)
     autopub.githubrelease(args)
