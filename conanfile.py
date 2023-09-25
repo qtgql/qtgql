@@ -17,7 +17,7 @@ class PATHS:
 
 ConanBool = [True, False]
 
-__version__: str = "0.135.4"
+__version__: str = "0.135.5"
 
 IS_GITHUB_ACTION = os.environ.get("IS_GITHUB_ACTION", False)
 

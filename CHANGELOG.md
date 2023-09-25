@@ -1,6 +1,18 @@
 CHANGELOG
 =========
 
+0.136.0 - 2023-09-25
+--------------------
+
+* Support for Windows.
+
+* Breaking changes:
+  * `qtgql::bases::Environment`
+  now accepts a network layer as a shared_ptr (previously was unique_ptr).
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #414](https://github.com/qtgql/qtgql/pull/414/)
+
+
 0.135.5 - 2023-09-06
 --------------------
 
