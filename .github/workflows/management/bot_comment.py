@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 from dataclasses import dataclass
 from pathlib import Path
@@ -5,7 +7,7 @@ from pathlib import Path
 import jinja2
 
 try:
-    from . import githubref, releasefile, template
+    from . import githubref, releasefile
 
 except ImportError:
     import githubref
@@ -28,8 +30,9 @@ class BotCommentContext:
 def render(context: BotCommentContext) -> str:
     return BOT_COMMENT_TEMPLATE.render(context=context)
 
-if __name__ == "__main__":
-    session = githubref.get_github_session(os.getenv("BOT_TOKEN"))
+
+def main() -> None:
+    session = githubref.get_github_session()
     pr = githubref.get_pr(session, int(os.getenv("PR_NUMBER")))
     preview = None
     try:
@@ -37,7 +40,11 @@ if __name__ == "__main__":
     except releasefile.InvalidReleaseFileError as exc:
         raise exc
     finally:
-        content = template.render(
-            template.BotCommentContext(preview),
+        content = render(
+            BotCommentContext(preview),
         )
         githubref.create_or_update_bot_comment(pr, content)
+
+
+if __name__ == "__main__":
+    main()

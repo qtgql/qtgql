@@ -27,6 +27,8 @@ class ReleaseType(Enum):
 class ReleasePreview:
     type: ReleaseType
     changelog: str
+
+
 def parse_release_file(contents: str) -> ReleasePreview:
     match = RELEASE_TYPE_REGEX.match(contents.splitlines()[0])
 
@@ -39,6 +41,7 @@ def parse_release_file(contents: str) -> ReleasePreview:
         release_type,
         contents,
     )
+
 
 def get_release_preview(pr: PullRequest) -> ReleasePreview:
     for f in pr.get_files():
