@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+0.138.0 - 2023-09-26
+--------------------
+fix auto release 9
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #431](https://github.com/qtgql/qtgql/pull/431/)
 
 0.136.3 - 2023-09-26
 --------------------
