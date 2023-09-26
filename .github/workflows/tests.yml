@@ -78,7 +78,7 @@ jobs:
           choco install mingw --version 11.2.0 -y --allow-downgrade
       - name: install msvc - windows
         if: runner.os == 'Windows' && contains(matrix.profile.profile, 'msvc')
-        uses: TheMrMilchmann/setup-msvc-dev@v2
+        uses: TheMrMilchmann/setup-msvc-dev@v3
         with:
           arch: x64
           toolset: 14.3
