@@ -196,6 +196,7 @@ def main() -> None:
     # remove release file
     git("rm", str(PATHS.RELEASE_FILE))
     git("commit", "-m", f"Release {PROJECT_NAME}@{bumped_version}", "--no-verify")
+    git("push", "origin", "HEAD")
     # GitHub release
     repo = githubref.get_repo(githubref.get_github_session())
     release = repo.create_git_release(
