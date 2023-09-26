@@ -1,3 +1,3 @@
-Release type: patch
+Release type: minor
 
-fix release 5
+fix release 7
