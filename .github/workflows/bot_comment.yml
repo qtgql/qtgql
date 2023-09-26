@@ -8,7 +8,7 @@ on:
     paths:
     - "qtgql/**"
     - "qtgqlcodegen/**"
-    - ".github/workflows/release_check.yml"
+    - ".github/workflows/bot_comment.yml"
     - "RELEASE.md"
 
 jobs:
