@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+0.136.2 - 2023-09-26
+--------------------
+
+fix release CI
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #419](https://github.com/qtgql/qtgql/pull/419/)
+
+
 0.136.1 - 2023-09-26
 --------------------
 
