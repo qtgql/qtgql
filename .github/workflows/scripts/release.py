@@ -47,7 +47,13 @@ if __name__ == "__main__":
     update_cmake_version()
     update_python_versions()
     subprocess.run(
-        ["git", "add", str(PATHS.ROOT_CMAKE), str(INIT_FILE), str(CONANFILE)],
+        ["git", "add",
+         str(PATHS.ROOT_CMAKE),
+         str(INIT_FILE),
+         str(CONANFILE),
+         str((PATHS.PROJECT_ROOT / "pyproject.toml").resolve(True)),
+         str((PATHS.PROJECT_ROOT / "CHANGELOG.md").resolve(True))
+         ],
         cwd=PATHS.PROJECT_ROOT,
     ).check_returncode()
     autopub.build(args)
