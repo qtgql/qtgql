@@ -15,6 +15,8 @@ from .utils import PATHS
 
 REPO_SLUG = "qtgql/qtgql"
 
+PROJECT_NAME = "qtgql"
+
 
 def git(*args: str):
     return subprocess.run(["git", *args]).check_returncode()
@@ -166,15 +168,15 @@ def main() -> None:
     os.chdir(PATHS.PROJECT_ROOT)
     release_file = parse_release_file(PATHS.RELEASE_FILE.read_text(encoding="utf-8"))
     bump_version(release_file.type.value)
-    cur_ver = get_current_version()
+    bumped_version = get_current_version()
     current_contributor = get_last_commit_contributor(
         os.getenv("BOT_TOKEN", None),
     )
     contributor_details = get_contributor_details(current_contributor)
     pretty_changes = pprint_release_change_log(release_file, contributor_details)
-    update_change_log(pretty_changes, cur_ver)
-    update_cmake_version(cur_ver)
-    update_python_versions(cur_ver)
+    update_change_log(pretty_changes, bumped_version)
+    update_cmake_version(bumped_version)
+    update_python_versions(bumped_version)
     git(
         "add",
         str(PATHS.ROOT_CMAKE),
@@ -185,11 +187,12 @@ def main() -> None:
     )
     # remove release file
     git("rm", str(PATHS.RELEASE_FILE))
+    git("commit", "-m", f"Release {PROJECT_NAME}@{bumped_version}")
     # GitHub release
     repo = githubref.get_repo(githubref.get_github_session())
     release = repo.create_git_release(
-        name=f"qtgql {cur_ver}",
-        tag=cur_ver,
+        name=f"{PROJECT_NAME} {bumped_version}",
+        tag=bumped_version,
         generate_release_notes=False,
         message=pretty_changes,
     )
