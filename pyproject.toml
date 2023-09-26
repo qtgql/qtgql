@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "qtgql"
-version = "0.136.2"
+version = "0.136.3"
 packages = [{ include = "qtgqlcodegen" }]
 description = "Qt framework for building graphql driven QML applications"
 authors = ["Nir <88795475+nrbnlulu@users.noreply.github.com>"]
@@ -32,7 +32,6 @@ strawberry-graphql = ">=0.158.2"
 cmake = ">=3.25.0"
 pygithub = ">=1.58.2"
 httpx = ">=0.18.2"
-autopub = {extras = ["githubrelease"], version = "^0.3.0"}
 mimesis = ">=10.1.0"
 pytest = "7.3.1"
 pytest-cov = ">=4.1.0"

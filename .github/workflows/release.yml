@@ -35,5 +35,5 @@ jobs:
             POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
           run: |
             git remote set-url origin https://${{ secrets.BOT_TOKEN }}@github.com/${{ github.repository }}
-            cd .github && poetry run python -m workflows.scripts.release
+            cd .github && poetry run python -m workflows.main_branch_only.release
             poetry publish --username __token__

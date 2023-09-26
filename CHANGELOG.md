@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+0.136.3 - 2023-09-26
+--------------------
+fix release CI
+
+here should be contrib details
 
 0.136.2 - 2023-09-26
 --------------------

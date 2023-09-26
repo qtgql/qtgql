@@ -1,15 +1,18 @@
+import os
+
 from github import Github
 from github.PullRequest import PullRequest
+from github.Repository import Repository
 
 
-
-def get_github_session(token: str) -> Github:
+def get_github_session(token: str = os.getenv("BOT_TOKEN")) -> Github:
     return Github(token)
 
+def get_repo(g: Github) -> Repository:
+    return g.get_repo("qtgql/qtgql")
 
 def get_pr(g: Github, num: int) -> PullRequest:
-    qtgql = g.get_repo("qtgql/qtgql")
-    return qtgql.get_pull(num)
+    return get_repo(g).get_pull(num)
 
 
 def create_or_update_bot_comment(pr: PullRequest, content: str) -> None:
