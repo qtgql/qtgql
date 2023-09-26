@@ -10,4 +10,4 @@
 
 >This project is currently under development, and **it is not** production ready,
 You can play-around and tell us what is wrong / missing / awesome :smile:.
-[Visit the docs for more info](https://nrbnlulu.github.io/qtgql/) (WIP).
+[Visit the docs for more info](https://qtgql.github.io/qtgql/) (WIP).
