@@ -17,7 +17,7 @@ class PATHS:
 
 ConanBool = [True, False]
 
-__version__: str = "0.136.1"
+__version__: str = "0.136.2"
 
 IS_GITHUB_ACTION = os.environ.get("IS_GITHUB_ACTION", False)
 
@@ -42,7 +42,13 @@ class EnvManager:
 
 
 class Qt6Installer:
-    def __init__(self, os_name: Literal["windows"] | Literal["linux"], version: str, arch: str, arch_folder: str):
+    def __init__(
+        self,
+        os_name: Literal["windows"] | Literal["linux"],
+        version: str,
+        arch: str,
+        arch_folder: str,
+    ):
         self.os_name = os_name
         self.is_windows = os_name == "windows"
         self.is_linux = os_name == "linux"
@@ -61,7 +67,7 @@ class Qt6Installer:
 
     @property
     def qt_root_dir(self) -> Path | None:
-        aqt_versioned_root = (self.aqt_install_dir / self.version)
+        aqt_versioned_root = self.aqt_install_dir / self.version
         if aqt_versioned_root.exists():
             for folder in os.scandir(aqt_versioned_root):
                 if folder.name == self.arch_folder:
@@ -149,7 +155,6 @@ class QtGqlRecipe(ConanFile):
     def is_linux(self) -> bool:
         return self.os_name == "linux"
 
-
     @cached_property
     def qt_version(self) -> str:
         qt_version = self.options.qt_version.value
@@ -160,7 +165,6 @@ class QtGqlRecipe(ConanFile):
         if self.options.test.value in ("True", "true", True):
             return True
         return False
-
 
     def generate(self) -> None:
         deps = CMakeDeps(self)
@@ -177,13 +181,16 @@ class QtGqlRecipe(ConanFile):
             else:
                 arch = "win64_mingw"
                 arch_folder = "mingw_64"
-        qt_installer = Qt6Installer(self.os_name, self.options.qt_version.value,
-                                    arch=arch, arch_folder=arch_folder
-                                    )
+        qt_installer = Qt6Installer(
+            self.os_name,
+            self.options.qt_version.value,
+            arch=arch,
+            arch_folder=arch_folder,
+        )
         qt_installer.install()
-        tc.cache_variables[
-            "QT_DL_LIBRARIES"
-        ] = str(qt_installer.dll_path)  # used by catch2 to discover tests/
+        tc.cache_variables["QT_DL_LIBRARIES"] = str(
+            qt_installer.dll_path,
+        )  # used by catch2 to discover tests/
         tc.cache_variables["Qt6_DIR"] = str(qt_installer.qt6_cmake_config)
         tc.cache_variables["QTGQL_TESTING"] = self.should_test
         tc.cache_variables["TESTS_QML_DIR"] = (self.build_path / "tests").as_posix()
