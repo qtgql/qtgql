@@ -168,7 +168,7 @@ def main() -> None:
     bump_version(release_file.type.value)
     cur_ver = get_current_version()
     current_contributor = get_last_commit_contributor(
-        os.getenv("BOT_TOKEN", None) or "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",
+        os.getenv("BOT_TOKEN", None),
     )
     contributor_details = get_contributor_details(current_contributor)
     pretty_changes = pprint_release_change_log(release_file, contributor_details)
@@ -176,7 +176,6 @@ def main() -> None:
     update_cmake_version(cur_ver)
     update_python_versions(cur_ver)
     git(
-        "git",
         "add",
         str(PATHS.ROOT_CMAKE),
         str(INIT_FILE),
