@@ -1,3 +1,3 @@
 Release type: minor
 
-fix release 7
+fix release 8

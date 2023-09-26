@@ -246,11 +246,6 @@ exclude_lines = [
 
 
 
-[tool.autopub]
-git-username = "QtGqlBot"
-git-email = "bot@no.reply"
-project-name = "qtgql"
-append-github-contributor = true
 
 [tool.poetry.scripts]
 qtgql = "qtgqlcodegen.cli:entrypoint"

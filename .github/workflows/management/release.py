@@ -16,10 +16,17 @@ from .utils import PATHS
 REPO_SLUG = "qtgql/qtgql"
 
 PROJECT_NAME = "qtgql"
+git_username = "QtGqlBot"
+git_email = "bot@no.reply"
 
 
 def git(*args: str):
     return subprocess.run(["git", *args]).check_returncode()
+
+
+def configure_git(username: str, email: str) -> None:
+    git("config", "user.name", username)
+    git("config", "user.email", email)
 
 
 @dataclass
@@ -177,6 +184,7 @@ def main() -> None:
     update_change_log(pretty_changes, bumped_version)
     update_cmake_version(bumped_version)
     update_python_versions(bumped_version)
+    configure_git(git_username, git_email)
     git(
         "add",
         str(PATHS.ROOT_CMAKE),
