@@ -28,7 +28,7 @@ jobs:
           id: check_release
           env:
             GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
-          run: cd .github && poetry run python -m workflows.management release
+          run: cd .github && poetry run python -m workflows.management check-release
         - name: Publish
           if: steps.check_release.outputs.status == ''
           env:
