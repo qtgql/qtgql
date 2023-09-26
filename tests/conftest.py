@@ -20,7 +20,7 @@ class PATHS:
     PROJECT_ROOT = Path(__file__).parent.parent
     ROOT_CMAKE = PROJECT_ROOT / "CMakeLists.txt"
     QTGQLCODEGEN_ROOT = PROJECT_ROOT / "qtgqlcodegen"
-
+    PYPROJECT_TOML = PROJECT_ROOT / "pyproject.toml"
 
 class PersonFactory(mimesis.Person):
     def age(self, minimum: int = 0, maximum: int = 999999) -> int:

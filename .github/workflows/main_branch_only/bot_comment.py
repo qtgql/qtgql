@@ -1,4 +1,8 @@
 import os
+from dataclasses import dataclass
+from pathlib import Path
+
+import jinja2
 
 try:
     from . import githubref, releasefile, template
@@ -6,7 +10,23 @@ try:
 except ImportError:
     import githubref
     import releasefile
-    import template
+
+
+template_env = jinja2.Environment(
+    loader=jinja2.FileSystemLoader(Path(__file__).parent / "templates"),
+    autoescape=jinja2.select_autoescape(),
+)
+
+BOT_COMMENT_TEMPLATE = template_env.get_template("bot_comment.jinja.md")
+
+
+@dataclass
+class BotCommentContext:
+    release_preview: releasefile.ReleasePreview | None = None
+
+
+def render(context: BotCommentContext) -> str:
+    return BOT_COMMENT_TEMPLATE.render(context=context)
 
 if __name__ == "__main__":
     session = githubref.get_github_session(os.getenv("BOT_TOKEN"))
