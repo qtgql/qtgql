@@ -114,7 +114,6 @@ def update_python_versions(version: str) -> None:
 
         replaced = re.sub(pattern, ver_repl, file.read_text(), count=1)
         file.write_text(replaced, "UTF-8")
-        git(["add", str(file)])
 
     replace__version__(INIT_FILE)
     replace__version__(CONANFILE)
@@ -168,7 +167,9 @@ def main() -> None:
     release_file = parse_release_file(PATHS.RELEASE_FILE.read_text(encoding="utf-8"))
     bump_version(release_file.type.value)
     cur_ver = get_current_version()
-    current_contributor = get_last_commit_contributor(os.getenv("BOT_TOKEN"))
+    current_contributor = get_last_commit_contributor(
+        os.getenv("BOT_TOKEN", None) or "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",
+    )
     contributor_details = get_contributor_details(current_contributor)
     pretty_changes = pprint_release_change_log(release_file, contributor_details)
     update_change_log(pretty_changes, cur_ver)
