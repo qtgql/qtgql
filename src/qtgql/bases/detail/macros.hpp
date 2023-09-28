@@ -24,3 +24,23 @@
   [[nodiscard]] static std::shared_ptr<type> shared() {                        \
     return std::make_shared<type>();                                           \
   };
+
+#define QTGQL_QOPTIONAL(type)                                                  \
+  class QOptional##type : public QObject {                                     \
+    Q_OBJECT                                                                   \
+    Q_PROPERTY(value type READ value WRITE set_value NOTIFY valueChanged)      \
+    std::optional<type> m_value;                                               \
+                                                                               \
+  public:                                                                      \
+    type value() { return m_value.value(); }                                   \
+    void set_value(const std::optional<type> &v) {                             \
+      if (m_value != v) {                                                      \
+        m_value = v;                                                           \
+        emit valueChanged();                                                   \
+      }                                                                        \
+    }                                                                          \
+  signals:                                                                     \
+    void valueChanged();                                                       \
+  }
+
+QTGQL_QOPTIONAL(QString)

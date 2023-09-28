@@ -9,11 +9,13 @@ namespace RecursiveInputObject {
 using namespace qtgql;
 
 auto ENV_NAME = std::string("RecursiveInputObject");
-auto SCHEMA_ADDR = test_utils::get_server_address(QString::fromStdString(ENV_NAME));
+auto SCHEMA_ADDR =
+    test_utils::get_server_address(QString::fromStdString(ENV_NAME));
 
 TEST_CASE("RecursiveInputObject") {
   auto env = test_utils::get_or_create_env(
-      ENV_NAME, test_utils::DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
+      ENV_NAME,
+      test_utils::DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
 
   SECTION("test deserialize") {
     auto mq = mainquery::MainQuery::shared();

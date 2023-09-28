@@ -10,7 +10,8 @@
 namespace OptionalScalars {
 using namespace qtgql;
 auto ENV_NAME = std::string("OptionalScalars");
-auto SCHEMA_ADDR = test_utils::get_server_address(QString::fromStdString(ENV_NAME));
+auto SCHEMA_ADDR =
+    test_utils::get_server_address(QString::fromStdString(ENV_NAME));
 
 template <typename User> void check_user_is_nulled(const User &user) {
   REQUIRE(user->get_age() == bases::DEFAULTS::INT);
@@ -30,7 +31,8 @@ template <typename User> void check_user_filled(const User &user) {
 
 TEST_CASE("OptionalScalars") {
   auto env = test_utils::get_or_create_env(
-      ENV_NAME, test_utils::DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
+      ENV_NAME,
+      test_utils::DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = mainquery::MainQuery::shared();
   SECTION("test deserialize - when null returns default values") {
     mq->set_variables({true});

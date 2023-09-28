@@ -47,7 +47,7 @@ class CtestTestCommand:
             content = Path(log_file + ".log").resolve(True).read_text("utf-8")
             # for some reason, py3.10 will return non-zeo return code on some cases
             # even though the test case were passing.
-            if not "All tests passed" in content:
+            if "All tests passed" not in content:
                 pytest.fail(content)
 
 
