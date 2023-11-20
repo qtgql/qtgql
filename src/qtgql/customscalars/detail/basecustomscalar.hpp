@@ -30,7 +30,9 @@ public:
    * Serialize the scalar. Used for operation variables.
    */
   [[nodiscard]] virtual QJsonValue serialize() const = 0;
-
+        [[nodiscard]] T value() const{
+            return m_value;
+        }
   /*
    * Deserializes data fetched from graphql.
    */
