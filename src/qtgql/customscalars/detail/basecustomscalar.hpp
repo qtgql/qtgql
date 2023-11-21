@@ -13,6 +13,7 @@ namespace customscalars {
 template <typename T, typename T_QtType> class CustomScalarABC {
 protected:
   T m_value;
+  T_QtType m_qt_value_cached;
 
 public:
   // abstract methods

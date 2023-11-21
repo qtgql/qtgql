@@ -141,7 +141,7 @@ class QtGqlTestCase:
         :return: list of user-defined custom scalars. this is needed in order to add them to the cmake target.
         """
         return [
-            (self.generated_dir.parent / cs.include_path).resolve(True)
+            (self.generated_dir / cs.include_path).resolve(True)
             for cs in self.config.custom_scalars.values()
             if cs.graphql_name not in CUSTOM_SCALARS
         ]
@@ -636,7 +636,7 @@ CountryScalar = CustomScalarDefinition(
     graphql_name="Country",
     to_qt_type="QString",
     deserialized_type="QString",
-    include_path="countryscalar.hpp",
+    include_path="../countryscalar.hpp",
 )
 
 CustomUserScalarTestCase = QtGqlTestCase(
