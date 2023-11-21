@@ -10,12 +10,14 @@ namespace ListOfUnion {
 using namespace qtgql;
 
 auto ENV_NAME = std::string("ListOfUnion");
-auto SCHEMA_ADDR = test_utils::get_server_address(QString::fromStdString(ENV_NAME));
+auto SCHEMA_ADDR =
+    test_utils::get_server_address(QString::fromStdString(ENV_NAME));
 
 TEST_CASE("ListOfUnion") {
   auto env = test_utils::get_or_create_env(
-      ENV_NAME, test_utils::DebugClientSettings{.print_debug = true,
-                                    .prod_settings = {.url = SCHEMA_ADDR}});
+      ENV_NAME,
+      test_utils::DebugClientSettings{.print_debug = true,
+                                      .prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = mainquery::MainQuery::shared();
   mq->fetch();
   test_utils::wait_for_completion(mq);
@@ -42,8 +44,7 @@ TEST_CASE("ListOfUnion") {
     modify_mut->set_variables({person->get_id(), 3, new_name});
     modify_mut->fetch();
     test_utils::wait_for_completion(modify_mut);
-    REQUIRE(model->get(3)->property("name").toString() ==
-            new_name);
+    REQUIRE(model->get(3)->property("name").toString() == new_name);
   }
   SECTION("test update add") {
     auto insert_mut = inserttolist::InsertToList::shared();
@@ -81,8 +82,7 @@ TEST_CASE("ListOfUnion") {
 
     test_utils::wait_for_completion(remove_mut);
 
-    REQUIRE(model->get(3)->property("name").toString() !=
-            name_for_third_item);
+    REQUIRE(model->get(3)->property("name").toString() != name_for_third_item);
   };
 }
 

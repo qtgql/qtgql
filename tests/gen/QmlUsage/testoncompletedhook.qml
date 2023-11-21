@@ -5,8 +5,9 @@ Item {
     id: root
     objectName: "root"
     property bool success: false
-    UseSimpleQuery {objectName: "useSimpleQuery";
+    UseSimpleQuery {
         id: main_query
+        objectName: "useSimpleQuery"
         onCompletedChanged: root.success = true
     }
     Component.onCompleted: {

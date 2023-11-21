@@ -3,82 +3,80 @@
 #include <memory>
 namespace test_utils {
 
-    QString get_server_address(const QString &suffix, const QString &prefix) {
-        auto env_addr = getenv("SCHEMAS_SERVER_ADDR");
-        QString addr = "://localhost:9000/";
-        if (env_addr) {
-            addr = QString::fromUtf8(env_addr);
+QString get_server_address(const QString &suffix, const QString &prefix) {
+  auto env_addr = getenv("SCHEMAS_SERVER_ADDR");
+  QString addr = "://localhost:9000/";
+  if (env_addr) {
+    addr = QString::fromUtf8(env_addr);
+  }
+  return prefix + addr + suffix;
+}
+
+bool DebugAbleWsNetworkLayer::has_handler(
+    const std::shared_ptr<bases::HandlerABC> &handler) {
+  for (const auto &uuid_handler_pair : m_connected_handlers) {
+    if (uuid_handler_pair.second == handler)
+      return true;
+  }
+  return false;
+}
+
+void DebugAbleWsNetworkLayer::onTextMessageReceived(
+    const QString &raw_message) {
+  auto raw_data = QJsonDocument::fromJson(raw_message.toUtf8());
+  if (raw_data.isObject()) {
+    auto data = raw_data.object();
+    if (m_settings.print_debug) {
+      qDebug() << data;
+    }
+    if (data.contains("id")) {
+      // Any that contains ID is directed to a single handler.
+      auto message = gqltransportws::GqlTrnsWsMsgWithID(data);
+      if (message.type == qtgql::gqltransportws::PROTOCOL::NEXT) {
+        m_current_message = message.payload;
+      } else if (message.type == qtgql::gqltransportws::PROTOCOL::COMPLETE) {
+        if (m_settings.print_debug) {
+          qDebug() << "Completed";
         }
-        return prefix + addr + suffix;
-    }
-
-
-
-    bool DebugAbleWsNetworkLayer::has_handler(
-            const std::shared_ptr<bases::HandlerABC> &handler) {
-        for (const auto &uuid_handler_pair : m_connected_handlers) {
-            if (uuid_handler_pair.second == handler)
-                return true;
+      }
+    } else {
+      auto message = gqltransportws::BaseGqlTrnsWsMsg(data);
+      auto message_type = message.type;
+      if (message_type == gqltransportws::PROTOCOL::PONG) {
+        m_pong_received = true;
+        if (!m_settings.handle_pong) {
+          return;
         }
-        return false;
+      } else if (message_type == gqltransportws::PROTOCOL::CONNECTION_ACK &&
+                 !m_settings.handle_ack) {
+        return;
+      }
     }
+  }
+  GqlTransportWs::onTextMessageReceived(raw_message);
+}
 
-    void DebugAbleWsNetworkLayer::onTextMessageReceived(
-            const QString &raw_message) {
-        auto raw_data = QJsonDocument::fromJson(raw_message.toUtf8());
-        if (raw_data.isObject()) {
-            auto data = raw_data.object();
-            if (m_settings.print_debug) {
-                qDebug() << data;
-            }
-            if (data.contains("id")) {
-                // Any that contains ID is directed to a single handler.
-                auto message = gqltransportws::GqlTrnsWsMsgWithID(data);
-                if (message.type == qtgql::gqltransportws::PROTOCOL::NEXT) {
-                    m_current_message = message.payload;
-                } else if (message.type == qtgql::gqltransportws::PROTOCOL::COMPLETE) {
-                    if (m_settings.print_debug) {
-                        qDebug() << "Completed";
-                    }
-                }
-            } else {
-                auto message = gqltransportws::BaseGqlTrnsWsMsg(data);
-                auto message_type = message.type;
-                if (message_type == gqltransportws::PROTOCOL::PONG) {
-                    m_pong_received = true;
-                    if (!m_settings.handle_pong) {
-                        return;
-                    }
-                } else if (message_type == gqltransportws::PROTOCOL::CONNECTION_ACK &&
-                           !m_settings.handle_ack) {
-                    return;
-                }
-            }
-        }
-        GqlTransportWs::onTextMessageReceived(raw_message);
-    }
+DebugAbleWsNetworkLayer::DebugAbleWsNetworkLayer(
+    const DebugClientSettings &settings)
+    : gqltransportws::GqlTransportWs(settings.prod_settings),
+      m_settings{settings} {}
 
-    DebugAbleWsNetworkLayer::DebugAbleWsNetworkLayer(
-            const DebugClientSettings &settings)
-            : gqltransportws::GqlTransportWs(settings.prod_settings),
-              m_settings{settings} {}
+void DebugAbleWsNetworkLayer::wait_for_valid() {
+  if (!QTest::qWaitFor([this]() { return this->gql_is_valid(); }, 1000)) {
+    throw "Client could not connect to the GraphQL server";
+  }
+}
 
-    void DebugAbleWsNetworkLayer::wait_for_valid() {
-        if (!QTest::qWaitFor([this]() { return this->gql_is_valid(); }, 1000)) {
-            throw "Client could not connect to the GraphQL server";
-        }
-    }
-
-    DebugAbleWsNetworkLayer *DebugAbleWsNetworkLayer::from_environment(
-            const std::shared_ptr<bases::Environment> &env) {
-        return dynamic_cast<DebugAbleWsNetworkLayer *>(env->get_network_layer());
-    };
-    std::shared_ptr<DebugAbleWsNetworkLayer> get_valid_ws_client() {
-        auto client = std::shared_ptr<DebugAbleWsNetworkLayer>(
-                new DebugAbleWsNetworkLayer({.url = get_server_address()}));
-        client->wait_for_valid();
-        return client;
-    }
+DebugAbleWsNetworkLayer *DebugAbleWsNetworkLayer::from_environment(
+    const std::shared_ptr<bases::Environment> &env) {
+  return dynamic_cast<DebugAbleWsNetworkLayer *>(env->get_network_layer());
+};
+std::shared_ptr<DebugAbleWsNetworkLayer> get_valid_ws_client() {
+  auto client = std::shared_ptr<DebugAbleWsNetworkLayer>(
+      new DebugAbleWsNetworkLayer({.url = get_server_address()}));
+  client->wait_for_valid();
+  return client;
+}
 void wait_for_completion(
     const std::shared_ptr<qtgql::bases::OperationHandlerABC> &operation) {
   if (!QTest::qWaitFor([&]() -> bool { return operation->completed(); },

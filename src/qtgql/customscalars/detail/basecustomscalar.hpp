@@ -21,6 +21,11 @@ public:
    * pipeline)
    */
   virtual const QString &GRAPHQL_NAME() = 0;
+  /**
+   * Getter - return m_value
+   * @return m_value
+   */
+  const T &get_value() const { return m_value; };
   /*
    * Will be used by the property getter, This is the official value that Qt
    * should "understand".

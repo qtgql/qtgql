@@ -15,7 +15,7 @@ void DebugHandler::on_completed() { m_completed = true; }
 
 void DebugHandler::wait_for_completed() const {
     qtgql_assert_m(QTest::qWaitFor([&]() -> bool { return m_completed; }, 1500),
-             "handler couldn't complete successfully.")} QString
+                   "handler couldn't complete successfully.")} QString
     get_subscription_str(bool raiseOn5, const QString &op_name, int target) {
   QString ro5 = raiseOn5 ? "true" : "false";
   return QString("subscription %1 {count(target: %2, raiseOn5: %3) }")
