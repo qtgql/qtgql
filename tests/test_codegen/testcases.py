@@ -639,6 +639,8 @@ CountryScalar = CustomScalarDefinition(
     include_path="../countryscalar.hpp",
 )
 
+# A scalar that was implemented by a user.
+
 CustomUserScalarTestCase = QtGqlTestCase(
     schema=schemas.object_with_user_defined_scalar.schema,
     custom_scalars={CountryScalar.graphql_name: CountryScalar},

@@ -142,6 +142,17 @@ return 👉f.private_name👈;
 {%- endif -%}
 };
 {% endfor %}
+// 👉 t.name 👈 custom getters
+{% for f in t.fields_with_custom_getter -%}
+[[nodiscard]] const 👉 f.type.proxy_cpp_type 👈 & 👉 t.name 👈::👉 f.concrete.getter_name 👈_cpp() const {
+    return m_inst->👉 f.concrete.getter_name 👈(
+    {%- if f.cached_by_args -%}
+    👉f.variable_builder_name 👈(m_operation)
+    {% endif -%}
+    );
+}
+{% endfor -%}
+
 // args builders
 {%for f in t.fields_with_args -%}
 👉 f.concrete.arguments_type 👈  👉 t.name 👈::👉 f.variable_builder_name 👈(const 👉context.operation.name👈* operation){

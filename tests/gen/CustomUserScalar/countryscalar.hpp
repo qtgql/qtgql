@@ -16,9 +16,8 @@ public:
     return ret;
   };
   void deserialize(const QJsonValue &raw_data) final {
-    auto country_id = raw_data.toString().toStdString();
-    m_value = countries_map().at(country_id);
-    m_qt_value_cached = QString::fromStdString(m_value);
+    m_value = raw_data.toString().toStdString();
+    m_qt_value_cached = QString::fromStdString(countries_map().at(m_value));
   }
   const QString &to_qt() final { return m_qt_value_cached; };
   [[nodiscard]] QJsonValue serialize() const final {
