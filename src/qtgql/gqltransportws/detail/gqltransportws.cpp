@@ -201,10 +201,9 @@ bool GqlTransportWs::gql_is_valid() const {
   return is_valid() && m_connection_ack;
 }
 
-void GqlTransportWs::execute(
-    const std::shared_ptr<bases::HandlerABC> &handler) {
-  auto new_op_id = QUuid::createUuid();
-  execute_impl(new_op_id, handler);
+void GqlTransportWs::execute(const std::shared_ptr<bases::HandlerABC> &handler,
+                             QUuid op_id) {
+  execute_impl(op_id, handler);
 }
 void GqlTransportWs::execute_impl(
     const QUuid &op_id, const std::shared_ptr<bases::HandlerABC> &handler) {

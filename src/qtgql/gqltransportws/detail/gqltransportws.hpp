@@ -176,7 +176,8 @@ public:
   [[nodiscard]] bool gql_is_valid() const;
 
   // execute / pend a handler for execution.
-  void execute(const std::shared_ptr<bases::HandlerABC> &handler) override;
+  void execute(const std::shared_ptr<bases::HandlerABC> &handler,
+               QUuid op_id = QUuid::createUuid()) override;
   void set_headers(const std::map<QString, QString> &headers);
 
   // reconnect with previous settings.
