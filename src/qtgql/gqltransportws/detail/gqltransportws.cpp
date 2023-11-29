@@ -120,11 +120,19 @@ void GqlTransportWs::send_message(const bases::HashAbleABC &message) {
   m_ws->sendTextMessage(QJsonDocument(message.serialize()).toJson());
 }
 
+void GqlTransportWs::send_message(const bases::HashAbleABC &message,
+                                  QUuid uuid) {
+  QJsonObject msg = message.serialize();
+  msg.insert("id", uuid.toString());
+  m_ws->sendTextMessage(QJsonDocument(msg).toJson());
+}
+
 void GqlTransportWs::onTextMessageReceived(const QString &message) {
   auto raw_data = QJsonDocument::fromJson(message.toUtf8());
   if (raw_data.isObject()) {
     auto data = raw_data.object();
     if (data.contains("id")) {
+      auto uuid = data.value("id");
       // Any that contains ID is directed to a single handler.
       auto op_message = GqlTrnsWsMsgWithID(data);
       auto message_type = op_message.type;
@@ -207,10 +215,21 @@ void GqlTransportWs::execute(const std::shared_ptr<bases::HandlerABC> &handler,
 }
 void GqlTransportWs::execute_impl(
     const QUuid &op_id, const std::shared_ptr<bases::HandlerABC> &handler) {
+  // check if there is a same subscription with different uuid
+  auto i = m_connected_handlers.begin();
+  while (i != m_connected_handlers.end()) {
+    const auto &uuid_handler = (*i);
+    if (uuid_handler.second->message().query == handler->message().query) {
+      // send complete message to server
+      send_message(DEF_MESSAGES::COMPLETE, op_id);
+      uuid_handler.first.fromString(op_id.toString());
+      break;
+    }
+    i++;
+  }
   // if GQL_ACK and connected
   // send a message and delete the pending handler, it is now "connected".
   if (!m_connected_handlers.contains(op_id)) {
-
     if (gql_is_valid()) {
       m_connected_handlers[op_id] = handler;
       send_message(GqlTrnsWsMsgWithID(handler->message(), op_id));
@@ -219,7 +238,6 @@ void GqlTransportWs::execute_impl(
     }
   }
 }
-
 void GqlTransportWs::set_headers(const std::map<QString, QString> &headers) {
   m_settings.headers = headers;
 }
