@@ -58,7 +58,8 @@ class that should support executing handlers
 `on_error` / 'on_completed' when the operation is completed.
 */
 struct QTGQL_EXPORT NetworkLayerABC {
-  virtual void execute(const std::shared_ptr<HandlerABC> &handler);
+  virtual void execute(const std::shared_ptr<HandlerABC> &handler,
+                       QUuid op_id = QUuid::createUuid());
 };
 
 } // namespace qtgql::bases

@@ -6,6 +6,7 @@
 #include "objecttype.hpp"
 #include "qtgql/qtgql_export.hpp"
 #include <QTimer>
+#include <QUuid>
 #include <utility>
 
 namespace qtgql::bases {
@@ -73,6 +74,7 @@ class QTGQL_EXPORT Environment {
   UniqueCache m_cache;
   static std::map<std::string, std::shared_ptr<Environment>> *ENV_MAP();
   std::string m_name;
+  QUuid new_op_id;
 
 public:
   // static members

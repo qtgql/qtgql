@@ -94,6 +94,7 @@ namespace DEF_MESSAGES {
 const auto CONNECTION_INIT = BaseGqlTrnsWsMsg(PROTOCOL::CONNECTION_INIT);
 const auto PING = BaseGqlTrnsWsMsg(PROTOCOL::PING);
 const auto PONG = BaseGqlTrnsWsMsg(PROTOCOL::PONG);
+const auto COMPLETE = BaseGqlTrnsWsMsg(PROTOCOL::PONG);
 } // namespace DEF_MESSAGES
 
 struct GqlTransportWsClientSettings {
@@ -111,7 +112,7 @@ class QTGQL_EXPORT GqlTransportWs : public QObject,
 
 private:
   void send_message(const bases::HashAbleABC &message);
-
+  void send_message(const bases::HashAbleABC &message, QUuid uuid);
 private Q_SLOTS:
 
   void onReconnectTimeout();
@@ -176,7 +177,8 @@ public:
   [[nodiscard]] bool gql_is_valid() const;
 
   // execute / pend a handler for execution.
-  void execute(const std::shared_ptr<bases::HandlerABC> &handler) override;
+  void execute(const std::shared_ptr<bases::HandlerABC> &handler,
+               QUuid op_id = QUuid::createUuid()) override;
   void set_headers(const std::map<QString, QString> &headers);
 
   // reconnect with previous settings.

@@ -67,7 +67,8 @@ Environment::Environment(std::string name,
       m_cache(std::move(cache_)) {}
 
 void Environment::execute(const std::shared_ptr<HandlerABC> &handler) {
-  m_network_layer->execute(handler);
+  new_op_id = QUuid::createUuid();
+  m_network_layer->execute(handler, new_op_id);
 }
 
 EnvCache::EnvCache(const qtgql::bases::EnvCacheOptions &options)

@@ -77,17 +77,6 @@ public:
       environment()->execute(a);
     }
   }
-
-  void refetch() {
-    if (m_completed) {
-      set_completed(false);
-      fetch();
-    } else {
-      qWarning() << "Tried to refetch operation "
-                 << m_message_template.operationName
-                 << " but the operation haven't completed yet.";
-    }
-  };
   void set_vars(const QJsonObject &vars) {
     m_message_template.set_variables(vars);
   }

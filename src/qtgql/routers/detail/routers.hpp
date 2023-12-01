@@ -18,7 +18,8 @@ public:
       std::shared_ptr<gqltransportws::GqlTransportWs> ws_layer,
       std::shared_ptr<gqloverhttp::GraphQLOverHttp> http_layer);
 
-  void execute(const std::shared_ptr<bases::HandlerABC> &handler) override;
+  void execute(const std::shared_ptr<bases::HandlerABC> &handler,
+               QUuid op_id = QUuid::createUuid()) override;
 };
 
 } // namespace qtgql::routers
