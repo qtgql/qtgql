@@ -94,7 +94,7 @@ namespace DEF_MESSAGES {
 const auto CONNECTION_INIT = BaseGqlTrnsWsMsg(PROTOCOL::CONNECTION_INIT);
 const auto PING = BaseGqlTrnsWsMsg(PROTOCOL::PING);
 const auto PONG = BaseGqlTrnsWsMsg(PROTOCOL::PONG);
-const auto COMPLETE = BaseGqlTrnsWsMsg(PROTOCOL::PONG);
+const auto COMPLETE = BaseGqlTrnsWsMsg(PROTOCOL::COMPLETE);
 } // namespace DEF_MESSAGES
 
 struct GqlTransportWsClientSettings {
