@@ -45,7 +45,7 @@ jobs:
       matrix: ${{ steps.set_matrix.outputs.matrix }}
 
   tests:
-    name: ${{matrix.profile.profile}} ${{matrix.profile.runner_os}} py${{ matrix.python_version }} qt${{profile.qt_version}}- ${{toJSON(matrix.testcases)}}
+    name: ${{matrix.profile.profile}} ${{matrix.profile.runner_os}} py${{matrix.python_version}} qt${{matrix.qt_version}}- ${{toJSON(matrix.testcases)}}
     runs-on: ${{ matrix.profile.runner_os }}
     needs: provide_testcase_matrix
     strategy:
@@ -111,9 +111,9 @@ jobs:
         shell: bash
         run: |
           if [ "$RUNNER_OS" == "Windows" ]; then
-            poetry run conan build . -o test=True -s build_type=Debug  -o qt_version=${{profile.qt_version}} -pr=profiles/Windows_mingw --build=missing;
+            poetry run conan build . -o test=True -s build_type=Debug  -o qt_version=${{matrix.qt_version}} -pr=profiles/Windows_mingw --build=missing;
           elif [ "$RUNNER_OS" == "Linux" ]; then
-            poetry run xvfb-run -a conan build . -o test=True -o qt_version=${{profile.qt_version}} -s build_type=Debug -pr=profiles/Linux --build=missing -c tools.system.package_manager:sudo=True -c tools.system.package_manager:mode=install
+            poetry run xvfb-run -a conan build . -o test=True -o qt_version=${{matrix.qt_version}} -s build_type=Debug -pr=profiles/Linux --build=missing -c tools.system.package_manager:sudo=True -c tools.system.package_manager:mode=install
           fi
 
       - name: Run tests
