@@ -121,7 +121,7 @@ class QtGqlRecipe(ConanFile):
     topics = ("GraphQL", "Qt", "codegen")
     version = __version__
     build_policy = "missing"
-    options = {"qt_version": ["6.5.0"], "verbose": ConanBool, "test": ConanBool}  # noqa
+    options = {"qt_version": ["6.5.2", "6.6.0"], "verbose": ConanBool, "test": ConanBool}  # noqa
     default_options = {  # noqa
         "verbose": False,
         "qt_version": "6.5.0",

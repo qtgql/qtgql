@@ -31,7 +31,7 @@ CONAN_PROFILES = (
 class Matrix:
     testcases: list[str]
     profile: list[ConanProfile]
-    qt_version: list[str] = Factory(lambda: ["6.5.2"])
+    qt_version: list[str] = Factory(lambda: ["6.6.0"])
     python_version: list[str] = Factory(lambda: ["3.9", "3.10", "3.11"])
 
 
