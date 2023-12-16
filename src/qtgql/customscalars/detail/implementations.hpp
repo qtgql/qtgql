@@ -3,8 +3,7 @@
 #include "qtgql/qtgql_export.hpp"
 #include <QDateTime>
 
-namespace qtgql {
-namespace customscalars {
+namespace qtgql::customscalars {
 class QTGQL_EXPORT BaseTimeScalar {
 protected:
   QString m_cached_to_qt;
@@ -66,5 +65,4 @@ public:
   const QString &to_qt() override;
   [[nodiscard]] QJsonValue serialize() const override;
 };
-}; // namespace customscalars
-}; // namespace qtgql
+}; // namespace qtgql::customscalars
