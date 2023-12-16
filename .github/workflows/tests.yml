@@ -10,7 +10,7 @@ on:
         description: 'JSON of all your targets'
     branches: [main]
     paths:
-      - "qtgql/**"
+      - "src/**"
       - "tests/**"
       - "pyproject.toml"
       - "poetry.lock"
