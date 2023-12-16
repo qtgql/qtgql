@@ -118,7 +118,7 @@ def init_func(argv):
     return app
 
 
-def main(port: int = 9000):
+def main(port: int = 10000):
     web.run_app(app, host="localhost", port=port)
 
 
