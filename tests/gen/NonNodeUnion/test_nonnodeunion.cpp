@@ -7,11 +7,13 @@ namespace NonNodeUnion {
 using namespace qtgql;
 
 auto ENV_NAME = std::string("NonNodeUnion");
-auto SCHEMA_ADDR = test_utils::get_server_address(QString::fromStdString(ENV_NAME));
+auto SCHEMA_ADDR =
+    test_utils::get_server_address(QString::fromStdString(ENV_NAME));
 
 TEST_CASE("NonNodeUnion") {
   auto env = test_utils::get_or_create_env(
-      ENV_NAME, test_utils::DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
+      ENV_NAME,
+      test_utils::DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = mainquery::MainQuery::shared();
   mq->set_variables({NonNodeUnion::Enums::UnionChoice::PERSON});
   mq->fetch();
@@ -44,7 +46,7 @@ TEST_CASE("NonNodeUnion") {
     auto root = mq->data();
     test_utils::SignalCatcher catcher({.source_obj = root, .only = "whoAmI"});
     mq->set_variables({NonNodeUnion::Enums::UnionChoice::FROG});
-    mq->refetch();
+    mq->fetch();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(mq);
     auto frog_maybe = root->get_whoAmI();
