@@ -12,5 +12,6 @@ void qtgql::routers::SubscriptionRouter::execute(
     ws_layer->execute(handler, op_id);
   } else {
     http_layer->execute(handler, op_id);
+    
   }
 }
