@@ -12,6 +12,7 @@
 
 #include "qtgql/bases/bases.hpp"
 #include "qtgql/gqltransportws/gqltransportws.hpp"
+#include "qtgql/gqloverhttp/gqloverhttp.hpp"
 #include "testframework.hpp"
 
 namespace fs = std::filesystem;
@@ -28,7 +29,7 @@ using namespace qtgql;
 QString get_server_address(const QString &suffix = "graphql",
                            const QString &prefix = "ws");
 
-struct DebugClientSettings {
+struct DebugWsClientSettings {
   QString url;
   bool handle_ack = true;
   bool handle_pong = true;
@@ -43,11 +44,11 @@ class DebugAbleWsNetworkLayer : public gqltransportws::GqlTransportWs {
 
 public:
   bool m_pong_received = false;
-  DebugClientSettings m_settings;
+  DebugWsClientSettings m_settings;
   QJsonObject m_current_message;
 
   explicit DebugAbleWsNetworkLayer(
-      const DebugClientSettings &settings = DebugClientSettings());
+      const DebugWsClientSettings &settings = DebugWsClientSettings());
   void wait_for_valid();
   bool is_reconnect_timer_active() { return m_reconnect_timer->isActive(); }
   bool has_handler(const std::shared_ptr<bases::HandlerABC> &handler);
@@ -151,9 +152,18 @@ struct QmlBot {
   }
 };
 [[maybe_unused]] std::shared_ptr<bases::Environment>
+get_or_create_http_env(const std::string &env_name,
+                       const std::map<std::string, std::string> &headers = {},
+                       std::chrono::milliseconds cache_dur = 5s
+                       );
+
+
+
+                           [[maybe_unused]] std::shared_ptr<bases::Environment>
 get_or_create_env(const std::string &env_name,
-                  const DebugClientSettings &settings,
+                  const DebugWsClientSettings &settings,
                   std::chrono::milliseconds cache_dur = 5s);
+
 void remove_env(const QString &env_name);
 
 struct SignalCatcherParams {

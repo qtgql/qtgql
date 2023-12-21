@@ -1,4 +1,5 @@
 import strawberry
+from strawberry.types import Info
 
 from tests.test_codegen.schemas.node_interface import Node
 
@@ -21,21 +22,13 @@ class User(Node):
     age: int
     country: Country
 
-
-# ugly hack for `test_custom_scalar_update` to pass.
-
-RET_CODE = ["isr", "uk"]
-for _ in range(20):
-    RET_CODE.extend(RET_CODE)
-
-
 @strawberry.type
 class Query:
     _prev = ""
 
     @strawberry.field()
-    def user(self) -> User:
-        return User(name="Patrick", age=100, country=RET_CODE.pop())
+    def user(self, info: Info) -> User:
+        return User(name="Patrick", age=100, country=info.context.headers["country-code"])
 
 
 schema = strawberry.Schema(query=Query)

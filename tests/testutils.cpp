@@ -57,7 +57,7 @@ void DebugAbleWsNetworkLayer::onTextMessageReceived(
 }
 
 DebugAbleWsNetworkLayer::DebugAbleWsNetworkLayer(
-    const DebugClientSettings &settings)
+    const DebugWsClientSettings &settings)
     : gqltransportws::GqlTransportWs(settings.prod_settings),
       m_settings{settings} {}
 
@@ -85,9 +85,28 @@ void wait_for_completion(
     throw std::runtime_error(error_message);
   }
 }
+
+std::shared_ptr<qtgql::bases::Environment>
+get_or_create_http_env(const std::string &env_name,
+                       const std::map<std::string, std::string> &headers,
+                       std::chrono::milliseconds cache_dur){
+    auto env = bases::Environment::get_env(env_name);
+    if (!env.has_value()) {
+      auto env_ = std::make_shared<bases::Environment>(
+          env_name,
+          std::unique_ptr<qtgql::gqloverhttp::GraphQLOverHttp>(
+              new qtgql::gqloverhttp::GraphQLOverHttp(
+                  get_http_server_addr("graphql"), headers)),
+          std::unique_ptr<qtgql::bases::EnvCache>(
+                  new qtgql::bases::EnvCache{{cache_dur}}));
+        return env_;
+    }
+    return env.value();
+};
+
 std::shared_ptr<qtgql::bases::Environment>
 get_or_create_env(const std::string &env_name,
-                  const DebugClientSettings &settings,
+                  const DebugWsClientSettings &settings,
                   std::chrono::milliseconds cache_dur) {
   auto env = bases::Environment::get_env(env_name);
   if (!env.has_value()) {

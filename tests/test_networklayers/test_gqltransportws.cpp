@@ -26,7 +26,7 @@ TEST_CASE("GraphQLTransportWS") {
 
   SECTION("If ack not received - gql is not valid") {
     auto invalid_client =
-        test_utils::DebugAbleWsNetworkLayer(test_utils::DebugClientSettings{
+        test_utils::DebugAbleWsNetworkLayer(test_utils::DebugWsClientSettings{
             .url = test_utils::get_server_address(), .handle_ack = false});
     REQUIRE(QTest::qWaitFor([&]() { return invalid_client.is_valid(); }, 1000));
     std::ignore = QTest::qWaitFor(

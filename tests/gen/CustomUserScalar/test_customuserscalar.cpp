@@ -10,12 +10,13 @@ auto SCHEMA_ADDR =
     test_utils::get_server_address(QString::fromStdString(ENV_NAME));
 
 TEST_CASE("CustomUserScalar") {
-  test_utils::get_or_create_env(
-      ENV_NAME,
-      test_utils::DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
+    auto env = test_utils::get_or_create_http_env(ENV_NAME);
+    auto http_nl = dynamic_cast<gqloverhttp::GraphQLOverHttp*>(
+          env->get_network_layer());
 
   SECTION("test deserialize") {
     auto mq = mainquery::MainQuery::shared();
+    http_nl->set_headers({{"country-code", "uk"}});
     mq->fetch();
     test_utils::wait_for_completion(mq);
     auto user = mq->data()->get_user();
@@ -26,6 +27,7 @@ TEST_CASE("CustomUserScalar") {
   };
   SECTION("test update") {
     auto mq = mainquery::MainQuery::shared();
+    http_nl->set_headers({{"country-code", "isr"}});
     mq->fetch();
     test_utils::wait_for_completion(mq);
     auto user = mq->data()->get_user();
@@ -33,6 +35,7 @@ TEST_CASE("CustomUserScalar") {
     REQUIRE(country.toStdString() == "Israel");
     auto country_cpp = user->get_country_cpp();
     REQUIRE(country_cpp->get_value() == "isr");
+    http_nl->set_headers({{"country-code", "uk"}});
     mq->refetch();
     test_utils::wait_for_completion(mq);
     REQUIRE(user->get_country().toStdString() == "United Kingdom");
