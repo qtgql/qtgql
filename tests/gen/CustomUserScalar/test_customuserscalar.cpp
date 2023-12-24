@@ -6,11 +6,12 @@ namespace CustomUserScalar {
 using namespace qtgql;
 
 auto ENV_NAME = std::string("CustomUserScalar");
-auto SCHEMA_ADDR =
-    test_utils::get_server_address(QString::fromStdString(ENV_NAME));
 
 TEST_CASE("CustomUserScalar") {
-    auto env = test_utils::get_or_create_http_env(ENV_NAME);
+    auto SCHEMA_ADDR =
+            test_utils::get_server_address(QString::fromStdString(ENV_NAME), "http");
+
+    auto env = test_utils::get_or_create_http_env(ENV_NAME, SCHEMA_ADDR);
     auto http_nl = dynamic_cast<gqloverhttp::GraphQLOverHttp*>(
           env->get_network_layer());
 

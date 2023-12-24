@@ -153,6 +153,7 @@ struct QmlBot {
 };
 [[maybe_unused]] std::shared_ptr<bases::Environment>
 get_or_create_http_env(const std::string &env_name,
+                       const QString & url,
                        const std::map<std::string, std::string> &headers = {},
                        std::chrono::milliseconds cache_dur = 5s
                        );

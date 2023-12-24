@@ -4,20 +4,26 @@ include(Catch)
 set(TESTS_TARGET "test_qtgql")
 set(CMAKE_OBJECT_PATH_MAX 9999)
 
-add_executable(${TESTS_TARGET}
-        main.cpp
-        ${TEST_SRCS}
+add_library(test_utils
         testutils.cpp testutils.hpp
         test_networklayers/utils.hpp
         test_networklayers/utils.cpp
-        test_listmodel.cpp
-
-        test_customscalar.cpp
-        test_networklayers/test_gqltransportws.cpp
-        test_networklayers/test_graphql_over_http.cpp
-
-        test_networklayers/test_subscription_router.cpp
 )
+target_link_libraries(test_utils
+        PUBLIC
+        Qt6::Quick
+        Qt6::Test
+        Qt6::Qml
+        qtgql
+        Catch2::Catch2
+)
+add_executable(${TESTS_TARGET}
+        main.cpp
+        ${TEST_SRCS}
+)
+
+
+
 add_compile_definitions(TESTS_QML_DIR=${TESTS_QML_DIR} ${TESTS_TARGET})
 include_directories(../tests)
 
@@ -31,13 +37,31 @@ target_compile_features(${TESTS_TARGET} PRIVATE cxx_std_17)
 set_target_properties(${TESTS_TARGET} PROPERTIES AUTOMOC TRUE)
 target_link_libraries(${TESTS_TARGET}
  PUBLIC
-    Qt6::Test
-    Qt6::Qml
-    qtgql
-    Catch2::Catch2
+        Qt6::Test
+        Qt6::Qml
+        qtgql
+        Catch2::Catch2
+        test_utils
 )
+add_executable(core_tests
+        main.cpp
 
+        test_listmodel.cpp
 
+        test_customscalar.cpp
+        test_networklayers/test_gqltransportws.cpp
+        test_networklayers/test_graphql_over_http.cpp
+
+        test_networklayers/test_subscription_router.cpp
+)
+target_link_libraries(core_tests
+        PUBLIC
+        Qt6::Test
+        Qt6::Qml
+        qtgql
+        Catch2::Catch2
+        test_utils
+)
 catch_discover_tests(${TESTS_TARGET}
         DL_PATHS ${QT_DL_LIBRARIES}
 )
