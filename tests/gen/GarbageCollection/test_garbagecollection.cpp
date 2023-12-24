@@ -22,9 +22,9 @@ TEST_CASE("GarbageCollection") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME,
       test_utils::DebugWsClientSettings{.prod_settings =
-                                          {
-                                              .url = SCHEMA_ADDR,
-                                          }},
+                                            {
+                                                .url = SCHEMA_ADDR,
+                                            }},
       100ms);
   SECTION("Test Garbage collection") {
 

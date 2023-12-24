@@ -16,7 +16,7 @@ TEST_CASE("PartiallyInitializedNode") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME,
       test_utils::DebugWsClientSettings{.print_debug = true,
-                                      .prod_settings = {.url = SCHEMA_ADDR}});
+                                        .prod_settings = {.url = SCHEMA_ADDR}});
 
   SECTION("test update on node type (cached) on possibly null fields.") {
     auto mq_partial = partialcreateuser::PartialCreateUser::shared();

@@ -1,6 +1,6 @@
-#include "testframework.hpp"
 #include "gen/MainQuery.hpp"
 #include "gen/UserWithSameIDDiffFields.hpp"
+#include "testframework.hpp"
 #include "testutils.hpp"
 
 #include "qtgql/gqloverhttp/gqloverhttp.hpp"
@@ -9,10 +9,10 @@ namespace Scalars {
 using namespace qtgql;
 
 TEST_CASE("Scalars") {
-    auto ENV_NAME = std::string("Scalars");
+  auto ENV_NAME = std::string("Scalars");
 
-    auto SCHEMA_ADDR =
-        test_utils::get_server_address(QString::fromStdString(ENV_NAME));
+  auto SCHEMA_ADDR =
+      test_utils::get_server_address(QString::fromStdString(ENV_NAME));
   auto env = test_utils::get_or_create_env(
       ENV_NAME,
       test_utils::DebugWsClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});

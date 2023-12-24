@@ -22,11 +22,16 @@ class User(Node):
     age: int
     country: Country
 
+
 @strawberry.type
 class Query:
     @strawberry.field()
     def user(self, info: Info) -> User:
-        return User(name="Patrick", age=100, country=info.context['request'].headers["country-code"])
+        return User(
+            name="Patrick",
+            age=100,
+            country=info.context["request"].headers["country-code"],
+        )
 
 
 schema = strawberry.Schema(query=Query)

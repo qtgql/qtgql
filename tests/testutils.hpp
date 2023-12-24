@@ -11,8 +11,8 @@
 #include <memory>
 
 #include "qtgql/bases/bases.hpp"
-#include "qtgql/gqltransportws/gqltransportws.hpp"
 #include "qtgql/gqloverhttp/gqloverhttp.hpp"
+#include "qtgql/gqltransportws/gqltransportws.hpp"
 #include "testframework.hpp"
 
 namespace fs = std::filesystem;
@@ -152,15 +152,11 @@ struct QmlBot {
   }
 };
 [[maybe_unused]] std::shared_ptr<bases::Environment>
-get_or_create_http_env(const std::string &env_name,
-                       const QString & url,
+get_or_create_http_env(const std::string &env_name, const QString &url,
                        const std::map<std::string, std::string> &headers = {},
-                       std::chrono::milliseconds cache_dur = 5s
-                       );
+                       std::chrono::milliseconds cache_dur = 5s);
 
-
-
-                           [[maybe_unused]] std::shared_ptr<bases::Environment>
+[[maybe_unused]] std::shared_ptr<bases::Environment>
 get_or_create_env(const std::string &env_name,
                   const DebugWsClientSettings &settings,
                   std::chrono::milliseconds cache_dur = 5s);

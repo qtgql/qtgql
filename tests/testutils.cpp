@@ -87,23 +87,21 @@ void wait_for_completion(
 }
 
 std::shared_ptr<qtgql::bases::Environment>
-get_or_create_http_env(const std::string &env_name,
-                       const QString & url,
+get_or_create_http_env(const std::string &env_name, const QString &url,
                        const std::map<std::string, std::string> &headers,
-                       std::chrono::milliseconds cache_dur){
-    auto env = bases::Environment::get_env(env_name);
-    if (!env.has_value()) {
-      auto env_ = std::make_shared<bases::Environment>(
-          env_name,
-          std::unique_ptr<qtgql::gqloverhttp::GraphQLOverHttp>(
-              new qtgql::gqloverhttp::GraphQLOverHttp(
-                      url, headers)),
-          std::unique_ptr<qtgql::bases::EnvCache>(
-                  new qtgql::bases::EnvCache{{cache_dur}}));
-        bases::Environment::set_gql_env(env_);
-        return env_;
-    }
-    return env.value();
+                       std::chrono::milliseconds cache_dur) {
+  auto env = bases::Environment::get_env(env_name);
+  if (!env.has_value()) {
+    auto env_ = std::make_shared<bases::Environment>(
+        env_name,
+        std::unique_ptr<qtgql::gqloverhttp::GraphQLOverHttp>(
+            new qtgql::gqloverhttp::GraphQLOverHttp(url, headers)),
+        std::unique_ptr<qtgql::bases::EnvCache>(
+            new qtgql::bases::EnvCache{{cache_dur}}));
+    bases::Environment::set_gql_env(env_);
+    return env_;
+  }
+  return env.value();
 };
 
 std::shared_ptr<qtgql::bases::Environment>
