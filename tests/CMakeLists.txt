@@ -17,6 +17,7 @@ target_link_libraries(utils_for_tests
         qtgql
         Catch2::Catch2
 )
+
 add_executable(${TESTS_TARGET}
         main.cpp
         ${CODEGEN_TEST_SOURCES}
@@ -39,28 +40,31 @@ target_link_libraries(${TESTS_TARGET}
         Catch2::Catch2
         utils_for_tests
 )
-add_executable(test_core
-        main.cpp
+if (QTGQL_SHOULD_TEST_CORE)
 
-        test_listmodel.cpp
+    add_executable(test_core
+            main.cpp
 
-        test_customscalar.cpp
-        test_networklayers/test_gqltransportws.cpp
-        test_networklayers/test_graphql_over_http.cpp
+            test_listmodel.cpp
 
-        test_networklayers/test_subscription_router.cpp
-)
-target_link_libraries(test_core
-        PUBLIC
-        Qt6::Test
-        Qt6::Qml
-        qtgql
-        Catch2::Catch2
-        utils_for_tests
-)
-catch_discover_tests(test_core
-        DL_PATHS ${QT_DL_LIBRARIES}
-)
+            test_customscalar.cpp
+            test_networklayers/test_gqltransportws.cpp
+            test_networklayers/test_graphql_over_http.cpp
+
+            test_networklayers/test_subscription_router.cpp
+    )
+    target_link_libraries(test_core
+            PUBLIC
+            Qt6::Test
+            Qt6::Qml
+            qtgql
+            Catch2::Catch2
+            utils_for_tests
+    )
+    catch_discover_tests(test_core
+            DL_PATHS ${QT_DL_LIBRARIES}
+    )
+endif()
 
 catch_discover_tests(${TESTS_TARGET}
         DL_PATHS ${QT_DL_LIBRARIES}
