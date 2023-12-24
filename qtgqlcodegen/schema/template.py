@@ -33,8 +33,11 @@ class SchemaTemplateContext:
     def dependencies(self) -> list[str]:
         ret: list[str] = []
         for scalar in self.config.custom_scalars.values():
-            if scalar.include_path not in ret:
-                ret.append(scalar.include_path)
+            include_path = scalar.include_path
+            if include_path not in ret:
+                if not (include_path.startswith(('"', "<"))):
+                    include_path = f'"{include_path}"'
+                ret.append(include_path)
         return [f"#include {inc}" for inc in ret]
 
     @property

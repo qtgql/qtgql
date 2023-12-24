@@ -11,7 +11,7 @@ on:
     branches: [main]
     paths:
       - "qtgql/**"
-      - "tests/**"
+      - "src/**"
       - "pyproject.toml"
       - "poetry.lock"
       - ".github/workflows/test.yml"
@@ -45,7 +45,7 @@ jobs:
       matrix: ${{ steps.set_matrix.outputs.matrix }}
 
   tests:
-    name: ${{matrix.profile.profile}} ${{matrix.profile.runner_os}} py${{ matrix.python_version }} - ${{toJSON(matrix.testcases)}}
+    name: ${{matrix.profile.profile}} ${{matrix.profile.runner_os}} py${{matrix.python_version}} qt${{matrix.qt_version}}- ${{toJSON(matrix.testcases)}}
     runs-on: ${{ matrix.profile.runner_os }}
     needs: provide_testcase_matrix
     strategy:
@@ -74,8 +74,9 @@ jobs:
           echo "QT_QPA_PLATFORM=xcb" >> $GITHUB_ENV
       - name: install mingw - windows
         if: runner.os == 'Windows' && contains(matrix.profile.profile, 'mingw')
-        run: |
-          choco install mingw --version 11.2.0 -y --allow-downgrade
+        uses: egor-tensin/setup-mingw@v2.2.0
+        with:
+          version: "11.2.0"
       - name: install msvc - windows
         if: runner.os == 'Windows' && contains(matrix.profile.profile, 'msvc')
         uses: TheMrMilchmann/setup-msvc-dev@v2
@@ -109,17 +110,18 @@ jobs:
 
       - name: Conan build
         shell: bash
+        env:
+          SHOULD_TEST_CORE: ${{ env.SHOULD_TEST_CORE }}
         run: |
           if [ "$RUNNER_OS" == "Windows" ]; then
-            poetry run conan build . -o test=True -s build_type=Debug -pr=profiles/Windows_mingw --build=missing;
+            poetry run conan build . -o test=True -o test_core=${{env.SHOULD_TEST_CORE}} -s build_type=Debug  -o qt_version=${{matrix.qt_version}} -pr=profiles/Windows_mingw --build=missing;
           elif [ "$RUNNER_OS" == "Linux" ]; then
-            poetry run xvfb-run -a conan build . -o test=True -s build_type=Debug -pr=profiles/Linux --build=missing -c tools.system.package_manager:sudo=True -c tools.system.package_manager:mode=install
+            poetry run xvfb-run -a conan build . -o test=True -o test_core=${{env.SHOULD_TEST_CORE}} -o qt_version=${{matrix.qt_version}} -s build_type=Debug -pr=profiles/Linux --build=missing -c tools.system.package_manager:sudo=True -c tools.system.package_manager:mode=install
           fi
 
       - name: Run tests
         shell: bash
         run: |
-
           if [ "$RUNNER_OS" == "Windows" ]; then
             poetry run pytest tests --cov=qtgqlcodegen --cov-report=xml --cov-append
           elif [ "$RUNNER_OS" == "Linux" ]; then

@@ -13,6 +13,7 @@ namespace customscalars {
 template <typename T, typename T_QtType> class CustomScalarABC {
 protected:
   T m_value;
+  T_QtType m_qt_value_cached;
 
 public:
   // abstract methods
@@ -21,6 +22,11 @@ public:
    * pipeline)
    */
   virtual const QString &GRAPHQL_NAME() = 0;
+  /**
+   * Getter - return m_value
+   * @return m_value
+   */
+  const T &get_value() const { return m_value; };
   /*
    * Will be used by the property getter, This is the official value that Qt
    * should "understand".

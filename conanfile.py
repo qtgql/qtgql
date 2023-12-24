@@ -121,11 +121,17 @@ class QtGqlRecipe(ConanFile):
     topics = ("GraphQL", "Qt", "codegen")
     version = __version__
     build_policy = "missing"
-    options = {"qt_version": ["6.5.0"], "verbose": ConanBool, "test": ConanBool}  # noqa
+    options = {  # noqa
+        "qt_version": ["6.5.0", "6.6.0"],
+        "verbose": ConanBool,
+        "test": ConanBool,
+        "test_core": ConanBool,
+    }
     default_options = {  # noqa
         "verbose": False,
         "qt_version": "6.5.0",
         "test": False,
+        "test_core": False,
     }
 
     exports_sources = "CMakeLists.txt", "include/*", "pyproject.toml"
@@ -160,11 +166,19 @@ class QtGqlRecipe(ConanFile):
         qt_version = self.options.qt_version.value
         return qt_version
 
-    @cached_property
-    def should_test(self) -> bool:
-        if self.options.test.value in ("True", "true", True):
+    @staticmethod
+    def _parse_conan_bool(v: str) -> bool:
+        if v in ("True", "true", True):
             return True
         return False
+
+    @property
+    def should_test(self) -> bool:
+        return self._parse_conan_bool(self.options.test.value)
+
+    @property
+    def should_test_core(self) -> bool:
+        return self._parse_conan_bool(self.options.test_core.value)
 
     def generate(self) -> None:
         deps = CMakeDeps(self)
@@ -193,6 +207,7 @@ class QtGqlRecipe(ConanFile):
         )  # used by catch2 to discover tests/
         tc.cache_variables["Qt6_DIR"] = str(qt_installer.qt6_cmake_config)
         tc.cache_variables["QTGQL_TESTING"] = self.should_test
+        tc.cache_variables["QTGQL_TEST_CORE"] = self.should_test_core
         tc.cache_variables["TESTS_QML_DIR"] = (self.build_path / "tests").as_posix()
         if self.is_windows:
             tc.cache_variables["CMAKE_CXX_COMPILER"] = "c++.exe"

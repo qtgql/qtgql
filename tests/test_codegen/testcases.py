@@ -14,7 +14,7 @@ from attr import Factory, define
 from qtgqlcodegen.cli import app
 from qtgqlcodegen.config import QtGqlConfig
 from qtgqlcodegen.generator import SchemaGenerator
-from qtgqlcodegen.types import CustomScalarDefinition
+from qtgqlcodegen.types import CUSTOM_SCALARS, CustomScalarDefinition
 from typer.testing import CliRunner
 
 import tests.test_codegen.schemas as schemas
@@ -134,6 +134,17 @@ class QtGqlTestCase:
     @cached_property
     def url_suffix(self):
         return self.test_name
+
+    @cached_property
+    def custom_scalar_paths(self) -> list[Path]:
+        """
+        :return: list of user-defined custom scalars. this is needed in order to add them to the cmake target.
+        """
+        return [
+            (self.generated_dir / cs.include_path).resolve(True)
+            for cs in self.config.custom_scalars.values()
+            if cs.graphql_name not in CUSTOM_SCALARS
+        ]
 
     @contextlib.contextmanager
     def virtual_generate(self) -> None:
@@ -625,8 +636,10 @@ CountryScalar = CustomScalarDefinition(
     graphql_name="Country",
     to_qt_type="QString",
     deserialized_type="QString",
-    include_path="NOT IMPLEMENTED",
+    include_path="../countryscalar.hpp",
 )
+
+# A scalar that was implemented by a user.
 
 CustomUserScalarTestCase = QtGqlTestCase(
     schema=schemas.object_with_user_defined_scalar.schema,
@@ -1068,6 +1081,7 @@ PartiallyInitializedNode = QtGqlTestCase(
         should_test_deserialization=BoolWithReason.false("resolves issue #381"),
     ),
 )
+
 all_test_cases = [
     ScalarsTestCase,
     SimpleGarbageCollection,
@@ -1145,6 +1159,7 @@ implemented_testcases = [
     RecursiveInputObjectTestCase,
     ObjectInInterface,
     PartiallyInitializedNode,
+    CustomUserScalarTestCase,
 ]
 
 
@@ -1159,5 +1174,5 @@ def generate_testcases(*testcases: QtGqlTestCase) -> None:
 
 if __name__ == "__main__":
     generate_testcases(
-        PartiallyInitializedNode,
+        ScalarsTestCase,
     )

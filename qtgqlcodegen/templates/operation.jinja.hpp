@@ -72,8 +72,13 @@ protected:
     void _qtgql_connect_signals();
 public:
 {% for f in t.fields -%}
-[[nodiscard]] const 👉 f.type.property_type 👈  👉 f.concrete.getter_name 👈() const;
+[[nodiscard]] const 👉 f.type.property_type 👈 👉 f.concrete.getter_name 👈() const;
 {% endfor -%}
+// fields with custom getters
+{% for f in t.fields_with_custom_getter -%}
+[[nodiscard]] const 👉 f.type.proxy_cpp_type 👈 & 👉 f.concrete.getter_name 👈_cpp() const;
+{% endfor -%}
+
 public:
 [[nodiscard]] const QString & __typename() const final{
     return m_inst->__typename();

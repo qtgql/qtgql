@@ -45,7 +45,7 @@ template <typename T> struct is_shared_ptr : std::false_type {};
 template <typename T>
 struct is_shared_ptr<std::shared_ptr<T>> : std::true_type {};
 
-template <typename T> class  ListModelABC : public ListModelMixin {
+template <typename T> class ListModelABC : public ListModelMixin {
   typedef std::vector<T> T_VEC;
 
 private:
@@ -89,7 +89,6 @@ public:
       : ListModelMixin(parent), m_data{std::move(data)} {
     m_count = m_data.size();
   };
-
 
   [[nodiscard]] QVariant data(const QModelIndex &index,
                               int role) const override {
