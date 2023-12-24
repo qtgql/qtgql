@@ -10,12 +10,11 @@ from tests.test_codegen.testcases import (
 
 def generate_testcases_by_name(testcases_names: list[str]) -> None:
     to_gen = []
-    first_testcase = testcases_names[0]
     env_file = os.getenv("GITHUB_ENV")
     # this is a trick to avoid creating a whole GitHub action, instead we build
     #  the core tests only if we build the first testcase.
     with open(env_file, "a") as envfile:  # noqa: PTH123
-        if first_testcase == implemented_testcases[0].test_name:
+        if implemented_testcases[0].test_name in testcases_names:
             envfile.write("SHOULD_TEST_CORE=True")
         else:
             envfile.write("SHOULD_TEST_CORE=False")
