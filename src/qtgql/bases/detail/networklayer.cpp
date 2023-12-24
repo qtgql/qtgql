@@ -1,7 +1,8 @@
 #include "networklayer.hpp"
 namespace qtgql::bases {
 
-void NetworkLayerABC::execute(const std::shared_ptr<HandlerABC> &handler) {
+void NetworkLayerABC::execute(const std::shared_ptr<HandlerABC> &handler,
+                              QUuid op_id) {
   throw exceptions::NotImplementedError({});
 }
 

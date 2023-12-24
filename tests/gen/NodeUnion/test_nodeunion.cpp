@@ -13,7 +13,7 @@ auto SCHEMA_ADDR =
 TEST_CASE("NodeUnion") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME,
-      test_utils::DebugWsClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
+      test_utils::DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
 
   auto mq = mainquery::MainQuery::shared();
   mq->set_variables({Enums::UnionChoice::PERSON});
@@ -47,7 +47,7 @@ TEST_CASE("NodeUnion") {
     auto root = mq->data();
     test_utils::SignalCatcher catcher({.source_obj = root, .only = "whoAmI"});
     mq->set_variables({Enums::UnionChoice::FROG});
-    mq->refetch();
+    mq->fetch();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(mq);
     auto frog_maybe = root->get_whoAmI();

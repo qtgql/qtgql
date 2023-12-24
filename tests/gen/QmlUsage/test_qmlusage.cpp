@@ -31,7 +31,7 @@ bool check_list_view_count(const QQuickItem *list_view, int expected) {
 TEST_CASE("QmlUsageTestCase - simple") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME,
-      test_utils::DebugWsClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
+      test_utils::DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   QQmlApplicationEngine engine;
   auto bot = test_utils::QmlBot();
 
@@ -48,7 +48,7 @@ TEST_CASE("QmlUsageTestCase - simple") {
 TEST_CASE("QmlUsageTestCase - ListView") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME,
-      test_utils::DebugWsClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
+      test_utils::DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   QQmlApplicationEngine engine;
   auto bot = test_utils::QmlBot();
   auto store_id = QUuid::createUuid().toString();
@@ -71,7 +71,7 @@ TEST_CASE("QmlUsageTestCase - ListView") {
     remove_friend_mut->set_variables({store_id, last_friend_id});
     remove_friend_mut->fetch();
     test_utils::wait_for_completion(remove_friend_mut);
-    friends_query->refetch();
+    friends_query->fetch();
     test_utils::wait_for_completion(friends_query);
     REQUIRE(check_list_view_count(list_view, friends_count - 1));
   }
@@ -84,7 +84,7 @@ TEST_CASE("QmlUsageTestCase - ListView") {
     remove_friends_mut->set_variables({store_id, {f_1_id, f_2_id}});
     remove_friends_mut->fetch();
     test_utils::wait_for_completion(remove_friends_mut);
-    friends_query->refetch();
+    friends_query->fetch();
     test_utils::wait_for_completion(friends_query);
     REQUIRE(check_list_view_count(list_view, friends_count - 2));
   }

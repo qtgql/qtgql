@@ -14,7 +14,7 @@ auto SCHEMA_ADDR =
 TEST_CASE("NonNodeInterface") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME,
-      test_utils::DebugWsClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
+      test_utils::DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto animal_query = animalquery::AnimalQuery::shared();
   animal_query->set_variables({NonNodeInterface::Enums::AnimalKind::DOG});
   animal_query->fetch();
@@ -29,7 +29,7 @@ TEST_CASE("NonNodeInterface") {
     auto root = animal_query->data();
     animal_query->set_variables({NonNodeInterface::Enums::AnimalKind::PERSON});
     test_utils::SignalCatcher catcher({.source_obj = root, .only = "animal"});
-    animal_query->refetch();
+    animal_query->fetch();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(animal_query);
     REQUIRE(animal_query->data()->get_animal()->get_kind() ==
@@ -52,7 +52,7 @@ TEST_CASE("NonNodeInterface") {
     test_utils::SignalCatcher catcher(
         {.source_obj = change_age_mut->data(), .only = "changeAge"});
     change_age_mut->set_variables({animal_id, new_age});
-    change_age_mut->refetch();
+    change_age_mut->fetch();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(change_age_mut);
     REQUIRE(change_age_mut->data()->get_changeAge()->get_age() == new_age);

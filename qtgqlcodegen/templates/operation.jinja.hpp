@@ -207,9 +207,6 @@ public slots:
 void fetch(){
     m_operation->fetch();
 };
-void refetch(){
-    m_operation->refetch();
-};
 
 signals:
     void dataChanged();
