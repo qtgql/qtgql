@@ -1,5 +1,11 @@
 CHANGELOG
 =========
+0.138.1 - 2023-12-24
+--------------------
+This release adds a new getter on proxy typesfor custom scalars. This can be useful if you need to do some computationswith the custom scalar object rather than showing it to the user.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #468](https://github.com/qtgql/qtgql/pull/468/)
+
 0.138.0 - 2023-09-26
 --------------------
 fix auto release 9

@@ -10,11 +10,13 @@ namespace ListOfInterface {
 using namespace qtgql;
 
 auto ENV_NAME = std::string("ListOfInterface");
-auto SCHEMA_ADDR = test_utils::get_server_address(QString::fromStdString(ENV_NAME));
+auto SCHEMA_ADDR =
+    test_utils::get_server_address(QString::fromStdString(ENV_NAME));
 
 TEST_CASE("ListOfInterfaceTestcase") {
   auto env = test_utils::get_or_create_env(
-      ENV_NAME, test_utils::DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
+      ENV_NAME,
+      test_utils::DebugWsClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = mainquery::MainQuery::shared();
   mq->fetch();
   test_utils::wait_for_completion(mq);
@@ -49,8 +51,7 @@ TEST_CASE("ListOfInterfaceTestcase") {
     remove_mut->set_variables({person->get_id(), 3});
     remove_mut->fetch();
     test_utils::wait_for_completion(remove_mut);
-    REQUIRE(model->get(3)->property("name").toString() !=
-            name_for_third_item);
+    REQUIRE(model->get(3)->property("name").toString() != name_for_third_item);
   };
   SECTION("test update modify") {
     auto modify_mut = modifyname::ModifyName::shared();

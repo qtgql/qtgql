@@ -22,6 +22,7 @@ class PATHS:
     QTGQLCODEGEN_ROOT = PROJECT_ROOT / "qtgqlcodegen"
     PYPROJECT_TOML = PROJECT_ROOT / "pyproject.toml"
 
+
 class PersonFactory(mimesis.Person):
     def age(self, minimum: int = 0, maximum: int = 999999) -> int:
         return super().age(minimum, maximum)

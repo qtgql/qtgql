@@ -25,8 +25,9 @@ TEST_CASE("GraphQLTransportWS") {
   }
 
   SECTION("If ack not received - gql is not valid") {
-    auto invalid_client = test_utils::DebugAbleWsNetworkLayer(
-        test_utils::DebugClientSettings{.url = test_utils::get_server_address(), .handle_ack = false});
+    auto invalid_client =
+        test_utils::DebugAbleWsNetworkLayer(test_utils::DebugWsClientSettings{
+            .url = test_utils::get_server_address(), .handle_ack = false});
     REQUIRE(QTest::qWaitFor([&]() { return invalid_client.is_valid(); }, 1000));
     std::ignore = QTest::qWaitFor(
         [&]() -> bool { return invalid_client.gql_is_valid(); }, 200);
@@ -34,7 +35,8 @@ TEST_CASE("GraphQLTransportWS") {
   }
 
   SECTION("Connection init is sent and receives ack") {
-    auto client = test_utils::DebugAbleWsNetworkLayer({.url = test_utils::get_server_address()});
+    auto client = test_utils::DebugAbleWsNetworkLayer(
+        {.url = test_utils::get_server_address()});
     auto success =
         QTest::qWaitFor([&]() { return client.gql_is_valid(); }, 1000);
     REQUIRE(success);
@@ -55,9 +57,9 @@ TEST_CASE("GraphQLTransportWS") {
 
   SECTION("execute via environment") {
     auto env = new bases::Environment(
-        "Sample env",
-        std::shared_ptr<test_utils::DebugAbleWsNetworkLayer>(
-            new test_utils::DebugAbleWsNetworkLayer({.url = test_utils::get_server_address()})));
+        "Sample env", std::shared_ptr<test_utils::DebugAbleWsNetworkLayer>(
+                          new test_utils::DebugAbleWsNetworkLayer(
+                              {.url = test_utils::get_server_address()})));
     auto handler = std::make_shared<DebugHandler>(get_subscription_str());
     env->execute(handler);
     handler->wait_for_completed();
@@ -74,24 +76,25 @@ TEST_CASE("GraphQLTransportWS") {
   SECTION("Ping timeout close connection") {
     auto client = test_utils::DebugAbleWsNetworkLayer(
         {.handle_pong = false,
-         .prod_settings = {.url = test_utils::get_server_address(), .ping_timeout = 500}});
+         .prod_settings = {.url = test_utils::get_server_address(),
+                           .ping_timeout = 500}});
     client.wait_for_valid();
     REQUIRE(QTest::qWaitFor([&]() -> bool { return !client.is_valid(); }, 700));
   }
 
   SECTION("wont reconnect if reconnect is false") {
-    auto client =
-        test_utils::DebugAbleWsNetworkLayer({.prod_settings = {.url = test_utils::get_server_address(),
-                                                   .auto_reconnect = false}});
+    auto client = test_utils::DebugAbleWsNetworkLayer(
+        {.prod_settings = {.url = test_utils::get_server_address(),
+                           .auto_reconnect = false}});
     client.wait_for_valid();
     client.close();
     REQUIRE(QTest::qWaitFor([&]() -> bool { return !client.is_valid(); }, 700));
   }
 
   SECTION("Reconnection tests") {
-    auto client =
-        test_utils::DebugAbleWsNetworkLayer({.prod_settings = {.url = test_utils::get_server_address(),
-                                                   .auto_reconnect = true}});
+    auto client = test_utils::DebugAbleWsNetworkLayer(
+        {.prod_settings = {.url = test_utils::get_server_address(),
+                           .auto_reconnect = true}});
     client.wait_for_valid();
     client.close();
     SECTION("reconnect on disconnected") {

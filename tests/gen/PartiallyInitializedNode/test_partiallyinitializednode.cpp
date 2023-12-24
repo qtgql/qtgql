@@ -8,13 +8,15 @@ namespace PartiallyInitializedNode {
 using namespace qtgql;
 
 auto ENV_NAME = std::string("PartiallyInitializedNode");
-auto SCHEMA_ADDR = test_utils::get_server_address(QString::fromStdString(ENV_NAME));
+auto SCHEMA_ADDR =
+    test_utils::get_server_address(QString::fromStdString(ENV_NAME));
 
 TEST_CASE("PartiallyInitializedNode") {
   // resolves https://github.com/qtgql/qtgql/issues/381
   auto env = test_utils::get_or_create_env(
-      ENV_NAME, test_utils::DebugClientSettings{.print_debug = true,
-                                    .prod_settings = {.url = SCHEMA_ADDR}});
+      ENV_NAME,
+      test_utils::DebugWsClientSettings{.print_debug = true,
+                                        .prod_settings = {.url = SCHEMA_ADDR}});
 
   SECTION("test update on node type (cached) on possibly null fields.") {
     auto mq_partial = partialcreateuser::PartialCreateUser::shared();

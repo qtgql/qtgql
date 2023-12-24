@@ -7,7 +7,11 @@ target_link_libraries(${TESTS_TARGET} PRIVATE 👉 tc.test_name 👈)
 set(CODEGEN_TEST_SOURCES
 {% for tc in context.testcases -%}
 👉 tc.testcase_file.as_posix() 👈
+{% for cs_path in tc.custom_scalar_paths -%}
+👉 cs_path.as_posix() 👈
+{% endfor -%}
 {% endfor %}
+
 PARENT_SCOPE
 )
 

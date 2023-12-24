@@ -123,6 +123,14 @@ class QtGqlTypeABC(ABC):
         return f"const {self.member_type} &"
 
     @property
+    def proxy_cpp_type(self) -> str:
+        """
+        :return: The type before the qml 'serialization', This comes handy for custom scalars
+        that you have some computations to do in C++ other than showing them to the user (in QML).
+        """
+        raise NotImplementedError
+
+    @property
     def fget_type(self) -> str:
         """
 
@@ -307,6 +315,10 @@ class CustomScalarDefinition(QtGqlTypeABC):
     @property
     def property_type(self) -> str:
         return self.to_qt_type
+
+    @property
+    def proxy_cpp_type(self) -> str:
+        return self.fget_type
 
     @property
     def default_value_for_proxy(self) -> str:
@@ -534,6 +546,10 @@ class QtGqlQueriedObjectType(QtGqlQueriedTypeABC, QtGqlTypeABC):
     @cached_property
     def fields_with_args(self) -> tuple[QtGqlQueriedField, ...]:
         return tuple([field for field in self.fields if field.cached_by_args])
+
+    @cached_property
+    def fields_with_custom_getter(self) -> tuple[QtGqlQueriedField, ...]:
+        return tuple(f for f in self.fields if f.type.is_custom_scalar)
 
     @property
     def deserializer_name(self) -> str:
