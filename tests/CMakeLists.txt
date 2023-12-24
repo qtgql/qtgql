@@ -40,7 +40,7 @@ target_link_libraries(${TESTS_TARGET}
         Catch2::Catch2
         utils_for_tests
 )
-if (QTGQL_SHOULD_TEST_CORE)
+if (QTGQL_TEST_CORE)
 
     add_executable(test_core
             main.cpp
