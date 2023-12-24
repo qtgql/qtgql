@@ -110,6 +110,8 @@ jobs:
 
       - name: Conan build
         shell: bash
+        env:
+          SHOULD_TEST_CORE: ${{ env.SHOULD_TEST_CORE }}
         run: |
           if [ "$RUNNER_OS" == "Windows" ]; then
             poetry run conan build . -o test=True -s build_type=Debug  -o qt_version=${{matrix.qt_version}} -pr=profiles/Windows_mingw --build=missing;
