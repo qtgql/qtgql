@@ -13,7 +13,7 @@ auto SCHEMA_ADDR =
 TEST_CASE("ListOfScalarInInputObject") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME,
-      test_utils::DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
+      test_utils::DebugWsClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
 
   SECTION("test deserialize") {
     auto echo_op = echoarg::EchoArg::shared();

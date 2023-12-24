@@ -31,7 +31,7 @@ bool check_list_view_count(const QQuickItem *list_view, int expected) {
 TEST_CASE("QmlUsageTestCase - simple") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME,
-      test_utils::DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
+      test_utils::DebugWsClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   QQmlApplicationEngine engine;
   auto bot = test_utils::QmlBot();
 
@@ -48,7 +48,7 @@ TEST_CASE("QmlUsageTestCase - simple") {
 TEST_CASE("QmlUsageTestCase - ListView") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME,
-      test_utils::DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
+      test_utils::DebugWsClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   QQmlApplicationEngine engine;
   auto bot = test_utils::QmlBot();
   auto store_id = QUuid::createUuid().toString();

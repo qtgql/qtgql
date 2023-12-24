@@ -13,7 +13,7 @@ auto SCHEMA_ADDR =
 TEST_CASE("OptionalInput") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME,
-      test_utils::DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
+      test_utils::DebugWsClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto q = helloorechoquery::HelloOrEchoQuery::shared();
   SECTION("test deserialize") {
     QString to_compare = "foobar";

@@ -14,7 +14,7 @@ auto SCHEMA_ADDR =
 TEST_CASE("NonNodeInterface") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME,
-      test_utils::DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
+      test_utils::DebugWsClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto animal_query = animalquery::AnimalQuery::shared();
   animal_query->set_variables({NonNodeInterface::Enums::AnimalKind::DOG});
   animal_query->fetch();

@@ -15,7 +15,7 @@ auto SCHEMA_ADDR =
 TEST_CASE("Date") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME,
-      test_utils::DebugClientSettings{.print_debug = false,
+      test_utils::DebugWsClientSettings{.print_debug = false,
                                       .prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = std::make_shared<mainquery::MainQuery>();
   mq->fetch();

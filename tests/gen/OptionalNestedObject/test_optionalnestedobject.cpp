@@ -14,7 +14,7 @@ auto SCHEMA_ADDR =
 TEST_CASE("OptionalNestedObject") {
   auto env = test_utils::get_or_create_env(
       ENV_NAME,
-      test_utils::DebugClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
+      test_utils::DebugWsClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = std::make_shared<mainquery::MainQuery>();
   SECTION("test deserialize") {
     SECTION("returned null") {
