@@ -122,7 +122,6 @@ jobs:
       - name: Run tests
         shell: bash
         run: |
-
           if [ "$RUNNER_OS" == "Windows" ]; then
             poetry run pytest tests --cov=qtgqlcodegen --cov-report=xml --cov-append
           elif [ "$RUNNER_OS" == "Linux" ]; then

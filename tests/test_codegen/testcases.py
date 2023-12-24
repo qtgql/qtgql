@@ -1081,6 +1081,7 @@ PartiallyInitializedNode = QtGqlTestCase(
         should_test_deserialization=BoolWithReason.false("resolves issue #381"),
     ),
 )
+
 all_test_cases = [
     ScalarsTestCase,
     SimpleGarbageCollection,
