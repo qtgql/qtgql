@@ -178,10 +178,7 @@ class QtGqlRecipe(ConanFile):
 
     @property
     def should_test_core(self) -> bool:
-        return self._parse_conan_bool(self.options.test_core.value) or os.environ.get(
-            "SHOULD_TEST_CORE",
-            False,
-        )
+        return self._parse_conan_bool(self.options.test_core.value)
 
     def generate(self) -> None:
         deps = CMakeDeps(self)

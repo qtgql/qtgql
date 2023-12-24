@@ -18,7 +18,6 @@ def generate_testcases_by_name(testcases_names: list[str]) -> None:
             env_file = os.getenv("GITHUB_ENV")
             with open(env_file, "a") as envfile:  # noqa: PTH123
                 envfile.write("SHOULD_TEST_CORE=1")
-            os.environ.setdefault("SHOULD_TEST_CORE", "1")
 
     generate_testcases(*to_gen)
 
