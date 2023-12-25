@@ -9,7 +9,10 @@ void DebugHandler::on_next(const QJsonObject &data) {
   m_data = data;
 }
 
-void DebugHandler::on_error(const QJsonArray &errors) { m_errors = errors; }
+void DebugHandler::on_error(const QJsonArray &errors) {
+  m_completed = true;
+  m_errors = errors;
+}
 
 void DebugHandler::on_completed() { m_completed = true; }
 

@@ -3,7 +3,7 @@
 #include "utils.hpp"
 using namespace qtgql;
 
-TEST_CASE("test_fetch") {
+TEST_CASE("test graphql over http") {
   auto client = std::unique_ptr<gqloverhttp::GraphQLOverHttp>{
       new gqloverhttp::GraphQLOverHttp(
           test_utils::get_http_server_addr("graphql"), {})};
@@ -35,6 +35,18 @@ TEST_CASE("test_fetch") {
     handler->wait_for_completed();
     REQUIRE(handler->m_data["isAuthenticated"].toString().toStdString() ==
             expected_ret);
+  }
+  SECTION("test http error") {
+    client->set_headers({{"raise_http_error", "true"}});
+    auto handler =
+        std::make_shared<DebugHandler>("query HelloWorld{raiseError}");
+    client->execute(handler);
+    handler->wait_for_completed();
+    REQUIRE(handler->m_errors.first()
+                .toObject()
+                .value("message")
+                .toString()
+                .contains("This is a test error"));
   }
 }
 // TODO: add test case for network error
