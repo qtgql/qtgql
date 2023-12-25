@@ -38,7 +38,7 @@ TEST_CASE("ScalarArguments") {
     nl->set_headers({{{"NODE_ID"}, {container->get_id()}}});
     nl->reconnect();
     test_utils::SignalCatcher catcher({.source_obj = container});
-    mq->refetch();
+    mq->execute()();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(mq);
     REQUIRE(container->get_i() != int_exp);
