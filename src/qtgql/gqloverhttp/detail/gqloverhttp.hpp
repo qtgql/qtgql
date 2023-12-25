@@ -69,6 +69,7 @@ public:
 
   // execute a handler for execution.
   void execute(const std::shared_ptr<bases::HandlerABC> &handler) override {
+    auto execution_id = handler->get_execution_id();
     QJsonDocument data(handler->message().serialize());
     auto reply = m_manager->post(_GraphQLRequest(m_url, m_headers),
                                  QByteArray(data.toJson()));
@@ -76,15 +77,19 @@ public:
     QObject::connect(reply, &QNetworkReply::finished, [=]() {
       if (reply->error() == QNetworkReply::NoError) {
         auto contents = reply->readAll();
-        process_reply(contents, handler);
+        process_reply(execution_id, contents, handler);
       } else {
         qWarning() << reply->errorString();
       }
       reply->deleteLater();
     });
   };
-  static void process_reply(const QByteArray &raw_data,
+  static void process_reply(const QUuid &execution_id,
+                            const QByteArray &raw_data,
                             const std::shared_ptr<bases::HandlerABC> &handler) {
+    if (execution_id != handler->get_execution_id()) {
+      return; // ignore the reply, the handler already called execute again.
+    };
     auto response = GraphQLResponse(QJsonDocument::fromJson(raw_data).object());
     if (response.errors.has_value()) {
       handler->on_error(response.errors.value());

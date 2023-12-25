@@ -124,13 +124,13 @@ class QtGqlRecipe(ConanFile):
     options = {  # noqa
         "qt_version": ["6.5.0", "6.6.0"],
         "verbose": ConanBool,
-        "test": ConanBool,
+        "test_gen": ConanBool,
         "test_core": ConanBool,
     }
     default_options = {  # noqa
         "verbose": False,
         "qt_version": "6.5.0",
-        "test": False,
+        "test_gen": False,
         "test_core": False,
     }
 
@@ -173,8 +173,8 @@ class QtGqlRecipe(ConanFile):
         return False
 
     @property
-    def should_test(self) -> bool:
-        return self._parse_conan_bool(self.options.test.value)
+    def should_test_generated(self) -> bool:
+        return self._parse_conan_bool(self.options.test_gen.value)
 
     @property
     def should_test_core(self) -> bool:
@@ -206,7 +206,7 @@ class QtGqlRecipe(ConanFile):
             qt_installer.dll_path,
         )  # used by catch2 to discover tests/
         tc.cache_variables["Qt6_DIR"] = str(qt_installer.qt6_cmake_config)
-        tc.cache_variables["QTGQL_TESTING"] = self.should_test
+        tc.cache_variables["QTGQL_TEST_GEN"] = self.should_test_generated
         tc.cache_variables["QTGQL_TEST_CORE"] = self.should_test_core
         tc.cache_variables["TESTS_QML_DIR"] = (self.build_path / "tests").as_posix()
         if self.is_windows:

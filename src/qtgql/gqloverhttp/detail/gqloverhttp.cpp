@@ -1,7 +1,5 @@
 #include "gqloverhttp.hpp"
 
-#include <utility>
-
 namespace qtgql::gqloverhttp {
 
 GraphQLResponse::GraphQLResponse(const QJsonObject &payload) {

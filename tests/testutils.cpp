@@ -32,9 +32,9 @@ void DebugAbleWsNetworkLayer::onTextMessageReceived(
     if (data.contains("id")) {
       // Any that contains ID is directed to a single handler.
       auto message = gqltransportws::GqlTrnsWsMsgWithID(data);
-      if (message.type == qtgql::gqltransportws::PROTOCOL::NEXT) {
+      if (message.type == qtgql::gqltransportws::PROTOCOL::NEXT()) {
         m_current_message = message.payload;
-      } else if (message.type == qtgql::gqltransportws::PROTOCOL::COMPLETE) {
+      } else if (message.type == qtgql::gqltransportws::PROTOCOL::COMPLETE()) {
         if (m_settings.print_debug) {
           qDebug() << "Completed";
         }
@@ -42,12 +42,12 @@ void DebugAbleWsNetworkLayer::onTextMessageReceived(
     } else {
       auto message = gqltransportws::BaseGqlTrnsWsMsg(data);
       auto message_type = message.type;
-      if (message_type == gqltransportws::PROTOCOL::PONG) {
+      if (message_type == gqltransportws::PROTOCOL::PONG()) {
         m_pong_received = true;
         if (!m_settings.handle_pong) {
           return;
         }
-      } else if (message_type == gqltransportws::PROTOCOL::CONNECTION_ACK &&
+      } else if (message_type == gqltransportws::PROTOCOL::CONNECTION_ACK() &&
                  !m_settings.handle_ack) {
         return;
       }

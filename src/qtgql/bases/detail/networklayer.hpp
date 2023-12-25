@@ -50,6 +50,11 @@ struct QTGQL_EXPORT HandlerABC {
   virtual void on_completed() = 0;
 
   virtual const GraphQLMessage &message() = 0;
+
+  virtual QUuid get_execution_id();
+
+protected:
+  QUuid m_execution_id = QUuid::createUuid();
 };
 
 /*

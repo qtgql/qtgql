@@ -1,7 +1,6 @@
 find_package(Qt6 REQUIRED COMPONENTS Test Core Network)
 find_package(Catch2 REQUIRED COMPONENTS Catch2)
 include(Catch)
-set(TESTS_TARGET "test_qtgql")
 set(CMAKE_OBJECT_PATH_MAX 9999)
 
 add_library(utils_for_tests
@@ -17,29 +16,34 @@ target_link_libraries(utils_for_tests
         qtgql
         Catch2::Catch2
 )
+if (QTGQL_TEST_GEN)
+set(TESTS_TARGET "test_generated")
+    add_executable(${TESTS_TARGET}
+            main.cpp
+            ${CODEGEN_TEST_SOURCES}
+    )
+    add_compile_definitions(TESTS_QML_DIR=${TESTS_QML_DIR} ${TESTS_TARGET})
+    include_directories(../tests)
+    add_subdirectory(gen)
+    target_sources(${TESTS_TARGET}
+            PRIVATE
+            ${CODEGEN_TEST_SOURCES}
+    )
 
-add_executable(${TESTS_TARGET}
-        main.cpp
-        ${CODEGEN_TEST_SOURCES}
-)
-add_compile_definitions(TESTS_QML_DIR=${TESTS_QML_DIR} ${TESTS_TARGET})
-include_directories(../tests)
-add_subdirectory(gen)
-target_sources(${TESTS_TARGET}
-        PRIVATE
-        ${CODEGEN_TEST_SOURCES}
-)
-
-target_compile_features(${TESTS_TARGET} PRIVATE cxx_std_17)
-set_target_properties(${TESTS_TARGET} PROPERTIES AUTOMOC TRUE)
-target_link_libraries(${TESTS_TARGET}
- PUBLIC
-        Qt6::Test
-        Qt6::Qml
-        qtgql
-        Catch2::Catch2
-        utils_for_tests
-)
+    target_compile_features(${TESTS_TARGET} PRIVATE cxx_std_17)
+    set_target_properties(${TESTS_TARGET} PROPERTIES AUTOMOC TRUE)
+    target_link_libraries(${TESTS_TARGET}
+     PUBLIC
+            Qt6::Test
+            Qt6::Qml
+            qtgql
+            Catch2::Catch2
+            utils_for_tests
+    )
+    catch_discover_tests(${TESTS_TARGET}
+            DL_PATHS ${QT_DL_LIBRARIES}
+    )
+endif()
 if (QTGQL_TEST_CORE)
 
     add_executable(test_core
@@ -65,7 +69,3 @@ if (QTGQL_TEST_CORE)
             DL_PATHS ${QT_DL_LIBRARIES}
     )
 endif()
-
-catch_discover_tests(${TESTS_TARGET}
-        DL_PATHS ${QT_DL_LIBRARIES}
-)
