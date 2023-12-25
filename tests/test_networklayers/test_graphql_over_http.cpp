@@ -49,4 +49,3 @@ TEST_CASE("test graphql over http") {
                 .contains("This is a test error"));
   }
 }
-// TODO: add test case for network error
