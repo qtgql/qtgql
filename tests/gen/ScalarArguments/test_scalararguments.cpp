@@ -20,7 +20,7 @@ TEST_CASE("ScalarArguments") {
   QString string_exp("foobar");
   auto uuid_exp = QUuid::createUuid();
   mq->set_variables({int_exp, float_exp, string_exp, false, uuid_exp});
-  mq->fetch();
+  mq->execute();
   test_utils::wait_for_completion(mq);
   auto container = mq->data()->get_getContainer();
 

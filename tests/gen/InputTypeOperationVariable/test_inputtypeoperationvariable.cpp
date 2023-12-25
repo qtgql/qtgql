@@ -19,7 +19,7 @@ TEST_CASE("InputTypeOperationVariable") {
   QString old_post_content("this is a great post about elephants");
   create_post->set_variables(
       {CreatePostInput::create(old_post_content, "Post header")});
-  create_post->fetch();
+  create_post->execute();
   test_utils::wait_for_completion(create_post);
   auto post = create_post->data()->get_createPost();
   SECTION("test deserialize") {
@@ -32,7 +32,7 @@ TEST_CASE("InputTypeOperationVariable") {
     update_post->set_variables(
         {ModifyPostContentInput::create(post->get_id(), new_content)});
     test_utils::SignalCatcher catcher({.source_obj = post, .only = "content"});
-    update_post->fetch();
+    update_post->execute();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(update_post);
     REQUIRE(post->get_content() == new_content);

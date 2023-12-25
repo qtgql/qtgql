@@ -37,3 +37,4 @@ TEST_CASE("test_fetch") {
             expected_ret);
   }
 }
+// TODO: add test case for network error

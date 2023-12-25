@@ -17,7 +17,7 @@ TEST_CASE("NestedObject") {
       ENV_NAME,
       test_utils::DebugWsClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = std::make_shared<mainquery::MainQuery>();
-  mq->fetch();
+  mq->execute();
   test_utils::wait_for_completion(mq);
   SECTION("test deserialize") {
     auto name = mq->data()->get_user()->get_person()->get_name();
@@ -28,7 +28,7 @@ TEST_CASE("NestedObject") {
     auto change_user_name_op = updateusername::UpdateUserName::shared();
     QString new_name = "שלום";
     change_user_name_op->set_variables({old_user->get_id(), new_name});
-    change_user_name_op->fetch();
+    change_user_name_op->execute();
     auto inner_person = old_user->get_person();
     auto catcher =
         test_utils::SignalCatcher({.source_obj = inner_person, .only = "name"});
@@ -47,7 +47,7 @@ TEST_CASE("NestedObject") {
     auto old_person_id = user_inst_from_mq->get_person()->get_id();
     auto replace_person_op = replaceperson::ReplacePerson::shared();
     replace_person_op->set_variables({old_user_id});
-    replace_person_op->fetch();
+    replace_person_op->execute();
     // The current mechanism is to replace the instance with the new concrete.
     auto catcher = test_utils::SignalCatcher(
         {.source_obj = user_inst_from_mq->get_person(), .only = "name"});

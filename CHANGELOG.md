@@ -602,7 +602,7 @@ You could set `$returnNone` to `true` like this.
 ```cpp
 auto mq = std::make_shared<mainquery::MainQuery>();
 mq->setVariables({true});
-mq->fetch();
+mq->execute();
 ```
 
 Contributed by [ניר](https://github.com/nrbnlulu) via [PR #219](https://github.com/qtgql/qtgql/pull/219/)

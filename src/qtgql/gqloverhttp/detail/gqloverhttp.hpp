@@ -75,21 +75,25 @@ public:
                                  QByteArray(data.toJson()));
 
     QObject::connect(reply, &QNetworkReply::finished, [=]() {
+      if (execution_id != handler->get_execution_id()) {
+        // the handler has been invalidated.
+        return;
+      };
       if (reply->error() == QNetworkReply::NoError) {
         auto contents = reply->readAll();
-        process_reply(execution_id, contents, handler);
+        process_reply(contents, handler);
       } else {
         qWarning() << reply->errorString();
+        handler->on_error(QJsonArray({QJsonObject({
+            {"message", reply->errorString()},
+        })}));
       }
       reply->deleteLater();
     });
   };
-  static void process_reply(const QUuid &execution_id,
-                            const QByteArray &raw_data,
+  static void process_reply(const QByteArray &raw_data,
                             const std::shared_ptr<bases::HandlerABC> &handler) {
-    if (execution_id != handler->get_execution_id()) {
-      return; // ignore the reply, the handler already called execute again.
-    };
+
     auto response = GraphQLResponse(QJsonDocument::fromJson(raw_data).object());
     if (response.errors.has_value()) {
       handler->on_error(response.errors.value());

@@ -15,7 +15,7 @@ TEST_CASE("NonNodeType") {
       ENV_NAME,
       test_utils::DebugWsClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = mainquery::MainQuery::shared();
-  mq->fetch();
+  mq->execute();
   test_utils::wait_for_completion(mq);
   SECTION("test deserialize") {
     REQUIRE(!mq->data()->get_user()->get_name().isEmpty());
@@ -23,7 +23,7 @@ TEST_CASE("NonNodeType") {
   SECTION("test update") {
     auto prev_name = mq->data()->get_user()->get_name();
     auto mq2 = mainquery::MainQuery::shared();
-    mq2->fetch();
+    mq2->execute();
     test_utils::wait_for_completion(mq2);
     auto new_name = mq2->data()->get_user()->get_name();
     qDebug() << new_name << "old name is " << prev_name;

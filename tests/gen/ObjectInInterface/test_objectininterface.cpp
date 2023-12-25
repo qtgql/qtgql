@@ -18,7 +18,7 @@ TEST_CASE("ObjectInInterface") {
   SECTION("test deserialize") {
     auto animal_query = animal::Animal::shared();
     animal_query->set_variables({Enums::AnimalKind::DOG});
-    animal_query->fetch();
+    animal_query->execute();
     test_utils::wait_for_completion(animal_query);
     auto animal = animal_query->data()->get_animal();
     REQUIRE(animal->get_metadata()->get_kind() == Enums::AnimalKind::DOG);

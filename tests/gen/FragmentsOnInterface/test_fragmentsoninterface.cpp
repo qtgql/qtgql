@@ -18,7 +18,7 @@ TEST_CASE("FragmentsOnInterface") {
 
   auto animal_query = animalquery::AnimalQuery::shared();
   animal_query->set_variables({Enums::AnimalKind::DOG});
-  animal_query->fetch();
+  animal_query->execute();
   test_utils::wait_for_completion(animal_query);
   SECTION("test deserialize") {
     auto animal = animal_query->data()->get_animal();
@@ -45,7 +45,7 @@ TEST_CASE("FragmentsOnInterface") {
     // field
     auto animal_id = animal_query->data()->get_animal()->get_id();
     change_age_mut->set_variables({animal_id, 156});
-    change_age_mut->fetch();
+    change_age_mut->execute();
     test_utils::wait_for_completion(change_age_mut);
     // now we can test the update.
     int new_age = 2223432;

@@ -20,13 +20,13 @@ TEST_CASE("PartiallyInitializedNode") {
 
   SECTION("test update on node type (cached) on possibly null fields.") {
     auto mq_partial = partialcreateuser::PartialCreateUser::shared();
-    mq_partial->fetch();
+    mq_partial->execute();
     test_utils::wait_for_completion(mq_partial);
     REQUIRE(mq_partial->data()->get_createUser()->get_age() > 0);
     auto user_id = mq_partial->data()->get_createUser()->get_id();
     auto full_user = getuserbyid::GetUserById::shared();
     full_user->set_variables({user_id});
-    full_user->fetch();
+    full_user->execute();
     test_utils::wait_for_completion(full_user);
   };
 }

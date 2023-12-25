@@ -19,7 +19,7 @@ TEST_CASE("GqlOverHttpAsEnv") {
                                                     std::move(gql_over_http));
     bases::Environment::set_gql_env(env);
     auto mq = std::make_shared<mainquery::MainQuery>();
-    mq->fetch();
+    mq->execute();
     test_utils::wait_for_completion(mq);
     auto d = mq->data()->get_constUser();
     REQUIRE(d->get_age() == 24);

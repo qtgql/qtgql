@@ -20,28 +20,28 @@ TEST_CASE("OptionalNestedObject") {
     SECTION("returned null") {
       mq->set_variables({true});
       qDebug() << "Fetching null person";
-      mq->fetch();
+      mq->execute();
       test_utils::wait_for_completion(mq);
       auto p = mq->data()->get_user()->get_person();
       REQUIRE(p == nullptr);
     };
     mq->set_variables({false});
     SECTION("returned value") {
-      mq->fetch();
+      mq->execute();
       test_utils::wait_for_completion(mq);
       auto p = mq->data()->get_user()->get_person();
       REQUIRE(p->get_name() == "nir");
     };
   }
   mq->set_variables({false});
-  mq->fetch();
+  mq->execute();
   test_utils::wait_for_completion(mq);
   SECTION("test updates") {
     auto old_user = mq->data()->get_user();
     auto change_user_name_op = updateusername::UpdateUserName::shared();
     QString new_name = "שלום";
     change_user_name_op->set_variables({old_user->get_id(), new_name});
-    change_user_name_op->fetch();
+    change_user_name_op->execute();
     auto inner_person = old_user->get_person();
     auto catcher =
         test_utils::SignalCatcher({.source_obj = inner_person, .only = "name"});

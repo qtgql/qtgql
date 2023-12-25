@@ -18,7 +18,7 @@ TEST_CASE("Date") {
       test_utils::DebugWsClientSettings{.print_debug = false,
                                         .prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = std::make_shared<mainquery::MainQuery>();
-  mq->fetch();
+  mq->execute();
   test_utils::wait_for_completion(mq);
   SECTION("test deserialize") {
     auto user = mq->data()->get_user();
@@ -34,7 +34,7 @@ TEST_CASE("Date") {
     modified_user_op->set_variables({{new_birth}, user_id});
     auto catcher =
         test_utils::SignalCatcher({.source_obj = old_user, .only = "birth"});
-    modified_user_op->fetch();
+    modified_user_op->execute();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(modified_user_op);
     auto new_user = modified_user_op->data()->get_changeBirth();

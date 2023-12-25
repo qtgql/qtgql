@@ -18,7 +18,7 @@ TEST_CASE("ListOfScalarArgument") {
     auto mq = echoarg::EchoArg::shared();
     std::list<QString> echo_me = {"A", "B", "C"};
     mq->set_variables({.what = {echo_me}});
-    mq->fetch();
+    mq->execute();
     test_utils::wait_for_completion(mq);
     auto model = mq->data()->get_echo();
     REQUIRE(model->rowCount() > 0);

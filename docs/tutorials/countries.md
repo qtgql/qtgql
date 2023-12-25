@@ -419,7 +419,7 @@ int main(int argc, char *argv[]){
     // Create an operation handler
     auto cont_query = Countries::continentquery::ContinentQuery::shared();
     cont_query->set_variables(Countries::continentquery::ContinentQueryVariables{.code="EU"});
-    cont_query->fetch();
+    cont_query->execute();
     engine.rootContext()->setContextProperty("query", cont_query.get());
     QUrl url((fs::path(__FILE__).parent_path() / "qml" / "main.qml").c_str());
     engine.load(url);

@@ -18,7 +18,7 @@ TEST_CASE("Enum") {
       test_utils::DebugWsClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
 
   auto mq = std::make_shared<mainquery::MainQuery>();
-  mq->fetch();
+  mq->execute();
   test_utils::wait_for_completion(mq);
   SECTION("test deserialize") {
     REQUIRE(mq->data()->get_user()->get_status() == Enum::Enums::Connected);
@@ -31,7 +31,7 @@ TEST_CASE("Enum") {
     update_status->set_variables({user->get_id(), new_status});
     auto catcher =
         test_utils::SignalCatcher({.source_obj = user, .only = "status"});
-    update_status->fetch();
+    update_status->execute();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(update_status);
     REQUIRE(user->get_status() == new_status);

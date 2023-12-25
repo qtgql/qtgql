@@ -204,11 +204,8 @@ inline bool operation_on_flight() const{
 }
 
 public slots:
-void fetch(){
-    m_operation->fetch();
-};
-void refetch(){
-    m_operation->refetch();
+void execute(){
+    m_operation->execute();
 };
 
 signals:

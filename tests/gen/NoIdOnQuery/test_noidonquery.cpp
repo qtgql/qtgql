@@ -15,7 +15,7 @@ TEST_CASE("NoIdOnQuery") {
       ENV_NAME,
       test_utils::DebugWsClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = std::make_shared<mainquery::MainQuery>();
-  mq->fetch();
+  mq->execute();
   test_utils::wait_for_completion(mq);
   SECTION("test deserialize and appends ID selection to query") {
     REQUIRE(mq->data()->get_user()->get_id() != bases::DEFAULTS::ID);

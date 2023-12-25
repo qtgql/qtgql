@@ -18,14 +18,14 @@ TEST_CASE("OptionalInput") {
   SECTION("test deserialize") {
     QString to_compare = "foobar";
     q->set_variables({{to_compare}});
-    q->fetch();
+    q->execute();
     test_utils::wait_for_completion(q);
     REQUIRE(q->data()->get_echoOrHello().startsWith(to_compare));
   };
   SECTION("test update with variable") {
     QString to_compare = "foobar";
     q->set_variables({{to_compare}});
-    q->fetch();
+    q->execute();
     test_utils::wait_for_completion(q);
     test_utils::SignalCatcher catcher(
         {.source_obj = q->data(), .only = "echoOrHello"});
@@ -35,12 +35,12 @@ TEST_CASE("OptionalInput") {
     REQUIRE(prev != q->data()->get_echoOrHello());
   }
   SECTION("test deserialize no variable set.") {
-    q->fetch();
+    q->execute();
     test_utils::wait_for_completion(q);
     REQUIRE(q->data()->get_echoOrHello().startsWith("Hello World!"));
   };
   SECTION("test update no variable") {
-    q->fetch();
+    q->execute();
     test_utils::wait_for_completion(q);
     test_utils::SignalCatcher catcher(
         {.source_obj = q->data(), .only = "echoOrHello"});

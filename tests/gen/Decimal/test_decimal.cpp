@@ -17,7 +17,7 @@ TEST_CASE("Decimal") {
       ENV_NAME,
       test_utils::DebugWsClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = std::make_shared<mainquery::MainQuery>();
-  mq->fetch();
+  mq->execute();
   test_utils::wait_for_completion(mq);
 
   SECTION("test deserialize") {
@@ -32,7 +32,7 @@ TEST_CASE("Decimal") {
     modified_user_op->set_variables({{new_balance}, user_id});
     auto catcher =
         test_utils::SignalCatcher({.source_obj = old_user, .only = "balance"});
-    modified_user_op->fetch();
+    modified_user_op->execute();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(modified_user_op);
     auto new_user = modified_user_op->data()->get_changeBalance();

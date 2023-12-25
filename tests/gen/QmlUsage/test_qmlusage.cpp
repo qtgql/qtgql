@@ -54,7 +54,7 @@ TEST_CASE("QmlUsageTestCase - ListView") {
   auto store_id = QUuid::createUuid().toString();
   auto friends_query = friendslistquery::FriendsListQuery::shared();
   friends_query->set_variables({store_id});
-  friends_query->fetch();
+  friends_query->execute();
   test_utils::wait_for_completion(friends_query);
   auto main_qml = fs::path(__FILE__).parent_path() / "testlistview.qml";
   auto root_qquickitem = bot.load(main_qml);
@@ -69,7 +69,7 @@ TEST_CASE("QmlUsageTestCase - ListView") {
     REQUIRE(check_list_view_count(list_view, friends_count));
     auto remove_friend_mut = removefriend::RemoveFriend::shared();
     remove_friend_mut->set_variables({store_id, last_friend_id});
-    remove_friend_mut->fetch();
+    remove_friend_mut->execute();
     test_utils::wait_for_completion(remove_friend_mut);
     friends_query->refetch();
     test_utils::wait_for_completion(friends_query);
@@ -82,7 +82,7 @@ TEST_CASE("QmlUsageTestCase - ListView") {
     REQUIRE(check_list_view_count(list_view, friends_count));
     auto remove_friends_mut = removefriendsbatch::RemoveFriendsBatch::shared();
     remove_friends_mut->set_variables({store_id, {f_1_id, f_2_id}});
-    remove_friends_mut->fetch();
+    remove_friends_mut->execute();
     test_utils::wait_for_completion(remove_friends_mut);
     friends_query->refetch();
     test_utils::wait_for_completion(friends_query);
