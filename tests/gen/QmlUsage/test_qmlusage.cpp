@@ -71,7 +71,7 @@ TEST_CASE("QmlUsageTestCase - ListView") {
     remove_friend_mut->set_variables({store_id, last_friend_id});
     remove_friend_mut->execute();
     test_utils::wait_for_completion(remove_friend_mut);
-    friends_query->execute();
+    friends_query->execute(true);
     test_utils::wait_for_completion(friends_query);
     REQUIRE(check_list_view_count(list_view, friends_count - 1));
   }
@@ -84,7 +84,7 @@ TEST_CASE("QmlUsageTestCase - ListView") {
     remove_friends_mut->set_variables({store_id, {f_1_id, f_2_id}});
     remove_friends_mut->execute();
     test_utils::wait_for_completion(remove_friends_mut);
-    friends_query->execute();
+    friends_query->execute(true);
     test_utils::wait_for_completion(friends_query);
     REQUIRE(check_list_view_count(list_view, friends_count - 2));
   }

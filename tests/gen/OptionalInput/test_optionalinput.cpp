@@ -1,7 +1,6 @@
 #include "gen/HelloOrEchoQuery.hpp"
 #include "testframework.hpp"
 #include "testutils.hpp"
-#include <QSignalSpy>
 
 namespace OptionalInput {
 using namespace qtgql;
@@ -30,7 +29,7 @@ TEST_CASE("OptionalInput") {
     test_utils::SignalCatcher catcher(
         {.source_obj = q->data(), .only = "echoOrHello"});
     auto prev = q->data()->get_echoOrHello();
-    q->execute();
+    q->execute(true);
     REQUIRE(catcher.wait());
     REQUIRE(prev != q->data()->get_echoOrHello());
   }
@@ -45,7 +44,7 @@ TEST_CASE("OptionalInput") {
     test_utils::SignalCatcher catcher(
         {.source_obj = q->data(), .only = "echoOrHello"});
     auto prev = q->data()->get_echoOrHello();
-    q->execute();
+    q->execute(true);
     REQUIRE(catcher.wait());
     REQUIRE(prev != q->data()->get_echoOrHello());
   }
