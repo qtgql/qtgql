@@ -25,18 +25,19 @@ TEST_CASE("OptionalNestedObject") {
       auto p = mq->data()->get_user()->get_person();
       REQUIRE(p == nullptr);
     };
-    mq->set_variables({false});
     SECTION("returned value") {
+      mq->set_variables({false});
       mq->execute();
       test_utils::wait_for_completion(mq);
       auto p = mq->data()->get_user()->get_person();
       REQUIRE(p->get_name() == "nir");
     };
   }
-  mq->set_variables({false});
-  mq->execute();
-  test_utils::wait_for_completion(mq);
+
   SECTION("test updates") {
+    mq->set_variables({false});
+    mq->execute();
+    test_utils::wait_for_completion(mq);
     auto old_user = mq->data()->get_user();
     auto change_user_name_op = updateusername::UpdateUserName::shared();
     QString new_name = "שלום";

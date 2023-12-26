@@ -77,9 +77,11 @@ public:
                  "instantiate this with `std::make_shared`");
 
       environment()->execute(a);
+    } else {
+      qDebug()
+          << "OperationHandlerABC::execute() called twice! and no variables "
+             "have changed. or force was not set to true.";
     }
-    qDebug() << "OperationHandlerABC::execute() called twice! and no variables "
-                "have changed.";
   }
   /**
    * @brief invalidate the current operation.

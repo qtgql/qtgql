@@ -1,7 +1,6 @@
 #include "gen/MainQuery.hpp"
 #include "testframework.hpp"
 #include "testutils.hpp"
-#include <QSignalSpy>
 
 namespace ScalarArguments {
 using namespace qtgql;
@@ -38,7 +37,7 @@ TEST_CASE("ScalarArguments") {
     nl->set_headers({{{"NODE_ID"}, {container->get_id()}}});
     nl->reconnect();
     test_utils::SignalCatcher catcher({.source_obj = container});
-    mq->execute();
+    mq->execute(true);
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(mq);
     REQUIRE(container->get_i() != int_exp);
