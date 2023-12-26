@@ -15,7 +15,7 @@ TEST_CASE("ObjectWithListOfObject") {
       ENV_NAME,
       test_utils::DebugWsClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = mainquery::MainQuery::shared();
-  mq->fetch();
+  mq->execute();
   test_utils::wait_for_completion(mq);
   SECTION("test deserialize") {
     auto friends = mq->data()->get_user()->get_friends();
@@ -28,7 +28,7 @@ TEST_CASE("ObjectWithListOfObject") {
     auto mq_model = mq->data()->get_user()->get_friends();
     auto before_count = mq_model->rowCount();
     add_friend_mut->set_variables({mq->data()->get_user()->get_id(), new_name});
-    add_friend_mut->fetch();
+    add_friend_mut->execute();
     test_utils::wait_for_completion(add_friend_mut);
     // add friend mutation will add friend to the user with name X
     // when the updated user data returns from the mutation, the list on the

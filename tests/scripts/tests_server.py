@@ -3,6 +3,7 @@ from __future__ import annotations
 import random
 from typing import TYPE_CHECKING, AsyncGenerator
 
+import aiohttp.web_request
 import strawberry
 from aiohttp import web
 from faker import Faker
@@ -13,6 +14,7 @@ from tests.test_codegen.schemas.node_interface import Node
 from tests.test_codegen.testcases import implemented_testcases
 
 if TYPE_CHECKING:
+    from strawberry.http.typevars import Request
     from strawberry.types import Info
 
 fake = Faker()
@@ -100,6 +102,12 @@ class DebugGqlView(GraphQLView):
         super().__init__(*args, **kwargs)
         self.graphql_transport_ws_handler_class.testcase_name = testcase_name
         self.request_adapter_class.testcase_name = testcase_name
+
+    async def __call__(self, request: Request) -> web.StreamResponse:
+        if isinstance(request, aiohttp.web_request.Request):
+            if request.headers.get("raise_http_error"):
+                return web.HTTPBadRequest(reason="This is a test error")
+        return await super().__call__(request)
 
 
 app = web.Application()

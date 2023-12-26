@@ -18,7 +18,7 @@ TEST_CASE("FragmentsOnInterface") {
 
   auto animal_query = animalquery::AnimalQuery::shared();
   animal_query->set_variables({Enums::AnimalKind::DOG});
-  animal_query->fetch();
+  animal_query->execute();
   test_utils::wait_for_completion(animal_query);
   SECTION("test deserialize") {
     auto animal = animal_query->data()->get_animal();
@@ -30,7 +30,7 @@ TEST_CASE("FragmentsOnInterface") {
     auto root = animal_query->data();
     animal_query->set_variables({Enums::AnimalKind::PERSON});
     test_utils::SignalCatcher catcher({.source_obj = root, .only = "animal"});
-    animal_query->refetch();
+    animal_query->execute();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(animal_query);
     REQUIRE(animal_query->data()->get_animal()->get_kind() == Enums::PERSON);
@@ -45,14 +45,14 @@ TEST_CASE("FragmentsOnInterface") {
     // field
     auto animal_id = animal_query->data()->get_animal()->get_id();
     change_age_mut->set_variables({animal_id, 156});
-    change_age_mut->fetch();
+    change_age_mut->execute();
     test_utils::wait_for_completion(change_age_mut);
     // now we can test the update.
     int new_age = 2223432;
     test_utils::SignalCatcher catcher(
         {.source_obj = change_age_mut->data(), .only = "changeAge"});
     change_age_mut->set_variables({animal_id, new_age});
-    change_age_mut->refetch();
+    change_age_mut->execute();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(change_age_mut);
     REQUIRE(change_age_mut->data()->get_changeAge()->get_age() == new_age);

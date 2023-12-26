@@ -20,7 +20,7 @@ TEST_CASE("ListOfInputObject") {
     auto echo_query = mainquery::MainQuery::shared();
     std::list<ListOfInputObject::Echo> what_list = {{"What"}, {"Am"}, {"I"}};
     echo_query->set_variables({ListOfInputObject::What::create(what_list)});
-    echo_query->fetch();
+    echo_query->execute();
     test_utils::wait_for_completion(echo_query);
     auto model = echo_query->data()->get_echo();
     REQUIRE(model->rowCount() > 0);

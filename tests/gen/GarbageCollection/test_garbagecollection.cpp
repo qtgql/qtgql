@@ -12,7 +12,7 @@ auto SCHEMA_ADDR =
 using namespace std::chrono_literals;
 std::shared_ptr<GarbageCollection::User> get_shared_user() {
   auto mq = std::make_shared<mainquery::MainQuery>();
-  mq->fetch();
+  mq->execute();
   test_utils::wait_for_completion(mq);
   auto node_id = mq->data()->get_constUser()->get_id();
   REQUIRE(mq.use_count() == 1);

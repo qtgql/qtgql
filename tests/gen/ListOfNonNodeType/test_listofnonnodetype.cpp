@@ -17,7 +17,7 @@ TEST_CASE("ListOfNonNodeType") {
       ENV_NAME,
       test_utils::DebugWsClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = mainquery::MainQuery::shared();
-  mq->fetch();
+  mq->execute();
   test_utils::wait_for_completion(mq);
   SECTION("test deserialize") {
     auto user = mq->data()->get_users()->first();
@@ -30,10 +30,10 @@ TEST_CASE("ListOfNonNodeType") {
     REQUIRE(prev_name != new_name);
     auto change_username_mut = changeusername::ChangeUserName::shared();
     change_username_mut->set_variables({0, new_name});
-    change_username_mut->fetch();
+    change_username_mut->execute();
     test_utils::wait_for_completion(change_username_mut);
     test_utils::SignalCatcher catcher({.source_obj = user, .only = "name"});
-    mq->refetch();
+    mq->execute(true);
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(mq);
     REQUIRE(user->get_name().toStdString() == new_name.toStdString());
@@ -44,9 +44,9 @@ TEST_CASE("ListOfNonNodeType") {
     auto insert_user = insertuser::InsertUser::shared();
     QString user_name("fobar");
     insert_user->set_variables({3, user_name});
-    insert_user->fetch();
+    insert_user->execute();
     test_utils::wait_for_completion(insert_user);
-    mq->refetch();
+    mq->execute(true);
     test_utils::wait_for_completion(mq);
     REQUIRE(model->rowCount() == prev_len + 1);
     REQUIRE(model->get(3)->get_name().toStdString() == user_name.toStdString());

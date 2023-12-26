@@ -1,7 +1,6 @@
 #include "gen/MainQuery.hpp"
 #include "testframework.hpp"
 #include "testutils.hpp"
-#include <QSignalSpy>
 
 namespace ScalarArguments {
 using namespace qtgql;
@@ -20,7 +19,7 @@ TEST_CASE("ScalarArguments") {
   QString string_exp("foobar");
   auto uuid_exp = QUuid::createUuid();
   mq->set_variables({int_exp, float_exp, string_exp, false, uuid_exp});
-  mq->fetch();
+  mq->execute();
   test_utils::wait_for_completion(mq);
   auto container = mq->data()->get_getContainer();
 
@@ -38,7 +37,7 @@ TEST_CASE("ScalarArguments") {
     nl->set_headers({{{"NODE_ID"}, {container->get_id()}}});
     nl->reconnect();
     test_utils::SignalCatcher catcher({.source_obj = container});
-    mq->refetch();
+    mq->execute(true);
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(mq);
     REQUIRE(container->get_i() != int_exp);

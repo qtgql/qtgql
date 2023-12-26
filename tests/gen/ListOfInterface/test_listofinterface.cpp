@@ -18,7 +18,7 @@ TEST_CASE("ListOfInterfaceTestcase") {
       ENV_NAME,
       test_utils::DebugWsClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = mainquery::MainQuery::shared();
-  mq->fetch();
+  mq->execute();
   test_utils::wait_for_completion(mq);
   SECTION("test deserialize") {
     auto root = mq->data();
@@ -49,7 +49,7 @@ TEST_CASE("ListOfInterfaceTestcase") {
     }
     REQUIRE(!name_for_third_item.isEmpty());
     remove_mut->set_variables({person->get_id(), 3});
-    remove_mut->fetch();
+    remove_mut->execute();
     test_utils::wait_for_completion(remove_mut);
     REQUIRE(model->get(3)->property("name").toString() != name_for_third_item);
   };
@@ -59,7 +59,7 @@ TEST_CASE("ListOfInterfaceTestcase") {
     auto model = person->get_pets();
     QString new_name("Frank Zappa");
     modify_mut->set_variables({person->get_id(), 3, new_name});
-    modify_mut->fetch();
+    modify_mut->execute();
     test_utils::wait_for_completion(modify_mut);
     REQUIRE(model->get(3)->get_name().toStdString() == new_name.toStdString());
   }
@@ -71,7 +71,7 @@ TEST_CASE("ListOfInterfaceTestcase") {
     auto prev_length = model->rowCount();
     insert_mut->set_variables({person->get_id(), prev_length + 1, name_to_set,
                                ListOfInterface::Enums::UnionTypes::DOG});
-    insert_mut->fetch();
+    insert_mut->execute();
     test_utils::wait_for_completion(insert_mut);
     REQUIRE(prev_length < model->rowCount());
     qDebug() << model->last();

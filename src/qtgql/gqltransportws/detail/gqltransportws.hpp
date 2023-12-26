@@ -17,17 +17,18 @@ namespace qtgql::gqltransportws {
 // The WebSocket sub-protocol for this specification is: graphql-transport-
 // ws.
 // https://github.com/enisdenjo/graphql-ws/blob/master/PROTOCOL.md
-namespace PROTOCOL {
-inline const QString CONNECTION_INIT = "connection_init";
-inline const QString CONNECTION_ACK = "connection_ack";
-inline const QString ERROR = "error";
-inline const QString COMPLETE = "complete";
-inline const QString NEXT = "next";
-inline const QString PING = "ping";
-inline const QString PONG = "pong";
-inline const QString SUBSCRIBE =
-    "subscribe"; // for queries | mutations as well.
-};               // namespace PROTOCOL
+struct QTGQL_EXPORT PROTOCOL {
+  static QString CONNECTION_INIT() { return "connection_init"; }
+  static QString CONNECTION_ACK() { return "connection_ack"; }
+  static QString ERROR() { return "error"; }
+  static QString COMPLETE() { return "complete"; }
+  static QString NEXT() { return "next"; }
+  static QString PING() { return "ping"; }
+  static QString PONG() { return "pong"; }
+  static QString SUBSCRIBE() {
+    return "subscribe";
+  } // for queries | mutations as well.
+};
 
 struct BaseGqlTrnsWsMsg : public bases::HashAbleABC {
   QString type;
@@ -71,15 +72,17 @@ struct GqlTrnsWsMsgWithID : public BaseGqlTrnsWsMsg {
   explicit GqlTrnsWsMsgWithID(const QJsonObject &data)
       : BaseGqlTrnsWsMsg(data) { // NOLINT
     this->op_id = QUuid::fromString(data["id"].toString());
-    if (this->type == PROTOCOL::ERROR) {
+    if (this->type == PROTOCOL::ERROR()) {
       errors = data.value("payload").toArray();
     }
   }
 
   explicit GqlTrnsWsMsgWithID(const bases::GraphQLMessage &payload,
                               const QUuid &id)
-      : BaseGqlTrnsWsMsg(PROTOCOL::SUBSCRIBE, payload.serialize()),
+      : BaseGqlTrnsWsMsg(PROTOCOL::SUBSCRIBE(), payload.serialize()),
         op_id{id} {};
+  explicit GqlTrnsWsMsgWithID(const QString &msg_type, const QUuid &op_id)
+      : BaseGqlTrnsWsMsg(msg_type), op_id(op_id){};
 
   [[nodiscard]] bool has_errors() const { return !this->errors.isEmpty(); }
 
@@ -89,12 +92,21 @@ struct GqlTrnsWsMsgWithID : public BaseGqlTrnsWsMsg {
     return ret;
   }
 };
-
-namespace DEF_MESSAGES {
-const auto CONNECTION_INIT = BaseGqlTrnsWsMsg(PROTOCOL::CONNECTION_INIT);
-const auto PING = BaseGqlTrnsWsMsg(PROTOCOL::PING);
-const auto PONG = BaseGqlTrnsWsMsg(PROTOCOL::PONG);
-} // namespace DEF_MESSAGES
+struct DEF_MESSAGES {
+  static auto CONNECTION_INIT() {
+    static const auto CONNECTION_INIT =
+        BaseGqlTrnsWsMsg(PROTOCOL::CONNECTION_INIT());
+    return CONNECTION_INIT;
+  }
+  static auto PING() {
+    static const auto PING = BaseGqlTrnsWsMsg(PROTOCOL::PING());
+    return PING;
+  }
+  static auto PONG() {
+    static const auto PONG = BaseGqlTrnsWsMsg(PROTOCOL::PONG());
+    return PONG;
+  }
+};
 
 struct GqlTransportWsClientSettings {
   const QUrl url;
@@ -158,13 +170,13 @@ protected Q_SLOTS:
   void onDisconnected();
 
   void onError(const QAbstractSocket::SocketError &error);
-  void execute_impl(const QUuid &op_id,
+  void execute_impl(const QUuid &execution_id,
                     const std::shared_ptr<bases::HandlerABC> &handler);
 
 public:
   inline static const QString SUB_PROTOCOL = "graphql-transport-ws";
 
-  explicit GqlTransportWs(const GqlTransportWsClientSettings &settings);
+  explicit GqlTransportWs(GqlTransportWsClientSettings settings);
 
   void close(QWebSocketProtocol::CloseCode closeCode =
                  QWebSocketProtocol::CloseCodeNormal,

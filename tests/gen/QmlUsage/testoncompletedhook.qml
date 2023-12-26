@@ -11,7 +11,7 @@ Item {
         onCompletedChanged: root.success = true
     }
     Component.onCompleted: {
-        main_query.fetch();
+        main_query.execute();
     }
     Text {
         text: `completed ${main_query.completed}`

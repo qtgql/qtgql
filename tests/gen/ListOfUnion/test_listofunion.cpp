@@ -19,7 +19,7 @@ TEST_CASE("ListOfUnion") {
       test_utils::DebugWsClientSettings{.print_debug = true,
                                         .prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = mainquery::MainQuery::shared();
-  mq->fetch();
+  mq->execute();
   test_utils::wait_for_completion(mq);
   SECTION("test deserialize") {
     auto root = mq->data();
@@ -42,7 +42,7 @@ TEST_CASE("ListOfUnion") {
     auto model = person->get_pets();
     QString new_name("Frank Zappa");
     modify_mut->set_variables({person->get_id(), 3, new_name});
-    modify_mut->fetch();
+    modify_mut->execute();
     test_utils::wait_for_completion(modify_mut);
     REQUIRE(model->get(3)->property("name").toString() == new_name);
   }
@@ -54,7 +54,7 @@ TEST_CASE("ListOfUnion") {
     auto prev_length = model->rowCount();
     insert_mut->set_variables({person->get_id(), prev_length + 1, name_to_set,
                                ListOfUnion::Enums::UnionTypes::DOG});
-    insert_mut->fetch();
+    insert_mut->execute();
     test_utils::wait_for_completion(insert_mut);
     REQUIRE(prev_length < model->rowCount());
     qDebug() << model->last();
@@ -78,7 +78,7 @@ TEST_CASE("ListOfUnion") {
 
     auto remove_mut = removeat::RemoveAt::shared();
     remove_mut->set_variables({person->get_id(), 3});
-    remove_mut->fetch();
+    remove_mut->execute();
 
     test_utils::wait_for_completion(remove_mut);
 

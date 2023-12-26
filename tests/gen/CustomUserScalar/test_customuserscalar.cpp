@@ -18,7 +18,7 @@ TEST_CASE("CustomUserScalar") {
   SECTION("test deserialize") {
     auto mq = mainquery::MainQuery::shared();
     http_nl->set_headers({{"country-code", "uk"}});
-    mq->fetch();
+    mq->execute();
     test_utils::wait_for_completion(mq);
     auto user = mq->data()->get_user();
     auto country = user->get_country();
@@ -29,7 +29,7 @@ TEST_CASE("CustomUserScalar") {
   SECTION("test update") {
     auto mq = mainquery::MainQuery::shared();
     http_nl->set_headers({{"country-code", "isr"}});
-    mq->fetch();
+    mq->execute();
     test_utils::wait_for_completion(mq);
     auto user = mq->data()->get_user();
     auto country = user->get_country();
@@ -37,7 +37,7 @@ TEST_CASE("CustomUserScalar") {
     auto country_cpp = user->get_country_cpp();
     REQUIRE(country_cpp->get_value() == "isr");
     http_nl->set_headers({{"country-code", "uk"}});
-    mq->refetch();
+    mq->execute(true);
     test_utils::wait_for_completion(mq);
     REQUIRE(user->get_country().toStdString() == "United Kingdom");
     REQUIRE(user->get_country_cpp()->get_value() == "uk");

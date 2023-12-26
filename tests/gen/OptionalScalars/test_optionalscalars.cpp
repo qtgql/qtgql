@@ -36,14 +36,14 @@ TEST_CASE("OptionalScalars") {
   auto mq = mainquery::MainQuery::shared();
   SECTION("test deserialize - when null returns default values") {
     mq->set_variables({true});
-    mq->fetch();
+    mq->execute();
     test_utils::wait_for_completion(mq);
     auto user = mq->data()->get_user();
     check_user_is_nulled(user);
   };
   SECTION("test deserialize - when not null") {
     mq->set_variables({false});
-    mq->fetch();
+    mq->execute();
     test_utils::wait_for_completion(mq);
     auto user = mq->data()->get_user();
     check_user_filled(user);
@@ -51,21 +51,21 @@ TEST_CASE("OptionalScalars") {
 
   SECTION("test updates - from null to value") {
     mq->set_variables({true});
-    mq->fetch();
+    mq->execute();
     test_utils::wait_for_completion(mq);
     auto change_name_mutation = filluser::FillUser::shared();
     auto user = mq->data()->get_user();
     check_user_is_nulled(user);
     change_name_mutation->set_variables({user->get_id()});
     auto catcher = test_utils::SignalCatcher({user});
-    change_name_mutation->fetch();
+    change_name_mutation->execute();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(change_name_mutation);
     check_user_filled(user);
   };
   SECTION("test update - from value to null") {
     mq->set_variables({false});
-    mq->fetch();
+    mq->execute();
     test_utils::wait_for_completion(mq);
     auto user = mq->data()->get_user();
     check_user_filled(user);
@@ -73,7 +73,7 @@ TEST_CASE("OptionalScalars") {
 
     auto nullify_mut = nullifyuser::NullifyUser::shared();
     nullify_mut->set_variables({mq->data()->get_user()->get_id()});
-    nullify_mut->fetch();
+    nullify_mut->execute();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(nullify_mut);
     check_user_is_nulled(user);

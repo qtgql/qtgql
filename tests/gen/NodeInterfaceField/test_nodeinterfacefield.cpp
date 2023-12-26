@@ -17,7 +17,7 @@ TEST_CASE("NodeInterfaceField") {
       test_utils::DebugWsClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = mainquery::MainQuery::shared();
   mq->set_variables({NodeInterfaceField::Enums::TypesEnum::User});
-  mq->fetch();
+  mq->execute();
   test_utils::wait_for_completion(mq);
   SECTION("test deserialize") {
     REQUIRE(mq->data()->get_node()->property("__typeName") == "User");
@@ -32,7 +32,7 @@ TEST_CASE("NodeInterfaceField") {
     QString new_name("Alfonso");
     change_name_mut->set_variables({user->get_id(), new_name});
     test_utils::SignalCatcher catcher({.source_obj = user, .only = "name"});
-    change_name_mut->fetch();
+    change_name_mut->execute();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(change_name_mut);
 
@@ -44,7 +44,7 @@ TEST_CASE("NodeInterfaceField") {
     test_utils::SignalCatcher catcher(
         {.source_obj = mq->data(), .only = "node"});
     mq2->set_variables({NodeInterfaceField::Enums::TypesEnum::User});
-    mq2->fetch();
+    mq2->execute();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(mq2);
     auto user1 =

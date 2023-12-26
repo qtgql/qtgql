@@ -19,7 +19,7 @@ TEST_CASE("ListOfScalar") {
       ENV_NAME,
       test_utils::DebugWsClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto rnd_post = getrndpost::GetRndPost::shared();
-  rnd_post->fetch();
+  rnd_post->execute();
   test_utils::wait_for_completion(rnd_post);
   SECTION("test deserialize") {
 
@@ -34,7 +34,7 @@ TEST_CASE("ListOfScalar") {
     QString new_tag("foobar");
     add_tag_mut->set_variables(
         {.postID = rnd_post->data()->get_post()->get_id(), .tag = new_tag});
-    add_tag_mut->fetch();
+    add_tag_mut->execute();
     test_utils::wait_for_completion(add_tag_mut);
     auto model = rnd_post->data()->get_post()->get_tags();
     auto last = model->last();
@@ -46,7 +46,7 @@ TEST_CASE("ListOfScalar") {
     auto remove_tag_mut = removeposttag::RemovePostTag::shared();
     remove_tag_mut->set_variables(
         {.postID = rnd_post->data()->get_post()->get_id(), .at = 2});
-    remove_tag_mut->fetch();
+    remove_tag_mut->execute();
     test_utils::wait_for_completion(remove_tag_mut);
     auto model = rnd_post->data()->get_post()->get_tags();
     REQUIRE(model->rowCount() < prev_ln);
@@ -59,7 +59,7 @@ TEST_CASE("ListOfScalar") {
         {.postID = rnd_post->data()->get_post()->get_id(),
          .at = 2,
          .newTag = new_tag});
-    replace_tag_mut->fetch();
+    replace_tag_mut->execute();
     test_utils::wait_for_completion(replace_tag_mut);
     auto model = rnd_post->data()->get_post()->get_tags();
     REQUIRE(model->data(model->index(2), 257).toString() == new_tag);

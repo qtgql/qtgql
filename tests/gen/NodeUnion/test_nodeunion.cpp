@@ -17,7 +17,7 @@ TEST_CASE("NodeUnion") {
 
   auto mq = mainquery::MainQuery::shared();
   mq->set_variables({Enums::UnionChoice::PERSON});
-  mq->fetch();
+  mq->execute();
   test_utils::wait_for_completion(mq);
   SECTION("test deserialize") {
     auto raw_ptr = mq->data()->get_whoAmI();
@@ -33,7 +33,7 @@ TEST_CASE("NodeUnion") {
     auto mq2 = mainquery::MainQuery::shared();
     test_utils::SignalCatcher catcher({.source_obj = person, .only = "name"});
     mq2->set_variables({Enums::UnionChoice::PERSON});
-    mq2->fetch();
+    mq2->execute();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(mq2);
     REQUIRE(mq->data()
@@ -47,7 +47,7 @@ TEST_CASE("NodeUnion") {
     auto root = mq->data();
     test_utils::SignalCatcher catcher({.source_obj = root, .only = "whoAmI"});
     mq->set_variables({Enums::UnionChoice::FROG});
-    mq->refetch();
+    mq->execute();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(mq);
     auto frog_maybe = root->get_whoAmI();

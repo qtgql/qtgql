@@ -35,4 +35,6 @@ std::optional<QString> get_operation_name(const QString &query) {
   }
   return {};
 }
+
+QUuid HandlerABC::get_execution_id() { return m_execution_id; }
 } // namespace qtgql::bases

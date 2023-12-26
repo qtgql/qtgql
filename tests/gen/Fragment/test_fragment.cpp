@@ -16,7 +16,7 @@ TEST_CASE("Fragment") {
       ENV_NAME,
       test_utils::DebugWsClientSettings{.prod_settings = {.url = SCHEMA_ADDR}});
   auto mq = mainquery::MainQuery::shared();
-  mq->fetch();
+  mq->execute();
   test_utils::wait_for_completion(mq);
 
   SECTION("test deserialize") {
@@ -38,7 +38,7 @@ TEST_CASE("Fragment") {
         UserWithSameIDAndDifferentFieldsQuery::shared();
     auto catcher = test_utils::SignalCatcher(
         {.source_obj = user, .excludes = {"voidField"}});
-    modified_user_op->fetch();
+    modified_user_op->execute();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(modified_user_op);
     auto modified_user =

@@ -69,22 +69,31 @@ public:
 
   // execute a handler for execution.
   void execute(const std::shared_ptr<bases::HandlerABC> &handler) override {
+    auto execution_id = handler->get_execution_id();
     QJsonDocument data(handler->message().serialize());
     auto reply = m_manager->post(_GraphQLRequest(m_url, m_headers),
                                  QByteArray(data.toJson()));
 
     QObject::connect(reply, &QNetworkReply::finished, [=]() {
+      if (execution_id != handler->get_execution_id()) {
+        // the handler has been invalidated.
+        return;
+      };
       if (reply->error() == QNetworkReply::NoError) {
         auto contents = reply->readAll();
         process_reply(contents, handler);
       } else {
         qWarning() << reply->errorString();
+        handler->on_error(QJsonArray({QJsonObject({
+            {"message", reply->errorString()},
+        })}));
       }
       reply->deleteLater();
     });
   };
   static void process_reply(const QByteArray &raw_data,
                             const std::shared_ptr<bases::HandlerABC> &handler) {
+
     auto response = GraphQLResponse(QJsonDocument::fromJson(raw_data).object());
     if (response.errors.has_value()) {
       handler->on_error(response.errors.value());

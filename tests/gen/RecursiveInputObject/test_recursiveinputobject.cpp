@@ -21,7 +21,7 @@ TEST_CASE("RecursiveInputObject") {
     auto mq = mainquery::MainQuery::shared();
     mq->set_variables(
         {RecursiveInput::create(RecursiveInput::create(std::nullopt, 2), 2)});
-    mq->fetch();
+    mq->execute();
     test_utils::wait_for_completion(mq);
     REQUIRE(mq->data()->get_depth() == 2);
   };

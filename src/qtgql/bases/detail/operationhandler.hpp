@@ -66,7 +66,9 @@ public:
     return Environment::get_env_strict(ENV_NAME());
   };
 
-  void fetch() {
+  void execute(bool force = false) {
+    if (force)
+      invalidate();
     if (!m_operation_on_the_fly && !m_completed) {
       set_operation_on_flight(true);
       auto a = shared_from_this();
@@ -75,20 +77,28 @@ public:
                  "instantiate this with `std::make_shared`");
 
       environment()->execute(a);
+    } else {
+      qDebug()
+          << "OperationHandlerABC::execute() called twice! and no variables "
+             "have changed. or force was not set to true.";
     }
   }
+  /**
+   * @brief invalidate the current operation.
+   *
+   * This will set the operation as not on flight and not completed.
+   * This will also generate a new execution id.
+   */
+  void invalidate() {
+    set_operation_on_flight(false);
+    set_completed(false);
+    m_execution_id = QUuid::createUuid();
+  }
 
-  void refetch() {
-    if (m_completed) {
-      set_completed(false);
-      fetch();
-    } else {
-      qWarning() << "Tried to refetch operation "
-                 << m_message_template.operationName
-                 << " but the operation haven't completed yet.";
-    }
-  };
   void set_vars(const QJsonObject &vars) {
+    // setting variables will invalidate the previous query.
+    invalidate();
+    m_execution_id = QUuid::createUuid();
     m_message_template.set_variables(vars);
   }
 

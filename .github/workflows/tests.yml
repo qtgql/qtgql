@@ -114,9 +114,9 @@ jobs:
           SHOULD_TEST_CORE: ${{ env.SHOULD_TEST_CORE }}
         run: |
           if [ "$RUNNER_OS" == "Windows" ]; then
-            poetry run conan build . -o test=True -o test_core=${{env.SHOULD_TEST_CORE}} -s build_type=Debug  -o qt_version=${{matrix.qt_version}} -pr=profiles/Windows_mingw --build=missing;
+            poetry run conan build . -o test_gen=True -o test_core=${{env.SHOULD_TEST_CORE}} -s build_type=Debug  -o qt_version=${{matrix.qt_version}} -pr=profiles/Windows_mingw --build=missing;
           elif [ "$RUNNER_OS" == "Linux" ]; then
-            poetry run xvfb-run -a conan build . -o test=True -o test_core=${{env.SHOULD_TEST_CORE}} -o qt_version=${{matrix.qt_version}} -s build_type=Debug -pr=profiles/Linux --build=missing -c tools.system.package_manager:sudo=True -c tools.system.package_manager:mode=install
+            poetry run xvfb-run -a conan build . -o test_gen=True -o test_core=${{env.SHOULD_TEST_CORE}} -o qt_version=${{matrix.qt_version}} -s build_type=Debug -pr=profiles/Linux --build=missing -c tools.system.package_manager:sudo=True -c tools.system.package_manager:mode=install
           fi
 
       - name: Run tests
