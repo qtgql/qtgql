@@ -24,8 +24,11 @@ with the desired testcases.
 
 ### Build
 conan would generate cmake presets for IDE's usage as well.
-```bash
-poetry run conan build . -o test=True
+add the option `test_core` to build the tests for the core library.
+add the option `test_gen` to build the tests for the generated code.
+ ```bash
+poetry run conan build . -o test_core=True -o test_gen=True
+```
 ```
 ### Testing
 Run tests GraphQL server
