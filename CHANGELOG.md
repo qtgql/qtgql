@@ -1,5 +1,11 @@
 CHANGELOG
 =========
+0.139.0 - 2023-12-26
+--------------------
+This release removes the previous approach of using `fetch` and `refetch`.Instead, the user would call `execute()` on the operation handler.It is important to note that every time you call `set_variables` on the operation handler,the network layers will ignore the previous execution.If a user wants to refetch the operation, and the variables haven't changed.They can call `execute(true)` again. This will force the network layers to refetch the operation.#### Bug Fixes:- Bad HTTP responses will now call the `on_error` callback and can be handled nythe operation handler just as if it was an operation error. Previously, failed HTTP responseswould cause the operation handler to be in a stale state, and it couldn't be used again.- errors were not piped down to qml proxy handler. Now they are.
+
+Contributed by [ניר](https://github.com/nrbnlulu) via [PR #477](https://github.com/qtgql/qtgql/pull/477/)
+
 0.138.1 - 2023-12-24
 --------------------
 This release adds a new getter on proxy typesfor custom scalars. This can be useful if you need to do some computationswith the custom scalar object rather than showing it to the user.
