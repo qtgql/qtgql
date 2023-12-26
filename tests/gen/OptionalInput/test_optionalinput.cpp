@@ -30,7 +30,7 @@ TEST_CASE("OptionalInput") {
     test_utils::SignalCatcher catcher(
         {.source_obj = q->data(), .only = "echoOrHello"});
     auto prev = q->data()->get_echoOrHello();
-    q->execute()();
+    q->execute();
     REQUIRE(catcher.wait());
     REQUIRE(prev != q->data()->get_echoOrHello());
   }
@@ -45,7 +45,7 @@ TEST_CASE("OptionalInput") {
     test_utils::SignalCatcher catcher(
         {.source_obj = q->data(), .only = "echoOrHello"});
     auto prev = q->data()->get_echoOrHello();
-    q->execute()();
+    q->execute();
     REQUIRE(catcher.wait());
     REQUIRE(prev != q->data()->get_echoOrHello());
   }

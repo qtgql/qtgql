@@ -47,7 +47,7 @@ TEST_CASE("NodeUnion") {
     auto root = mq->data();
     test_utils::SignalCatcher catcher({.source_obj = root, .only = "whoAmI"});
     mq->set_variables({Enums::UnionChoice::FROG});
-    mq->execute()();
+    mq->execute();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(mq);
     auto frog_maybe = root->get_whoAmI();

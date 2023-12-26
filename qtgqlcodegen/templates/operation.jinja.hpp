@@ -191,6 +191,7 @@ Use👉 context.operation.name 👈(QObject *parent = nullptr): QObject(parent){
     connect(op_ptr, &👉 context.operation.name 👈::dataChanged, this, [&]{emit dataChanged();});
     connect(op_ptr, &👉 context.operation.name 👈::completedChanged, this, [&]{emit completedChanged();});
     connect(op_ptr, &👉 context.operation.name 👈::operationOnFlightChanged, this, [&]{emit operationOnFlightChanged();});
+    connect(op_ptr, &👉 context.operation.name 👈::error, this, [&](const QJsonArray & errors){emit error(errors);});
 };
 
 inline const 👉 context.operation.root_type.name 👈 * data() const{
@@ -212,5 +213,6 @@ signals:
     void dataChanged();
     void completedChanged();
     void operationOnFlightChanged();
+    QJsonArray error(const QJsonArray &);
 };
 };

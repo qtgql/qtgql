@@ -10,3 +10,4 @@ the network layers will ignore the previous execution.
 - Bad HTTP responses will now call the `on_error` callback and can be handled ny
 the operation handler just as if it was an operation error. Previously, failed HTTP responses
 would cause the operation handler to be in a stale state, and it couldn't be used again.
+- errors were not piped down to qml proxy handler. Now they are.

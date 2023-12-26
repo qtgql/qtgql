@@ -33,7 +33,7 @@ TEST_CASE("ListOfNonNodeType") {
     change_username_mut->execute();
     test_utils::wait_for_completion(change_username_mut);
     test_utils::SignalCatcher catcher({.source_obj = user, .only = "name"});
-    mq->execute()();
+    mq->execute();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(mq);
     REQUIRE(user->get_name().toStdString() == new_name.toStdString());
@@ -46,7 +46,7 @@ TEST_CASE("ListOfNonNodeType") {
     insert_user->set_variables({3, user_name});
     insert_user->execute();
     test_utils::wait_for_completion(insert_user);
-    mq->execute()();
+    mq->execute();
     test_utils::wait_for_completion(mq);
     REQUIRE(model->rowCount() == prev_len + 1);
     REQUIRE(model->get(3)->get_name().toStdString() == user_name.toStdString());

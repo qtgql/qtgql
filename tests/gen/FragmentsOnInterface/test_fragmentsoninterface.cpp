@@ -30,7 +30,7 @@ TEST_CASE("FragmentsOnInterface") {
     auto root = animal_query->data();
     animal_query->set_variables({Enums::AnimalKind::PERSON});
     test_utils::SignalCatcher catcher({.source_obj = root, .only = "animal"});
-    animal_query->execute()();
+    animal_query->execute();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(animal_query);
     REQUIRE(animal_query->data()->get_animal()->get_kind() == Enums::PERSON);
@@ -52,7 +52,7 @@ TEST_CASE("FragmentsOnInterface") {
     test_utils::SignalCatcher catcher(
         {.source_obj = change_age_mut->data(), .only = "changeAge"});
     change_age_mut->set_variables({animal_id, new_age});
-    change_age_mut->execute()();
+    change_age_mut->execute();
     REQUIRE(catcher.wait());
     test_utils::wait_for_completion(change_age_mut);
     REQUIRE(change_age_mut->data()->get_changeAge()->get_age() == new_age);
