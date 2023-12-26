@@ -5,6 +5,8 @@ This release removes the previous approach of using `fetch` and `refetch`.
 Instead, the user would call `execute()` on the operation handler.
 It is important to note that every time you call `set_variables` on the operation handler,
 the network layers will ignore the previous execution.
+If a user wants to refetch the operation, and the variables haven't changed.
+They can call `execute(true)` again. This will force the network layers to refetch the operation.
 
 #### Bug Fixes:
 - Bad HTTP responses will now call the `on_error` callback and can be handled ny

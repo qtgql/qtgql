@@ -205,8 +205,8 @@ inline bool operation_on_flight() const{
 }
 
 public slots:
-void execute(){
-    m_operation->execute();
+void execute(bool force = false){
+    m_operation->execute(force);
 };
 
 signals:
