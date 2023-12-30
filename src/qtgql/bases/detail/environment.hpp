@@ -1,10 +1,10 @@
 #pragma once
 #include "./networklayer.hpp"
-#include "./objecttype.hpp"
+#include "./types.hpp"
 #include "QMap"
 #include "QString"
-#include "objecttype.hpp"
 #include "qtgql/qtgql_export.hpp"
+#include "types.hpp"
 #include <QTimer>
 #include <utility>
 

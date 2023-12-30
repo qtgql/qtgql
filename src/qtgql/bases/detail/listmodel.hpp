@@ -1,7 +1,7 @@
 #pragma once
 #include "QAbstractListModel"
-#include "objecttype.hpp"
 #include "qtgql/qtgql_export.hpp"
+#include "types.hpp"
 
 namespace qtgql::bases {
 

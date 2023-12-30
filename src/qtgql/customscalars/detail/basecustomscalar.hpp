@@ -1,4 +1,5 @@
 #pragma once
+#include "qtgql/bases/detail/types.hpp"
 #include "qtgql/qtgql_export.hpp"
 #include <QJsonValue>
 #include <QString>
@@ -10,7 +11,8 @@ namespace customscalars {
  * T_QtType - the property type that would be exposed to QML, usually this would
  * be a string
  */
-template <typename T, typename T_QtType> class CustomScalarABC {
+template <typename T, typename T_QtType>
+class CustomScalarABC : public bases::GraphQLType {
 protected:
   T m_value;
   T_QtType m_qt_value_cached;
