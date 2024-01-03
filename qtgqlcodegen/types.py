@@ -20,6 +20,9 @@ if TYPE_CHECKING:
 
 @define
 class QtGqlTypeABC(ABC):
+    def raw_attr(self) -> CppAttribute:
+        raise NotImplementedError
+
     @property
     def is_union(self) -> QtGqlUnion | None:
         return None
@@ -87,7 +90,7 @@ class QtGqlTypeABC(ABC):
         """
         :return: The QProperty type, usually will lay in the proxy.
         """
-        return f"{self.type_name()} &"  # default for scalars this should suffice.
+        return self.raw_attr().as_const_ref()  # default for scalars this should suffice.
 
     @property
     def default_value(self) -> str:
@@ -159,7 +162,7 @@ class QtGqlOptional(QtGqlTypeABC):
         return getattr(self.wrapped_type__, item)
 
     def __getattribute__(self, name):
-        if name not in ("wrapped_type__"):
+        if name not in ("wrapped_type__",):
             raise AttributeError
         else:
             return super().__getattribute__(name)
@@ -180,7 +183,7 @@ class QtGqlList(QtGqlTypeABC):
     def needs_proxy_model(self) -> bool:
         """Model of scalars / enums.
 
-        have no further selections hence they are shared across the
+        have no further selections, hence they are shared across the
         schema.
         """
         if self.of_type.is_builtin_scalar or self.of_type.is_enum:
@@ -190,7 +193,7 @@ class QtGqlList(QtGqlTypeABC):
     @property
     def member_type(self) -> str:
         if self.of_type.is_builtin_scalar:
-            # scalars has no underlying fields hence they don't need to be
+            # Scalars have no underlying fields, hence they don't need to be
             # proxied. So each proxy would get an instance to the model.
             return f"std::shared_ptr<{self.type_name()}>"
 
@@ -280,7 +283,7 @@ class BuiltinScalar(QtGqlTypeABC):
 
     @property
     def property_type(self) -> str:
-        return f"{self.type_name()} &"
+        return self.type_name()
 
     def json_repr(self, attr_name: str, accessor: str = "->") -> str:
         return f"{attr_name}{self.to_json_convertor}"
@@ -636,44 +639,44 @@ def DefaultsNs() -> CppAttribute:
 class _BuiltinScalars:
     INT = BuiltinScalar(
         CppAttribute("int"),
-        DefaultsNs().ns_add("INT"),
+        DefaultsNs().ns_add("INT").ns_add("value").call(),
         graphql_name="Int",
         from_json_convertor="toInt()",
     )
     FLOAT = BuiltinScalar(
         CppAttribute("float"),
-        DefaultsNs().ns_add("FLOAT"),
+        DefaultsNs().ns_add("FLOAT").ns_add("value").call(),
         graphql_name="Float",
         from_json_convertor="toDouble()",
     )
     STRING = BuiltinScalar(
         CppAttribute("QString"),
-        DefaultsNs().ns_add("STRING"),
+        DefaultsNs().ns_add("STRING").ns_add("value").call(),
         graphql_name="String",
         from_json_convertor="toString()",
     )
     ID = BuiltinScalar(
         ScalarsNs().ns_add("Id"),
-        DefaultsNs().ns_add("ID"),
+        DefaultsNs().ns_add("ID").ns_add("value").call(),
         graphql_name="ID",
         from_json_convertor="toString()",
     )
     BOOLEAN = BuiltinScalar(
         CppAttribute("bool"),
-        DefaultsNs().ns_add("BOOL"),
+        DefaultsNs().ns_add("BOOL").ns_add("value").call(),
         graphql_name="Boolean",
         from_json_convertor="toBool()",
     )
     VOID = BuiltinScalar(
         ScalarsNs().ns_add("Void"),
-        DefaultsNs().ns_add("VOID"),
+        DefaultsNs().ns_add("VOID").ns_add("value").call(),
         graphql_name="Void",
         from_json_convertor="",
     )
 
     UUID = BuiltinScalar(
         CppAttribute("QUuid"),
-        DefaultsNs().ns_add("UUID"),
+        DefaultsNs().ns_add("UUID").ns_add("value").call(),
         graphql_name="UUID",
         from_json_convertor="toVariant().toUuid()",
         to_json_convertor=".toString()",

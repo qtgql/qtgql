@@ -31,7 +31,8 @@ struct BOOLEAN {
 };
 struct ID {
   static auto value() {
-    return scalars::Id("9b2a0828-880d-4023-9909-de067984523c");
+    static auto ret = scalars::Id("9b2a0828-880d-4023-9909-de067984523c");
+    return ret;
   };
 };
 struct VOID {
@@ -59,26 +60,26 @@ struct Float : public GraphQLType, p_Delegates<Float, float, DEFAULTS::FLOAT> {
   [[nodiscard]] const char *__typename() const override { return "Float"; };
 };
 struct UUID : public GraphQLType, p_Delegates<UUID, QUuid, DEFAULTS::UUID> {
-  const char *__typename() const override { return "UUID"; };
+  [[nodiscard]] const char *__typename() const override { return "UUID"; };
 };
 struct String : public GraphQLType,
                 p_Delegates<String, QString, DEFAULTS::STRING> {
 
-  const char *__typename() const override { return "String"; };
+  [[nodiscard]] const char *__typename() const override { return "String"; };
 };
 
 struct Boolean : public GraphQLType,
                  p_Delegates<Boolean, bool, DEFAULTS::BOOLEAN> {
-  const char *__typename() const override { return "Boolean"; };
+  [[nodiscard]] const char *__typename() const override { return "Boolean"; };
 };
 
 struct ID : public GraphQLType, p_Delegates<ID, scalars::Id, DEFAULTS::ID> {
-  const char *__typename() const override { return "ID"; };
+  [[nodiscard]] const char *__typename() const override { return "ID"; };
 };
 struct VOID : public GraphQLType,
               p_Delegates<VOID, scalars::Void, DEFAULTS::VOID> {
   scalars::Void value = nullptr;
-  const char *__typename() const override { return "Void"; };
+  [[nodiscard]] const char *__typename() const override { return "Void"; };
 };
 
 class QTGQL_EXPORT ObjectTypeABC : public QObject, GraphQLType {

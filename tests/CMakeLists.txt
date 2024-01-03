@@ -17,7 +17,7 @@ target_link_libraries(utils_for_tests
         Catch2::Catch2
 )
 if (QTGQL_TEST_GEN)
-set(TESTS_TARGET "test_generated")
+    set(TESTS_TARGET "test_generated")
     add_executable(${TESTS_TARGET}
             main.cpp
             ${CODEGEN_TEST_SOURCES}
@@ -45,7 +45,6 @@ set(TESTS_TARGET "test_generated")
     )
 endif()
 if (QTGQL_TEST_CORE)
-
     add_executable(test_core
             main.cpp
 

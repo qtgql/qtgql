@@ -29,7 +29,7 @@ TEST_CASE("Scalars") {
     REQUIRE(d->get_name() == "nir");
     REQUIRE(d->get_uuid() ==
             QUuid::fromString("06335e84-2872-4914-8c5d-3ed07d2a2f16"));
-    REQUIRE(d->get_voidField() == qtgql::bases::DEFAULTS::VOID);
+    REQUIRE(d->get_voidField() == qtgql::bases::DEFAULTS::VOID::value());
   };
   SECTION("test update") {
 
