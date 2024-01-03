@@ -35,7 +35,7 @@ throw qtgql::exceptions::InterfaceDeserializationError(type_name.toStdString());
 {% for t in context.operation.narrowed_types -%}
 // Constructor
 {% set base_name -%}
-👉 context.qtgql_types.ObjectTypeABC.last if not t.base_interface else t.base_interface.name 👈
+👉 context.qtgql_types.ObjectTypeABC.attr if not t.base_interface else t.base_interface.name 👈
 {% endset -%}
 👉 t.name 👈::👉 t.name 👈(👉 context.operation.name 👈 * operation, const std::shared_ptr<👉 t.concrete.name 👈> &inst)
 : m_inst{inst}, 👉 base_name 👈::👉 base_name 👈(operation)

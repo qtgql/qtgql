@@ -97,5 +97,5 @@ class QtGqlTypes:
 
 
 if __name__ == "__main__":  # pragma: no cover
-    QtGqlTypes.ListModelABC.build().as_shared_ptr().call(CppAttribute("1"), CppAttribute("2"))
+    QtGqlTypes.ListModelABC.as_shared_ptr().call(CppAttribute("1"), CppAttribute("2"))
     #  TODO: add tests for cppref.py

@@ -43,7 +43,7 @@ class 👉context.export_macro👈  👉 t.name 👈: public 👉 context.qtgql_
 
 👉 proxy_type_fields(t, context) 👈
 public:
-    using 👉 context.qtgql_types.ObjectTypeABC.name 👈::👉 context.qtgql_types.ObjectTypeABC.last 👈;
+    using 👉 context.qtgql_types.ObjectTypeABC.ns_add(context.qtgql_types.ObjectTypeABC).build() 👈;
 {% for f in t.fields -%}
 [[nodiscard]] inline virtual const 👉 f.type.property_type 👈  👉 f.concrete.getter_name 👈() const {
 throw qtgql::exceptions::InterfaceDirectAccessError("👉t.concrete.name👈");
