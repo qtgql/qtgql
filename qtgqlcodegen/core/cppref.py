@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from functools import cached_property
+from functools import cached_property, lru_cache
 from typing import TYPE_CHECKING, NamedTuple
 
 import attrs
@@ -12,13 +12,16 @@ if TYPE_CHECKING:
 CppAccessor: TypeAlias = 'Literal["::"] | Literal["."] | Literal["->"]'
 
 
-@define()
+@define(hash=True, repr=False)
 class CppAttribute:
     class ParentCppAttribute(NamedTuple):
         accessor: CppAccessor
         attr: CppAttribute
 
-    @define
+        def __hash__(self) -> int:
+            return hash(self.accessor) + hash(self.attr)
+
+    @define(hash=True)
     class Wrapper:
         start: str = ""
         end: str = ""
@@ -39,6 +42,12 @@ class CppAttribute:
             parent=self._as_parent("::"),
         )
 
+    def dot_add(self, inner: str) -> CppAttribute:
+        return CppAttribute(
+            attr=inner,
+            parent=self._as_parent("."),
+        )
+
     def call(self, *args: CppAttribute) -> Self:
         self.wrapper.end += f"({', '.join((a.build() for a in args))})"
         return self
@@ -53,9 +62,23 @@ class CppAttribute:
     def as_shared_ptr(self) -> CppAttribute:
         return shared_ptr().set_template_value(self.build())
 
-    def as_const_ref(self) -> CppAttribute:
-        return CppAttribute(f"const {self.build()}&")
+    def as_std_vec(self) -> CppAttribute:
+        return std_vec().set_template_value(self.build())
 
+    def as_std_list(self) -> CppAttribute:
+        return std_list().set_template_value(self.build())
+
+    def as_const_ref(self) -> Self:
+        self.wrapper.start = "const"
+        self.wrapper.end = "&"
+        return self
+
+    def as_const_ptr(self) -> Self:
+        self.wrapper.start = "const"
+        self.wrapper.end = "*"
+        return self
+
+    @lru_cache(maxsize=2 * 300)
     def build(self, prev_val: str = "") -> str:
         ret = f"{self.wrapper.start}{self.attr}{prev_val}{self.wrapper.end}"
         if self.parent:
@@ -64,19 +87,33 @@ class CppAttribute:
         return ret
 
     @cached_property
-    def name(self) -> str:
-        return self.build()
-
-    @cached_property
     def last(self) -> str:
         if self.parent:
             return self.parent.attr.last
         return self.attr
 
+    def __str__(self) -> str:
+        return self.build()
+
+    def __repr__(self) -> str:
+        return f"<CppAttribute {self.build()}>"
+
 
 def shared_ptr() -> CppAttribute:
     return CppAttribute(
         attr="std::shared_ptr",
+    )
+
+
+def std_vec() -> CppAttribute:
+    return CppAttribute(
+        attr="std::vector",
+    )
+
+
+def std_list() -> CppAttribute:
+    return CppAttribute(
+        attr="std::list",
     )
 
 

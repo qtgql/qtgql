@@ -53,7 +53,7 @@ throw qtgql::exceptions::InterfaceDirectAccessError("👉t.concrete.name👈");
 {% endfor %}
 // ------------ Narrowed Object types ------------
 {% for t in context.operation.narrowed_types %}
-class 👉context.export_macro👈  👉 t.name 👈: public 👉 context.qtgql_types.ObjectTypeABC.name if not t.base_interface else t.base_interface.name 👈{
+class 👉context.export_macro👈  👉 t.name 👈: public 👉 context.qtgql_types.ObjectTypeABC.build() if not t.base_interface else t.base_interface.name 👈{
 
 👉context.operation.name👈* m_operation;
 
@@ -72,7 +72,7 @@ protected:
     void _qtgql_connect_signals();
 public:
 {% for f in t.fields -%}
-[[nodiscard]] const 👉 f.type.property_type 👈 👉 f.concrete.getter_name 👈() const;
+[[nodiscard]] 👉 f.type.property_type 👈 👉 f.concrete.getter_name 👈() const;
 {% endfor -%}
 // fields with custom getters
 {% for f in t.fields_with_custom_getter -%}

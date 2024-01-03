@@ -5,6 +5,7 @@ from typing import NamedTuple
 from graphql import OperationType
 from graphql.type import definition as gql_def
 
+from qtgqlcodegen.core.cppref import CppAttribute
 from qtgqlcodegen.core.exceptions import QtGqlException
 from qtgqlcodegen.core.graphql_ref import (
     is_enum_definition,
@@ -44,7 +45,7 @@ def _evaluate_input_object(
 ) -> QtGqlInputObject | None:
     if not type_info.input_objects.get(type_.name, None):
         return QtGqlInputObject(
-            name=type_.name,
+            name=CppAttribute(type_.name),
             docstring=type_.description,
             fields_dict={
                 name: _evaluate_argument_field(type_info, name, field)
@@ -188,7 +189,7 @@ def _evaluate_object_type(
     options = _evaluate_object_fields(type_info, type_)
 
     ret = QtGqlObjectType(
-        name=t_name,
+        name=CppAttribute(t_name),
         interfaces_raw=options.implements,
         docstring=type_.description,
         fields_dict=options.all_fields,
@@ -210,7 +211,7 @@ def _evaluate_interface_type(
         return ret
     options = _evaluate_object_fields(type_info, interface)
     ret = QtGqlInterface(
-        name=interface.name,
+        name=CppAttribute(interface.name),
         interfaces_raw=options.implements,
         docstring=interface.description,
         fields_dict=options.all_fields,
@@ -223,7 +224,7 @@ def _evaluate_interface_type(
                 f"Node is a reserved type, id field on `Node` interface must be of type `ID!`"
                 f"\n Got: {interface.fields['id']}",
             )
-    type_info.interfaces[ret.name] = ret
+    type_info.interfaces[interface.name] = ret
     return ret
 
 
@@ -270,6 +271,6 @@ def evaluate_schema(
                 type_info.enums[enum.name] = enum
         elif input_obj_def := is_input_definition(type_):
             if inp := _evaluate_input_object(type_info, input_obj_def):
-                type_info.input_objects[inp.name] = inp
+                type_info.input_objects[inp.name.attr] = inp
 
     return type_info

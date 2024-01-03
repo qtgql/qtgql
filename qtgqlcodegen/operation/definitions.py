@@ -55,7 +55,7 @@ class QtGqlQueriedField:
 
     @cached_property
     def is_root(self) -> bool:
-        return self.origin.name in self.type_info.schema_type_info.root_types_names
+        return self.origin.name.attr in self.type_info.schema_type_info.root_types_names
 
     @property
     def variable_builder_name(self) -> str:

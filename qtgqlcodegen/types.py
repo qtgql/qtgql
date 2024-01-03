@@ -20,6 +20,7 @@ if TYPE_CHECKING:
 
 @define
 class QtGqlTypeABC(ABC):
+    @property
     def raw_attr(self) -> CppAttribute:
         raise NotImplementedError
 
@@ -79,26 +80,26 @@ class QtGqlTypeABC(ABC):
         raise NotImplementedError(f"{self} is not supported as an input type ATM")
 
     @abstractmethod
-    def type_name(self) -> str:
+    def type_name(self) -> CppAttribute:
         """
         :returns: The C++ "real" type mostly this would be the member type as well.
         """
         raise NotImplementedError
 
     @property
-    def property_type(self) -> str:
+    def property_type(self) -> CppAttribute:
         """
         :return: The QProperty type, usually will lay in the proxy.
         """
-        return self.raw_attr().as_const_ref()  # default for scalars this should suffice.
+        return self.raw_attr.as_const_ref()  # default for scalars this should suffice.
 
     @property
-    def default_value(self) -> str:
+    def default_value(self) -> CppAttribute:
         """
 
         :return: C++ default value initializer for this type, mostly used at schema level.
         """
-        return "nullptr"
+        return CppAttribute("nullptr")
 
     @property
     def default_value_for_proxy(self) -> str:
@@ -110,23 +111,23 @@ class QtGqlTypeABC(ABC):
         raise NotImplementedError("This type doesn't define a default value for proxy")
 
     @property
-    def member_type(self) -> str:
+    def member_type(self) -> CppAttribute:
         """
         :returns: The C++ type of the concrete instance member.
         """
         # Usually `type_name` should suffice, if the type needs to return something else this is overridden.
-        return f"std::shared_ptr<{self.type_name()}>"
+        return self.type_name().as_shared_ptr()
 
     @property
-    def member_type_arg(self) -> str:
+    def member_type_arg(self) -> CppAttribute:
         """
 
         :return: The C++ member_type if it was passed in argument to somewhere.
         """
-        return f"const {self.member_type} &"
+        return self.member_type.as_const_ref()
 
     @property
-    def proxy_cpp_type(self) -> str:
+    def proxy_cpp_type(self) -> CppAttribute:
         """
         :return: The type before the qml 'serialization', This comes handy for custom scalars
         that you have some computations to do in C++ other than showing them to the user (in QML).
@@ -134,7 +135,7 @@ class QtGqlTypeABC(ABC):
         raise NotImplementedError
 
     @property
-    def fget_type(self) -> str:
+    def fget_type(self) -> CppAttribute:
         """
 
         :return: type for the proxy object, usually this would be the member type though for custom scalars
@@ -167,7 +168,7 @@ class QtGqlOptional(QtGqlTypeABC):
         else:
             return super().__getattribute__(name)
 
-    def type_name(self) -> str:  # pragma: no cover
+    def type_name(self) -> CppAttribute:  # pragma: no cover
         raise NotImplementedError
 
 
@@ -191,35 +192,39 @@ class QtGqlList(QtGqlTypeABC):
         return False
 
     @property
-    def member_type(self) -> str:
+    def member_type(self) -> CppAttribute:
         if self.of_type.is_builtin_scalar:
             # Scalars have no underlying fields, hence they don't need to be
             # proxied. So each proxy would get an instance to the model.
-            return f"std::shared_ptr<{self.type_name()}>"
+            return self.type_name().as_shared_ptr()
 
-        return f"std::vector<{self.of_type.member_type}>"
+        return self.of_type.member_type.as_std_vec()
 
-    def type_name(self) -> str:
+    def type_name(self) -> CppAttribute:
         if bs := self.of_type.is_builtin_scalar:
-            return f"{QtGqlTypes.ListModelABC.name}<{bs.type_name()}>"
+            return QtGqlTypes.ListModelABC.set_template_value(bs.type_name().build())
         raise NotImplementedError(
             "complex models have no valid type for schema concretes, call member_type",
         )
 
     @property
-    def default_value(self) -> str:
+    def default_value(self) -> CppAttribute:
         if self.of_type.is_builtin_scalar:
-            return "nullptr"
-        return "{}"
+            return CppAttribute("nullptr")
+        return CppAttribute("{}")
+
+    @cached_property
+    def raw_attr(self) -> CppAttribute:
+        return QtGqlTypes.ListModelABC.set_template_value(self.of_type.property_type.build())
 
     @property
-    def property_type(self) -> str:
+    def property_type(self) -> CppAttribute:
         if self.of_type.is_queried_object_type or self.of_type.is_queried_interface:
-            return f"{QtGqlTypes.ListModelABC.name}<{self.of_type.property_type}> *"
+            return self.raw_attr
         if self.of_type.is_queried_union:
-            return f"{QtGqlTypes.ListModelABC.name}<{self.of_type.property_type}> *"
+            return self.raw_attr.as_const_ptr()
         if self.of_type.is_builtin_scalar:
-            return f"{self.type_name()} *"
+            return self.type_name().as_const_ptr()
         raise NotImplementedError
 
 
@@ -231,10 +236,10 @@ class QtGqlInputList(QtGqlTypeABC):
     def is_input_list(self) -> QtGqlInputList | None:
         return self
 
-    def type_name(self) -> str:
+    def type_name(self) -> CppAttribute:
         if obj := self.of_type.is_input_object_type:
-            return f"std::list<{obj.name}>"
-        return f"std::list<{self.of_type.type_name()}>"
+            return obj.name.as_std_list()
+        return self.of_type.type_name().as_std_list()
 
 
 @define
@@ -245,12 +250,12 @@ class QtGqlUnion(QtGqlTypeABC):
     def is_union(self) -> QtGqlUnion | None:
         return self
 
-    def type_name(self) -> str:
-        return f"{QtGqlTypes.ObjectTypeABC.name}"
+    def type_name(self) -> CppAttribute:
+        return QtGqlTypes.ObjectTypeABC
 
     @property
-    def member_type(self) -> str:
-        return f"std::shared_ptr<{self.type_name()}>"
+    def member_type(self) -> CppAttribute:
+        return self.type_name().as_shared_ptr()
 
     def get_by_name(self, name: str) -> QtGqlObjectType | None:
         for possible in self.types:
@@ -272,18 +277,18 @@ class BuiltinScalar(QtGqlTypeABC):
 
     @property
     def default_value_for_proxy(self) -> str:
-        return self.default_value_.name
+        return self.default_value_.build()
 
-    def type_name(self) -> str:
-        return self.attr.name
+    def type_name(self) -> CppAttribute:
+        return self.attr
 
     @property
     def is_void(self) -> bool:
         return self is BuiltinScalars.VOID
 
     @property
-    def property_type(self) -> str:
-        return self.type_name()
+    def property_type(self) -> CppAttribute:
+        return self.attr.ns_add("T_Delegated")
 
     def json_repr(self, attr_name: str, accessor: str = "->") -> str:
         return f"{attr_name}{self.to_json_convertor}"
@@ -291,10 +296,10 @@ class BuiltinScalar(QtGqlTypeABC):
 
 @define
 class CustomScalarDefinition(QtGqlTypeABC):
-    name: str
+    name: CppAttribute
     graphql_name: str
     deserialized_type: str
-    to_qt_type: str
+    to_qt_type: CppAttribute
     include_path: str
 
     @property
@@ -304,35 +309,39 @@ class CustomScalarDefinition(QtGqlTypeABC):
     def json_repr(self, attr_name: str, accessor: str = "->") -> str:
         return f"{attr_name}.serialize()"
 
-    def type_name(self) -> str:
+    def type_name(self) -> CppAttribute:
         return self.name
 
     @property
-    def fget_type(self) -> str:
-        return f"std::shared_ptr<{self.type_name()}>"
+    def fget_type(self) -> CppAttribute:
+        return self.type_name().as_shared_ptr()
 
     @property
     def getter_is_constable(self) -> bool:
         return False
 
     @property
-    def property_type(self) -> str:
+    def property_type(self) -> CppAttribute:
         return self.to_qt_type
 
     @property
-    def proxy_cpp_type(self) -> str:
+    def proxy_cpp_type(self) -> CppAttribute:
         return self.fget_type
 
     @property
     def default_value_for_proxy(self) -> str:
-        return f"{self.name}().to_qt()"
+        return self.name.call().dot_add("to_qt").call().build()
 
 
 @define(slots=False)
 class BaseQtGqlObjectType(QtGqlTypeABC):
-    name: str
+    name: CppAttribute
     fields_dict: dict[str, QtGqlFieldDefinition]
     docstring: str | None = ""
+
+    @property
+    def raw_attr(self) -> CppAttribute:
+        return self.name
 
     @cached_property
     def fields(self) -> tuple[QtGqlFieldDefinition, ...]:
@@ -371,19 +380,9 @@ class QtGqlObjectType(BaseQtGqlObjectType):
         ```
         Type `Foo` would extend only `A`
 
-        If there are no interfaces returns only NodeInterfaceABC or ObjectTypeABC.
+        If there are no interfaces, return only NodeInterfaceABC or ObjectTypeABC.
         """
         not_unique_interfaces: list[QtGqlInterface] = []
-
-        if not self.interfaces_raw:
-            # TODO(https://github.com/qtgql/qtgql/issues/267): these are not really interfaces though they are inherited if there are no interfaces.
-            if interface := self.is_interface:
-                if interface.is_node_interface:
-                    return [QtGqlTypes.NodeInterfaceABC]  # type: ignore
-                return [QtGqlTypes.ObjectTypeABC]  # type: ignore
-            else:
-                return [QtGqlTypes.ObjectTypeABC]  # type: ignore
-
         for interface in self.interfaces_raw:
             for other in self.interfaces_raw:
                 if other is not interface:
@@ -391,6 +390,20 @@ class QtGqlObjectType(BaseQtGqlObjectType):
                         not_unique_interfaces.append(other)
 
         return [intfs for intfs in self.interfaces_raw if intfs not in not_unique_interfaces]
+
+    def get_bases_jinja(self) -> str:
+        if not self.interfaces_raw:
+            if interface := self.is_interface:
+                if interface.is_node_interface:
+                    ret = QtGqlTypes.NodeInterfaceABC.build()
+                else:
+                    ret = QtGqlTypes.ObjectTypeABC.build()
+            else:
+                ret = QtGqlTypes.ObjectTypeABC.build()
+            ret = f"public {ret}"
+        else:
+            ret = ", ".join([f"public {base.name}" for base in self.bases])
+        return f": {ret}"
 
     @cached_property
     def implements_node(self) -> bool:
@@ -400,16 +413,16 @@ class QtGqlObjectType(BaseQtGqlObjectType):
     def is_object_type(self) -> QtGqlObjectType | None:
         return self
 
-    def type_name(self) -> str:
+    def type_name(self) -> CppAttribute:
         return self.name
 
     @property
-    def member_type(self) -> str:
-        return f"std::shared_ptr<{self.type_name()}>"
+    def member_type(self) -> CppAttribute:
+        return self.type_name().as_shared_ptr()
 
     @property
-    def member_type_arg(self) -> str:
-        return f"const {self.member_type} &"
+    def member_type_arg(self) -> CppAttribute:
+        return self.member_type.as_const_ref()
 
     def __attrs_post_init__(self):
         # inject this object type to the interface.
@@ -442,7 +455,8 @@ class QtGqlDeferredType(Generic[T_QtGqlType], QtGqlTypeABC):
         else:
             return super().__getattribute__(name)
 
-    def type_name(self) -> str:  # we only override it since it is abstractmethod
+    def type_name(self) -> CppAttribute:  # pragma: no cover
+        # we only override it since it is abstractmethod
         raise NotImplementedError("this should not be reached since we override __getattribute__")
 
 
@@ -476,14 +490,14 @@ class QtGqlInputObject(BaseQtGqlObjectType):
     def is_input_object_type(self) -> QtGqlInputObject | None:
         return self
 
-    def type_name(self) -> str:
+    def type_name(self) -> CppAttribute:
         # NOTE: this is not in `member_type` because input types that are
         # shared for schema might have a different type.
         # If you are kind, fix this.
         # Note: using shared ptr here is just for convenience and input objects
         # are not really intended to be shared around, I tried using `unique_ptr` but had
         # issues with constructors of `optional` calling CC on it.
-        return f"std::shared_ptr<{self.name}>"
+        return self.name.as_shared_ptr()
 
     def json_repr(self, attr_name: str, accessor: str = "->") -> str:
         return f"{attr_name}{accessor}to_json()"
@@ -508,14 +522,14 @@ class QtGqlEnumDefinition(QtGqlTypeABC):
         return f"{self.name}EnumMap"
 
     @property
-    def namespaced_name(self) -> str:
-        return f"Enums::{self.name}"
+    def namespaced_name(self) -> CppAttribute:
+        return CppAttribute("Enums").ns_add(self.name)
 
     @property
     def is_enum(self) -> QtGqlEnumDefinition | None:
         return self
 
-    def type_name(self) -> str:
+    def type_name(self) -> CppAttribute:
         return self.namespaced_name
 
     def json_repr(self, attr_name: str, accessor: str = "->") -> str:
@@ -529,7 +543,7 @@ class QtGqlQueriedTypeABC(ABC):
 
 @define(slots=False, repr=False)
 class QtGqlQueriedObjectType(QtGqlQueriedTypeABC, QtGqlTypeABC):
-    name: str
+    name: CppAttribute
     concrete: QtGqlObjectType
     fields_dict: dict[str, QtGqlQueriedField] = attrs.Factory(dict)
     base_interface: QtGqlQueriedInterface | None = None  # I think that there could be only one
@@ -562,12 +576,12 @@ class QtGqlQueriedObjectType(QtGqlQueriedTypeABC, QtGqlTypeABC):
     def updater_name(self) -> str:
         return f"updaters::update_{self.name}"
 
-    def type_name(self) -> str:
+    def type_name(self) -> CppAttribute:
         return self.name
 
     @property
-    def property_type(self) -> str:
-        return f"{self.type_name()} *"
+    def property_type(self) -> CppAttribute:
+        return self.type_name().as_const_ptr()
 
     @cached_property
     def references(self) -> list[QtGqlQueriedField]:
@@ -620,12 +634,12 @@ class QtGqlQueriedUnion(QtGqlQueriedTypeABC, QtGqlTypeABC):
     def is_queried_union(self) -> QtGqlQueriedUnion | None:
         return self
 
-    def type_name(self) -> str:
+    def type_name(self) -> CppAttribute:
         return self.concrete.type_name()
 
     @property
-    def property_type(self) -> str:
-        return f"{QtGqlTypes.ObjectTypeABC.name} *"
+    def property_type(self) -> CppAttribute:
+        return QtGqlTypes.ObjectTypeABC.as_const_ptr()
 
 
 def ScalarsNs() -> CppAttribute:
@@ -638,44 +652,44 @@ def DefaultsNs() -> CppAttribute:
 
 class _BuiltinScalars:
     INT = BuiltinScalar(
-        CppAttribute("int"),
+        QtGqlBasesNs().ns_add("Int"),
         DefaultsNs().ns_add("INT").ns_add("value").call(),
         graphql_name="Int",
         from_json_convertor="toInt()",
     )
     FLOAT = BuiltinScalar(
-        CppAttribute("float"),
+        QtGqlBasesNs().ns_add("Float"),
         DefaultsNs().ns_add("FLOAT").ns_add("value").call(),
         graphql_name="Float",
         from_json_convertor="toDouble()",
     )
     STRING = BuiltinScalar(
-        CppAttribute("QString"),
+        QtGqlBasesNs().ns_add("String"),
         DefaultsNs().ns_add("STRING").ns_add("value").call(),
         graphql_name="String",
         from_json_convertor="toString()",
     )
     ID = BuiltinScalar(
-        ScalarsNs().ns_add("Id"),
+        QtGqlBasesNs().ns_add("ID"),
         DefaultsNs().ns_add("ID").ns_add("value").call(),
         graphql_name="ID",
         from_json_convertor="toString()",
     )
     BOOLEAN = BuiltinScalar(
-        CppAttribute("bool"),
+        QtGqlBasesNs().ns_add("Boolean"),
         DefaultsNs().ns_add("BOOL").ns_add("value").call(),
         graphql_name="Boolean",
         from_json_convertor="toBool()",
     )
     VOID = BuiltinScalar(
-        ScalarsNs().ns_add("Void"),
+        QtGqlBasesNs().ns_add("Void"),
         DefaultsNs().ns_add("VOID").ns_add("value").call(),
         graphql_name="Void",
         from_json_convertor="",
     )
 
     UUID = BuiltinScalar(
-        CppAttribute("QUuid"),
+        QtGqlBasesNs().ns_add("UUID"),
         DefaultsNs().ns_add("UUID").ns_add("value").call(),
         graphql_name="UUID",
         from_json_convertor="toVariant().toUuid()",
@@ -699,32 +713,38 @@ class _BuiltinScalars:
 
 
 BuiltinScalars = _BuiltinScalars()
+
+
+def custom_scalar_ns() -> CppAttribute:
+    return CppAttribute("qtgql").ns_add("customscalars")
+
+
 DateTimeScalarDefinition = CustomScalarDefinition(
-    name="qtgql::customscalars::DateTimeScalar",
+    name=custom_scalar_ns().ns_add("DateTimeScalar"),
     graphql_name="DateTime",
     deserialized_type="QDateTime",
-    to_qt_type="QString",
+    to_qt_type=CppAttribute("QString"),
     include_path="<qtgql/customscalars/customscalars.hpp>",
 )
 DateScalarDefinition = CustomScalarDefinition(
-    name="qtgql::customscalars::DateScalar",
+    name=custom_scalar_ns().ns_add("DateScalar"),
     graphql_name="Date",
     deserialized_type="QDate",
-    to_qt_type="QString",
+    to_qt_type=CppAttribute("QString"),
     include_path="<qtgql/customscalars/customscalars.hpp>",
 )
 TimeScalarDefinition = CustomScalarDefinition(
-    name="qtgql::customscalars::TimeScalar",
+    name=custom_scalar_ns().ns_add("TimeScalar"),
     graphql_name="Time",
     deserialized_type="QTime",
-    to_qt_type="QString",
+    to_qt_type=CppAttribute("QString"),
     include_path="<qtgql/customscalars/customscalars.hpp>",
 )
 DecimalScalarDefinition = CustomScalarDefinition(
-    name="qtgql::customscalars::DecimalScalar",
+    name=custom_scalar_ns().ns_add("DecimalScalar"),
     graphql_name="Decimal",
     deserialized_type="QString",
-    to_qt_type="QString",
+    to_qt_type=CppAttribute("QString"),
     include_path="<qtgql/customscalars/customscalars.hpp>",
 )
 CUSTOM_SCALARS: CustomScalarMap = {

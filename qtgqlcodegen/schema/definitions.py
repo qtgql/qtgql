@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 from attr import Factory, define
 from graphql import OperationType
 
+from qtgqlcodegen.core.cppref import CppAttribute
 from qtgqlcodegen.types import BuiltinScalars
 from qtgqlcodegen.utils import cached_method, require
 
@@ -92,9 +93,9 @@ class QtGqlFieldDefinition(BaseQtGqlFieldDefinition):
         return False
 
     @property
-    def default_value(self) -> str:
+    def default_value(self) -> CppAttribute:
         if self.arguments:
-            return "{}"
+            return CppAttribute("{}")
         return self.type.default_value
 
 
@@ -152,7 +153,7 @@ class SchemaTypeInfo:
         )
 
     def add_objecttype(self, objecttype: QtGqlObjectType) -> None:
-        self.object_types[objecttype.name] = objecttype
+        self.object_types[objecttype.name.attr] = objecttype
 
     @cached_property
     def root_types(self) -> list[gql_def.GraphQLObjectType | None]:

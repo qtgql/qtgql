@@ -27,7 +27,7 @@ struct STRING {
   static auto value() { return QString(""); };
 };
 struct BOOLEAN {
-  static auto value() { return false; };
+  constexpr static auto value() { return false; };
 };
 struct ID {
   static auto value() {
@@ -41,10 +41,18 @@ struct VOID {
 
 }; // namespace DEFAULTS
 template <class T_self, class T, class default_> struct p_Delegates {
-  T value = default_::value();
+  typedef T T_Delegated;
+  T_Delegated value = default_::value();
+  explicit p_Delegates(const T_Delegated &val) : value(val){};
+  static std::shared_ptr<T_self> create(const T &value_) {
+    return std::make_shared<T_self>(value_);
+  };
   bool operator==(const T_self &other) const { return value == other.value; };
   bool operator<=(const T_self &other) const { return value <= other.value; };
   bool operator>=(const T_self &other) const { return value >= other.value; };
+  bool operator==(const T &other) const { return value == other; };
+  bool operator<=(const T &other) const { return value <= other; };
+  bool operator>=(const T &other) const { return value >= other; };
 };
 struct GraphQLType {
   virtual const char *__typename() const {
@@ -53,32 +61,42 @@ struct GraphQLType {
   };
 };
 struct Int : public GraphQLType, p_Delegates<Int, int, DEFAULTS::INT> {
+  using p_Delegates::p_Delegates;
+
   [[nodiscard]] const char *__typename() const override { return "Int"; };
 };
 struct Float : public GraphQLType, p_Delegates<Float, float, DEFAULTS::FLOAT> {
+  using p_Delegates::p_Delegates;
 
   [[nodiscard]] const char *__typename() const override { return "Float"; };
 };
 struct UUID : public GraphQLType, p_Delegates<UUID, QUuid, DEFAULTS::UUID> {
+  using p_Delegates::p_Delegates;
+
   [[nodiscard]] const char *__typename() const override { return "UUID"; };
 };
 struct String : public GraphQLType,
                 p_Delegates<String, QString, DEFAULTS::STRING> {
+  using p_Delegates::p_Delegates;
 
   [[nodiscard]] const char *__typename() const override { return "String"; };
 };
 
 struct Boolean : public GraphQLType,
                  p_Delegates<Boolean, bool, DEFAULTS::BOOLEAN> {
+  using p_Delegates::p_Delegates;
+
   [[nodiscard]] const char *__typename() const override { return "Boolean"; };
 };
 
 struct ID : public GraphQLType, p_Delegates<ID, scalars::Id, DEFAULTS::ID> {
+  using p_Delegates::p_Delegates;
+
   [[nodiscard]] const char *__typename() const override { return "ID"; };
 };
-struct VOID : public GraphQLType,
-              p_Delegates<VOID, scalars::Void, DEFAULTS::VOID> {
-  scalars::Void value = nullptr;
+struct Void : public GraphQLType,
+              p_Delegates<Void, scalars::Void, DEFAULTS::VOID> {
+  using p_Delegates::p_Delegates;
   [[nodiscard]] const char *__typename() const override { return "Void"; };
 };
 

@@ -17,7 +17,7 @@ void 👉 f.signal_name 👈();
 
 public:
 {%for f in type.unique_fields %}
-[[nodiscard]] const 👉 f.type.fget_type 👈 &👉 f.getter_name 👈(
+[[nodiscard]] 👉 f.type.fget_type 👈 👉 f.getter_name 👈(
 {%- if f.arguments -%}const 👉 f.arguments_type 👈 & args {% endif -%}
 ) {%- if f.type.getter_is_constable -%}const{% endif %}{
 {%- if f.arguments -%}

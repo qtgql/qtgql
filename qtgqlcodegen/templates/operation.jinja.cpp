@@ -128,16 +128,16 @@ return 👉f.private_name👈;
     {%- if f.cached_by_args -%}
     👉f.variable_builder_name 👈(m_operation)
     {% endif -%}
-    );
+    )
     {%- endset -%}
     {% if f.type.is_optional -%}
-    auto ret = 👉 value_or_null 👈
+    auto ret = 👉 value_or_null 👈;
     if (ret)
-        return *ret;
+        return ret->value;
     else
         return 👉f.type.default_value_for_proxy 👈;
     {% else -%}
-    return *👉 value_or_null 👈;
+    return 👉 value_or_null 👈->value;
     {% endif -%}
 {%- endif -%}
 };

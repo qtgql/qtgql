@@ -5,7 +5,7 @@ QML_UNCREATABLE("QtGql does not supports instantiation via qml")
 Q_PROPERTY(QString  __typeName READ __typename CONSTANT)
 
 {% for f in t.fields -%}
-Q_PROPERTY(const 👉 f.type.property_type 👈 👉 f.name 👈 READ 👉 f.concrete.getter_name 👈 NOTIFY 👉 f.concrete.signal_name 👈);
+Q_PROPERTY(👉 f.type.property_type 👈 👉 f.name 👈 READ 👉 f.concrete.getter_name 👈 NOTIFY 👉 f.concrete.signal_name 👈);
 {% endfor %}
 signals:
 {%for f in t.fields -%}

@@ -86,7 +86,7 @@ class 👉 type.name 👈;
 
 // ---------- Interfaces ----------
 {% for interface in context.interfaces -%}
-class 👉context.export_macro👈  👉 interface.name 👈 {% for base in interface.bases %} {%if loop.first %}: {% endif %} public 👉 base.name 👈 {% if not loop.last %}, {% endif %}{% endfor %}{
+class 👉context.export_macro👈  👉 interface.name 👈 👉 interface.get_bases_jinja() 👈 {
 Q_OBJECT
 
 👉 concrete_type_fields(interface) 👈
@@ -103,8 +103,8 @@ static auto & ENV_CACHE() {
 // ---------- Object Types ----------
 
 {% for type in context.types %}
-{%- set base_class -%}{% if type. implements_node %}NodeInterfaceABC{% else %}ObjectTypeABC{% endif %}{%- endset -%}
-class 👉context.export_macro👈  👉 type.name 👈 {% for base in type.bases %}{%if loop.first%}: {% endif %} public 👉 base.name 👈 {% if not loop.last %}, {% endif %}{% endfor %}{
+{%- set base_class -%}{% if type. implements_node %}NodeInterfaceABC{% else %}ObjectTypeABC{% endif %}{%- endset -%} // TODO: can that be deleted?
+class 👉context.export_macro👈  👉 type.name 👈 👉 type.get_bases_jinja() 👈{
 Q_OBJECT
 👉 concrete_type_fields(type) 👈
 public:

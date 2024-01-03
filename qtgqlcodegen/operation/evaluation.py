@@ -6,6 +6,7 @@ import graphql
 from graphql import OperationDefinitionNode, OperationType, language as gql_lang
 from graphql.language import visitor
 
+from qtgqlcodegen.core.cppref import CppAttribute
 from qtgqlcodegen.core.graphql_ref import (
     SelectionsSet,
     is_field_node,
@@ -261,7 +262,7 @@ def _unwrap_interface_inline_fragments(
             if field_node.name.value != "__typename":
                 concrete_selections.append(field_node)
 
-    initial[parent_concrete.name] = concrete_selections
+    initial[parent_concrete.name.attr] = concrete_selections
     return initial
 
 
@@ -285,11 +286,11 @@ def _create_objects_for_interface(
             selections_for_obj: list[gql_lang.FieldNode] = []
             # collect selections from parent interfaces.
             for base in concrete_choice.interfaces_raw:
-                if selections_for_base := raw_selections_map.get(base.name, None):
+                if selections_for_base := raw_selections_map.get(base.name.attr, None):
                     selections_for_obj.extend(selections_for_base)
 
             # collect selections from the object itself.
-            if choice_fields := raw_selections_map.get(concrete_choice.name, None):
+            if choice_fields := raw_selections_map.get(concrete_choice.name.attr, None):
                 selections_for_obj.extend(choice_fields)
 
             # This could probably be more optimized though, currently
@@ -331,11 +332,11 @@ def _evaluate_interface(
             field_node=field,
             origin=concrete,
         )
-        for field in raw_selections_map[concrete.name]
+        for field in raw_selections_map[concrete.name.attr]
     }
 
     ret = QtGqlQueriedInterface(
-        name=name,
+        name=CppAttribute(name),
         concrete=concrete,
         choices=choices,
         fields_dict=fields_for_interface,
@@ -353,7 +354,10 @@ def _evaluate_object_type(
     selection_set: SelectionsSet,
     path: str,  # current path in the query tree.
 ) -> QtGqlQueriedObjectType:
-    assert not type_info.narrowed_types_map.get(concrete.name, None), "object already evaluated"
+    assert not type_info.narrowed_types_map.get(
+        concrete.name.attr,
+        None,
+    ), "object already evaluated"
     unwrapped_selections = unwrap_frag_spreads(type_info.available_fragments, selection_set)
     type_info.used_fragments.update(unwrapped_selections.used_fragments)
     selection_set = unwrapped_selections.selection_set
@@ -377,7 +381,7 @@ def _evaluate_object_type(
         return ret
 
     ret = QtGqlQueriedObjectType(
-        name=name,
+        name=CppAttribute(name),
         concrete=concrete,
         fields_dict=fields,
     )
