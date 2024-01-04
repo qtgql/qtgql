@@ -581,7 +581,7 @@ class QtGqlQueriedObjectType(QtGqlQueriedTypeABC, QtGqlTypeABC):
 
     @property
     def property_type(self) -> CppAttribute:
-        return self.type_name().as_const_ptr()
+        return self.type_name().as_ptr()
 
     @cached_property
     def references(self) -> list[QtGqlQueriedField]:
