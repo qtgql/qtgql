@@ -32,7 +32,7 @@ CONST_USER = User(
 
 @strawberry.type
 class Query:
-    @strawberry.field
+    @strawberry.field()
     def user(self) -> User:
         return User()
 

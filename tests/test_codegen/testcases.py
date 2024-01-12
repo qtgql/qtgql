@@ -218,6 +218,11 @@ ScalarsTestCase = QtGqlTestCase(
             uuid
           }
         }
+        query OnlyNameField {
+          constUser {
+            name
+          }
+        }
         """,
     test_name="Scalars",
 )
