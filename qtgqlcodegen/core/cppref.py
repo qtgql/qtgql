@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import copy
+import functools
 from functools import cached_property, lru_cache
-from typing import TYPE_CHECKING, NamedTuple, TypeVar
+from typing import TYPE_CHECKING, Callable, NamedTuple, TypeVar
 
 import attrs
 from attr import define
@@ -12,15 +13,16 @@ if TYPE_CHECKING:
 
 CppAccessor: TypeAlias = 'Literal["::"] | Literal["."] | Literal["->"]'
 
-T_fn = TypeVar("T_fn")
+T_fn = TypeVar("T_fn", bound=Callable)
 
 
 def _copy_self(func: T_fn) -> T_fn:
+    @functools.wraps(func)
     def wrapper(self, *args, **kwargs):
         self = self.copy()
         return func(self, *args, **kwargs)
 
-    return wrapper
+    return wrapper  # type: ignore
 
 
 @define(hash=True, repr=False)
@@ -34,8 +36,8 @@ class CppAttribute:
 
     @define(hash=True)
     class Wrapper:
-        start: tuple[str]
-        end: tuple[str]
+        start: tuple[str, ...]
+        end: tuple[str, ...]
 
     attr: str
     wrapper: CppAttribute.Wrapper = attrs.field(

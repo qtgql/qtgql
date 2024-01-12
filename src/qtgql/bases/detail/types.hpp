@@ -55,7 +55,7 @@ template <class T_self, class T, class default_> struct p_Delegates {
   bool operator>=(const T &other) const { return value >= other; };
 };
 struct GraphQLType {
-  virtual const char *__typename() const {
+  virtual const QString __typename() const {
     throw exceptions::NotImplementedError(
         {"Derived classes must override this method."});
   };
@@ -63,47 +63,47 @@ struct GraphQLType {
 struct Int : public GraphQLType, p_Delegates<Int, int, DEFAULTS::INT> {
   using p_Delegates::p_Delegates;
 
-  [[nodiscard]] const char *__typename() const override { return "Int"; };
+  [[nodiscard]] const QString __typename() const override { return "Int"; };
 };
 struct Float : public GraphQLType, p_Delegates<Float, float, DEFAULTS::FLOAT> {
   using p_Delegates::p_Delegates;
 
-  [[nodiscard]] const char *__typename() const override { return "Float"; };
+  [[nodiscard]] const QString __typename() const override { return "Float"; };
 };
 struct UUID : public GraphQLType, p_Delegates<UUID, QUuid, DEFAULTS::UUID> {
   using p_Delegates::p_Delegates;
 
-  [[nodiscard]] const char *__typename() const override { return "UUID"; };
+  [[nodiscard]] const QString __typename() const override { return "UUID"; };
 };
 struct String : public GraphQLType,
                 p_Delegates<String, QString, DEFAULTS::STRING> {
   using p_Delegates::p_Delegates;
 
-  [[nodiscard]] const char *__typename() const override { return "String"; };
+  [[nodiscard]] const QString __typename() const override { return "String"; };
 };
 
 struct Boolean : public GraphQLType,
                  p_Delegates<Boolean, bool, DEFAULTS::BOOLEAN> {
   using p_Delegates::p_Delegates;
 
-  [[nodiscard]] const char *__typename() const override { return "Boolean"; };
+  [[nodiscard]] const QString __typename() const override { return "Boolean"; };
 };
 
 struct ID : public GraphQLType, p_Delegates<ID, scalars::Id, DEFAULTS::ID> {
   using p_Delegates::p_Delegates;
 
-  [[nodiscard]] const char *__typename() const override { return "ID"; };
+  [[nodiscard]] const QString __typename() const override { return "ID"; };
 };
 struct Void : public GraphQLType,
               p_Delegates<Void, scalars::Void, DEFAULTS::VOID> {
   using p_Delegates::p_Delegates;
-  [[nodiscard]] const char *__typename() const override { return "Void"; };
+  [[nodiscard]] const QString __typename() const override { return "Void"; };
 };
 
 class QTGQL_EXPORT ObjectTypeABC : public QObject, GraphQLType {
   Q_OBJECT
 
-  Q_PROPERTY(const char *__typeName READ __typename CONSTANT)
+  Q_PROPERTY(const QString __typename READ __typename CONSTANT)
 public:
   using QObject::QObject;
 };
@@ -114,7 +114,7 @@ class QTGQL_EXPORT NodeInterfaceABC : public ObjectTypeABC {
 public:
   using ObjectTypeABC::ObjectTypeABC;
 
-  [[nodiscard]] virtual const std::shared_ptr<scalars::Id> &get_id() const = 0;
+  [[nodiscard]] virtual std::shared_ptr<qtgql::bases::ID> get_id() const = 0;
 };
 
 } // namespace qtgql::bases

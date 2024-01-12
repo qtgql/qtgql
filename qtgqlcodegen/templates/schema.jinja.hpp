@@ -125,7 +125,7 @@ QTGQL_STATIC_MAKE_SHARED(👉 type.name 👈)
 👉 type.name 👈()= default;
 
 public:
-inline const char * __typename() const final{
+inline const QString __typename() const final{
     return "👉 type.name 👈";
 };
 };

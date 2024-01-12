@@ -80,7 +80,7 @@ public:
 {% endfor -%}
 
 public:
-[[nodiscard]] const char*  __typename() const final{
+[[nodiscard]] const QString  __typename() const final{
     return m_inst->__typename();
 }
 };

@@ -468,7 +468,7 @@ class QtGqlInterface(QtGqlObjectType):
     def is_node_interface(self) -> bool:
         """As specified by https://graphql.org/learn/global-object-
         identification/#node-interface."""
-        if self.name == "Node":
+        if self.name.attr == "Node":
             id_field_maybe = self.fields[0]
             return id_field_maybe.name == "id" and id_field_maybe.type is BuiltinScalars.ID
         return False
