@@ -95,13 +95,13 @@ jobs:
         run: |
           poetry run conan profile detect
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         if: startsWith(runner.os, 'Linux')
         with:
           path: ~/MyConnandeps
           key: Qt6 # there is no need for something dynamic conan will pick the right one any-ways
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         if: startsWith(runner.os, 'Windows')
         with:
           path: ~\MyConnandeps
